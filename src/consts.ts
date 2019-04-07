@@ -96,11 +96,19 @@ export const CSS = `
   font-size: 16px;
   overflow: auto;
 }
+
+.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {
+    display: none; // Safari and Chrome
+}
 .properties_area {
   width: 30%;
   max-width: 200px;
   border-right: 1px solid #999;
   box-sizing: border-box;
+}
+.properties_scroll_area {
+  display: inline-block;
+  min-width: 100%;
 }
 .keyframes_area {
   flex: 1;

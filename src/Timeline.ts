@@ -20,7 +20,8 @@ let isExportCSS = false;
                 .keyframe_cursor
     .scroll_area
         .properties_area
-            .properties * N
+            .properties_scroll_area
+                .properties * N
         .keyframes_area
             .keyframes_scroll_area
                 .keyframes * N
@@ -38,7 +39,7 @@ export default class Timeline {
     private keyframesAreaEl: HTMLElement;
     private keyframesHeaderAreaEl: HTMLElement;
     private propertiesAreaEl: HTMLElement;
-    scrollAreaEl: HTMLElement;
+    private scrollAreaEl: HTMLElement;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -72,6 +73,7 @@ export default class Timeline {
 
         const scrollAreaEl = createElement(".scroll_area", timelineEl);
         const propertiesAreaEl = createElement(".properties_area", scrollAreaEl);
+        const propertiesScrollAreaEl = createElement(".properties_scroll_area", propertiesAreaEl);
         const keyframesAreaEl = createElement(".keyframes_area", scrollAreaEl);
         const keyframesScrollAreaEl = createElement(".keyframes_scroll_area", keyframesAreaEl);
         const lineAreaEl = createElement(".line_area");
@@ -99,7 +101,7 @@ export default class Timeline {
             const properties = property.split("///");
             const length = properties.length;
             const times = timelineInfo[property];
-            const propertyEl = createElement(".properties", propertiesAreaEl);
+            const propertyEl = createElement(".properties", propertiesScrollAreaEl);
             const keyframesEl = createElement(".keyframes", keyframesScrollAreaEl);
 
             createElement(".arrow.unfold", propertyEl);
@@ -116,7 +118,7 @@ export default class Timeline {
 
             keyframesEl.setAttribute("data-property", property);
 
-            toArray(propertiesAreaEl.querySelectorAll(`[data-property="${properties.slice(0, -1).join("///").replace(/"/g, "\\\"")}"]`))
+            toArray(propertiesScrollAreaEl.querySelectorAll(`[data-property="${properties.slice(0, -1).join("///").replace(/"/g, "\\\"")}"]`))
                 .forEach(el => {
                     el.setAttribute("data-object", "1");
                 });
