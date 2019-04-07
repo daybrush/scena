@@ -1,8 +1,10 @@
 import Scene from "scenejs";
 import { getTimelineInfo, createElement, toValue, getTarget } from "./utils";
 import { drag } from "@daybrush/drag";
-import { CSS } from "./consts";
+import { CSS, PREFIX, FOLD_CLASS } from "./consts";
 import { hasClass, toArray, isArray, addClass, removeClass } from "@daybrush/utils";
+import Axes, { PinchInput } from "@egjs/axes";
+
 let isExportCSS = false;
 
 /*
@@ -36,11 +38,15 @@ export default class Timeline {
     private keyframesAreaEl: HTMLElement;
     private keyframesHeaderAreaEl: HTMLElement;
     private propertiesAreaEl: HTMLElement;
+    scrollAreaEl: HTMLElement;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
         this.scene = scene;
         this.initElement(scene, parentEl);
+    }
+    public getElement() {
+        return this.timelineEl;
     }
     private initElement(scene: Scene, parentEl: HTMLElement) {
         const duration = scene.getDuration();
@@ -82,17 +88,12 @@ export default class Timeline {
             const keytimeEl = createElement(".keytime", keyframesHeadeerContainerEl);
 
             keytimeEl.style.width = `${100 / maxTime}%`;
-            keytimeEl.innerHTML = `
-          <span>${time}s</span>
-          <div class="graduation start"></div>
-          <div class="graduation quarter"></div>
-          <div class="graduation half"></div>
-          <div class="graduation quarter3"></div>
-            `;
-
-            const lineEl = createElement(".time_line", lineAreaEl);
-
-            lineEl.style.left = `${100 / maxTime * i}%`;
+            createElement("span", keytimeEl).innerHTML = `${time}s`;
+            createElement(".graduation.start", keytimeEl);
+            createElement(".graduation.quarter", keytimeEl);
+            createElement(".graduation.half", keytimeEl);
+            createElement(".graduation.quarter3", keytimeEl);
+            createElement(".division_line", lineAreaEl).style.left = `${100 / maxTime * i}%`;
         }
         for (const property in timelineInfo) {
             const properties = property.split("///");
@@ -116,9 +117,9 @@ export default class Timeline {
             keyframesEl.setAttribute("data-property", property);
 
             toArray(propertiesAreaEl.querySelectorAll(`[data-property="${properties.slice(0, -1).join("///").replace(/"/g, "\\\"")}"]`))
-            .forEach(el => {
-                el.setAttribute("data-object", "1");
-            });
+                .forEach(el => {
+                    el.setAttribute("data-object", "1");
+                });
             propertyEl.setAttribute("data-item", properties[0]);
             times.forEach(([time, value], i) => {
                 const keyframeEl = createElement(".keyframe", keyframesContainerEl);
@@ -150,6 +151,7 @@ export default class Timeline {
         this.cursorEl = cursorEl;
         this.cursorHeaderEl = cursorHeaderEl;
         this.keyframesScrollAreaEl = keyframesScrollAreaEl;
+        this.scrollAreaEl = scrollAreaEl;
         this.propertiesAreaEl = propertiesAreaEl;
         this.keyframesHeaderScrollAreaEl = keyframesHeaderScrollAreaEl;
         this.keyframesAreaEl = keyframesAreaEl;
@@ -163,7 +165,7 @@ export default class Timeline {
         parentEl && parentEl.appendChild(timelineEl);
     }
     private syncScroll() {
-        const {keyframesHeaderAreaEl, keyframesAreaEl} = this;
+        const { keyframesHeaderAreaEl, keyframesAreaEl } = this;
         let isScrollKeyframe = false;
 
         keyframesHeaderAreaEl.addEventListener("scroll", () => {
@@ -184,20 +186,45 @@ export default class Timeline {
         });
     }
     private wheelZoom() {
-        const {keyframesHeaderScrollAreaEl, keyframesScrollAreaEl} = this;
+        const { keyframesHeaderScrollAreaEl, keyframesScrollAreaEl } = this;
         const originalWidth = parseFloat(keyframesHeaderScrollAreaEl.style.width);
-        let width = originalWidth;
+        const axes = new Axes({
+            zoom: {
+                range: [100, Infinity],
+            },
+        }, {}, {
+                zoom: originalWidth,
+            });
+        axes.connect("zoom", new PinchInput(keyframesScrollAreaEl, {
+            scale: 0.7,
+            hammerManagerOptions: {
+                touchAction: "auto",
+            },
+        }));
+        axes.on("hold", e => {
+            console.log("hold");
+            if (e.inputEvent) {
+                e.inputEvent.preventDefault();
+            }
+        });
+        axes.on("change", e => {
+            const width = e.pos.zoom;
 
+            keyframesHeaderScrollAreaEl.style.width = `${width}%`;
+            keyframesScrollAreaEl.style.width = `${width}%`;
+
+            if (e.inputEvent) {
+                e.inputEvent.preventDefault();
+            }
+        });
         keyframesHeaderScrollAreaEl.addEventListener("wheel", e => {
             const delta = e.deltaY;
 
-            width = Math.max(width + delta / originalWidth * 5, 100);
-            keyframesHeaderScrollAreaEl.style.width = `${width}%`;
-            keyframesScrollAreaEl.style.width = `${width}%`;
+            axes.setBy({ zoom: delta / originalWidth * 5 });
         });
     }
     private fold() {
-        const {propertiesAreaEl, keyframesScrollAreaEl} = this;
+        const { propertiesAreaEl, keyframesScrollAreaEl } = this;
 
         function getFoldInfos(target, property) {
             const infos = [];
@@ -225,7 +252,7 @@ export default class Timeline {
             return infos;
         }
         propertiesAreaEl.addEventListener("click", e => {
-            const target = getTarget(e.target as Element, el => hasClass(el, "properties"));
+            const target = getTarget(e.target as Element, el => hasClass(el, `${PREFIX}properties`));
 
             if (!target || target.getAttribute("data-object") === "0") {
                 return;
@@ -246,13 +273,13 @@ export default class Timeline {
                 } else {
                     const infoProerpty = info.getAttribute("data-property").replace(/"/g, "\\\"");
                     const keyframeEl =
-                        keyframesScrollAreaEl.querySelector(`.keyframes[data-property="${infoProerpty}"]`);
+                        keyframesScrollAreaEl.querySelector(`.${PREFIX}keyframes[data-property="${infoProerpty}"]`);
                     if (isFold) {
-                        removeClass(keyframeEl, "fold");
-                        removeClass(info, "fold");
+                        removeClass(keyframeEl, FOLD_CLASS);
+                        removeClass(info, FOLD_CLASS);
                     } else {
-                        addClass(keyframeEl, "fold");
-                        addClass(info, "fold");
+                        addClass(keyframeEl, FOLD_CLASS);
+                        addClass(info, FOLD_CLASS);
                     }
                 }
             });
@@ -262,6 +289,8 @@ export default class Timeline {
         const {
             cursorEl,
             cursorHeaderEl,
+            scrollAreaEl,
+            keyframesAreaEl,
             keyframesScrollAreaEl,
             keyframesHeaderScrollAreaEl,
             scene,
@@ -285,24 +314,39 @@ export default class Timeline {
 
             scene.setTime(`${percentage * 100}%`);
         }
+        function click(e, clientX) {
+            const target = getTarget(e.target as Element, el => hasClass(el, `${PREFIX}keyframe`));
+
+            if (target) {
+                scene.setTime(target.getAttribute("data-time"));
+            } else {
+                move(clientX);
+            }
+            e.preventDefault();
+        }
+        drag(keyframesScrollAreaEl, {
+            events: ["touch"],
+            container: window,
+            drag: ({ deltaX, deltaY, inputEvent }) => {
+                keyframesAreaEl.scrollLeft -= deltaX;
+                scrollAreaEl.scrollTop -= deltaY;
+                inputEvent.preventDefault();
+            },
+            dragend: ({ isDrag, clientX, inputEvent }) => {
+                !isDrag && click(inputEvent, clientX);
+            },
+        });
         drag(cursorHeaderEl, {
-            drag: ({clientX}) => {
+            drag: ({ clientX }) => {
                 move(clientX);
             },
-            container: document.body,
+            container: window,
         });
         keyframesHeaderScrollAreaEl.addEventListener("click", e => {
             move(e.clientX);
         });
         keyframesScrollAreaEl.addEventListener("click", e => {
-            const target = getTarget(e.target as Element, el => hasClass(el, "keyframe"));
-
-            if (target) {
-                scene.setTime(target.getAttribute("data-time"));
-            } else {
-                move(e.clientX);
-            }
-            e.preventDefault();
+            click(e, e.clientX);
         });
     }
 }

@@ -8,9 +8,10 @@
   "types": "declaration/Timeline.d.ts",
   "scripts": {
     "start": "rollup -c -w",
-    "build": "rollup -c && npm run declaration",
+    "build": "rollup -c && npm run declaration && print-sizes ./dist ",
     "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
-    "release": "npm run build && release"
+    "release": "npm run build && release",
+    "release:init": "npm run build && release -i"
   },
   "repository": {
     "type": "git",
@@ -23,12 +24,14 @@
   },
   "homepage": "https://github.com/daybrush/scenejs-timeline#readme",
   "dependencies": {
-    "@daybrush/drag": "^0.1.0",
+    "@daybrush/drag": "^0.4.1",
+    "@egjs/axes": "^2.5.10",
     "scenejs": "^1.0.0-rc5"
   },
   "devDependencies": {
-    "@daybrush/builder": "0.0.2",
-    "@daybrush/release": "0.0.6",
+    "@daybrush/builder": "0.0.3",
+    "@daybrush/release": "^0.1.0",
+    "print-sizes": "0.0.4",
     "tslint": "^5.15.0",
     "typescript": "^3.4.2"
   }

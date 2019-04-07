@@ -8,6 +8,7 @@ export default builder([
     external: {
         "@daybrush/utils": "utils",
         "@daybrush/drag": "utils",
+        "@egjs/axes": "eg.Axes",
     },
   },
   {
@@ -18,6 +19,7 @@ export default builder([
     external: {
         "@daybrush/utils": "utils",
         "@daybrush/drag": "utils",
+        "@egjs/axes": "eg.Axes",
     },
   },
   {
@@ -41,6 +43,7 @@ export default builder([
     external: {
         "@daybrush/utils": "utils",
         "@daybrush/drag": "utils",
+        "@egjs/axes": "eg.Axes",
     },
   },
 

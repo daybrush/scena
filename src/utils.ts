@@ -1,11 +1,14 @@
+import { PREFIX } from "./consts";
+import Scene, { SceneItem } from "scenejs";
+
 export function createElement(selector: string, parentEl?: Element) {
-    const classNames = selector.match(/(?<=\.)[^.#\s]+/g) || [];
+    const classNames = selector.match(/\.([^.#\s])+/g) || [];
     const tag = (selector.match(/^[^.#\s]+/g) || [])[0] || "div";
-    const id = (selector.match(/(?<=#)[^.#\s]+/g) || [])[0] || "";
+    const id = (selector.match(/#[^.#\s]+/g) || [])[0] || "";
     const el = document.createElement(tag);
 
-    id && (el.id = id);
-    el.className = classNames.join(" ");
+    id && (el.id = id.replace(/^#/g, ""));
+    el.className = classNames.map(name => `${PREFIX}${name.replace(/^\./g, "")}`).join(" ");
 
     parentEl && parentEl.appendChild(el);
     return el;
@@ -27,9 +30,10 @@ export function toValue(value: any) {
     }
     return value;
 }
-export function getTimelineInfo(scene) {
+export function getTimelineInfo(scene: Scene) {
   const timelineInfo = {};
-  scene.forEach(item => {
+  scene.forEach((item: SceneItem) => {
+    const delay = item.getDelay();
     const times = item.times;
 
     times.forEach(time => {
@@ -47,7 +51,7 @@ export function getTimelineInfo(scene) {
             }
             const info = timelineInfo[name];
 
-            info.push([time, lastObj]);
+            info.push([delay + time, lastObj]);
         }
 
         if (typeof lastObj === "object") {

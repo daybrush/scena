@@ -1,36 +1,39 @@
+export const PREFIX = `scenejs_timeline_`;
+
+export const FOLD_CLASS = `${PREFIX}fold`;
 export const CSS = `
 .timeline {
   position: relative;
   font-size: 0;
   background: #000;
 }
-.timeline .sticky_area, .timeline .scroll_area {
+.sticky_area, .scroll_area {
    width: 100%;
    position: relative;
   display: flex;
   -webkit-align-items: flex-start;
   align-items: flex-start;
 }
-.timeline .sticky_area {
+.sticky_area {
   position: relative;
   z-index: 10;
   top: 0;
   height: 30px;
 }
-.timeline .sticky_area .keyframes {
+.sticky_area .keyframes {
   padding: 0px;
 }
-.timeline .sticky_area .properties_area,
-.timeline .sticky_area .properties,
-.timeline .sticky_area .keyframes_area,
-.timeline .sticky_area .keyframes_scroll_area,
-.timeline .sticky_area .keyframes {
+.sticky_area .properties_area,
+.sticky_area .properties,
+.sticky_area .keyframes_area,
+.sticky_area .keyframes_scroll_area,
+.sticky_area .keyframes {
   height: 100%;
 }
-.timeline .sticky_area .keyframes_area::-webkit-scrollbar {
+.sticky_area .keyframes_area::-webkit-scrollbar {
     display: none; // Safari and Chrome
 }
-.timeline .sticky_area .keyframe_cursor {
+.sticky_area .keyframe_cursor {
     position: absolute;
     border-top: 10px solid #f55;
     border-left: 5px solid transparent;
@@ -63,7 +66,7 @@ export const CSS = `
   bottom: 0;
   width: 1px;
   height: 10px;
-  background: #777;
+  background: #999;
   transform: translate(-50%);
 }
 .keytime .graduation.half {
@@ -78,7 +81,7 @@ export const CSS = `
   left: 75%;
   height: 5px;
 }
-.timeline .scroll_area {
+.scroll_area {
   position: relative;
   width: 100%;
   height: calc(100% - 30px);
@@ -197,11 +200,11 @@ export const CSS = `
   left: 15px;
   transform: translate(-50%);
 }
-.time_line {
+.division_line {
   position: absolute;
   background: #333;
   width: 1px;
   height: 100%;
   transform: translate(-50%);
 }
-`;
+`.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
