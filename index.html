@@ -124,11 +124,16 @@ const timeline = new Timeline(scene, document.body);
 
 </script>
 <style>
-.scenejs_timeline_timeline {
-	position: fixed;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 300px;
+
+body .scenejs_timeline_timeline {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  left: 0;
+  max-height: 200px;
+  max-width: 600px;
+  width: 100%;
+  overflow: auto;
 }
 </style>

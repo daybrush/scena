@@ -1,6 +1,6 @@
 {
   "name": "@scenejs/timeline",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "./dist/timeline.js",
   "module": "./dist/timeline.esm.js",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@daybrush/builder": "0.0.3",
-    "@daybrush/release": "^0.1.0",
+    "@daybrush/release": "^0.1.1",
     "print-sizes": "0.0.4",
     "tslint": "^5.15.0",
     "typescript": "^3.4.2"

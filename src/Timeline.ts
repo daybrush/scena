@@ -324,29 +324,28 @@ export default class Timeline {
             }
             e.preventDefault();
         }
-        drag(keyframesScrollAreaEl, {
-            events: ["touch"],
-            container: window,
-            drag: ({ deltaX, deltaY, inputEvent }) => {
-                keyframesAreaEl.scrollLeft -= deltaX;
-                scrollAreaEl.scrollTop -= deltaY;
-                inputEvent.preventDefault();
-            },
-            dragend: ({ isDrag, clientX, inputEvent }) => {
-                !isDrag && click(inputEvent, clientX);
-            },
-        });
         drag(cursorHeaderEl, {
+            dragstart: ({inputEvent}) => {
+                inputEvent.stopPropagation();
+            },
             drag: ({ clientX }) => {
                 move(clientX);
             },
             container: window,
         });
-        keyframesHeaderScrollAreaEl.addEventListener("click", e => {
-            move(e.clientX);
+        [keyframesScrollAreaEl, keyframesHeaderScrollAreaEl].forEach(el => {
+            drag(el, {
+                container: window,
+                drag: ({ deltaX, deltaY, inputEvent }) => {
+                    keyframesAreaEl.scrollLeft -= deltaX;
+                    scrollAreaEl.scrollTop -= deltaY;
+                    inputEvent.preventDefault();
+                },
+                dragend: ({ isDrag, clientX, inputEvent }) => {
+                    !isDrag && click(inputEvent, clientX);
+                },
+            });
         });
-        keyframesScrollAreaEl.addEventListener("click", e => {
-            click(e, e.clientX);
-        });
+
     }
 }

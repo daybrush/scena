@@ -6,6 +6,8 @@ export const CSS = `
   position: relative;
   font-size: 0;
   background: #000;
+  display: flex;
+  flex-direction: column;
 }
 .sticky_area, .scroll_area {
    width: 100%;
@@ -18,6 +20,7 @@ export const CSS = `
   position: relative;
   z-index: 10;
   top: 0;
+  min-height: 30px;
   height: 30px;
 }
 .sticky_area .keyframes {
