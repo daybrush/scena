@@ -170,14 +170,15 @@ export const CSS = `
 .keyframe {
   position: absolute;
   font-size: 0px;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   top: 0px;
   bottom: 0px;
   margin: auto;
   background: #fff;
   border: 2px solid #333;
   border-radius: 2px;
+  box-sizing: border-box;
   transform: translate(-50%) rotate(45deg);
   z-index: 1;
   cursor: pointer;
