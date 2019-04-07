@@ -5038,6 +5038,7 @@ version: 0.0.3
         axes.setBy({
           zoom: delta / originalWidth * 5
         });
+        !e.deltaX && e.preventDefault();
       });
     };
 

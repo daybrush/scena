@@ -320,6 +320,7 @@ function () {
       axes.setBy({
         zoom: delta / originalWidth * 5
       });
+      !e.deltaX && e.preventDefault();
     });
   };
 
