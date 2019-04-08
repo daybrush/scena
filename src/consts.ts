@@ -1,6 +1,4 @@
 export const PREFIX = `scenejs_timeline_`;
-
-export const FOLD_CLASS = `${PREFIX}fold`;
 export const CSS = `
 .timeline {
   position: relative;
@@ -9,34 +7,36 @@ export const CSS = `
   display: flex;
   flex-direction: column;
 }
-.sticky_area, .scroll_area {
+.header_area, .scroll_area {
    width: 100%;
    position: relative;
   display: flex;
   -webkit-align-items: flex-start;
   align-items: flex-start;
 }
-.sticky_area {
+.header_area {
   position: relative;
   z-index: 10;
   top: 0;
-  min-height: 30px;
   height: 30px;
+  min-height: 30px;
 }
-.sticky_area .keyframes {
+.header_area .keyframes {
   padding: 0px;
 }
-.sticky_area .properties_area,
-.sticky_area .properties,
-.sticky_area .keyframes_area,
-.sticky_area .keyframes_scroll_area,
-.sticky_area .keyframes {
+.header_area .properties_area,
+.header_area .keyframes_area,
+.header_area .values_area,
+.header_area .keyframes_scroll_area {
+    height: 100%;
+}
+.header_area .property, .header_area .value, .header_area .keyframes {
   height: 100%;
 }
-.sticky_area .keyframes_area::-webkit-scrollbar {
+.header_area .keyframes_area::-webkit-scrollbar {
     display: none; // Safari and Chrome
 }
-.sticky_area .keyframe_cursor {
+.header_area .keyframe_cursor {
     position: absolute;
     border-top: 10px solid #f55;
     border-left: 5px solid transparent;
@@ -69,7 +69,7 @@ export const CSS = `
   bottom: 0;
   width: 1px;
   height: 10px;
-  background: #999;
+  background: #777;
   transform: translate(-50%);
 }
 .keytime .graduation.half {
@@ -90,7 +90,7 @@ export const CSS = `
   height: calc(100% - 30px);
   overflow: auto;
 }
-.properties_area, .keyframes_area {
+.properties_area, .keyframes_area, .values_area {
   display: inline-block;
   position: relative;
   font-size: 16px;
@@ -103,8 +103,33 @@ export const CSS = `
 .properties_area {
   width: 30%;
   max-width: 200px;
-  border-right: 1px solid #999;
   box-sizing: border-box;
+}
+.values_area {
+    width: 50px;
+    min-width: 50px;
+    display: inline-block;
+    border-right: 1px solid #999;
+    box-sizing: border-box;
+}
+.value input {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: none;
+    color: #ff5;
+    font-weight: bold;
+    background: none;
+    border: 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+.value[data-object="1"] input {
+    display: none;
 }
 .properties_scroll_area {
   display: inline-block;
@@ -117,7 +142,7 @@ export const CSS = `
   position: relative;
   min-width: 300px;
 }
-.keyframes, .properties {
+.keyframes, .property, .value {
   position: relative;
   height: 25px;
   border-bottom: 1px solid #777;
@@ -126,10 +151,10 @@ export const CSS = `
   background: rgba(73, 73, 73, 0.7);
   z-index: 1;
 }
-.properties:nth-child(2n), .keyframes:nth-child(2n) {
+.property:nth-child(2n), .keyframes:nth-child(2n), .value:nth-child(2n) {
   background: rgba(90, 90, 90, 0.7);
 }
-.properties {
+.property {
   line-height: 25px;
   padding-left: 10px;
   box-sizing: border-box;
@@ -137,30 +162,33 @@ export const CSS = `
   font-weight: bold;
   color: #eee;
 }
-
-.properties .arrow {
+.property.time_area {
+    color: #ff5;
+    line-height: 30px;
+}
+.property .arrow {
     position: relative;
     display: inline-block;
     margin-right: 5px;
     width: 0;
     vertical-align: middle;
 }
-.properties .arrow {
+.property .arrow {
     border-top: 6px solid #eee;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
 }
-.properties[data-fold="1"] .arrow {
+.property[data-fold="1"] .arrow {
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     border-right: 0;
     border-left: 6px solid #eee;
     margin-left: 2px;
 }
-.properties[data-object="0"] .arrow {
+.property[data-object="0"] .arrow {
     display: none;
 }
-.properties.fold, .keyframes.fold {
+.property.fold, .keyframes.fold, .value.fold {
     display: none;
 }
 .keyframes {

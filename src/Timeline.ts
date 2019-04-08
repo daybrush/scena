@@ -1,45 +1,16 @@
 import Scene from "scenejs";
-import { getTimelineInfo, createElement, toValue, getTarget } from "./utils";
+import { getTimelineInfo, toValue, getTarget , hasClass, removeClass, addClass, makeStructure, flatObject} from "./utils";
 import { drag } from "@daybrush/drag";
-import { CSS, PREFIX, FOLD_CLASS } from "./consts";
-import { hasClass, toArray, isArray, addClass, removeClass } from "@daybrush/utils";
+import { CSS, PREFIX } from "./consts";
+import { isObject, isArray, IObject } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
+import { ElementStructure, Ids } from "./types";
 
 let isExportCSS = false;
 
-/*
-.timeline
-    .stick_area
-        .properties_area
-            .properties
-        .keyframes_area
-            .keyframes_scroll_area
-                .keyframes
-                    .keyframes_container
-                        .keytime * N
-                .keyframe_cursor
-    .scroll_area
-        .properties_area
-            .properties_scroll_area
-                .properties * N
-        .keyframes_area
-            .keyframes_scroll_area
-                .keyframes * N
-                    .keyframes_container
-                        .keyframe * N
-
-*/
 export default class Timeline {
     private scene: Scene;
-    private timelineEl: HTMLElement;
-    private cursorHeaderEl: HTMLElement;
-    private cursorEl: HTMLElement;
-    private keyframesScrollAreaEl: HTMLElement;
-    private keyframesHeaderScrollAreaEl: HTMLElement;
-    private keyframesAreaEl: HTMLElement;
-    private keyframesHeaderAreaEl: HTMLElement;
-    private propertiesAreaEl: HTMLElement;
-    private scrollAreaEl: HTMLElement;
+    private ids: Ids;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -47,149 +18,277 @@ export default class Timeline {
         this.initElement(scene, parentEl);
     }
     public getElement() {
-        return this.timelineEl;
+        return this.ids.timeline;
     }
     private initElement(scene: Scene, parentEl: HTMLElement) {
         const duration = scene.getDuration();
         const timelineInfo = getTimelineInfo(scene);
-        const timelineEl = createElement(".timeline");
-        if (!isExportCSS) {
-            const timelineStyleEl = createElement("style.timeline_style", timelineEl);
-
-            timelineStyleEl.innerHTML = CSS;
-            isExportCSS = true;
-        }
-        const stickyAreaEl = createElement(".sticky_area", timelineEl);
-        const propertiesHeaderAreaEl = createElement(".properties_area", stickyAreaEl);
-        const keyframesHeaderAreaEl = createElement(".keyframes_area", stickyAreaEl);
-        const propertyHeaderEl = createElement(".properties", propertiesHeaderAreaEl);
-        const keyframesHeaderScrollAreaEl = createElement(".keyframes_scroll_area", keyframesHeaderAreaEl);
-        const keyframesHeaderEl = createElement(".keyframes", keyframesHeaderScrollAreaEl);
-        const keyframesHeadeerContainerEl = createElement(".keyframes_container", keyframesHeaderEl);
-        const cursorHeaderEl = createElement(".keyframe_cursor", keyframesHeaderScrollAreaEl);
-        const cursorEl = createElement(".keyframe_cursor");
-
-        propertyHeaderEl.innerHTML = "Item Name";
-
-        const scrollAreaEl = createElement(".scroll_area", timelineEl);
-        const propertiesAreaEl = createElement(".properties_area", scrollAreaEl);
-        const propertiesScrollAreaEl = createElement(".properties_scroll_area", propertiesAreaEl);
-        const keyframesAreaEl = createElement(".keyframes_area", scrollAreaEl);
-        const keyframesScrollAreaEl = createElement(".keyframes_scroll_area", keyframesAreaEl);
-        const lineAreaEl = createElement(".line_area");
         const maxDuration = Math.ceil(duration);
         const maxTime = maxDuration;
-
-        keyframesHeaderScrollAreaEl.style.minWidth = `${50 * maxTime}px`;
-        keyframesScrollAreaEl.style.minWidth = `${50 * maxTime}px`;
-        keyframesHeaderScrollAreaEl.style.width = `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`;
-        keyframesScrollAreaEl.style.width = `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`;
-
+        const keytimes: ElementStructure[] = [];
+        const properties: ElementStructure[] = [];
+        const values: ElementStructure[] = [];
+        const lines: ElementStructure[] = [];
+        const keyframesList: ElementStructure[] = [];
+        let timelineCSS: ElementStructure;
+        if (!isExportCSS) {
+            timelineCSS = {
+                selector: "style.style",
+                html: CSS,
+            };
+            isExportCSS = true;
+        }
         for (let i = 0; i <= maxTime; ++i) {
             const time = i;
-            const keytimeEl = createElement(".keytime", keyframesHeadeerContainerEl);
+            keytimes.push({
+                selector: ".keytime",
+                style: {
+                    width: `${100 / maxTime}%`,
+                },
+                children: [
+                    {
+                        selector: "span",
+                        html: `${time}s`,
+                    },
+                    ".graduation.start",
+                    ".graduation.quarter",
+                    ".graduation.half",
+                    ".graduation.quarter3",
+                ],
+            });
 
-            keytimeEl.style.width = `${100 / maxTime}%`;
-            createElement("span", keytimeEl).innerHTML = `${time}s`;
-            createElement(".graduation.start", keytimeEl);
-            createElement(".graduation.quarter", keytimeEl);
-            createElement(".graduation.half", keytimeEl);
-            createElement(".graduation.quarter3", keytimeEl);
-            createElement(".division_line", lineAreaEl).style.left = `${100 / maxTime * i}%`;
+            lines.push({
+                selector: ".division_line",
+                style: {
+                    left: `${100 / maxTime * i}%`,
+                },
+            });
         }
         for (const property in timelineInfo) {
-            const properties = property.split("///");
-            const length = properties.length;
+            const propertyNames = property.split("///");
+            const length = propertyNames.length;
             const times = timelineInfo[property];
-            const propertyEl = createElement(".properties", propertiesScrollAreaEl);
-            const keyframesEl = createElement(".keyframes", keyframesScrollAreaEl);
+            const id = propertyNames[length - 1];
 
-            createElement(".arrow.unfold", propertyEl);
-            const spanEl = createElement("span", propertyEl);
-            const keyframesContainerEl = createElement(".keyframes_container", keyframesEl);
-            const id = properties[length - 1];
-
-            spanEl.innerHTML = id;
-            propertyEl.style.paddingLeft = `${10 + (length - 1) * 20}px`;
-            propertyEl.setAttribute("data-id", id);
-            propertyEl.setAttribute("data-parent", properties[length - 2] || "");
-            propertyEl.setAttribute("data-property", property);
-            propertyEl.setAttribute("data-object", "0");
-
-            keyframesEl.setAttribute("data-property", property);
-
-            toArray(propertiesScrollAreaEl.querySelectorAll(`[data-property="${properties.slice(0, -1).join("///").replace(/"/g, "\\\"")}"]`))
-                .forEach(el => {
-                    el.setAttribute("data-object", "1");
-                });
-            propertyEl.setAttribute("data-item", properties[0]);
-            times.forEach(([time, value], i) => {
-                const keyframeEl = createElement(".keyframe", keyframesContainerEl);
+            properties.push({
+                id: "properties[]",
+                selector: ".property",
+                dataset: {
+                    id,
+                    property,
+                    parent: propertyNames[length - 2] || "",
+                    object: "0",
+                    item: propertyNames[0],
+                },
+                style: {
+                    paddingLeft: `${10 + (length - 1) * 20}px`,
+                },
+                children: [
+                    ".arrow",
+                    {
+                        selector: "span",
+                        html: id,
+                    },
+                ],
+            });
+            const isHasObject = times[0] && isObject(times[0][1]);
+            values.push({
+                id: "values[]",
+                selector: ".value",
+                dataset: {
+                    property,
+                    object: isHasObject ? "1" : "0",
+                },
+                children: {
+                    id: "inputs[]",
+                    selector: "input",
+                    attr: {
+                        value: times[0] ? times[0][1] : "",
+                    },
+                },
+            });
+            const parentProperty = propertyNames.slice(0, -1).join("///");
+            properties.forEach(({dataset}) => {
+                if (dataset.property === parentProperty) {
+                    dataset.object = "1";
+                }
+            });
+            const keyframeLines: ElementStructure[] = [];
+            const keyframes = times.map(([time, value], i) => {
                 const valueText = toValue(value);
-
-                keyframeEl.setAttribute("data-time", time);
-                keyframeEl.setAttribute("data-value", valueText);
-                keyframeEl.style.left = `${time / maxTime * 100}%`;
-                keyframeEl.innerHTML = `${time} ${valueText}`;
 
                 if (times[i + 1]) {
                     const [nextTime, nextValue] = times[i + 1];
                     const nextValueText = toValue(nextValue);
 
                     if (valueText === nextValueText) {
-                        const keyframeLineEl = createElement(".keyframe_line", keyframesContainerEl);
-
-                        keyframeLineEl.style.left = `${time / maxTime * 100}%`;
-                        keyframeLineEl.style.width = `${(nextTime - time) / maxTime * 100}%`;
+                        keyframeLines.push({
+                            selector: ".keyframe_line",
+                            style: {
+                                left: `${time / maxTime * 100}%`,
+                                width: `${(nextTime - time) / maxTime * 100}%`,
+                            },
+                        });
                     }
                 }
+
+                return {
+                    selector: ".keyframe",
+                    dataset: {
+                        time,
+                        value: valueText,
+                    },
+                    style: {
+                        left: `${time / maxTime * 100}%`,
+                    },
+                    html: `${time} ${valueText}`,
+                };
+            });
+            keyframesList.push({
+                id: "keyframesList[]",
+                selector: ".keyframes",
+                dataset: {
+                    property,
+                },
+                children: {
+                    selector: ".keyframes_container",
+                    children: [
+                        ...keyframes,
+                        ...keyframeLines,
+                    ],
+                },
             });
         }
+        const structure: ElementStructure = {
+            selector: ".timeline",
+            id: "timeline",
+            children: [
+                timelineCSS,
+                {
+                    selector: ".header_area",
+                    children: [
+                        {
+                            id: "propertiesAreas[]",
+                            selector: ".properties_area",
+                            children: [
+                                {
+                                    id: "timeArea",
+                                    selector: ".property.time_area",
+                                    html: "0s",
+                                },
+                            ],
+                        },
+                        {
+                            selector: ".values_area",
+                            children: ".value",
+                        },
+                        {
+                            id: "keyframesAreas[]",
+                            selector: ".keyframes_area",
+                            children: {
+                                style: {
+                                    minWidth: `${50 * maxTime}px`,
+                                    width: `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`,
+                                },
+                                id: "keyframesScrollAreas[]",
+                                selector: ".keyframes_scroll_area",
+                                children: {
+                                    selector: ".keyframes",
+                                    children: [
+                                        {
+                                            selector: ".keyframes_container",
+                                            children: keytimes,
+                                        },
+                                        {
+                                            selector: ".keyframe_cursor",
+                                            id: "cursors[]",
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    id: "scrollArea",
+                    selector: ".scroll_area",
+                    children: [
+                        {
+                            id: "propertiesAreas[]",
+                            selector: ".properties_area",
+                            children: [
+                                {
+                                    selector: ".properties_scroll_area",
+                                    children: properties,
+                                },
+                            ],
+                        },
+                        {
+                            id: "valuesArea",
+                            selector: ".values_area",
+                            children: values,
+                        },
+                        {
+                            id: "keyframesAreas[]",
+                            selector: ".keyframes_area",
+                            children: {
+                                style: {
+                                    minWidth: `${50 * maxTime}px`,
+                                    width: `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`,
+                                },
+                                id: "keyframesScrollAreas[]",
+                                selector: ".keyframes_scroll_area",
+                                children: [
+                                    ...keyframesList,
+                                    {
+                                        selector: ".keyframe_cursor",
+                                        id: "cursors[]",
+                                    },
+                                    {
+                                        selector: ".line_area",
+                                        children: lines,
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+            ],
+        };
 
-        keyframesScrollAreaEl.appendChild(lineAreaEl);
-        keyframesScrollAreaEl.appendChild(cursorEl);
-
-        this.timelineEl = timelineEl;
-        this.cursorEl = cursorEl;
-        this.cursorHeaderEl = cursorHeaderEl;
-        this.keyframesScrollAreaEl = keyframesScrollAreaEl;
-        this.scrollAreaEl = scrollAreaEl;
-        this.propertiesAreaEl = propertiesAreaEl;
-        this.keyframesHeaderScrollAreaEl = keyframesHeaderScrollAreaEl;
-        this.keyframesAreaEl = keyframesAreaEl;
-        this.keyframesHeaderAreaEl = keyframesHeaderAreaEl;
-
+        this.ids = makeStructure(structure, parentEl);
         this.syncScroll();
         this.wheelZoom();
         this.drag();
         this.fold();
-
-        parentEl && parentEl.appendChild(timelineEl);
     }
     private syncScroll() {
-        const { keyframesHeaderAreaEl, keyframesAreaEl } = this;
+        const {
+            keyframesAreas,
+        } = this.ids;
         let isScrollKeyframe = false;
 
-        keyframesHeaderAreaEl.addEventListener("scroll", () => {
+        keyframesAreas[0].addEventListener("scroll", () => {
             if (isScrollKeyframe) {
                 isScrollKeyframe = false;
             } else {
                 isScrollKeyframe = true;
-                keyframesAreaEl.scrollLeft = keyframesHeaderAreaEl.scrollLeft;
+                keyframesAreas[1].scrollLeft = keyframesAreas[0].scrollLeft;
             }
         });
-        keyframesAreaEl.addEventListener("scroll", () => {
+        keyframesAreas[1].addEventListener("scroll", () => {
             if (isScrollKeyframe) {
                 isScrollKeyframe = false;
             } else {
                 isScrollKeyframe = true;
-                keyframesHeaderAreaEl.scrollLeft = keyframesAreaEl.scrollLeft;
+                keyframesAreas[0].scrollLeft = keyframesAreas[1].scrollLeft;
             }
         });
     }
     private wheelZoom() {
-        const { keyframesHeaderScrollAreaEl, keyframesScrollAreaEl } = this;
-        const originalWidth = parseFloat(keyframesHeaderScrollAreaEl.style.width);
+        const { keyframesScrollAreas } = this.ids;
+        const originalWidth = parseFloat(keyframesScrollAreas[0].style.width);
+
         const axes = new Axes({
             zoom: {
                 range: [100, Infinity],
@@ -197,7 +296,7 @@ export default class Timeline {
         }, {}, {
                 zoom: originalWidth,
             });
-        axes.connect("zoom", new PinchInput(keyframesScrollAreaEl, {
+        axes.connect("zoom", new PinchInput(keyframesScrollAreas[1], {
             scale: 0.7,
             hammerManagerOptions: {
                 touchAction: "auto",
@@ -212,121 +311,141 @@ export default class Timeline {
         axes.on("change", e => {
             const width = e.pos.zoom;
 
-            keyframesHeaderScrollAreaEl.style.width = `${width}%`;
-            keyframesScrollAreaEl.style.width = `${width}%`;
+            keyframesScrollAreas.forEach(el => {
+                el.style.width = `${width}%`;
+            });
 
             if (e.inputEvent) {
                 e.inputEvent.preventDefault();
             }
         });
-        keyframesHeaderScrollAreaEl.addEventListener("wheel", e => {
+        keyframesScrollAreas[0].addEventListener("wheel", e => {
             const delta = e.deltaY;
 
             axes.setBy({ zoom: delta / originalWidth * 5 });
+            !e.deltaX && e.preventDefault();
         });
     }
     private fold() {
-        const { propertiesAreaEl, keyframesScrollAreaEl } = this;
+        const {
+            keyframesList,
+            properties,
+            values,
+            propertiesAreas,
+        } = this.ids;
 
-        function getFoldInfos(target, property) {
-            const infos = [];
-            let nextElementSibling = target.nextElementSibling;
-            while (nextElementSibling) {
-                const nextProperty = nextElementSibling.getAttribute("data-property");
-
-                if (nextProperty.indexOf(property) !== 0) {
-                    break;
-                }
-                infos.push(nextElementSibling);
-                if (nextElementSibling.getAttribute("data-object") === "1") {
-                    const nextInfos = getFoldInfos(nextElementSibling, nextProperty);
-
-                    infos.push(nextInfos);
-
-                    let nextInfo = nextInfos;
-                    while (isArray(nextInfo)) {
-                        nextInfo = nextInfos[nextInfos.length - 1];
-                    }
-                    nextElementSibling = nextInfo;
-                }
-                nextElementSibling = nextElementSibling.nextElementSibling;
-            }
-            return infos;
-        }
-        propertiesAreaEl.addEventListener("click", e => {
-            const target = getTarget(e.target as Element, el => hasClass(el, `${PREFIX}properties`));
+        propertiesAreas[1].addEventListener("click", e => {
+            const target = getTarget(e.target as HTMLElement, el => hasClass(el, "property"));
 
             if (!target || target.getAttribute("data-object") === "0") {
                 return;
             }
+
+
+            const length = properties.length;
+            let index = properties.indexOf(target);
+
+            if (index === -1) {
+                return;
+            }
+
             const isFold = target.getAttribute("data-fold") === "1";
-            const property = target.getAttribute("data-property");
-            const infos = getFoldInfos(target, property);
 
-            target.setAttribute("data-fold", isFold ? "" : "1");
-            infos.forEach(function forEach(info, i, arr) {
-                if (isArray(info)) {
-                    const prevInfo = arr[i - 1];
-                    const isPrevFold = prevInfo.getAttribute("data-fold") === "1";
+            function fold(isPrevFold) {
+                const nextTarget = properties[index];
+                const nextProperty = nextTarget.getAttribute("data-property");
+                const isNextFold = nextTarget.getAttribute("data-fold") === "1";
+                const isNextObject = nextTarget.getAttribute("data-object") === "1";
 
-                    if (!isFold || (isFold && !isPrevFold)) {
-                        info.forEach(forEach);
-                    }
-                } else {
-                    const infoProerpty = info.getAttribute("data-property").replace(/"/g, "\\\"");
-                    const keyframeEl =
-                        keyframesScrollAreaEl.querySelector(`.${PREFIX}keyframes[data-property="${infoProerpty}"]`);
+                if (target !== nextTarget) {
                     if (isFold) {
-                        removeClass(keyframeEl, FOLD_CLASS);
-                        removeClass(info, FOLD_CLASS);
+                        if (!isPrevFold)  {
+                            removeClass(keyframesList[index], "fold");
+                            removeClass(values[index], "fold");
+                            removeClass(nextTarget, "fold");
+                        }
                     } else {
-                        addClass(keyframeEl, FOLD_CLASS);
-                        addClass(info, FOLD_CLASS);
+                        addClass(keyframesList[index], "fold");
+                        addClass(values[index], "fold");
+                        addClass(nextTarget, "fold");
                     }
                 }
-            });
+                if (!isNextObject) {
+                    return;
+                }
+
+                for (++index; index < length; ++index) {
+                    const el = properties[index];
+
+                    if (
+                        // itemProperties
+                        el.getAttribute("data-property").indexOf(nextProperty) > -1
+                    ) {
+                        // isChild
+                        fold(!isPrevFold && isNextFold);
+                    } else {
+                        --index;
+                        // not child
+                        break;
+                    }
+                }
+            }
+
+            fold(isFold);
+            target.setAttribute("data-fold", isFold ? "0" : "1");
         });
+    }
+    private setInputs(obj: IObject<any>) {
+        const valuesArea = this.ids.valuesArea;
+        for (const name in obj) {
+            valuesArea.querySelector<HTMLInputElement>(`[data-property="${name}"] input`).value = obj[name];
+        }
     }
     private drag() {
         const {
-            cursorEl,
-            cursorHeaderEl,
-            scrollAreaEl,
-            keyframesAreaEl,
-            keyframesScrollAreaEl,
-            keyframesHeaderScrollAreaEl,
-            scene,
-        } = this;
+            scrollArea,
+            timeArea,
+            cursors,
+            keyframesAreas,
+            keyframesScrollAreas,
+        } = this.ids;
+        const scene = this.scene;
 
         scene.on("animate", e => {
             const time = e.time;
             const maxDuration = Math.ceil(scene.getDuration());
             const px = 15 - 30 * time / maxDuration;
             const percent = 100 * time / maxDuration;
+            const left = `calc(${percent}% + ${px}px)`;
 
-            cursorEl.style.left = `calc(${percent}% + ${px}px)`;
-            cursorHeaderEl.style.left = `calc(${percent}% + ${px}px)`;
+            this.setInputs(flatObject(e.frames));
+            timeArea.innerHTML = `${time}s`;
+            cursors.forEach(cursor => {
+                cursor.style.left = left;
+            });
         });
         function move(clientX: number) {
-            const rect = keyframesScrollAreaEl.getBoundingClientRect();
+            const rect = keyframesScrollAreas[1].getBoundingClientRect();
             const scrollAreaWidth = rect.width - 30;
             const scrollAreaX = rect.left + 15;
             const x = Math.min(scrollAreaWidth, Math.max(clientX - scrollAreaX, 0));
             const percentage = x / scrollAreaWidth;
+            let time = scene.getDuration() * percentage;
 
-            scene.setTime(`${percentage * 100}%`);
+            time = Math.ceil(time * 20) / 20;
+            scene.setTime(time);
         }
         function click(e, clientX) {
-            const target = getTarget(e.target as Element, el => hasClass(el, `${PREFIX}keyframe`));
+            const target = getTarget(e.target as HTMLElement, el => hasClass(el, "keyframe"));
 
             if (target) {
                 scene.setTime(target.getAttribute("data-time"));
-            } else {
+            } else if (!hasClass(e.target as Element, "keyframe_cursor")) {
                 move(clientX);
             }
             e.preventDefault();
         }
-        drag(cursorHeaderEl, {
+        drag(cursors[0], {
             dragstart: ({inputEvent}) => {
                 inputEvent.stopPropagation();
             },
@@ -335,12 +454,12 @@ export default class Timeline {
             },
             container: window,
         });
-        [keyframesScrollAreaEl, keyframesHeaderScrollAreaEl].forEach(el => {
+        keyframesScrollAreas.forEach(el => {
             drag(el, {
                 container: window,
                 drag: ({ deltaX, deltaY, inputEvent }) => {
-                    keyframesAreaEl.scrollLeft -= deltaX;
-                    scrollAreaEl.scrollTop -= deltaY;
+                    keyframesAreas[1].scrollLeft -= deltaX;
+                    scrollArea.scrollTop -= deltaY;
                     inputEvent.preventDefault();
                 },
                 dragend: ({ isDrag, clientX, inputEvent }) => {

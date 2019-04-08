@@ -1,5 +1,14 @@
 import { PREFIX } from "./consts";
-import Scene, { SceneItem } from "scenejs";
+import Scene, { SceneItem, Frame } from "scenejs";
+import {
+    hasClass as hasClass2,
+    addClass as addClass2,
+    removeClass as removeClass2,
+    isString,
+    IObject,
+    isObject,
+} from "@daybrush/utils";
+import { ElementStructure } from "./types";
 
 export function createElement(selector: string, parentEl?: Element) {
     const classNames = selector.match(/\.([^.#\s])+/g) || [];
@@ -29,6 +38,23 @@ export function toValue(value: any) {
         return `{${keys(value).map(k => `${k}: ${toValue(value[k])}`).join(", ")}}`;
     }
     return value;
+}
+export function flatObject(obj: IObject<any>, newObj: IObject<any> = {}) {
+
+    for (const name in obj) {
+        const value = obj[name];
+
+        if (isObject(value)) {
+            const nextObj = flatObject(value.constructor.name === "Frame" ? (value as Frame).get() : value);
+
+            for (const nextName in nextObj) {
+                newObj[`${name}///${nextName}`] = nextObj[nextName];
+            }
+        } else {
+            newObj[name] = value;
+        }
+    }
+    return newObj;
 }
 export function getTimelineInfo(scene: Scene) {
   const timelineInfo = {};
@@ -65,14 +91,76 @@ export function getTimelineInfo(scene: Scene) {
   return timelineInfo;
 }
 
-export function getTarget(target: Element, conditionCallback: (el: Element) => boolean): Element {
+export function getTarget(target: HTMLElement, conditionCallback: (el: Element) => boolean): HTMLElement {
     let parentTarget = target;
 
     while (parentTarget && parentTarget !== document.body) {
         if (conditionCallback(parentTarget)) {
             return parentTarget;
         }
-        parentTarget = parentTarget.parentNode as Element;
+        parentTarget = parentTarget.parentNode as HTMLElement;
     }
     return null;
+}
+
+export function hasClass(target: Element, className: string) {
+    return hasClass2(target, `${PREFIX}${className}`);
+}
+export function addClass(target: Element, className: string) {
+    return addClass2(target, `${PREFIX}${className}`);
+}
+export function removeClass(target: Element, className: string) {
+    return removeClass2(target, `${PREFIX}${className}`);
+}
+
+export function makeStructure<T>(
+    structure: ElementStructure,
+    parentEl?: Element,
+    obj: IObject<HTMLElement | HTMLElement[]> = {},
+): T {
+    const {selector, id, attr, dataset, children, style, html} = structure;
+    const el = createElement(selector);
+
+    if (id) {
+        if (id.indexOf("[]") > -1) {
+            const objId = id.replace("[]", "");
+
+            if (!obj[objId]) {
+                obj[objId] = [];
+            }
+            (obj[objId] as HTMLElement[]).push(el);
+        } else {
+            obj[id] = el;
+        }
+    }
+    if (dataset) {
+        for (const name in dataset) {
+            el.setAttribute(`data-${name}`, dataset[name]);
+        }
+    }
+    if (attr) {
+        for (const name in attr) {
+            el.setAttribute(name, attr[name]);
+        }
+    }
+    if (style) {
+        for (const name in style) {
+            el.style[name] = style[name];
+        }
+    }
+    if (html) {
+        el.innerHTML = html;
+    }
+    if (children) {
+        ([] as Array<string | ElementStructure>).concat(children).filter(child => child).forEach(child => {
+            if (isString(child)) {
+                makeStructure({ selector: child }, el, obj);
+            } else {
+                makeStructure(child, el, obj);
+            }
+        });
+    }
+    parentEl && parentEl.appendChild(el);
+
+    return (obj as any);
 }
