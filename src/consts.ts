@@ -120,7 +120,7 @@ export const CSS = `
     display: block;
     width: 100%;
     height: 100%;
-    background: none;
+    background: transparent;
     color: #ff5;
     font-weight: bold;
     background: none;
@@ -162,9 +162,14 @@ export const CSS = `
   font-weight: bold;
   color: #eee;
 }
-.property.time_area {
+.time_area {
+    font-size: 13px;
     color: #ff5;
     line-height: 30px;
+    font-weight: bold;
+}
+.time_area:after {
+    content: "s";
 }
 .property .arrow {
     position: relative;

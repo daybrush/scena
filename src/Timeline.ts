@@ -4,8 +4,8 @@ import {
     hasClass, removeClass, addClass, makeStructure, flatObject
 } from "./utils";
 import { drag } from "@daybrush/drag";
-import { CSS, PREFIX } from "./consts";
-import { isObject, isArray, IObject } from "@daybrush/utils";
+import { CSS } from "./consts";
+import { isObject, IObject } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import { ElementStructure, Ids } from "./types";
 
@@ -13,6 +13,7 @@ let isExportCSS = false;
 
 export default class Timeline {
     private scene: Scene;
+    private maxTime: number;
     private structures: Ids<ElementStructure>;
     private elements: Ids<HTMLElement>;
     constructor(scene: Scene, parentEl: HTMLElement) {
@@ -28,13 +29,14 @@ export default class Timeline {
         const duration = scene.getDuration();
         const timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(duration);
-        const maxTime = maxDuration;
+        const maxTime =  Math.max(maxDuration, 10);
         const keytimes: ElementStructure[] = [];
         const properties: ElementStructure[] = [];
         const values: ElementStructure[] = [];
         const lines: ElementStructure[] = [];
         const keyframesList: ElementStructure[] = [];
         let timelineCSS: ElementStructure;
+
         if (!isExportCSS) {
             timelineCSS = {
                 selector: "style.style",
@@ -42,6 +44,8 @@ export default class Timeline {
             };
             isExportCSS = true;
         }
+        this.maxTime = maxTime;
+
         for (let i = 0; i <= maxTime; ++i) {
             const time = i;
             keytimes.push({
@@ -176,15 +180,17 @@ export default class Timeline {
                             selector: ".properties_area",
                             children: [
                                 {
-                                    id: "timeArea",
                                     selector: ".property.time_area",
-                                    html: "0s",
+                                    id: "timeArea",
+                                    html: "0",
                                 },
                             ],
                         },
                         {
                             selector: ".values_area",
-                            children: ".value",
+                            children: {
+                                selector: ".value",
+                            },
                         },
                         {
                             id: "keyframesAreas[]",
@@ -421,27 +427,28 @@ export default class Timeline {
         scene.on("animate", e => {
             const time = e.time;
             const maxDuration = Math.ceil(scene.getDuration());
-            const px = 15 - 30 * time / maxDuration;
-            const percent = 100 * time / maxDuration;
+            const maxTime = this.maxTime;
+            const px = 15 - 30 * time / maxTime;
+            const percent = 100 * time / maxTime;
             const left = `calc(${percent}% + ${px}px)`;
 
             this.setInputs(flatObject(e.frames));
-            timeArea.innerHTML = `${time}s`;
+            timeArea.innerHTML = `${time}`;
             cursors.forEach(cursor => {
                 cursor.style.left = left;
             });
         });
-        function move(clientX: number) {
+        const move = (clientX: number) => {
             const rect = keyframesScrollAreas[1].getBoundingClientRect();
             const scrollAreaWidth = rect.width - 30;
             const scrollAreaX = rect.left + 15;
             const x = Math.min(scrollAreaWidth, Math.max(clientX - scrollAreaX, 0));
             const percentage = x / scrollAreaWidth;
-            let time = scene.getDuration() * percentage;
+            let time = this.maxTime * percentage;
 
             time = Math.ceil(time * 20) / 20;
             scene.setTime(time);
-        }
+        };
         function click(e, clientX) {
             const target = getTarget(e.target as HTMLElement, el => hasClass(el, "keyframe"));
 
