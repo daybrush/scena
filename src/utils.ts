@@ -113,11 +113,14 @@ export function removeClass(target: Element, className: string) {
     return removeClass2(target, `${PREFIX}${className}`);
 }
 
-export function makeStructure<T>(
+export function makeStructure<T, U>(
     structure: ElementStructure,
     parentEl?: Element,
-    obj: IObject<HTMLElement | HTMLElement[]> = {},
-): T {
+    obj: {
+        structures: IObject<any>,
+        elements: IObject<any>
+    } = {structures: {}, elements: {}},
+): {structures: T, elements: U} {
     const {selector, id, attr, dataset, children, style, html} = structure;
     const el = createElement(selector);
 
@@ -125,12 +128,15 @@ export function makeStructure<T>(
         if (id.indexOf("[]") > -1) {
             const objId = id.replace("[]", "");
 
-            if (!obj[objId]) {
-                obj[objId] = [];
+            if (!obj.structures[objId]) {
+                obj.structures[objId] = [];
+                obj.elements[objId] = [];
             }
-            (obj[objId] as HTMLElement[]).push(el);
+            obj.structures[objId].push(structure);
+            obj.elements[objId].push(el);
         } else {
-            obj[id] = el;
+            obj.elements[id] = el;
+            obj.structures[id] = structure;
         }
     }
     if (dataset) {

@@ -1,5 +1,8 @@
 import Scene from "scenejs";
-import { getTimelineInfo, toValue, getTarget , hasClass, removeClass, addClass, makeStructure, flatObject} from "./utils";
+import {
+    getTimelineInfo, toValue, getTarget,
+    hasClass, removeClass, addClass, makeStructure, flatObject
+} from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS, PREFIX } from "./consts";
 import { isObject, isArray, IObject } from "@daybrush/utils";
@@ -10,7 +13,8 @@ let isExportCSS = false;
 
 export default class Timeline {
     private scene: Scene;
-    private ids: Ids;
+    private structures: Ids<ElementStructure>;
+    private elements: Ids<HTMLElement>;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -18,7 +22,7 @@ export default class Timeline {
         this.initElement(scene, parentEl);
     }
     public getElement() {
-        return this.ids.timeline;
+        return this.elements.timeline;
     }
     private initElement(scene: Scene, parentEl: HTMLElement) {
         const duration = scene.getDuration();
@@ -256,7 +260,10 @@ export default class Timeline {
             ],
         };
 
-        this.ids = makeStructure(structure, parentEl);
+        const {structures, elements} = makeStructure(structure, parentEl);
+
+        this.structures = structures;
+        this.elements = elements;
         this.syncScroll();
         this.wheelZoom();
         this.drag();
@@ -265,7 +272,7 @@ export default class Timeline {
     private syncScroll() {
         const {
             keyframesAreas,
-        } = this.ids;
+        } = this.elements;
         let isScrollKeyframe = false;
 
         keyframesAreas[0].addEventListener("scroll", () => {
@@ -286,7 +293,7 @@ export default class Timeline {
         });
     }
     private wheelZoom() {
-        const { keyframesScrollAreas } = this.ids;
+        const { keyframesScrollAreas } = this.elements;
         const originalWidth = parseFloat(keyframesScrollAreas[0].style.width);
 
         const axes = new Axes({
@@ -332,7 +339,7 @@ export default class Timeline {
             properties,
             values,
             propertiesAreas,
-        } = this.ids;
+        } = this.elements;
 
         propertiesAreas[1].addEventListener("click", e => {
             const target = getTarget(e.target as HTMLElement, el => hasClass(el, "property"));
@@ -396,7 +403,7 @@ export default class Timeline {
         });
     }
     private setInputs(obj: IObject<any>) {
-        const valuesArea = this.ids.valuesArea;
+        const valuesArea = this.elements.valuesArea;
         for (const name in obj) {
             valuesArea.querySelector<HTMLInputElement>(`[data-property="${name}"] input`).value = obj[name];
         }
@@ -408,7 +415,7 @@ export default class Timeline {
             cursors,
             keyframesAreas,
             keyframesScrollAreas,
-        } = this.ids;
+        } = this.elements;
         const scene = this.scene;
 
         scene.on("animate", e => {

@@ -1,17 +1,17 @@
 import { IObject } from "@daybrush/utils";
 
-export interface Ids {
-    timeArea: HTMLElement;
-    scrollArea: HTMLElement;
-    valuesArea: HTMLElement;
-    timeline: HTMLElement;
-    properties: HTMLElement[];
-    values: HTMLElement[];
-    keyframesList: HTMLElement[];
-    cursors: HTMLElement[];
-    keyframesAreas: HTMLElement[];
-    propertiesAreas: HTMLElement[];
-    keyframesScrollAreas: HTMLElement[];
+export interface Ids<T> {
+    timeArea: T;
+    scrollArea: T;
+    valuesArea: T;
+    timeline: T;
+    properties: T[];
+    values: T[];
+    keyframesList: T[];
+    cursors: T[];
+    keyframesAreas: T[];
+    propertiesAreas: T[];
+    keyframesScrollAreas: T[];
 }
 export interface ElementStructure {
     selector: string;
