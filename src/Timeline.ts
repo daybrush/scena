@@ -22,6 +22,7 @@ export default class Timeline {
     private propertiesNames: string[] = [];
     private maxTime: number = 0;
     private axes: Axes;
+    private selectedIndex: number = -1;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -295,6 +296,26 @@ export default class Timeline {
             !e.deltaX && e.preventDefault();
         });
     }
+    private select(index: number) {
+        const prevSelectedIndex = this.selectedIndex;
+        const values = this.structures.values;
+        const properties = this.structures.properties;
+        const keyframesList = this.structures.keyframesList;
+
+        this.selectedIndex = index;
+
+        if (prevSelectedIndex > -1) {
+            removeClass(properties[prevSelectedIndex].element, "select");
+            removeClass(values[prevSelectedIndex].element, "select");
+            removeClass(keyframesList[prevSelectedIndex].element, "select");
+        }
+
+        if (index > -1) {
+            addClass(properties[prevSelectedIndex].element, "select");
+            addClass(values[prevSelectedIndex].element, "select");
+            addClass(keyframesList[prevSelectedIndex].element, "select");
+        }
+    }
     private fold() {
         const {
             keyframesList,
@@ -381,6 +402,7 @@ export default class Timeline {
         });
     }
     private drag() {
+        const structures = this.structures;
         const {
             scrollArea,
             timeArea,
@@ -412,7 +434,7 @@ export default class Timeline {
         const move = (clientX: number) => {
             scene.setTime(getTime(clientX));
         };
-        function click(e, clientX) {
+        const click = (e, clientX, clientY) => {
             const target = getTarget(e.target as HTMLElement, el => hasClass(el, "keyframe"));
 
             if (target) {
@@ -420,8 +442,15 @@ export default class Timeline {
             } else if (!hasClass(e.target as Element, "keyframe_cursor")) {
                 move(clientX);
             }
+            const list = structures.keyframesList;
+            const index = findElementIndexByPosition(
+                list.map(({element}) => element),
+                clientY,
+            );
+
+            this.select(index);
             e.preventDefault();
-        }
+        };
         const dblclick = (e, clientX, clientY) => {
             const list = this.structures.keyframesList;
             const index = findElementIndexByPosition(
@@ -456,7 +485,7 @@ export default class Timeline {
                     inputEvent.preventDefault();
                 },
                 dragend: ({ isDrag, clientX, clientY, inputEvent }) => {
-                    !isDrag && click(inputEvent, clientX);
+                    !isDrag && click(inputEvent, clientX, clientY);
                     dblCheck(isDrag, inputEvent, clientX, clientY, dblclick);
                 },
             });
