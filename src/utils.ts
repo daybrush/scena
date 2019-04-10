@@ -7,10 +7,13 @@ import {
     isString,
     IObject,
     isObject,
+    isArray,
 } from "@daybrush/utils";
 import { ElementStructure } from "./types";
 
-export function createElement(selector: string, parentEl?: Element) {
+export function createElement(structure: ElementStructure, parentEl?: Element) {
+    const {selector, dataset, attr, style, html} = structure;
+
     const classNames = selector.match(/\.([^.#\s])+/g) || [];
     const tag = (selector.match(/^[^.#\s]+/g) || [])[0] || "div";
     const id = (selector.match(/#[^.#\s]+/g) || [])[0] || "";
@@ -19,6 +22,24 @@ export function createElement(selector: string, parentEl?: Element) {
     id && (el.id = id.replace(/^#/g, ""));
     el.className = classNames.map(name => `${PREFIX}${name.replace(/^\./g, "")}`).join(" ");
 
+    if (dataset) {
+        for (const name in dataset) {
+            el.setAttribute(`data-${name}`, dataset[name]);
+        }
+    }
+    if (attr) {
+        for (const name in attr) {
+            el.setAttribute(name, attr[name]);
+        }
+    }
+    if (style) {
+        for (const name in style) {
+            el.style[name] = style[name];
+        }
+    }
+    if (html) {
+        el.innerHTML = html;
+    }
     parentEl && parentEl.appendChild(el);
     return el;
 }
@@ -45,7 +66,7 @@ export function flatObject(obj: IObject<any>, newObj: IObject<any> = {}) {
         const value = obj[name];
 
         if (isObject(value)) {
-            const nextObj = flatObject(value.constructor.name === "Frame" ? (value as Frame).get() : value);
+            const nextObj = flatObject(isFrame(value) ? value.get() : value);
 
             for (const nextName in nextObj) {
                 newObj[`${name}///${nextName}`] = nextObj[nextName];
@@ -118,45 +139,49 @@ export function makeStructure<T, U>(
     parentEl?: Element,
     obj: {
         structures: IObject<any>,
-        elements: IObject<any>
-    } = {structures: {}, elements: {}},
-): {structures: T, elements: U} {
-    const {selector, id, attr, dataset, children, style, html} = structure;
-    const el = createElement(selector);
+        elements: IObject<any>,
+        element: Element,
+    } = {structures: {}, elements: {}, element: null},
+): {structures: T, elements: U, element: Element} {
+    const {id, memberof, children} = structure;
+    const el = createElement(structure);
+    const structures = obj.structures;
+    const elements = obj.elements;
 
     if (id) {
-        if (id.indexOf("[]") > -1) {
-            const objId = id.replace("[]", "");
+        [].concat(id).forEach(nextId => {
+            const isArrayId = nextId.indexOf("[]") > -1;
+            const isDoubleArrayId = isArrayId && nextId.indexOf("[][]") > -1;
 
-            if (!obj.structures[objId]) {
-                obj.structures[objId] = [];
-                obj.elements[objId] = [];
+            if (isArrayId) {
+                const objId = nextId.replace(/\[\]/g, "");
+
+                if (!structures[objId]) {
+                    structures[objId] = [];
+                    elements[objId] = [];
+                }
+                if (isDoubleArrayId) {
+                    structures[objId].push([]);
+                    elements[objId].push([]);
+                } else {
+                    structures[objId].push(structure);
+                    elements[objId].push(el);
+                }
+            } else {
+                structures[nextId] = structure;
+                elements[nextId] = el;
             }
-            obj.structures[objId].push(structure);
-            obj.elements[objId].push(el);
-        } else {
-            obj.elements[id] = el;
-            obj.structures[id] = structure;
+        });
+    }
+    if (memberof) {
+        if (!structures[memberof]) {
+            structures[memberof] = [[]];
+            elements[memberof] = [[]];
         }
+        structures[memberof][structures[memberof].length - 1].push(structure);
+        elements[memberof][elements[memberof].length - 1].push(el);
     }
-    if (dataset) {
-        for (const name in dataset) {
-            el.setAttribute(`data-${name}`, dataset[name]);
-        }
-    }
-    if (attr) {
-        for (const name in attr) {
-            el.setAttribute(name, attr[name]);
-        }
-    }
-    if (style) {
-        for (const name in style) {
-            el.style[name] = style[name];
-        }
-    }
-    if (html) {
-        el.innerHTML = html;
-    }
+
     if (children) {
         ([] as Array<string | ElementStructure>).concat(children).filter(child => child).forEach(child => {
             if (isString(child)) {
@@ -168,5 +193,119 @@ export function makeStructure<T, U>(
     }
     parentEl && parentEl.appendChild(el);
 
+    structure.element = el;
+    obj.element = el;
     return (obj as any);
+}
+export function compare(
+    prevArr: any,
+    nextArr: any,
+    callback: any,
+    syncCallback: any,
+) {
+    const prevKeys: Array<number | string> = prevArr.map(callback);
+    const nextKeys: Array<number | string> = nextArr.map(callback);
+    const prevKeysObject: IObject<number> = {};
+    const nextKeysObject = {};
+    const added = [];
+    const removed = [];
+
+    prevKeys.forEach((key, i) => {
+        prevKeysObject[key] = i;
+    });
+    nextKeys.forEach((key, i) => {
+        if (!(key in prevKeysObject)) {
+            added.push(i);
+        } else {
+            syncCallback(prevArr[prevKeysObject[key]], nextArr[i]);
+        }
+        nextKeysObject[key] = i;
+    });
+    prevKeys.forEach((key, i) => {
+        if (!(key in nextKeysObject)) {
+            removed.push(i);
+        }
+    });
+
+    return {added, removed};
+}
+export function makeCompareStructure(
+    prevStructures: any,
+    nextStructures: any,
+    parentStructure: any,
+    callback: any,
+) {
+    const parentElement = parentStructure.element;
+
+    const {added, removed} = compare(
+        prevStructures,
+        nextStructures,
+        callback,
+        ((prev, next) => {
+            next.element = prev.element;
+        }),
+    );
+    removed.reverse().forEach(index => {
+        parentElement.removeChild(prevStructures[index].element);
+    });
+    added.forEach(index => {
+        const {element} = makeStructure(
+            nextStructures[index],
+        );
+        parentElement.insertBefore(
+            element,
+            nextStructures[index + 1] && nextStructures[index + 1].element,
+        );
+    });
+
+    parentStructure.children = nextStructures;
+}
+export function isScene(value: any): value is Scene {
+    return value.constructor.name === "Scene";
+}
+export function isSceneItem(value: any): value is SceneItem {
+    return value.constructor.name === "SceneItem";
+}
+export function isFrame(value: any): value is Frame {
+    return value.constructor.name === "Frame";
+}
+export function splitProperty(scene: Scene, property: string) {
+    const names = property.split("///");
+    const length = names.length;
+    let item: Scene | SceneItem = scene;
+    let i;
+
+    for (i = 0; i < length; ++i) {
+        if (isSceneItem(item)) {
+            break;
+        }
+        item = scene.getItem(names[i]);
+    }
+    return {
+        item: item as SceneItem,
+        names: names.slice(0, i),
+        properties: names.slice(i),
+    };
+}
+export function getSceneItem(scene: Scene, names: string[]): SceneItem {
+    return names.reduce<any>(
+        (nextScene, name) => nextScene.getItem(name),
+        scene,
+    );
+}
+
+export function findElementIndexByPosition(elements: HTMLElement[], pos: number): number {
+    const length = elements.length;
+
+    for (let index = 0; index < length; ++index) {
+        const el = elements[index];
+        const box = el.getBoundingClientRect();
+        const top = box.top;
+        const bottom = top + box.height;
+
+        if (top <= pos && pos < bottom) {
+            return index;
+        }
+    }
+    return -1;
 }

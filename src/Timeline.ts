@@ -1,26 +1,32 @@
-import Scene from "scenejs";
+import Scene, { SceneItem } from "scenejs";
 import {
     getTimelineInfo, toValue, getTarget,
-    hasClass, removeClass, addClass, makeStructure, flatObject
+    hasClass, removeClass, addClass, makeStructure, flatObject,
+    makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
-import { isObject, IObject } from "@daybrush/utils";
+import { isObject, IObject, now } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import { ElementStructure, Ids } from "./types";
+import { getKeyframesStructure } from "./KeyframesStructure";
+import { dblCheck } from "./dblcheck";
+import { getKeytimesStructure, getLinesStructure } from "./KeytimesStructure";
 
 let isExportCSS = false;
 
 export default class Timeline {
     private scene: Scene;
-    private maxTime: number;
     private structures: Ids<ElementStructure>;
     private elements: Ids<HTMLElement>;
+    private propertiesNames: string[] = [];
+    private maxTime: number = 0;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
         this.scene = scene;
         this.initElement(scene, parentEl);
+        this.editor();
     }
     public getElement() {
         return this.elements.timeline;
@@ -29,14 +35,15 @@ export default class Timeline {
         const duration = scene.getDuration();
         const timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(duration);
-        const maxTime =  Math.max(maxDuration, 10);
-        const keytimes: ElementStructure[] = [];
+        const maxTime = maxDuration + 5;
+        const propertiesNames = this.propertiesNames;
         const properties: ElementStructure[] = [];
         const values: ElementStructure[] = [];
-        const lines: ElementStructure[] = [];
         const keyframesList: ElementStructure[] = [];
         let timelineCSS: ElementStructure;
 
+
+        this.maxTime = maxTime;
         if (!isExportCSS) {
             timelineCSS = {
                 selector: "style.style",
@@ -44,40 +51,14 @@ export default class Timeline {
             };
             isExportCSS = true;
         }
-        this.maxTime = maxTime;
 
-        for (let i = 0; i <= maxTime; ++i) {
-            const time = i;
-            keytimes.push({
-                selector: ".keytime",
-                style: {
-                    width: `${100 / maxTime}%`,
-                },
-                children: [
-                    {
-                        selector: "span",
-                        html: `${time}s`,
-                    },
-                    ".graduation.start",
-                    ".graduation.quarter",
-                    ".graduation.half",
-                    ".graduation.quarter3",
-                ],
-            });
-
-            lines.push({
-                selector: ".division_line",
-                style: {
-                    left: `${100 / maxTime * i}%`,
-                },
-            });
-        }
         for (const property in timelineInfo) {
             const propertyNames = property.split("///");
             const length = propertyNames.length;
             const times = timelineInfo[property];
             const id = propertyNames[length - 1];
 
+            propertiesNames.push(property);
             properties.push({
                 id: "properties[]",
                 selector: ".property",
@@ -92,7 +73,7 @@ export default class Timeline {
                     paddingLeft: `${10 + (length - 1) * 20}px`,
                 },
                 children: [
-                    ".arrow",
+                    { selector: ".arrow"},
                     {
                         selector: "span",
                         html: id,
@@ -121,49 +102,20 @@ export default class Timeline {
                     dataset.object = "1";
                 }
             });
-            const keyframeLines: ElementStructure[] = [];
-            const keyframes = times.map(([time, value], i) => {
-                const valueText = toValue(value);
-
-                if (times[i + 1]) {
-                    const [nextTime, nextValue] = times[i + 1];
-                    const nextValueText = toValue(nextValue);
-
-                    if (valueText === nextValueText) {
-                        keyframeLines.push({
-                            selector: ".keyframe_line",
-                            style: {
-                                left: `${time / maxTime * 100}%`,
-                                width: `${(nextTime - time) / maxTime * 100}%`,
-                            },
-                        });
-                    }
-                }
-
-                return {
-                    selector: ".keyframe",
-                    dataset: {
-                        time,
-                        value: valueText,
-                    },
-                    style: {
-                        left: `${time / maxTime * 100}%`,
-                    },
-                    html: `${time} ${valueText}`,
-                };
-            });
+            const keyframes = getKeyframesStructure(times, maxTime);
             keyframesList.push({
-                id: "keyframesList[]",
+                id: [
+                    "keyframesList[]",
+                    "keyframesInfoList[][]",
+                ],
                 selector: ".keyframes",
                 dataset: {
                     property,
                 },
                 children: {
+                    id: "keyframesContainers[]",
                     selector: ".keyframes_container",
-                    children: [
-                        ...keyframes,
-                        ...keyframeLines,
-                    ],
+                    children: keyframes,
                 },
             });
         }
@@ -206,8 +158,9 @@ export default class Timeline {
                                     selector: ".keyframes",
                                     children: [
                                         {
+                                            id: "keytimesContainer",
                                             selector: ".keyframes_container",
-                                            children: keytimes,
+                                            children: getKeytimesStructure(maxTime),
                                         },
                                         {
                                             selector: ".keyframe_cursor",
@@ -255,8 +208,9 @@ export default class Timeline {
                                         id: "cursors[]",
                                     },
                                     {
+                                        id: "lineArea",
                                         selector: ".line_area",
-                                        children: lines,
+                                        children: getLinesStructure(maxTime),
                                     },
                                 ],
                             },
@@ -354,7 +308,6 @@ export default class Timeline {
                 return;
             }
 
-
             const length = properties.length;
             let index = properties.indexOf(target);
 
@@ -438,7 +391,7 @@ export default class Timeline {
                 cursor.style.left = left;
             });
         });
-        const move = (clientX: number) => {
+        const getTime = (clientX: number) => {
             const rect = keyframesScrollAreas[1].getBoundingClientRect();
             const scrollAreaWidth = rect.width - 30;
             const scrollAreaX = rect.left + 15;
@@ -447,7 +400,11 @@ export default class Timeline {
             let time = this.maxTime * percentage;
 
             time = Math.ceil(time * 20) / 20;
-            scene.setTime(time);
+
+            return time;
+        };
+        const move = (clientX: number) => {
+            scene.setTime(getTime(clientX));
         };
         function click(e, clientX) {
             const target = getTarget(e.target as HTMLElement, el => hasClass(el, "keyframe"));
@@ -459,6 +416,22 @@ export default class Timeline {
             }
             e.preventDefault();
         }
+        const dblclick = (e, clientX, clientY) => {
+            const list = this.structures.keyframesList;
+            const index = findElementIndexByPosition(
+                list.map(({element}) => element),
+                clientY,
+            );
+
+            if (index === -1) {
+                return;
+            }
+            const time = getTime(clientX);
+            const {item, properties} = splitProperty(scene, list[index].dataset.property);
+
+            this.editKeyframe(time, item.getNowValue(time, properties), index, true);
+            this.updateKeytimes();
+        };
         drag(cursors[0], {
             dragstart: ({inputEvent}) => {
                 inputEvent.stopPropagation();
@@ -476,11 +449,122 @@ export default class Timeline {
                     scrollArea.scrollTop -= deltaY;
                     inputEvent.preventDefault();
                 },
-                dragend: ({ isDrag, clientX, inputEvent }) => {
+                dragend: ({ isDrag, clientX, clientY, inputEvent }) => {
                     !isDrag && click(inputEvent, clientX);
+                    dblCheck(isDrag, inputEvent, clientX, clientY, dblclick);
                 },
             });
         });
+    }
+    private updateKeytimes() {
+        const maxTime = this.scene.getDuration() + 5;
+        const keytimesContainer = this.structures.keytimesContainer;
+        const lineArea = this.structures.lineArea;
+        const keytimes = keytimesContainer.children as ElementStructure[];
+        const lines = lineArea.children as ElementStructure[];
+        const nextKeytimes = getKeytimesStructure(maxTime);
+        const nextLines = getLinesStructure(maxTime);
 
+        this.maxTime = maxTime;
+        makeCompareStructure(
+            keytimes,
+            nextKeytimes,
+            keytimesContainer,
+            ({dataset}) => (dataset.time),
+        );
+        makeCompareStructure(
+            lines,
+            nextLines,
+            lineArea,
+            ({dataset}, i) => i,
+        );
+    }
+    private updateKeyframes(names: string[], properties: string[], index: number) {
+        const keyframesContainer = this.structures.keyframesContainers[index];
+        const keyframes = keyframesContainer.children as ElementStructure[];
+        const length = properties.length;
+        const scene = this.scene;
+        const item: SceneItem = getSceneItem(scene, names);
+        const times = item.times.filter(time =>
+            length ?
+            item.getFrame(time).has(...properties) :
+            true,
+        );
+        const delay = item.getDelay();
+        const nextKeyframes = getKeyframesStructure(
+            times.map(time => [delay + time, item.getFrame(time).get(...properties)]),
+            this.maxTime,
+        );
+
+        makeCompareStructure(
+            keyframes,
+            nextKeyframes,
+            keyframesContainer,
+            ({dataset}) => (dataset.time),
+        );
+
+        if (length) {
+            const nextProperties = properties.slice(0, -1);
+            const nextProperty = [...names, ...nextProperties].join("///");
+            const nextIndex = this.propertiesNames.indexOf(nextProperty);
+
+            if (nextIndex !== -1) {
+                this.updateKeyframes(names, nextProperties, nextIndex);
+                return;
+            }
+        }
+        scene.setTime(scene.getTime());
+    }
+    private editKeyframe(time: number, value: any, index: number, isForce?: boolean) {
+        const valuesStructure = this.structures.values;
+        const property = valuesStructure[index].dataset.property as string;
+        const scene = this.scene;
+        const {
+            names,
+            properties,
+            item,
+        } = splitProperty(scene, property);
+
+        if (!isForce) {
+            const prevValue = (item as SceneItem).getNowValue(time, properties);
+
+            if (`${prevValue}` === value) {
+                return;
+            }
+        }
+        item.set(time, ...properties, value);
+
+        this.updateKeyframes(names, properties, index);
+    }
+    private edit(target: HTMLInputElement, value: any, isForce?: boolean) {
+        const parentEl = getTarget(target, el => hasClass(el, "value"));
+
+        if (!parentEl) {
+            return;
+        }
+        const values = this.elements.values;
+        const index = values.indexOf(parentEl);
+
+        if (index === -1) {
+            return;
+        }
+        this.editKeyframe(this.scene.getTime(), value, index, isForce);
+    }
+    private editor() {
+        const valuesArea = this.elements.valuesArea;
+
+        valuesArea.addEventListener("keyup", e => {
+            if (e.keyCode !== 13) {
+                return;
+            }
+            const target = e.target as HTMLInputElement;
+
+            this.edit(target, target.value, true);
+        });
+        valuesArea.addEventListener("focusout", e => {
+            const target = e.target as HTMLInputElement;
+
+            this.edit(target, target.value);
+        });
     }
 }

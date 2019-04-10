@@ -8,17 +8,23 @@ export interface Ids<T> {
     properties: T[];
     values: T[];
     keyframesList: T[];
+    keyframesInfoList: T[][];
     cursors: T[];
     keyframesAreas: T[];
     propertiesAreas: T[];
     keyframesScrollAreas: T[];
+    keyframesContainers: T[];
+    keytimesContainer: T;
+    lineArea: T;
 }
 export interface ElementStructure {
     selector: string;
-    id?: string;
+    id?: string | string[];
+    memberof?: string;
+    element?: HTMLElement;
     attr?: IObject<any>;
     dataset?: IObject<any>;
     style?: Partial<CSSStyleDeclaration>;
     html?: string;
-    children?: undefined | string | ElementStructure | Array<ElementStructure | undefined | string>;
+    children?: undefined | ElementStructure | Array<ElementStructure | undefined>;
 }
