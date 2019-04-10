@@ -10,7 +10,13 @@ import {
     isArray,
 } from "@daybrush/utils";
 import { ElementStructure } from "./types";
+import { sync } from "resolve";
 
+export function applyStyle(el: HTMLElement, style: IObject<any>) {
+    for (const name in style) {
+        el.style[name] = style[name];
+    }
+}
 export function createElement(structure: ElementStructure, parentEl?: Element) {
     const {selector, dataset, attr, style, html} = structure;
 
@@ -33,9 +39,7 @@ export function createElement(structure: ElementStructure, parentEl?: Element) {
         }
     }
     if (style) {
-        for (const name in style) {
-            el.style[name] = style[name];
-        }
+        applyStyle(el, style);
     }
     if (html) {
         el.innerHTML = html;
@@ -234,6 +238,7 @@ export function makeCompareStructure(
     nextStructures: any,
     parentStructure: any,
     callback: any,
+    syncCallback?: any,
 ) {
     const parentElement = parentStructure.element;
 
@@ -241,9 +246,10 @@ export function makeCompareStructure(
         prevStructures,
         nextStructures,
         callback,
-        ((prev, next) => {
+        (prev, next) => {
             next.element = prev.element;
-        }),
+            syncCallback && syncCallback(prev, next);
+        },
     );
     removed.reverse().forEach(index => {
         parentElement.removeChild(prevStructures[index].element);

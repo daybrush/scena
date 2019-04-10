@@ -2,14 +2,14 @@ import Scene, { SceneItem } from "scenejs";
 import {
     getTimelineInfo, toValue, getTarget,
     hasClass, removeClass, addClass, makeStructure, flatObject,
-    makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition
+    makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition, applyStyle
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
 import { isObject, IObject, now } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import { ElementStructure, Ids } from "./types";
-import { getKeyframesStructure } from "./KeyframesStructure";
+import { getKeyframesStructure, updateKeyframesStructure } from "./KeyframesStructure";
 import { dblCheck } from "./dblcheck";
 import { getKeytimesStructure, getLinesStructure } from "./KeytimesStructure";
 
@@ -21,6 +21,7 @@ export default class Timeline {
     private elements: Ids<HTMLElement>;
     private propertiesNames: string[] = [];
     private maxTime: number = 0;
+    private axes: Axes;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -41,7 +42,6 @@ export default class Timeline {
         const values: ElementStructure[] = [];
         const keyframesList: ElementStructure[] = [];
         let timelineCSS: ElementStructure;
-
 
         this.maxTime = maxTime;
         if (!isExportCSS) {
@@ -286,6 +286,8 @@ export default class Timeline {
                 e.inputEvent.preventDefault();
             }
         });
+
+        this.axes = axes;
         keyframesScrollAreas[0].addEventListener("wheel", e => {
             const delta = e.deltaY;
 
@@ -367,6 +369,17 @@ export default class Timeline {
             valuesArea.querySelector<HTMLInputElement>(`[data-property="${name}"] input`).value = obj[name];
         }
     }
+    private moveCursor(time: number) {
+        const {cursors} = this.elements;
+        const maxTime = this.maxTime;
+        const px = 15 - 30 * time / maxTime;
+        const percent = 100 * time / maxTime;
+        const left = `calc(${percent}% + ${px}px)`;
+
+        cursors.forEach(cursor => {
+            cursor.style.left = left;
+        });
+    }
     private drag() {
         const {
             scrollArea,
@@ -379,17 +392,10 @@ export default class Timeline {
 
         scene.on("animate", e => {
             const time = e.time;
-            const maxDuration = Math.ceil(scene.getDuration());
-            const maxTime = this.maxTime;
-            const px = 15 - 30 * time / maxTime;
-            const percent = 100 * time / maxTime;
-            const left = `calc(${percent}% + ${px}px)`;
+            this.moveCursor(time);
 
             this.setInputs(flatObject(e.frames));
             timeArea.innerHTML = `${time}`;
-            cursors.forEach(cursor => {
-                cursor.style.left = left;
-            });
         });
         const getTime = (clientX: number) => {
             const rect = keyframesScrollAreas[1].getBoundingClientRect();
@@ -399,7 +405,7 @@ export default class Timeline {
             const percentage = x / scrollAreaWidth;
             let time = this.maxTime * percentage;
 
-            time = Math.ceil(time * 20) / 20;
+            time = Math.round(time * 20) / 20;
 
             return time;
         };
@@ -458,6 +464,13 @@ export default class Timeline {
     }
     private updateKeytimes() {
         const maxTime = this.scene.getDuration() + 5;
+        const currentMaxTime = this.maxTime;
+
+        if (maxTime === currentMaxTime) {
+            return;
+        }
+
+        this.maxTime = maxTime;
         const keytimesContainer = this.structures.keytimesContainer;
         const lineArea = this.structures.lineArea;
         const keytimes = keytimesContainer.children as ElementStructure[];
@@ -465,19 +478,42 @@ export default class Timeline {
         const nextKeytimes = getKeytimesStructure(maxTime);
         const nextLines = getLinesStructure(maxTime);
 
-        this.maxTime = maxTime;
         makeCompareStructure(
             keytimes,
             nextKeytimes,
             keytimesContainer,
             ({dataset}) => (dataset.time),
+            (prev, cur) => {
+                applyStyle(cur.element, cur.style);
+            },
         );
         makeCompareStructure(
             lines,
             nextLines,
             lineArea,
-            ({dataset}, i) => i,
+            (_, i) => i,
+            (prev, cur) => {
+                applyStyle(cur.element, cur.style);
+            },
         );
+        const keyframesContainers = this.structures.keyframesContainers;
+
+        keyframesContainers.forEach(keyframesContainer => {
+            const children = keyframesContainer.children as ElementStructure[];
+            updateKeyframesStructure(children, maxTime);
+
+            children.forEach(structure => {
+                applyStyle(structure.element, structure.style);
+            });
+        });
+
+        this.moveCursor(this.scene.getTime());
+
+        if (currentMaxTime && currentMaxTime < maxTime) {
+            this.axes.setTo({
+                zoom: this.axes.get(["zoom"]).zoom * maxTime / currentMaxTime,
+            });
+        }
     }
     private updateKeyframes(names: string[], properties: string[], index: number) {
         const keyframesContainer = this.structures.keyframesContainers[index];
@@ -517,6 +553,11 @@ export default class Timeline {
     }
     private editKeyframe(time: number, value: any, index: number, isForce?: boolean) {
         const valuesStructure = this.structures.values;
+        const isObjectData = this.structures.properties[index].dataset.object === "1";
+
+        if (isObjectData) {
+            return;
+        }
         const property = valuesStructure[index].dataset.property as string;
         const scene = this.scene;
         const {
@@ -534,6 +575,7 @@ export default class Timeline {
         }
         item.set(time, ...properties, value);
 
+        scene.setTime(time);
         this.updateKeyframes(names, properties, index);
     }
     private edit(target: HTMLInputElement, value: any, isForce?: boolean) {
