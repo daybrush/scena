@@ -1,5 +1,17 @@
 import { toValue } from "./utils";
+import { ElementStructure } from "./types";
 
+export function updateKeyframesStructure(keyframes: ElementStructure[], maxTime) {
+    keyframes.forEach(keyframe => {
+        const {selector, dataset, style} = keyframe;
+        if (selector === ".keyframe") {
+            style.left = `${dataset.time / maxTime * 100}%`;
+        } else {
+            style.left = `${dataset.from / maxTime * 100}%`,
+            style.width = `${(dataset.to - dataset.from) / maxTime * 100}%`;
+        }
+    });
+}
 export function getKeyframesStructure(times, maxTime) {
     const keyframeLines = [];
 
@@ -15,6 +27,8 @@ export function getKeyframesStructure(times, maxTime) {
                     selector: ".keyframe_line",
                     dataset: {
                         time: `${time},${nextTime}`,
+                        from: time,
+                        to: nextTime,
                     },
                     style: {
                         left: `${time / maxTime * 100}%`,
