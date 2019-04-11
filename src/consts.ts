@@ -1,4 +1,5 @@
 export const PREFIX = `scenejs_timeline_`;
+
 export const CSS = `
 .timeline {
   position: relative;
@@ -33,6 +34,9 @@ export const CSS = `
 .header_area .property, .header_area .value, .header_area .keyframes {
   height: 100%;
 }
+.header_area .property {
+    line-height: 30px;
+}
 .header_area .keyframes_area::-webkit-scrollbar {
     display: none; // Safari and Chrome
 }
@@ -48,6 +52,20 @@ export const CSS = `
     background: none;
     cursor: pointer;
 }
+.control_area .keyframes {
+    padding-left: 8px;
+}
+.play_control_area {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%);
+}
+.play_control_area .control {
+    display: inline-block;
+    color: white;
+    margin: 0px 10px;
+}
 .keytime {
   position: relative;
   display: inline-block;
@@ -60,8 +78,11 @@ export const CSS = `
   max-width: 0px;
 }
 .keytime span {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: inline-block;
-  transform: translate(-50%);
+  transform: translate(-7px);
   color: #eee;
 }
 .keytime .graduation {
@@ -148,12 +169,10 @@ export const CSS = `
   border-bottom: 1px solid #777;
   box-sizing: border-box;
   white-space: nowrap;
-  background: rgba(73, 73, 73, 0.7);
+  background: rgba(90, 90, 90, 0.7);
   z-index: 1;
 }
-.property:nth-child(2n), .keyframes:nth-child(2n), .value:nth-child(2n) {
-  background: rgba(90, 90, 90, 0.7);
-}
+
 .property {
   line-height: 25px;
   padding-left: 10px;
@@ -177,8 +196,7 @@ export const CSS = `
     margin-right: 5px;
     width: 0;
     vertical-align: middle;
-}
-.property .arrow {
+    cursor: pointer;
     border-top: 6px solid #eee;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
@@ -195,6 +213,9 @@ export const CSS = `
 }
 .property.fold, .keyframes.fold, .value.fold {
     display: none;
+}
+.property.select, .value.select, .keyframes.select {
+    background: rgba(120, 120, 120, 0.7);
 }
 .keyframes {
 
@@ -217,12 +238,15 @@ export const CSS = `
   bottom: 0px;
   margin: auto;
   background: #fff;
-  border: 2px solid #333;
+  border: 2px solid #383838;
   border-radius: 2px;
   box-sizing: border-box;
   transform: translate(-50%) rotate(45deg);
   z-index: 1;
   cursor: pointer;
+}
+.select .keyframe {
+    border-color: #4d4d4d;
 }
 .keyframes_container, .line_area {
   position: relative;

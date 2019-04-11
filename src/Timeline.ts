@@ -126,16 +126,65 @@ export default class Timeline {
             children: [
                 timelineCSS,
                 {
+                    selector: ".header_area.control_area",
+                    children: [
+                        {
+                            selector: ".properties_area",
+                            children: {
+                                selector: ".property",
+                            },
+                        },
+                        {
+                            selector: ".values_area",
+                            children: {
+                                selector: ".value",
+                            },
+                        },
+                        {
+                            selector: ".keyframes_area",
+                            children: {
+                                selector: ".keyframes",
+                                children: [
+                                    {
+                                        selector: ".time_area",
+                                        id: "timeArea",
+                                        html: "0",
+                                    },
+                                    {
+                                        selector: ".play_control_area",
+                                        id: "playControlArea",
+                                        children: [
+                                            {
+                                                selector: ".control.prev",
+                                                html: "prev",
+                                            },
+                                            {
+                                                selector: ".control.play",
+                                                html: "play",
+                                            },
+                                            {
+                                                selector: ".control.next",
+                                                html: "next",
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                },
+                {
                     selector: ".header_area",
                     children: [
                         {
-                            id: "propertiesAreas[]",
+                            id: [
+                                "propertiesAreas[]",
+                            ],
                             selector: ".properties_area",
                             children: [
                                 {
-                                    selector: ".property.time_area",
-                                    id: "timeArea",
-                                    html: "0",
+                                    selector: ".property",
+                                    html: "Name",
                                 },
                             ],
                         },
@@ -311,9 +360,9 @@ export default class Timeline {
         }
 
         if (index > -1) {
-            addClass(properties[prevSelectedIndex].element, "select");
-            addClass(values[prevSelectedIndex].element, "select");
-            addClass(keyframesList[prevSelectedIndex].element, "select");
+            addClass(properties[index].element, "select");
+            addClass(values[index].element, "select");
+            addClass(keyframesList[index].element, "select");
         }
     }
     private fold() {
@@ -325,7 +374,8 @@ export default class Timeline {
         } = this.elements;
 
         propertiesAreas[1].addEventListener("click", e => {
-            const target = getTarget(e.target as HTMLElement, el => hasClass(el, "property"));
+            const arrow = getTarget(e.target as HTMLElement, el => hasClass(el, "arrow"));
+            const target = getTarget(arrow as HTMLElement, el => hasClass(el, "property"));
 
             if (!target || target.getAttribute("data-object") === "0") {
                 return;
