@@ -13,7 +13,7 @@ export function getKeytimesStructure(maxTime) {
             children: [
                 {
                     selector: "span",
-                    html: `${time}s`,
+                    html: `${time}`,
                 },
                 {selector: ".graduation.start"},
                 {selector: ".graduation.quarter"},

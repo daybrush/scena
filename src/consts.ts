@@ -37,6 +37,13 @@ export const CSS = `
 .header_area .property {
     line-height: 30px;
 }
+.header_area .value {
+    text-align: center;
+    color: #fff;
+    line-height: 30px;
+    font-weight: bold;
+    font-size: 20px;
+}
 .header_area .keyframes_area::-webkit-scrollbar {
     display: none; // Safari and Chrome
 }
@@ -53,7 +60,7 @@ export const CSS = `
     cursor: pointer;
 }
 .control_area .keyframes {
-    padding-left: 8px;
+    padding-left: 10px;
 }
 .play_control_area {
     position: absolute;
@@ -79,10 +86,10 @@ export const CSS = `
 }
 .keytime span {
   position: absolute;
-  top: 0;
+  top: 2px;
   left: 0;
   display: inline-block;
-  transform: translate(-7px);
+  transform: translate(-50%);
   color: #eee;
 }
 .keytime .graduation {
@@ -108,7 +115,7 @@ export const CSS = `
 .scroll_area {
   position: relative;
   width: 100%;
-  height: calc(100% - 30px);
+  height: calc(100% - 60px);
   overflow: auto;
 }
 .properties_area, .keyframes_area, .values_area {
@@ -142,7 +149,7 @@ export const CSS = `
     width: 100%;
     height: 100%;
     background: transparent;
-    color: #ff5;
+    color: #fe5;
     font-weight: bold;
     background: none;
     border: 0;
@@ -183,7 +190,7 @@ export const CSS = `
 }
 .time_area {
     font-size: 13px;
-    color: #ff5;
+    color: #fe5;
     line-height: 30px;
     font-weight: bold;
 }

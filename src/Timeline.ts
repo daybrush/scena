@@ -192,6 +192,7 @@ export default class Timeline {
                             selector: ".values_area",
                             children: {
                                 selector: ".value",
+                                html: "+",
                             },
                         },
                         {
@@ -276,8 +277,8 @@ export default class Timeline {
         this.elements = elements;
         this.syncScroll();
         this.wheelZoom();
-        this.drag();
-        this.fold();
+        this.dragKeyframes();
+        this.clickProperty();
     }
     private syncScroll() {
         const {
@@ -365,29 +366,37 @@ export default class Timeline {
             addClass(keyframesList[index].element, "select");
         }
     }
-    private fold() {
+    private clickProperty() {
         const {
             keyframesList,
-            properties,
             values,
             propertiesAreas,
         } = this.elements;
 
         propertiesAreas[1].addEventListener("click", e => {
+            const properties = this.elements.properties;
+            const length = properties.length;
             const arrow = getTarget(e.target as HTMLElement, el => hasClass(el, "arrow"));
-            const target = getTarget(arrow as HTMLElement, el => hasClass(el, "property"));
+            const target = getTarget(e.target as HTMLElement, el => hasClass(el, "property"));
 
-            if (!target || target.getAttribute("data-object") === "0") {
+            if (!target) {
                 return;
             }
-
-            const length = properties.length;
             let index = properties.indexOf(target);
 
             if (index === -1) {
                 return;
             }
+            // select
+            if (!arrow) {
+                this.select(index);
+                return;
+            }
 
+            // fold
+            if (target.getAttribute("data-object") === "0") {
+                return;
+            }
             const isFold = target.getAttribute("data-fold") === "1";
 
             function fold(isPrevFold) {
@@ -451,7 +460,7 @@ export default class Timeline {
             cursor.style.left = left;
         });
     }
-    private drag() {
+    private dragKeyframes() {
         const structures = this.structures;
         const {
             scrollArea,
