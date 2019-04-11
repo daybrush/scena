@@ -12,6 +12,7 @@ import { ElementStructure, Ids } from "./types";
 import { getKeyframesStructure, updateKeyframesStructure } from "./KeyframesStructure";
 import { dblCheck } from "./dblcheck";
 import { getKeytimesStructure, getLinesStructure } from "./KeytimesStructure";
+import keycon, {KeyController} from "keycon";
 
 let isExportCSS = false;
 
@@ -23,17 +24,37 @@ export default class Timeline {
     private maxTime: number = 0;
     private axes: Axes;
     private selectedIndex: number = -1;
+    private keycon: KeyController;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
         this.scene = scene;
-        this.initElement(scene, parentEl);
-        this.editor();
+        this.initStructure(scene, parentEl);
+        this.initEditor();
+        this.initScroll();
+        this.initWheelZoom();
+        this.initDragKeyframes();
+        this.clickProperty();
+        this.initKeyController();
     }
     public getElement() {
         return this.elements.timeline;
     }
-    private initElement(scene: Scene, parentEl: HTMLElement) {
+    private initKeyController() {
+        const scene = this.scene;
+        this.keycon = keycon()
+        .keydown(e => {
+            e.inputEvent.preventDefault();
+        })
+        .keyup("space", () => {
+            if (scene.getPlayState() === "running") {
+                scene.pause();
+            } else {
+                scene.play();
+            }
+        });
+    }
+    private initStructure(scene: Scene, parentEl: HTMLElement) {
         const duration = scene.getDuration();
         const timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(duration);
@@ -275,12 +296,8 @@ export default class Timeline {
 
         this.structures = structures;
         this.elements = elements;
-        this.syncScroll();
-        this.wheelZoom();
-        this.dragKeyframes();
-        this.clickProperty();
     }
-    private syncScroll() {
+    private initScroll() {
         const {
             keyframesAreas,
         } = this.elements;
@@ -303,7 +320,7 @@ export default class Timeline {
             }
         });
     }
-    private wheelZoom() {
+    private initWheelZoom() {
         const { keyframesScrollAreas } = this.elements;
         const originalWidth = parseFloat(keyframesScrollAreas[0].style.width);
 
@@ -460,7 +477,7 @@ export default class Timeline {
             cursor.style.left = left;
         });
     }
-    private dragKeyframes() {
+    private initDragKeyframes() {
         const structures = this.structures;
         const {
             scrollArea,
@@ -666,6 +683,9 @@ export default class Timeline {
         scene.setTime(time);
         this.updateKeyframes(names, properties, index);
     }
+    private restoreKeyframes() {
+        this.scene.setTime(this.scene.getTime());
+    }
     private edit(target: HTMLInputElement, value: any, isForce?: boolean) {
         const parentEl = getTarget(target, el => hasClass(el, "value"));
 
@@ -680,21 +700,25 @@ export default class Timeline {
         }
         this.editKeyframe(this.scene.getTime(), value, index, isForce);
     }
-    private editor() {
+    private initEditor() {
         const valuesArea = this.elements.valuesArea;
 
-        valuesArea.addEventListener("keyup", e => {
-            if (e.keyCode !== 13) {
-                return;
-            }
-            const target = e.target as HTMLInputElement;
+        keycon(valuesArea)
+        .keyup(e => {
+            e.inputEvent.stopPropagation();
+        })
+        .keyup("enter", e => {
+            const target = e.inputEvent.target as HTMLInputElement;
 
             this.edit(target, target.value, true);
+        })
+        .keyup("esc", e => {
+            const target = e.inputEvent.target as HTMLInputElement;
+
+            target.blur();
         });
         valuesArea.addEventListener("focusout", e => {
-            const target = e.target as HTMLInputElement;
-
-            this.edit(target, target.value);
+            this.restoreKeyframes();
         });
     }
 }
