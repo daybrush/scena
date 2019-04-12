@@ -138,19 +138,13 @@ export function removeClass(target: Element, className: string) {
     return removeClass2(target, `${PREFIX}${className}`);
 }
 
-export function makeStructure<T, U>(
+export function makeStructure<T>(
     structure: ElementStructure,
     parentEl?: Element,
-    obj: {
-        structures: IObject<any>,
-        elements: IObject<any>,
-        element: Element,
-    } = {structures: {}, elements: {}, element: null},
-): {structures: T, elements: U, element: Element} {
+    ids: IObject<any> = {},
+): {structure: ElementStructure, ids: T} {
     const {id, memberof, children} = structure;
     const el = createElement(structure);
-    const structures = obj.structures;
-    const elements = obj.elements;
 
     if (id) {
         [].concat(id).forEach(nextId => {
@@ -160,46 +154,39 @@ export function makeStructure<T, U>(
             if (isArrayId) {
                 const objId = nextId.replace(/\[\]/g, "");
 
-                if (!structures[objId]) {
-                    structures[objId] = [];
-                    elements[objId] = [];
+                if (!ids[objId]) {
+                    ids[objId] = [];
                 }
                 if (isDoubleArrayId) {
-                    structures[objId].push([]);
-                    elements[objId].push([]);
+                    ids[objId].push([]);
                 } else {
-                    structures[objId].push(structure);
-                    elements[objId].push(el);
+                    ids[objId].push(structure);
                 }
             } else {
-                structures[nextId] = structure;
-                elements[nextId] = el;
+                ids[nextId] = structure;
             }
         });
     }
     if (memberof) {
-        if (!structures[memberof]) {
-            structures[memberof] = [[]];
-            elements[memberof] = [[]];
+        if (!ids[memberof]) {
+            ids[memberof] = [[]];
         }
-        structures[memberof][structures[memberof].length - 1].push(structure);
-        elements[memberof][elements[memberof].length - 1].push(el);
+        ids[memberof][ids[memberof].length - 1].push(structure);
     }
 
     if (children) {
         ([] as Array<string | ElementStructure>).concat(children).filter(child => child).forEach(child => {
             if (isString(child)) {
-                makeStructure({ selector: child }, el, obj);
+                makeStructure({ selector: child }, el, ids);
             } else {
-                makeStructure(child, el, obj);
+                makeStructure(child, el, ids);
             }
         });
     }
     parentEl && parentEl.appendChild(el);
 
     structure.element = el;
-    obj.element = el;
-    return (obj as any);
+    return {structure, ids} as {structure: ElementStructure, ids: T};
 }
 export function compare(
     prevArr: any,
@@ -234,13 +221,13 @@ export function compare(
     return {added, removed};
 }
 export function makeCompareStructure(
-    prevStructures: any,
-    nextStructures: any,
-    parentStructure: any,
+    prevStructure: ElementStructure,
+    nextStructures: ElementStructure[],
     callback: any,
     syncCallback?: any,
 ) {
-    const parentElement = parentStructure.element;
+    const parentElement = prevStructure.element;
+    const prevStructures = prevStructure.children;
 
     const {added, removed} = compare(
         prevStructures,
@@ -255,16 +242,17 @@ export function makeCompareStructure(
         parentElement.removeChild(prevStructures[index].element);
     });
     added.forEach(index => {
-        const {element} = makeStructure(
+        const {structure: { element }} = makeStructure(
             nextStructures[index],
         );
+
         parentElement.insertBefore(
             element,
             nextStructures[index + 1] && nextStructures[index + 1].element,
         );
     });
 
-    parentStructure.children = nextStructures;
+    prevStructure.children = nextStructures;
 }
 export function isScene(value: any): value is Scene {
     return value.constructor.name === "Scene";
