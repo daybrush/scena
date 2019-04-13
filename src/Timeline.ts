@@ -1,6 +1,6 @@
 import Scene, { SceneItem } from "scenejs";
 import {
-    getTimelineInfo, toValue, getTarget,
+    getTimelineInfo, getTarget,
     hasClass, removeClass, addClass, makeStructure, flatObject,
     makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition, applyStyle
 } from "./utils";
@@ -12,7 +12,7 @@ import { ElementStructure, Ids } from "./types";
 import { getKeyframesStructure, updateKeyframesStructure } from "./KeyframesStructure";
 import { dblCheck } from "./dblcheck";
 import { getKeytimesStructure, getLinesStructure } from "./KeytimesStructure";
-import keycon, {KeyController} from "keycon";
+import KeyController from "keycon";
 
 let isExportCSS = false;
 
@@ -88,7 +88,7 @@ export default class Timeline {
         });
     }
     private initKeyController() {
-        keycon()
+        new KeyController()
         .keydown("space", ({inputEvent}) => {
             inputEvent.preventDefault();
         })
@@ -820,7 +820,7 @@ export default class Timeline {
     private initEditor() {
         const valuesArea = this.ids.valuesArea.element;
 
-        keycon(valuesArea)
+        new KeyController(valuesArea)
         .keydown(e => {
             e.inputEvent.stopPropagation();
         })
