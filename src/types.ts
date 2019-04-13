@@ -23,6 +23,7 @@ export interface Ids {
 export interface ElementStructure {
     selector: string;
     id?: string | string[];
+    key?: string | number;
     memberof?: string;
     element?: HTMLElement;
     attr?: IObject<any>;

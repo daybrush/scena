@@ -8,9 +8,9 @@ import {
     IObject,
     isObject,
     isArray,
+    isUndefined,
 } from "@daybrush/utils";
 import { ElementStructure } from "./types";
-import { sync } from "resolve";
 
 export function applyStyle(el: HTMLElement, style: IObject<any>) {
     for (const name in style) {
@@ -137,15 +137,8 @@ export function addClass(target: Element, className: string) {
 export function removeClass(target: Element, className: string) {
     return removeClass2(target, `${PREFIX}${className}`);
 }
-
-export function makeStructure<T>(
-    structure: ElementStructure,
-    parentEl?: Element,
-    ids: IObject<any> = {},
-): {structure: ElementStructure, ids: T} {
-    const {id, memberof, children} = structure;
-    const el = createElement(structure);
-
+export function addId(structure: ElementStructure, ids: IObject<any> = {}) {
+    const {id, memberof} = structure;
     if (id) {
         [].concat(id).forEach(nextId => {
             const isArrayId = nextId.indexOf("[]") > -1;
@@ -173,7 +166,20 @@ export function makeStructure<T>(
         }
         ids[memberof][ids[memberof].length - 1].push(structure);
     }
+}
+export function makeStructure<T>(
+    structure: ElementStructure,
+    parentEl?: Element,
+    ids: IObject<any> = {},
+): {structure: ElementStructure, ids: T} {
+    const {children, key, selector} = structure;
+    const el = createElement(structure);
 
+    addId(structure, ids);
+
+    if (isUndefined(key)) {
+        structure.key = selector;
+    }
     if (children) {
         ([] as Array<string | ElementStructure>).concat(children).filter(child => child).forEach(child => {
             if (isString(child)) {
@@ -189,13 +195,12 @@ export function makeStructure<T>(
     return {structure, ids} as {structure: ElementStructure, ids: T};
 }
 export function compare(
-    prevArr: any,
-    nextArr: any,
-    callback: any,
-    syncCallback: any,
+    prevArr: any[],
+    nextArr: any[],
+    syncCallback: (prev: ElementStructure, next: ElementStructure) => void,
 ) {
-    const prevKeys: Array<number | string> = prevArr.map(callback);
-    const nextKeys: Array<number | string> = nextArr.map(callback);
+    const prevKeys: Array<number | string> = prevArr.map(({ key, selector }) => isUndefined(key) ? selector : key);
+    const nextKeys: Array<number | string> = nextArr.map(({ key, selector }) => isUndefined(key) ? selector : key);
     const prevKeysObject: IObject<number> = {};
     const nextKeysObject = {};
     const added = [];
@@ -220,22 +225,22 @@ export function compare(
 
     return {added, removed};
 }
+export function concat<T>(arr: T | T[]): T[] {
+    return [].concat(arr);
+}
 export function makeCompareStructure(
     prevStructure: ElementStructure,
     nextStructures: ElementStructure[],
-    callback: any,
-    syncCallback?: any,
 ) {
     const parentElement = prevStructure.element;
-    const prevStructures = prevStructure.children;
-
+    const prevStructures = concat(prevStructure.children || []);
     const {added, removed} = compare(
         prevStructures,
-        nextStructures,
-        callback,
+        nextStructures || [],
         (prev, next) => {
             next.element = prev.element;
-            syncCallback && syncCallback(prev, next);
+            applyStyle(next.element, next.style);
+            makeCompareStructure(prev, concat(next.children || []));
         },
     );
     removed.reverse().forEach(index => {
@@ -245,23 +250,67 @@ export function makeCompareStructure(
         const {structure: { element }} = makeStructure(
             nextStructures[index],
         );
-
         parentElement.insertBefore(
             element,
             nextStructures[index + 1] && nextStructures[index + 1].element,
         );
     });
 
-    prevStructure.children = nextStructures;
+    if (nextStructures) {
+        prevStructure.children = nextStructures;
+    }
+}
+export function findStructure(
+    selector: string,
+    structure: ElementStructure | ElementStructure[],
+    multi: true,
+    arr?: ElementStructure[],
+): ElementStructure[];
+export function findStructure(
+    selector: string,
+    structure: ElementStructure | ElementStructure[],
+    multi?: false,
+    arr?: ElementStructure[],
+): ElementStructure;
+export function findStructure(
+    selector: string,
+    structure: ElementStructure | ElementStructure[],
+    multi: true | false,
+    arr?: ElementStructure[],
+): ElementStructure | ElementStructure[];
+export function findStructure(
+    selector: string,
+    structure: ElementStructure | ElementStructure[],
+    multi: boolean = false,
+    arr: ElementStructure[] = [],
+): ElementStructure | ElementStructure[] {
+    if (isArray(structure)) {
+        const length = structure.length;
+
+        for (let i = 0; i < length; ++i) {
+            findStructure(selector, structure[i], multi, arr);
+        }
+    } else {
+        if (structure.selector === selector) {
+            arr.push(structure);
+        }
+        if (!multi && arr.length) {
+            return arr[0];
+        }
+        if (structure.children) {
+            findStructure(selector, structure.children, multi, arr);
+        }
+    }
+    return multi ? arr : arr[0];
 }
 export function isScene(value: any): value is Scene {
-    return value.constructor.name === "Scene";
+    return !!(value.constructor as typeof Scene).prototype.getItem;
 }
 export function isSceneItem(value: any): value is SceneItem {
-    return value.constructor.name === "SceneItem";
+    return !!(value.constructor as typeof SceneItem).prototype.getFrame;
 }
 export function isFrame(value: any): value is Frame {
-    return value.constructor.name === "Frame";
+    return !!(value.constructor as typeof Frame).prototype.toCSS;
 }
 export function splitProperty(scene: Scene, property: string) {
     const names = property.split("///");

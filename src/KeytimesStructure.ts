@@ -3,6 +3,7 @@ export function getKeytimesStructure(maxTime) {
 
     for (let time = 0; time <= maxTime; ++time) {
         keytimes.push({
+            key: time,
             dataset: {
                 time,
             },
@@ -29,6 +30,7 @@ export function getLinesStructure(maxTime: number) {
 
     for (let time = 0; time <= maxTime; ++time) {
         lines.push({
+            key: time,
             selector: ".division_line",
             style: {
                 left: `${100 / maxTime * time}%`,

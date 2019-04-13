@@ -2,27 +2,33 @@ import Scene, { SceneItem } from "scenejs";
 import {
     getTimelineInfo, getTarget,
     hasClass, removeClass, addClass, makeStructure, flatObject,
-    makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition, applyStyle
+    makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition, applyStyle, findStructure
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
-import { isObject, IObject, now } from "@daybrush/utils";
+import { isObject, IObject, now, addEvent } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import { ElementStructure, Ids } from "./types";
-import { getKeyframesStructure, updateKeyframesStructure } from "./KeyframesStructure";
+import {
+    updateKeyframesStructure,
+    getKeyframesListStructure, getKeyframesScrollAreaChildrenStructure,
+} from "./KeyframesStructure";
 import { dblCheck } from "./dblcheck";
 import { getKeytimesStructure, getLinesStructure } from "./KeytimesStructure";
 import KeyController from "keycon";
+import { getHeaderAreaStructure } from "./HeaderAreaStructure";
+import { getScrollAreaStructure } from "./ScrollAreaStructure";
+import { getControlAreaStructure } from "./ControlAreaStructure";
 
 let isExportCSS = false;
 
 export default class Timeline {
     private scene: Scene;
     private ids: Ids;
-    private propertiesNames: string[] = [];
     private maxTime: number = 0;
     private axes: Axes;
     private selectedIndex: number = -1;
+    private keycon: KeyController;
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -88,7 +94,7 @@ export default class Timeline {
         });
     }
     private initKeyController() {
-        new KeyController()
+        this.keycon = new KeyController()
         .keydown("space", ({inputEvent}) => {
             inputEvent.preventDefault();
         })
@@ -98,7 +104,7 @@ export default class Timeline {
         .keydown("right", e => {
             this.next();
         })
-        .keyup("delete", () => {
+        .keyup("backspace", () => {
             this.removeKeyframe(this.selectedIndex, this.scene.getTime());
         })
         .keyup("esc", () => {
@@ -109,14 +115,10 @@ export default class Timeline {
         });
     }
     private initStructure(scene: Scene, parentEl: HTMLElement) {
-        const duration = scene.getDuration();
+        const duration = Math.ceil(scene.getDuration());
         const timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(duration);
         const maxTime = maxDuration + 5;
-        const propertiesNames = this.propertiesNames;
-        const properties: ElementStructure[] = [];
-        const values: ElementStructure[] = [];
-        const keyframesList: ElementStructure[] = [];
         let timelineCSS: ElementStructure;
 
         this.maxTime = maxTime;
@@ -128,223 +130,14 @@ export default class Timeline {
             isExportCSS = true;
         }
 
-        for (const property in timelineInfo) {
-            const propertyNames = property.split("///");
-            const length = propertyNames.length;
-            const times = timelineInfo[property];
-            const id = propertyNames[length - 1];
-
-            propertiesNames.push(property);
-            properties.push({
-                id: "properties[]",
-                selector: ".property",
-                dataset: {
-                    id,
-                    property,
-                    parent: propertyNames[length - 2] || "",
-                    object: "0",
-                    item: propertyNames[0],
-                },
-                style: {
-                    paddingLeft: `${10 + (length - 1) * 20}px`,
-                },
-                children: [
-                    { selector: ".arrow"},
-                    {
-                        selector: "span",
-                        html: id,
-                    },
-                ],
-            });
-            const isHasObject = times[0] && isObject(times[0][1]);
-            values.push({
-                id: "values[]",
-                selector: ".value",
-                dataset: {
-                    property,
-                    object: isHasObject ? "1" : "0",
-                },
-                children: {
-                    id: "inputs[]",
-                    selector: "input",
-                    attr: {
-                        value: times[0] ? times[0][1] : "",
-                    },
-                },
-            });
-            const parentProperty = propertyNames.slice(0, -1).join("///");
-            properties.forEach(({dataset}) => {
-                if (dataset.property === parentProperty) {
-                    dataset.object = "1";
-                }
-            });
-            const keyframes = getKeyframesStructure(times, maxTime);
-            keyframesList.push({
-                id: [
-                    "keyframesList[]",
-                ],
-                selector: ".keyframes",
-                dataset: {
-                    property,
-                },
-                children: {
-                    id: "keyframesContainers[]",
-                    selector: ".keyframes_container",
-                    children: keyframes,
-                },
-            });
-        }
         const structure: ElementStructure = {
             selector: ".timeline",
             id: "timeline",
             children: [
                 timelineCSS,
-                {
-                    selector: ".header_area.control_area",
-                    children: [
-                        {
-                            selector: ".properties_area",
-                            children: {
-                                selector: ".property",
-                            },
-                        },
-                        {
-                            selector: ".values_area",
-                            children: {
-                                selector: ".value",
-                            },
-                        },
-                        {
-                            selector: ".keyframes_area",
-                            children: {
-                                selector: ".keyframes",
-                                children: [
-                                    {
-                                        selector: ".time_area",
-                                        id: "timeArea",
-                                        html: "0",
-                                    },
-                                    {
-                                        selector: ".play_control_area",
-                                        id: "playControlArea",
-                                        children: [
-                                            {
-                                                id: "prevBtn",
-                                                selector: ".control.prev",
-                                                html: "prev",
-                                            },
-                                            {
-                                                id: "playBtn",
-                                                selector: ".control.play",
-                                                html: "play",
-                                            },
-                                            {
-                                                id: "nextBtn",
-                                                selector: ".control.next",
-                                                html: "next",
-                                            },
-                                        ],
-                                    },
-                                ],
-                            },
-                        },
-                    ],
-                },
-                {
-                    selector: ".header_area",
-                    children: [
-                        {
-                            id: [
-                                "propertiesAreas[]",
-                            ],
-                            selector: ".properties_area",
-                            children: [
-                                {
-                                    selector: ".property",
-                                    html: "Name",
-                                },
-                            ],
-                        },
-                        {
-                            selector: ".values_area",
-                            children: {
-                                selector: ".value",
-                                html: "+",
-                            },
-                        },
-                        {
-                            id: "keyframesAreas[]",
-                            selector: ".keyframes_area",
-                            children: {
-                                style: {
-                                    minWidth: `${50 * maxTime}px`,
-                                    width: `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`,
-                                },
-                                id: "keyframesScrollAreas[]",
-                                selector: ".keyframes_scroll_area",
-                                children: {
-                                    selector: ".keyframes",
-                                    children: [
-                                        {
-                                            id: "keytimesContainer",
-                                            selector: ".keyframes_container",
-                                            children: getKeytimesStructure(maxTime),
-                                        },
-                                        {
-                                            selector: ".keyframe_cursor",
-                                            id: "cursors[]",
-                                        },
-                                    ],
-                                },
-                            },
-                        },
-                    ],
-                },
-                {
-                    id: "scrollArea",
-                    selector: ".scroll_area",
-                    children: [
-                        {
-                            id: "propertiesAreas[]",
-                            selector: ".properties_area",
-                            children: [
-                                {
-                                    selector: ".properties_scroll_area",
-                                    children: properties,
-                                },
-                            ],
-                        },
-                        {
-                            id: "valuesArea",
-                            selector: ".values_area",
-                            children: values,
-                        },
-                        {
-                            id: "keyframesAreas[]",
-                            selector: ".keyframes_area",
-                            children: {
-                                style: {
-                                    minWidth: `${50 * maxTime}px`,
-                                    width: `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`,
-                                },
-                                id: "keyframesScrollAreas[]",
-                                selector: ".keyframes_scroll_area",
-                                children: [
-                                    ...keyframesList,
-                                    {
-                                        selector: ".keyframe_cursor",
-                                        id: "cursors[]",
-                                    },
-                                    {
-                                        id: "lineArea",
-                                        selector: ".line_area",
-                                        children: getLinesStructure(maxTime),
-                                    },
-                                ],
-                            },
-                        },
-                    ],
-                },
+                getControlAreaStructure(),
+                getHeaderAreaStructure(maxDuration, maxTime),
+                getScrollAreaStructure(timelineInfo, maxDuration, maxTime),
             ],
         };
 
@@ -418,12 +211,23 @@ export default class Timeline {
             axes.setBy({ zoom: delta / originalWidth * 5 });
             !e.deltaX && e.preventDefault();
         });
+
+        addEvent(scrollArea, "wheel", e => {
+            if (!this.keycon.altKey) {
+                return;
+            }
+            e.preventDefault();
+            const delta = e.deltaY;
+
+            axes.setBy({ zoom: delta / originalWidth * 5 });
+        });
     }
     private select(index: number) {
         const prevSelectedIndex = this.selectedIndex;
-        const values = this.ids.values;
-        const properties = this.ids.properties;
-        const keyframesList = this.ids.keyframesList;
+        const ids = this.ids;
+        const values = ids.values;
+        const properties = ids.properties;
+        const keyframesList = ids.keyframesList;
 
         this.selectedIndex = index;
 
@@ -628,7 +432,6 @@ export default class Timeline {
         const {item, properties} = splitProperty(scene, list[index].dataset.property);
 
         this.editKeyframe(time, item.getNowValue(time, properties), index, true);
-        this.updateKeytimes();
     }
     private removeKeyframe(index: number, time: number) {
         if (index === -1) {
@@ -643,8 +446,7 @@ export default class Timeline {
         } else {
             item.removeFrame(time);
         }
-        this.updateKeyframes(names, properties, index);
-        this.updateKeytimes();
+        this.updateKeyframes();
     }
     private updateKeytimes() {
         const maxTime = this.scene.getDuration() + 5;
@@ -661,116 +463,51 @@ export default class Timeline {
         const nextKeytimes = getKeytimesStructure(maxTime);
         const nextLines = getLinesStructure(maxTime);
 
+        // update keytimes
         makeCompareStructure(
             keytimesContainer,
             nextKeytimes,
-            ({dataset}) => (dataset.time),
-            (prev, cur) => {
-                applyStyle(cur.element, cur.style);
-            },
         );
+        // update lines
         makeCompareStructure(
             lineArea,
             nextLines,
-            (_, i) => i,
-            (prev, cur) => {
-                applyStyle(cur.element, cur.style);
-            },
         );
         const keyframesContainers = ids.keyframesContainers;
 
+        // update keyframes style
         keyframesContainers.forEach(keyframesContainer => {
             const children = keyframesContainer.children as ElementStructure[];
-            updateKeyframesStructure(children, maxTime);
 
-            children.forEach(structure => {
-                applyStyle(structure.element, structure.style);
-            });
+            updateKeyframesStructure(children, maxTime);
         });
 
         this.moveCursor(this.scene.getTime());
 
+        // zoom
         if (currentMaxTime && currentMaxTime < maxTime) {
             this.axes.setTo({
                 zoom: this.axes.get(["zoom"]).zoom * maxTime / currentMaxTime,
             });
         }
     }
-    private updateKeyframes(names: string[], properties: string[], index: number) {
+    private updateKeyframes() {
         const timelineInfo = getTimelineInfo(this.scene);
         const maxTime = this.maxTime;
-        const nextKeyframesList = [];
         const ids = this.ids;
         const scrollArea = this.ids.keyframesScrollAreas[1];
-
-        for (const property in timelineInfo) {
-            const times = timelineInfo[property];
-            const keyframes = getKeyframesStructure(times, maxTime);
-
-            nextKeyframesList.push({
-                id: [
-                    "keyframesList[]",
-                ],
-                selector: ".keyframes",
-                dataset: {
-                    property,
-                },
-                children: {
-                    id: "keyframesContainers[]",
-                    selector: ".keyframes_container",
-                    children: keyframes,
-                },
-            });
-        }
-        console.log(ids.keyframesList, nextKeyframesList);
+        const nextKeyframesList = getKeyframesListStructure(timelineInfo, maxTime);
+        const nextScrollAreaChildren = getKeyframesScrollAreaChildrenStructure(nextKeyframesList, maxTime);
         makeCompareStructure(
             scrollArea,
-            nextKeyframesList,
-            ({dataset}) => dataset.property,
-            ({prev, next}) => {
-                makeCompareStructure(
-                    prev.children,
-                    next.children.children,
-                    ({dataset}) => (dataset.time),
-                );
-            },
+            nextScrollAreaChildren,
         );
+        ids.lineArea = findStructure(".line_area", nextScrollAreaChildren, false);
+        ids.keyframesContainers = findStructure(".keyframes_container", nextKeyframesList, true);
         ids.keyframesList = nextKeyframesList;
 
-        // const keyframesContainer = this.ids.keyframesContainers[index];
-        // const keyframes = keyframesContainer.children as ElementStructure[];
-        // const length = properties.length;
-        // const scene = this.scene;
-        // const item: SceneItem = getSceneItem(scene, names);
-        // const times = item.times.filter(time =>
-        //     length ?
-        //     item.getFrame(time).has(...properties) :
-        //     true,
-        // );
-        // const delay = item.getDelay();
-        // const nextKeyframes = getKeyframesStructure(
-        //     times.map(time => [delay + time, item.getFrame(time).get(...properties)]),
-        //     this.maxTime,
-        // );
-
-        // makeCompareStructure(
-        //     keyframes,
-        //     nextKeyframes,
-        //     keyframesContainer,
-        //     ({dataset}) => (dataset.time),
-        // );
-
-        // if (length) {
-        //     const nextProperties = properties.slice(0, -1);
-        //     const nextProperty = [...names, ...nextProperties].join("///");
-        //     const nextIndex = this.propertiesNames.indexOf(nextProperty);
-
-        //     if (nextIndex !== -1) {
-        //         this.updateKeyframes(names, nextProperties, nextIndex);
-        //         return;
-        //     }
-        // }
-        // scene.setTime(scene.getTime());
+        this.updateKeytimes();
+        this.scene.setTime(this.scene.getTime());
     }
     private editKeyframe(time: number, value: any, index: number, isForce?: boolean) {
         const ids = this.ids;
@@ -798,7 +535,7 @@ export default class Timeline {
         item.set(time, ...properties, value);
 
         scene.setTime(time);
-        this.updateKeyframes(names, properties, index);
+        this.updateKeyframes();
     }
     private restoreKeyframes() {
         this.scene.setTime(this.scene.getTime());
