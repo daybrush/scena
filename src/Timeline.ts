@@ -40,6 +40,7 @@ export default class Timeline {
         this.initDragKeyframes();
         this.initClickProperty();
         this.initController();
+        this.initDragValues();
         this.initKeyController();
     }
     public getElement() {
@@ -426,11 +427,36 @@ export default class Timeline {
             });
         });
     }
+    private initDragValues() {
+        let dragTarget: HTMLInputElement = null;
+        drag(this.ids.valuesArea.element, {
+            container: window,
+            dragstart: e => {
+                dragTarget = e.inputEvent.target;
+
+                if (!this.keycon.altKey || !getTarget(dragTarget, el => el.nodeName === "INPUT")) {
+                    return false;
+                }
+            },
+            drag: e => {
+                const value = dragTarget.value;
+
+                console.log(value);
+
+                const nextValue = value.replace(/\d+/g, num => {
+                    return `${parseFloat(num) + 1}`;
+                });
+
+                dragTarget.value = nextValue;
+            },
+        });
+    }
     private addKeyframe(index: number, time: number) {
         const list = this.ids.keyframesList;
         const scene = this.scene;
         const {item, properties} = splitProperty(scene, list[index].dataset.property);
 
+        console.log(index, properties);
         this.editKeyframe(time, item.getNowValue(time, properties), index, true);
     }
     private removeKeyframe(index: number, time: number) {

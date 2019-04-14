@@ -155,6 +155,7 @@ export const CSS = `
     border: 0;
     box-sizing: border-box;
     text-align: center;
+    cursor: ew-resize;
 }
 .value[data-object="1"] input {
     display: none;

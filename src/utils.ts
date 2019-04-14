@@ -205,6 +205,7 @@ export function compare(
     const nextKeysObject = {};
     const added = [];
     const removed = [];
+    const changed = [];
 
     prevKeys.forEach((key, i) => {
         prevKeysObject[key] = i;
@@ -218,12 +219,27 @@ export function compare(
         nextKeysObject[key] = i;
     });
     prevKeys.forEach((key, i) => {
-        if (!(key in nextKeysObject)) {
+        const index = nextKeysObject[key];
+        if (isUndefined(index)) {
             removed.push(i);
+        } else if (i !== index) {
+            changed.push([i, index]);
         }
     });
+    changed.sort((a, b) => {
+        return a[1] > b[1] ? 1 : -1;
+      });
 
-    return {added, removed};
+    const newChanged: number[][] = [];
+    let prev = [-1, -1];
+    changed.forEach(changeInfo => {
+        if (prev[0] > changeInfo[0]) {
+          newChanged.push(prev);
+        }
+        prev = changeInfo;
+    });
+
+    return {added, removed, changed: newChanged};
 }
 export function concat<T>(arr: T | T[]): T[] {
     return [].concat(arr);
@@ -234,7 +250,7 @@ export function makeCompareStructure(
 ) {
     const parentElement = prevStructure.element;
     const prevStructures = concat(prevStructure.children || []);
-    const {added, removed} = compare(
+    const {added, changed, removed} = compare(
         prevStructures,
         nextStructures || [],
         (prev, next) => {
@@ -243,6 +259,9 @@ export function makeCompareStructure(
             makeCompareStructure(prev, concat(next.children || []));
         },
     );
+    changed.forEach(([from, to]) => {
+        parentElement.insertBefore(nextStructures[to].element, nextStructures[to + 1].element);
+    });
     removed.reverse().forEach(index => {
         parentElement.removeChild(prevStructures[index].element);
     });
