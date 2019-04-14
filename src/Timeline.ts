@@ -1,8 +1,7 @@
 import Scene, { SceneItem } from "scenejs";
 import {
     getTimelineInfo, getTarget,
-    hasClass, removeClass, addClass, makeStructure, flatObject,
-    makeCompareStructure, splitProperty, getSceneItem, findElementIndexByPosition, applyStyle, findStructure
+    hasClass, removeClass, addClass, flatObject, splitProperty, findElementIndexByPosition, findStructure, createElement, updateElement
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
@@ -16,6 +15,7 @@ import {
 import { dblCheck } from "./dblcheck";
 import { getKeytimesStructure, getLinesStructure } from "./KeytimesStructure";
 import KeyController from "keycon";
+import DataDOM from "data-dom";
 import { getHeaderAreaStructure } from "./HeaderAreaStructure";
 import { getScrollAreaStructure } from "./ScrollAreaStructure";
 import { getControlAreaStructure } from "./ControlAreaStructure";
@@ -24,11 +24,13 @@ let isExportCSS = false;
 
 export default class Timeline {
     private scene: Scene;
-    private ids: Ids;
     private maxTime: number = 0;
     private axes: Axes;
     private selectedIndex: number = -1;
     private keycon: KeyController;
+    private datadom: DataDOM<ElementStructure>;
+    private structure: ElementStructure;
+    private ids: Ids = {};
     constructor(scene: Scene, parentEl: HTMLElement) {
         scene.finish();
 
@@ -42,9 +44,11 @@ export default class Timeline {
         this.initController();
         this.initDragValues();
         this.initKeyController();
+
+
     }
     public getElement() {
-        return this.ids.timeline.element;
+        return this.structure.element;
     }
     // scene control
     public prev() {
@@ -120,6 +124,7 @@ export default class Timeline {
         const timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(duration);
         const maxTime = maxDuration + 5;
+        const ids = this.ids;
         let timelineCSS: ElementStructure;
 
         this.maxTime = maxTime;
@@ -133,16 +138,21 @@ export default class Timeline {
 
         const structure: ElementStructure = {
             selector: ".timeline",
-            id: "timeline",
+            ref: e => {
+                ids.timeline = e;
+            },
             children: [
                 timelineCSS,
-                getControlAreaStructure(),
-                getHeaderAreaStructure(maxDuration, maxTime),
-                getScrollAreaStructure(timelineInfo, maxDuration, maxTime),
+                getControlAreaStructure(ids),
+                getHeaderAreaStructure(ids, maxDuration, maxTime),
+                getScrollAreaStructure(ids, timelineInfo, maxDuration, maxTime),
             ],
         };
-
-        this.ids = makeStructure<Ids>(structure, parentEl).ids;
+        this.datadom = new DataDOM(
+            createElement,
+            updateElement,
+        );
+        this.structure = this.datadom.render(structure, parentEl);
     }
     private initScroll() {
         const {
@@ -490,14 +500,16 @@ export default class Timeline {
         const nextLines = getLinesStructure(maxTime);
 
         // update keytimes
-        makeCompareStructure(
-            keytimesContainer,
+        this.datadom.update(
+            keytimesContainer.children,
             nextKeytimes,
+            keytimesContainer,
         );
         // update lines
-        makeCompareStructure(
-            lineArea,
+        this.datadom.update(
+            lineArea.children,
             nextLines,
+            lineArea,
         );
         const keyframesContainers = ids.keyframesContainers;
 
@@ -522,15 +534,16 @@ export default class Timeline {
         const maxTime = this.maxTime;
         const ids = this.ids;
         const scrollArea = this.ids.keyframesScrollAreas[1];
-        const nextKeyframesList = getKeyframesListStructure(timelineInfo, maxTime);
-        const nextScrollAreaChildren = getKeyframesScrollAreaChildrenStructure(nextKeyframesList, maxTime);
-        makeCompareStructure(
-            scrollArea,
+        const nextKeyframesList = getKeyframesListStructure(ids, timelineInfo, maxTime);
+        const nextScrollAreaChildren = getKeyframesScrollAreaChildrenStructure(ids, nextKeyframesList, maxTime);
+
+        ids.keyframesList = [];
+        ids.keyframesContainers = [];
+        this.datadom.update(
+            scrollArea.children,
             nextScrollAreaChildren,
+            scrollArea,
         );
-        ids.lineArea = findStructure(".line_area", nextScrollAreaChildren, false);
-        ids.keyframesContainers = findStructure(".keyframes_container", nextKeyframesList, true);
-        ids.keyframesList = nextKeyframesList;
 
         this.updateKeytimes();
         this.scene.setTime(this.scene.getTime());

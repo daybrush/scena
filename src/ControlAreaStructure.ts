@@ -1,4 +1,6 @@
-export function getControlAreaStructure() {
+import { Ids, ElementStructure } from "./types";
+
+export function getControlAreaStructure(ids: Ids): ElementStructure {
     return {
         selector: ".header_area.control_area",
         children: [
@@ -21,25 +23,32 @@ export function getControlAreaStructure() {
                     children: [
                         {
                             selector: ".time_area",
-                            id: "timeArea",
+                            ref: (e: ElementStructure) => {
+                                ids.timeArea = e;
+                            },
                             html: "0",
                         },
                         {
                             selector: ".play_control_area",
-                            id: "playControlArea",
                             children: [
                                 {
-                                    id: "prevBtn",
+                                    ref: (e: ElementStructure) => {
+                                        ids.prevBtn = e;
+                                    },
                                     selector: ".control.prev",
                                     html: "prev",
                                 },
                                 {
-                                    id: "playBtn",
+                                    ref: (e: ElementStructure) => {
+                                        ids.playBtn = e;
+                                    },
                                     selector: ".control.play",
                                     html: "play",
                                 },
                                 {
-                                    id: "nextBtn",
+                                    ref: (e: ElementStructure) => {
+                                        ids.nextBtn = e;
+                                    },
                                     selector: ".control.next",
                                     html: "next",
                                 },

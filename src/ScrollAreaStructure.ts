@@ -1,32 +1,41 @@
 import { getKeyframesAreaStructure, getKeyframesListStructure } from "./KeyframesStructure";
-import { ElementStructure } from "./types";
+import { ElementStructure, Ids } from "./types";
 import { getPropertiesStructure } from "./PropertiesStructure";
 import { getValuesStructure } from "./ValuesStructure";
 
-export function getScrollAreaStructure(timelineInfo, maxDuration: number, maxTime: number) {
-    const properties: ElementStructure[] = getPropertiesStructure(timelineInfo);
-    const values: ElementStructure[] = getValuesStructure(timelineInfo);
-    const keyframesList: ElementStructure[] = getKeyframesListStructure(timelineInfo, maxTime);
+export function getScrollAreaStructure(ids: Ids, timelineInfo, maxDuration: number, maxTime: number): ElementStructure {
+    const keyframesList: ElementStructure[] = getKeyframesListStructure(ids, timelineInfo, maxTime);
+
     return {
-        id: "scrollArea",
+        ref: e => {
+            ids.scrollArea = e;
+            ids.keyframesList = [];
+            ids.keyframesContainers = [];
+        },
         selector: ".scroll_area",
         children: [
             {
-                id: "propertiesAreas[]",
+                ref: e => {
+                    ids.propertiesAreas[1] = e;
+                    ids.properties = [];
+                },
                 selector: ".properties_area",
                 children: [
                     {
                         selector: ".properties_scroll_area",
-                        children: properties,
+                        children: getPropertiesStructure(ids, timelineInfo),
                     },
                 ],
             },
             {
-                id: "valuesArea",
+                ref: e => {
+                    ids.valuesArea = e;
+                    ids.values = [];
+                },
                 selector: ".values_area",
-                children: values,
+                children: getValuesStructure(ids, timelineInfo),
             },
-            getKeyframesAreaStructure(keyframesList, maxDuration, maxTime),
+            getKeyframesAreaStructure(ids, keyframesList, maxDuration, maxTime),
         ],
     };
 }

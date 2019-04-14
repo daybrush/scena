@@ -26,6 +26,7 @@
   "dependencies": {
     "@daybrush/drag": "^0.4.2",
     "@egjs/axes": "^2.5.10",
+    "data-dom": "0.0.3",
     "keycon": "^0.2.0",
     "scenejs": "^1.0.0-rc7"
   },

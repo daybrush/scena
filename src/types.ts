@@ -1,34 +1,29 @@
 import { IObject } from "@daybrush/utils";
+import { DataStructure } from "data-dom";
 
 export interface Ids {
-    timeArea: ElementStructure;
-    scrollArea: ElementStructure;
-    valuesArea: ElementStructure;
-    timeline: ElementStructure;
-    properties: ElementStructure[];
-    values: ElementStructure[];
-    keyframesList: ElementStructure[];
-    keyframesInfoList: ElementStructure[][];
-    cursors: ElementStructure[];
-    keyframesAreas: ElementStructure[];
-    propertiesAreas: ElementStructure[];
-    keyframesScrollAreas: ElementStructure[];
-    keyframesContainers: ElementStructure[];
-    keytimesContainer: ElementStructure;
-    lineArea: ElementStructure;
-    prevBtn: ElementStructure;
-    playBtn: ElementStructure;
-    nextBtn: ElementStructure;
+    timeArea?: ElementStructure;
+    scrollArea?: ElementStructure;
+    valuesArea?: ElementStructure;
+    timeline?: ElementStructure;
+    properties?: ElementStructure[];
+    values?: ElementStructure[];
+    keyframesList?: ElementStructure[];
+    cursors?: ElementStructure[];
+    keyframesAreas?: ElementStructure[];
+    propertiesAreas?: ElementStructure[];
+    keyframesScrollAreas?: ElementStructure[];
+    keyframesContainers?: ElementStructure[];
+    keytimesContainer?: ElementStructure;
+    lineArea?: ElementStructure;
+    prevBtn?: ElementStructure;
+    playBtn?: ElementStructure;
+    nextBtn?: ElementStructure;
 }
-export interface ElementStructure {
+export interface ElementStructure extends DataStructure {
     selector: string;
-    id?: string | string[];
-    key?: string | number;
-    memberof?: string;
-    element?: HTMLElement;
     attr?: IObject<any>;
     dataset?: IObject<any>;
     style?: Partial<CSSStyleDeclaration>;
     html?: string;
-    children?: undefined | ElementStructure | Array<ElementStructure | undefined>;
 }

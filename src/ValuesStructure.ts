@@ -1,20 +1,22 @@
 import { isObject } from "@daybrush/utils";
+import { Ids, ElementStructure } from "./types";
 
-export function getValuesStructure(timelineInfo) {
-    const values = [];
+export function getValuesStructure(ids: Ids, timelineInfo): ElementStructure[] {
+    const values: ElementStructure[] = [];
 
     for (const property in timelineInfo) {
         const times = timelineInfo[property];
         const isHasObject = times[0] && isObject(times[0][1]);
         values.push({
-            id: "values[]",
+            ref: (e, i) => {
+                ids.values[i] = e;
+            },
             selector: ".value",
             dataset: {
                 property,
                 object: isHasObject ? "1" : "0",
             },
             children: {
-                id: "inputs[]",
                 selector: "input",
                 attr: {
                     value: times[0] ? times[0][1] : "",

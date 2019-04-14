@@ -1,6 +1,6 @@
-import { ElementStructure } from "./types";
+import { ElementStructure, Ids } from "./types";
 
-export function getPropertiesStructure(timelineInfo) {
+export function getPropertiesStructure(ids: Ids, timelineInfo) {
     const properties: ElementStructure[] = [];
 
     for (const property in timelineInfo) {
@@ -9,7 +9,9 @@ export function getPropertiesStructure(timelineInfo) {
         const id = propertyNames[length - 1];
 
         properties.push({
-            id: "properties[]",
+            ref: (e, i) => {
+                ids.properties[i] = e;
+            },
             selector: ".property",
             dataset: {
                 id,

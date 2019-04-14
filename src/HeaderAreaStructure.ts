@@ -1,13 +1,19 @@
 import { getKeytimesStructure } from "./KeytimesStructure";
+import { Ids, ElementStructure } from "./types";
 
-export function getHeaderAreaStructure(maxDuration: number, maxTime: number) {
+export function getHeaderAreaStructure(ids: Ids, maxDuration: number, maxTime: number): ElementStructure {
     return {
         selector: ".header_area",
+        ref: e => {
+            ids.keyframesScrollAreas = [];
+            ids.keyframesAreas = [];
+            ids.propertiesAreas = [];
+        },
         children: [
             {
-                id: [
-                    "propertiesAreas[]",
-                ],
+                ref: (e: ElementStructure) => {
+                    ids.propertiesAreas[0] = e;
+                },
                 selector: ".properties_area",
                 children: [
                     {
@@ -24,26 +30,37 @@ export function getHeaderAreaStructure(maxDuration: number, maxTime: number) {
                 },
             },
             {
-                id: "keyframesAreas[]",
+                ref: e => {
+                    ids.keyframesAreas[0] = e;
+                },
                 selector: ".keyframes_area",
                 children: {
                     style: {
                         minWidth: `${50 * maxTime}px`,
                         width: `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`,
                     },
-                    id: "keyframesScrollAreas[]",
+                    ref: (e: ElementStructure) => {
+                        ids.keyframesScrollAreas[0] = e;
+                    },
                     selector: ".keyframes_scroll_area",
                     children: {
+                        ref: e => {
+                            ids.cursors = [];
+                        },
                         selector: ".keyframes",
                         children: [
                             {
-                                id: "keytimesContainer",
+                                ref: e => {
+                                    ids.keytimesContainer = e;
+                                },
                                 selector: ".keyframes_container",
                                 children: getKeytimesStructure(maxTime),
                             },
                             {
                                 selector: ".keyframe_cursor",
-                                id: "cursors[]",
+                                ref: e => {
+                                    ids.cursors[0] = e;
+                                },
                             },
                         ],
                     },

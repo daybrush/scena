@@ -17,7 +17,8 @@ export function applyStyle(el: HTMLElement, style: IObject<any>) {
         el.style[name] = style[name];
     }
 }
-export function createElement(structure: ElementStructure, parentEl?: Element) {
+
+export function createElement(structure: ElementStructure) {
     const {selector, dataset, attr, style, html} = structure;
 
     const classNames = selector.match(/\.([^.#\s])+/g) || [];
@@ -44,8 +45,24 @@ export function createElement(structure: ElementStructure, parentEl?: Element) {
     if (html) {
         el.innerHTML = html;
     }
-    parentEl && parentEl.appendChild(el);
     return el;
+}
+export function updateElement(prevStructure: ElementStructure, nextStructure: ElementStructure) {
+    const {dataset, attr, style, html, element} = nextStructure;
+    if (dataset) {
+        for (const name in dataset) {
+            element.setAttribute(`data-${name}`, dataset[name]);
+        }
+    }
+    if (attr) {
+        for (const name in attr) {
+            element.setAttribute(name, attr[name]);
+        }
+    }
+    style && applyStyle(element, style);
+    if (prevStructure.html !== nextStructure.html) {
+        element.innerHTML = html;
+    }
 }
 export function keys(value: object) {
     const arr = [];
@@ -136,148 +153,6 @@ export function addClass(target: Element, className: string) {
 }
 export function removeClass(target: Element, className: string) {
     return removeClass2(target, `${PREFIX}${className}`);
-}
-export function addId(structure: ElementStructure, ids: IObject<any> = {}) {
-    const {id, memberof} = structure;
-    if (id) {
-        [].concat(id).forEach(nextId => {
-            const isArrayId = nextId.indexOf("[]") > -1;
-            const isDoubleArrayId = isArrayId && nextId.indexOf("[][]") > -1;
-
-            if (isArrayId) {
-                const objId = nextId.replace(/\[\]/g, "");
-
-                if (!ids[objId]) {
-                    ids[objId] = [];
-                }
-                if (isDoubleArrayId) {
-                    ids[objId].push([]);
-                } else {
-                    ids[objId].push(structure);
-                }
-            } else {
-                ids[nextId] = structure;
-            }
-        });
-    }
-    if (memberof) {
-        if (!ids[memberof]) {
-            ids[memberof] = [[]];
-        }
-        ids[memberof][ids[memberof].length - 1].push(structure);
-    }
-}
-export function makeStructure<T>(
-    structure: ElementStructure,
-    parentEl?: Element,
-    ids: IObject<any> = {},
-): {structure: ElementStructure, ids: T} {
-    const {children, key, selector} = structure;
-    const el = createElement(structure);
-
-    addId(structure, ids);
-
-    if (isUndefined(key)) {
-        structure.key = selector;
-    }
-    if (children) {
-        ([] as Array<string | ElementStructure>).concat(children).filter(child => child).forEach(child => {
-            if (isString(child)) {
-                makeStructure({ selector: child }, el, ids);
-            } else {
-                makeStructure(child, el, ids);
-            }
-        });
-    }
-    parentEl && parentEl.appendChild(el);
-
-    structure.element = el;
-    return {structure, ids} as {structure: ElementStructure, ids: T};
-}
-export function compare(
-    prevArr: any[],
-    nextArr: any[],
-    syncCallback: (prev: ElementStructure, next: ElementStructure) => void,
-) {
-    const prevKeys: Array<number | string> = prevArr.map(({ key, selector }) => isUndefined(key) ? selector : key);
-    const nextKeys: Array<number | string> = nextArr.map(({ key, selector }) => isUndefined(key) ? selector : key);
-    const prevKeysObject: IObject<number> = {};
-    const nextKeysObject = {};
-    const added = [];
-    const removed = [];
-    const changed = [];
-
-    prevKeys.forEach((key, i) => {
-        prevKeysObject[key] = i;
-    });
-    nextKeys.forEach((key, i) => {
-        if (!(key in prevKeysObject)) {
-            added.push(i);
-        } else {
-            syncCallback(prevArr[prevKeysObject[key]], nextArr[i]);
-        }
-        nextKeysObject[key] = i;
-    });
-    prevKeys.forEach((key, i) => {
-        const index = nextKeysObject[key];
-        if (isUndefined(index)) {
-            removed.push(i);
-        } else if (i !== index) {
-            changed.push([i, index]);
-        }
-    });
-    changed.sort((a, b) => {
-        return a[1] > b[1] ? 1 : -1;
-      });
-
-    const newChanged: number[][] = [];
-    let prev = [-1, -1];
-    changed.forEach(changeInfo => {
-        if (prev[0] > changeInfo[0]) {
-          newChanged.push(prev);
-        }
-        prev = changeInfo;
-    });
-
-    return {added, removed, changed: newChanged};
-}
-export function concat<T>(arr: T | T[]): T[] {
-    return [].concat(arr);
-}
-export function makeCompareStructure(
-    prevStructure: ElementStructure,
-    nextStructures: ElementStructure[],
-) {
-    const parentElement = prevStructure.element;
-    const prevStructures = concat(prevStructure.children || []);
-    const {added, changed, removed} = compare(
-        prevStructures,
-        nextStructures || [],
-        (prev, next) => {
-            next.element = prev.element;
-            applyStyle(next.element, next.style);
-            makeCompareStructure(prev, concat(next.children || []));
-        },
-    );
-    changed.forEach(([from, to]) => {
-        parentElement.insertBefore(nextStructures[to].element, nextStructures[to + 1].element);
-    });
-    removed.reverse().forEach(index => {
-        parentElement.removeChild(prevStructures[index].element);
-    });
-    added.forEach(index => {
-        const {structure: { element }} = makeStructure(
-            nextStructures[index],
-        );
-        parentElement.insertBefore(
-            element,
-            nextStructures[index + 1] && nextStructures[index + 1].element,
-        );
-    });
-
-    if (nextStructures) {
-        prevStructure.children = nextStructures;
-    }
 }
 export function findStructure(
     selector: string,
