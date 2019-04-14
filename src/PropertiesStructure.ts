@@ -12,6 +12,7 @@ export function getPropertiesStructure(ids: Ids, timelineInfo) {
             ref: (e, i) => {
                 ids.properties[i] = e;
             },
+            key: property,
             selector: ".property",
             dataset: {
                 id,

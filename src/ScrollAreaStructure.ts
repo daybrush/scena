@@ -3,7 +3,12 @@ import { ElementStructure, Ids } from "./types";
 import { getPropertiesStructure } from "./PropertiesStructure";
 import { getValuesStructure } from "./ValuesStructure";
 
-export function getScrollAreaStructure(ids: Ids, timelineInfo, maxDuration: number, maxTime: number): ElementStructure {
+export function getScrollAreaStructure(
+    ids: Ids,
+    timelineInfo,
+    maxDuration: number,
+    maxTime: number,
+): ElementStructure {
     const keyframesList: ElementStructure[] = getKeyframesListStructure(ids, timelineInfo, maxTime);
 
     return {

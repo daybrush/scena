@@ -11,6 +11,7 @@ export function getValuesStructure(ids: Ids, timelineInfo): ElementStructure[] {
             ref: (e, i) => {
                 ids.values[i] = e;
             },
+            key: property,
             selector: ".value",
             dataset: {
                 property,

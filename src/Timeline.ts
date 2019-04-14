@@ -1,7 +1,9 @@
 import Scene, { SceneItem } from "scenejs";
 import {
     getTimelineInfo, getTarget,
-    hasClass, removeClass, addClass, flatObject, splitProperty, findElementIndexByPosition, findStructure, createElement, updateElement
+    hasClass, removeClass, addClass,
+    flatObject, splitProperty, findElementIndexByPosition,
+    createElement, updateElement,
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
@@ -482,7 +484,7 @@ export default class Timeline {
         } else {
             item.removeFrame(time);
         }
-        this.updateKeyframes();
+        this.update();
     }
     private updateKeytimes() {
         const maxTime = this.scene.getDuration() + 5;
@@ -529,24 +531,17 @@ export default class Timeline {
             });
         }
     }
-    private updateKeyframes() {
+    private update() {
         const timelineInfo = getTimelineInfo(this.scene);
-        const maxTime = this.maxTime;
-        const ids = this.ids;
-        const scrollArea = this.ids.keyframesScrollAreas[1];
-        const nextKeyframesList = getKeyframesListStructure(ids, timelineInfo, maxTime);
-        const nextScrollAreaChildren = getKeyframesScrollAreaChildrenStructure(ids, nextKeyframesList, maxTime);
 
-        ids.keyframesList = [];
-        ids.keyframesContainers = [];
-        this.datadom.update(
-            scrollArea.children,
-            nextScrollAreaChildren,
-            scrollArea,
+        const nextScrollAreaStructure = getScrollAreaStructure(
+            this.ids, timelineInfo, Math.ceil(this.scene.getDuration()), this.maxTime,
         );
 
-        this.updateKeytimes();
-        this.scene.setTime(this.scene.getTime());
+        this.datadom.update(
+            this.ids.scrollArea,
+            nextScrollAreaStructure,
+        );
     }
     private editKeyframe(time: number, value: any, index: number, isForce?: boolean) {
         const ids = this.ids;
@@ -559,7 +554,6 @@ export default class Timeline {
         const property = valuesStructure[index].dataset.property as string;
         const scene = this.scene;
         const {
-            names,
             properties,
             item,
         } = splitProperty(scene, property);
@@ -574,7 +568,7 @@ export default class Timeline {
         item.set(time, ...properties, value);
 
         scene.setTime(time);
-        this.updateKeyframes();
+        this.update();
     }
     private restoreKeyframes() {
         this.scene.setTime(this.scene.getTime());
