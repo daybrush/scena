@@ -15,7 +15,14 @@ export function updateKeyframesStructure(keyframes: ElementStructure[], maxTime)
     });
 }
 
-export function getKeyframesAreaStructure(ids: Ids, keyframesList, maxDuration, maxTime): ElementStructure {
+export function getKeyframesAreaStructure(
+    ids: Ids,
+    keyframesList,
+    zoom: number,
+    maxDuration: number,
+    maxTime: number,
+): ElementStructure {
+    const width = Math.min(maxDuration ? maxTime / maxDuration : 1, 2);
     return {
         ref: e => {
             ids.keyframesAreas[1] = e;
@@ -24,7 +31,10 @@ export function getKeyframesAreaStructure(ids: Ids, keyframesList, maxDuration, 
         children: {
             style: {
                 minWidth: `${50 * maxTime}px`,
-                width: `${(maxDuration ? maxTime / maxDuration : 1) * 100}%`,
+                width: `${width * zoom * 100}%`,
+            },
+            dataset: {
+                width,
             },
             ref: e => {
                 ids.keyframesScrollAreas[1] = e;

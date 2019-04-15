@@ -6,6 +6,7 @@ import { getValuesStructure } from "./ValuesStructure";
 export function getScrollAreaStructure(
     ids: Ids,
     timelineInfo,
+    zoom: number,
     maxDuration: number,
     maxTime: number,
 ): ElementStructure {
@@ -40,7 +41,7 @@ export function getScrollAreaStructure(
                 selector: ".values_area",
                 children: getValuesStructure(ids, timelineInfo),
             },
-            getKeyframesAreaStructure(ids, keyframesList, maxDuration, maxTime),
+            getKeyframesAreaStructure(ids, keyframesList, zoom, maxDuration, maxTime),
         ],
     };
 }
