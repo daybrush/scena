@@ -74,6 +74,7 @@ export function getKeyframesListStructure(ids: Ids, timelineInfo, maxTime: numbe
         keyframesList.push({
             ref: (e, i) => {
                 ids.keyframesList[i] = e;
+                ids.keyframesContainers[i] = e.children as ElementStructure;
             },
             selector: ".keyframes",
             key: property,
@@ -81,9 +82,6 @@ export function getKeyframesListStructure(ids: Ids, timelineInfo, maxTime: numbe
                 property,
             },
             children: {
-                ref: (e, i) => {
-                    ids.keyframesContainers[i] = e;
-                },
                 selector: ".keyframes_container",
                 children: keyframes,
             },
