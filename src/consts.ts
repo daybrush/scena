@@ -64,14 +64,56 @@ export const CSS = `
 }
 .play_control_area {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%);
+    transform: translate(-50%, -50%);
 }
 .play_control_area .control {
+    position: relative;
     display: inline-block;
+    vertical-align: middle;
     color: white;
-    margin: 0px 10px;
+    margin: 0px 15px;
+}
+.play {
+    border-left: 16px solid white;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+}
+.pause {
+    border-left: 4px solid #fff;
+    border-right: 4px solid #fff;
+    width: 8px;
+    height: 18px;
+}
+.prev {
+    border-right: 10px solid white;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+}
+.prev:before {
+    position: absolute;
+    content: "";
+    width: 3px;
+    height: 10px;
+    top: 0;
+    right: 100%;
+    transform: translate(0, -50%);
+    background: white;
+}
+.next {
+    border-left: 10px solid white;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+}
+.next:before {
+    position: absolute;
+    content: "";
+    width: 3px;
+    height: 10px;
+    top: 0;
+    transform: translate(0, -50%);
+    background: white;
 }
 .keytime {
   position: relative;
@@ -255,6 +297,9 @@ export const CSS = `
 }
 .select .keyframe {
     border-color: #4d4d4d;
+}
+.keyframe.select {
+    background: #f55;
 }
 .keyframes_container, .line_area {
   position: relative;

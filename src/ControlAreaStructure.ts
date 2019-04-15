@@ -36,21 +36,18 @@ export function getControlAreaStructure(ids: Ids): ElementStructure {
                                         ids.prevBtn = e;
                                     },
                                     selector: ".control.prev",
-                                    html: "prev",
                                 },
                                 {
                                     ref: (e: ElementStructure) => {
                                         ids.playBtn = e;
                                     },
                                     selector: ".control.play",
-                                    html: "play",
                                 },
                                 {
                                     ref: (e: ElementStructure) => {
                                         ids.nextBtn = e;
                                     },
                                     selector: ".control.next",
-                                    html: "next",
                                 },
                             ],
                         },
