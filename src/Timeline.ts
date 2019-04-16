@@ -3,7 +3,7 @@ import {
     getTimelineInfo, getTarget,
     hasClass, removeClass, addClass,
     flatObject, splitProperty, findElementIndexByPosition,
-    createElement, updateElement, findIndexByProperty, findStructure,
+    createElement, updateElement, findIndexByProperty, findStructure, numberFormat,
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
@@ -42,6 +42,8 @@ export default class Timeline {
         this.initController();
         this.initDragValues();
         this.initKeyController();
+
+        scene.setTime(0);
     }
     public getElement() {
         return this.structure.element;
@@ -93,8 +95,36 @@ export default class Timeline {
             removeClass(playBtn, "pause");
             // playBtn.innerHTML = "play";
         });
+        new KeyController(ids.timeArea.element)
+        .keydown(e => {
+            !e.isToggle && e.inputEvent.stopPropagation();
+        })
+        .keyup(e => {
+            !e.isToggle && e.inputEvent.stopPropagation();
+        })
+        .keyup("enter", e => {
+            // go to time
+            const element = ids.timeArea.element;
+            const value = (element as HTMLInputElement).value;
+            const result = /(\d+):(\d+):(\d+)/g.exec(value);
+
+            if (!result) {
+                return;
+            }
+            const minute = parseFloat(result[1]);
+            const second = parseFloat(result[2]);
+            const milisecond = parseFloat(`0.${result[3]}`);
+            const time = minute * 60 + second + milisecond;
+
+            scene.setTime(time);
+        });
     }
     private initKeyController() {
+        const ids = this.ids;
+
+        window.addEventListener("blur", () => {
+            removeClass(ids.timeline.element, "alt");
+        });
         this.keycon = new KeyController()
         .keydown("space", ({inputEvent}) => {
             inputEvent.preventDefault();
@@ -107,6 +137,12 @@ export default class Timeline {
         })
         .keyup("backspace", () => {
             this.removeKeyframe(this.selectedProperty, this.scene.getTime());
+        })
+        .keydown("alt", () => {
+            addClass(ids.timeline.element, "alt");
+        })
+        .keyup("alt", () => {
+            removeClass(ids.timeline.element, "alt");
         })
         .keyup("esc", () => {
             this.finish();
@@ -341,7 +377,10 @@ export default class Timeline {
             this.moveCursor(time);
 
             this.setInputs(flatObject(e.frames));
-            timeArea.element.innerHTML = `${Math.round(time * 100) / 100}`;
+            const minute = numberFormat(Math.floor(time / 60), 2);
+            const second = numberFormat(Math.floor(time % 60), 2);
+            const milisecond = numberFormat(Math.floor((time % 1) * 100), 3, true);
+            (timeArea.element as HTMLInputElement).value = `${minute}:${second}:${milisecond}`;
         });
         const getTime = (clientX: number) => {
             const rect = keyframesScrollAreas[1].element.getBoundingClientRect();
@@ -418,6 +457,8 @@ export default class Timeline {
             dragstart: e => {
                 dragTarget = e.inputEvent.target;
                 dragTargetValue = dragTarget.value;
+
+                console.log(this.keycon.altKey, getTarget(dragTarget, el => el.nodeName === "INPUT"));
                 if (!this.keycon.altKey || !getTarget(dragTarget, el => el.nodeName === "INPUT")) {
                     return false;
                 }
@@ -539,10 +580,10 @@ export default class Timeline {
 
         new KeyController(valuesArea)
         .keydown(e => {
-            e.inputEvent.stopPropagation();
+            !e.isToggle && e.inputEvent.stopPropagation();
         })
         .keyup(e => {
-            e.inputEvent.stopPropagation();
+            !e.isToggle && e.inputEvent.stopPropagation();
         })
         .keyup("enter", e => {
             const target = e.inputEvent.target as HTMLInputElement;
