@@ -27,7 +27,7 @@
     "@daybrush/drag": "^0.4.2",
     "@egjs/axes": "^2.5.10",
     "data-dom": "0.0.4",
-    "keycon": "^0.2.0",
+    "keycon": "^0.2.2",
     "scenejs": "^1.0.0-rc7"
   },
   "devDependencies": {

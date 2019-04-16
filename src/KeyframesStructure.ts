@@ -99,7 +99,7 @@ export function getKeyframesStructure(times: any[][], maxTime): ElementStructure
             const [nextTime, nextValue] = times[i + 1];
             const nextValueText = toValue(nextValue);
 
-            if (valueText === nextValueText) {
+            if (valueText !== nextValueText) {
                 keyframeLines.push({
                     selector: ".keyframe_line",
                     key: `${time},${nextTime}`,

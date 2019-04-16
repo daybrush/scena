@@ -49,9 +49,9 @@ export const CSS = `
 }
 .header_area .keyframe_cursor {
     position: absolute;
-    border-top: 10px solid #f55;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
+    border-top: 10px solid #4af;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
     width: 0;
     height: 0;
     bottom: 0;
@@ -76,15 +76,15 @@ export const CSS = `
     margin: 0px 15px;
 }
 .play {
-    border-left: 16px solid white;
-    border-top: 9px solid transparent;
-    border-bottom: 9px solid transparent;
+    border-left: 14px solid white;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
 }
 .pause {
     border-left: 4px solid #fff;
     border-right: 4px solid #fff;
-    width: 8px;
-    height: 18px;
+    width: 6px;
+    height: 16px;
 }
 .prev {
     border-right: 10px solid white;
@@ -191,12 +191,14 @@ export const CSS = `
     width: 100%;
     height: 100%;
     background: transparent;
-    color: #fe5;
+    color: #4af;
     font-weight: bold;
     background: none;
     border: 0;
     box-sizing: border-box;
     text-align: center;
+}
+.alt .value input {
     cursor: ew-resize;
 }
 .value[data-object="1"] input {
@@ -233,9 +235,14 @@ export const CSS = `
 }
 .time_area {
     font-size: 13px;
-    color: #fe5;
+    color: #4af;
     line-height: 30px;
     font-weight: bold;
+    height: 100%;
+    line-height: 30px;
+    border: 0;
+    background: transparent;
+    outline: 0;
 }
 .time_area:after {
     content: "s";
@@ -276,7 +283,7 @@ export const CSS = `
   top: 0;
   bottom: 0;
   margin: auto;
-  background: #aaa;
+  background: #666;
   z-index: 0;
 }
 .keyframe {
@@ -296,10 +303,10 @@ export const CSS = `
   cursor: pointer;
 }
 .select .keyframe {
-    border-color: #4d4d4d;
+    border-color: #555;
 }
 .keyframe.select {
-    background: #f55;
+    background: #4af;
 }
 .keyframes_container, .line_area {
   position: relative;
@@ -316,7 +323,7 @@ export const CSS = `
   position: absolute;
   top: 0;
   z-index: 1;
-  background: #f55;
+  background: #4af;
   width: 1px;
   height: 100%;
   left: 15px;

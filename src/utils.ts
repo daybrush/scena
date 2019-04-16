@@ -12,6 +12,21 @@ import {
 } from "@daybrush/utils";
 import { ElementStructure } from "./types";
 
+export function numberFormat(num: number, count: number, isRight?: boolean) {
+    const length = `${num}`.length;
+    const arr = [];
+
+    if (isRight) {
+        arr.push(num);
+    }
+    for (let i = length; i < count; ++i) {
+        arr.push(0);
+    }
+    if (!isRight) {
+        arr.push(num);
+    }
+    return arr.join("");
+}
 export function applyStyle(el: HTMLElement, style: IObject<any>) {
     for (const name in style) {
         el.style[name] = style[name];

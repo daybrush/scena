@@ -22,11 +22,12 @@ export function getControlAreaStructure(ids: Ids): ElementStructure {
                     selector: ".keyframes",
                     children: [
                         {
-                            selector: ".time_area",
+                            selector: "input.time_area",
                             ref: (e: ElementStructure) => {
                                 ids.timeArea = e;
                             },
-                            html: "0",
+                            html: "???",
+                            // html: "0",
                         },
                         {
                             selector: ".play_control_area",
