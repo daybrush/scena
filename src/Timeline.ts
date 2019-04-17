@@ -298,6 +298,9 @@ export default class Timeline {
         }
 
         if (selectedProperty) {
+            if (document.activeElement) {
+                (document.activeElement as HTMLElement).blur();
+            }
             const selectedIndex = findIndexByProperty(selectedProperty, properties);
             addClass(properties[selectedIndex].element, "select");
             addClass(values[selectedIndex].element, "select");
@@ -471,7 +474,7 @@ export default class Timeline {
                 dragTarget.value = nextValue;
             },
             dragend: e => {
-                this.edit(dragTarget, dragTarget.value, true);
+                this.edit(dragTarget, dragTarget.value);
             },
         });
     }
@@ -481,7 +484,7 @@ export default class Timeline {
         const property = list[index].dataset.property;
         const {item, properties} = splitProperty(scene, property);
 
-        this.editKeyframe(time, item.getNowValue(time, properties), index, true);
+        this.editKeyframe(time, item.getNowValue(time, properties), index);
         this.select(property, time);
     }
     private removeKeyframe(property: string, time: number) {
@@ -531,7 +534,7 @@ export default class Timeline {
         );
         scene.setTime(scene.getTime());
     }
-    private editKeyframe(time: number, value: any, index: number, isForce?: boolean) {
+    private editKeyframe(time: number, value: any, index: number) {
         const ids = this.ids;
         const valuesStructure = ids.values;
         const isObjectData = ids.properties[index].dataset.object === "1";
@@ -540,28 +543,17 @@ export default class Timeline {
             return;
         }
         const property = valuesStructure[index].dataset.property as string;
+        const properties = property.split("///");
         const scene = this.scene;
-        const {
-            properties,
-            item,
-        } = splitProperty(scene, property);
 
-        if (!isForce) {
-            const prevValue = (item as SceneItem).getNowValue(time, properties);
-
-            if (`${prevValue}` === value) {
-                return;
-            }
-        }
-        item.set(time, ...properties, value);
-
+        scene.set(time, ...properties, value);
         scene.setTime(time);
         this.update();
     }
     private restoreKeyframes() {
         this.scene.setTime(this.scene.getTime());
     }
-    private edit(target: HTMLInputElement, value: any, isForce?: boolean) {
+    private edit(target: HTMLInputElement, value: any) {
         const parentEl = getTarget(target, el => hasClass(el, "value"));
 
         if (!parentEl) {
@@ -573,7 +565,7 @@ export default class Timeline {
         if (index === -1) {
             return;
         }
-        this.editKeyframe(this.scene.getTime(), value, index, isForce);
+        this.editKeyframe(this.scene.getTime(), value, index);
     }
     private initEditor() {
         const valuesArea = this.ids.valuesArea.element;
@@ -588,7 +580,7 @@ export default class Timeline {
         .keyup("enter", e => {
             const target = e.inputEvent.target as HTMLInputElement;
 
-            this.edit(target, target.value, true);
+            this.edit(target, target.value);
         })
         .keyup("esc", e => {
             const target = e.inputEvent.target as HTMLInputElement;
