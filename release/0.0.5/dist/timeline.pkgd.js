@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2019 
+Copyright (c) 2019 Daybrush
 name: @scenejs/timeline
-license: ISC
-author: 
+license: MIT
+author: Daybrush
 repository: git+https://github.com/daybrush/scenejs-timeline.git
 version: 0.0.5
 */
@@ -13,7 +13,7 @@ version: 0.0.5
 }(this, function () { 'use strict';
 
   var PREFIX = "scenejs_timeline_";
-  var CSS = "\n.timeline {\n  position: relative;\n  font-size: 0;\n  background: #000;\n  display: flex;\n  flex-direction: column;\n}\n.header_area, .scroll_area {\n   width: 100%;\n   position: relative;\n  display: flex;\n  -webkit-align-items: flex-start;\n  align-items: flex-start;\n}\n.header_area {\n  position: relative;\n  z-index: 10;\n  top: 0;\n  height: 30px;\n  min-height: 30px;\n}\n.header_area .keyframes {\n  padding: 0px;\n}\n.header_area .properties_area,\n.header_area .keyframes_area,\n.header_area .values_area,\n.header_area .keyframes_scroll_area {\n    height: 100%;\n}\n.header_area .property, .header_area .value, .header_area .keyframes {\n  height: 100%;\n}\n.header_area .property {\n    line-height: 30px;\n}\n.header_area .value {\n    text-align: center;\n    color: #fff;\n    line-height: 30px;\n    font-weight: bold;\n    font-size: 20px;\n}\n.header_area .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.header_area .keyframe_cursor {\n    position: absolute;\n    border-top: 10px solid #f55;\n    border-left: 5px solid transparent;\n    border-right: 5px solid transparent;\n    width: 0;\n    height: 0;\n    bottom: 0;\n    top: auto;\n    background: none;\n    cursor: pointer;\n}\n.control_area .keyframes {\n    padding-left: 10px;\n}\n.play_control_area {\n    position: absolute;\n    top: 0;\n    left: 50%;\n    transform: translate(-50%);\n}\n.play_control_area .control {\n    display: inline-block;\n    color: white;\n    margin: 0px 10px;\n}\n.keytime {\n  position: relative;\n  display: inline-block;\n  height: 100%;\n  font-size: 13px;\n  font-weight: bold;\n  color: #777;\n}\n.keytime:last-child {\n  max-width: 0px;\n}\n.keytime span {\n  position: absolute;\n  top: 2px;\n  left: 0;\n  display: inline-block;\n  transform: translate(-50%);\n  color: #eee;\n}\n.keytime .graduation {\n  position: absolute;\n  bottom: 0;\n  width: 1px;\n  height: 10px;\n  background: #777;\n  transform: translate(-50%);\n}\n.keytime .graduation.half {\n  left: 50%;\n  height: 7px;\n}\n.keytime .graduation.quarter {\n  left: 25%;\n  height: 5px;\n}\n.keytime .graduation.quarter3 {\n  left: 75%;\n  height: 5px;\n}\n.scroll_area {\n  position: relative;\n  width: 100%;\n  height: calc(100% - 60px);\n  overflow: auto;\n}\n.properties_area, .keyframes_area, .values_area {\n  display: inline-block;\n  position: relative;\n  font-size: 16px;\n  overflow: auto;\n}\n\n.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.properties_area {\n  width: 30%;\n  max-width: 200px;\n  box-sizing: border-box;\n}\n.values_area {\n    width: 50px;\n    min-width: 50px;\n    display: inline-block;\n    border-right: 1px solid #999;\n    box-sizing: border-box;\n}\n.value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #fe5;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n    text-align: center;\n}\n.value[data-object=\"1\"] input {\n    display: none;\n}\n.properties_scroll_area {\n  display: inline-block;\n  min-width: 100%;\n}\n.keyframes_area {\n  flex: 1;\n}\n.keyframes_scroll_area {\n  position: relative;\n  min-width: 300px;\n}\n.keyframes, .property, .value {\n  position: relative;\n  height: 25px;\n  border-bottom: 1px solid #777;\n  box-sizing: border-box;\n  white-space: nowrap;\n  background: rgba(90, 90, 90, 0.7);\n  z-index: 1;\n}\n\n.property {\n  line-height: 25px;\n  padding-left: 10px;\n  box-sizing: border-box;\n  font-size: 13px;\n  font-weight: bold;\n  color: #eee;\n}\n.time_area {\n    font-size: 13px;\n    color: #fe5;\n    line-height: 30px;\n    font-weight: bold;\n}\n.time_area:after {\n    content: \"s\";\n}\n.property .arrow {\n    position: relative;\n    display: inline-block;\n    margin-right: 5px;\n    width: 0;\n    vertical-align: middle;\n    cursor: pointer;\n    border-top: 6px solid #eee;\n    border-left: 4px solid transparent;\n    border-right: 4px solid transparent;\n}\n.property[data-fold=\"1\"] .arrow {\n    border-top: 4px solid transparent;\n    border-bottom: 4px solid transparent;\n    border-right: 0;\n    border-left: 6px solid #eee;\n    margin-left: 2px;\n}\n.property[data-object=\"0\"] .arrow {\n    display: none;\n}\n.property.fold, .keyframes.fold, .value.fold {\n    display: none;\n}\n.property.select, .value.select, .keyframes.select {\n    background: rgba(120, 120, 120, 0.7);\n}\n.keyframes {\n\n}\n.keyframe_line {\n  position: absolute;\n  height: 8px;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  background: #aaa;\n  z-index: 0;\n}\n.keyframe {\n  position: absolute;\n  font-size: 0px;\n  width: 12px;\n  height: 12px;\n  top: 0px;\n  bottom: 0px;\n  margin: auto;\n  background: #fff;\n  border: 2px solid #383838;\n  border-radius: 2px;\n  box-sizing: border-box;\n  transform: translate(-50%) rotate(45deg);\n  z-index: 1;\n  cursor: pointer;\n}\n.select .keyframe {\n    border-color: #4d4d4d;\n}\n.keyframes_container, .line_area {\n  position: relative;\n  width: calc(100% - 30px);\n  left: 15px;\n  height: 100%;\n}\n.line_area {\n  position: absolute;\n  top: 0;\n  z-index: 0;\n}\n.keyframe_cursor {\n  position: absolute;\n  top: 0;\n  z-index: 1;\n  background: #f55;\n  width: 1px;\n  height: 100%;\n  left: 15px;\n  transform: translate(-50%);\n}\n.division_line {\n  position: absolute;\n  background: #333;\n  width: 1px;\n  height: 100%;\n  transform: translate(-50%);\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
+  var CSS = "\n.timeline {\n  position: relative;\n  font-size: 0;\n  background: #000;\n  display: flex;\n  flex-direction: column;\n}\n.header_area, .scroll_area {\n   width: 100%;\n   position: relative;\n  display: flex;\n  -webkit-align-items: flex-start;\n  align-items: flex-start;\n}\n.header_area {\n  position: relative;\n  z-index: 10;\n  top: 0;\n  height: 30px;\n  min-height: 30px;\n}\n.header_area .keyframes {\n  padding: 0px;\n}\n.header_area .properties_area,\n.header_area .keyframes_area,\n.header_area .values_area,\n.header_area .keyframes_scroll_area {\n    height: 100%;\n}\n.header_area .property, .header_area .value, .header_area .keyframes {\n  height: 100%;\n}\n.header_area .property {\n    line-height: 30px;\n}\n.header_area .value {\n    text-align: center;\n    color: #fff;\n    line-height: 30px;\n    font-weight: bold;\n    font-size: 20px;\n}\n.header_area .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.header_area .keyframe_cursor {\n    position: absolute;\n    border-top: 10px solid #4af;\n    border-left: 6px solid transparent;\n    border-right: 6px solid transparent;\n    width: 0;\n    height: 0;\n    bottom: 0;\n    top: auto;\n    background: none;\n    cursor: pointer;\n}\n.control_area .keyframes {\n    padding-left: 10px;\n}\n.play_control_area {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n}\n.play_control_area .control {\n    position: relative;\n    display: inline-block;\n    vertical-align: middle;\n    color: white;\n    margin: 0px 15px;\n}\n.play {\n    border-left: 14px solid white;\n    border-top: 8px solid transparent;\n    border-bottom: 8px solid transparent;\n}\n.pause {\n    border-left: 4px solid #fff;\n    border-right: 4px solid #fff;\n    width: 6px;\n    height: 16px;\n}\n.prev {\n    border-right: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.prev:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    right: 100%;\n    transform: translate(0, -50%);\n    background: white;\n}\n.next {\n    border-left: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.next:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    transform: translate(0, -50%);\n    background: white;\n}\n.keytime {\n  position: relative;\n  display: inline-block;\n  height: 100%;\n  font-size: 13px;\n  font-weight: bold;\n  color: #777;\n}\n.keytime:last-child {\n  max-width: 0px;\n}\n.keytime span {\n  position: absolute;\n  top: 2px;\n  left: 0;\n  display: inline-block;\n  transform: translate(-50%);\n  color: #eee;\n}\n.keytime .graduation {\n  position: absolute;\n  bottom: 0;\n  width: 1px;\n  height: 10px;\n  background: #777;\n  transform: translate(-50%);\n}\n.keytime .graduation.half {\n  left: 50%;\n  height: 7px;\n}\n.keytime .graduation.quarter {\n  left: 25%;\n  height: 5px;\n}\n.keytime .graduation.quarter3 {\n  left: 75%;\n  height: 5px;\n}\n.scroll_area {\n  position: relative;\n  width: 100%;\n  height: calc(100% - 60px);\n  overflow: auto;\n}\n.properties_area, .keyframes_area, .values_area {\n  display: inline-block;\n  position: relative;\n  font-size: 16px;\n  overflow: auto;\n}\n\n.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.properties_area {\n  width: 30%;\n  max-width: 200px;\n  box-sizing: border-box;\n}\n.values_area {\n    width: 50px;\n    min-width: 50px;\n    display: inline-block;\n    border-right: 1px solid #999;\n    box-sizing: border-box;\n}\n.value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n    text-align: center;\n}\n.alt .value input {\n    cursor: ew-resize;\n}\n.value[data-object=\"1\"] input {\n    display: none;\n}\n.properties_scroll_area {\n  display: inline-block;\n  min-width: 100%;\n}\n.keyframes_area {\n  flex: 1;\n}\n.keyframes_scroll_area {\n  position: relative;\n  min-width: 300px;\n}\n.keyframes, .property, .value {\n  position: relative;\n  height: 25px;\n  border-bottom: 1px solid #777;\n  box-sizing: border-box;\n  white-space: nowrap;\n  background: rgba(90, 90, 90, 0.7);\n  z-index: 1;\n}\n\n.property {\n  line-height: 25px;\n  padding-left: 10px;\n  box-sizing: border-box;\n  font-size: 13px;\n  font-weight: bold;\n  color: #eee;\n}\n.time_area {\n    font-size: 13px;\n    color: #4af;\n    line-height: 30px;\n    font-weight: bold;\n    height: 100%;\n    line-height: 30px;\n    border: 0;\n    background: transparent;\n    outline: 0;\n}\n.time_area:after {\n    content: \"s\";\n}\n.property .arrow {\n    position: relative;\n    display: inline-block;\n    margin-right: 5px;\n    width: 0;\n    vertical-align: middle;\n    cursor: pointer;\n    border-top: 6px solid #eee;\n    border-left: 4px solid transparent;\n    border-right: 4px solid transparent;\n}\n.property[data-fold=\"1\"] .arrow {\n    border-top: 4px solid transparent;\n    border-bottom: 4px solid transparent;\n    border-right: 0;\n    border-left: 6px solid #eee;\n    margin-left: 2px;\n}\n.property[data-object=\"0\"] .arrow {\n    display: none;\n}\n.property.fold, .keyframes.fold, .value.fold {\n    display: none;\n}\n.property.select, .value.select, .keyframes.select {\n    background: rgba(120, 120, 120, 0.7);\n}\n.keyframes {\n\n}\n.keyframe_line {\n  position: absolute;\n  height: 8px;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  background: #666;\n  z-index: 0;\n}\n.keyframe {\n  position: absolute;\n  font-size: 0px;\n  width: 12px;\n  height: 12px;\n  top: 0px;\n  bottom: 0px;\n  margin: auto;\n  background: #fff;\n  border: 2px solid #383838;\n  border-radius: 2px;\n  box-sizing: border-box;\n  transform: translate(-50%) rotate(45deg);\n  z-index: 1;\n  cursor: pointer;\n}\n.select .keyframe {\n    border-color: #555;\n}\n.keyframe.select {\n    background: #4af;\n}\n.keyframes_container, .line_area {\n  position: relative;\n  width: calc(100% - 30px);\n  left: 15px;\n  height: 100%;\n}\n.line_area {\n  position: absolute;\n  top: 0;\n  z-index: 0;\n}\n.keyframe_cursor {\n  position: absolute;\n  top: 0;\n  z-index: 1;\n  background: #4af;\n  width: 1px;\n  height: 100%;\n  left: 15px;\n  transform: translate(-50%);\n}\n.division_line {\n  position: absolute;\n  background: #333;\n  width: 1px;\n  height: 100%;\n  transform: translate(-50%);\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
 
   /*
   Copyright (c) 2018 Daybrush
@@ -34,16 +34,6 @@ version: 0.0.5
 
   var OBJECT = "object";
   /**
-  * get string "string"
-  * @memberof Consts
-  * @example
-  import {STRING} from "@daybrush/utils";
-
-  console.log(STRING); // "string"
-  */
-
-  var STRING = "string";
-  /**
   * Check the type that the value is object.
   * @memberof Utils
   * @param {string} value - Value to check the type
@@ -60,24 +50,6 @@ version: 0.0.5
 
   function isObject(value) {
     return value && typeof value === OBJECT;
-  }
-  /**
-  * Check the type that the value is string.
-  * @memberof Utils
-  * @param {string} value - Value to check the type
-  * @return {} true if the type is correct, false otherwise
-  * @example
-  import {isString} from "@daybrush/utils";
-
-  console.log(isString("1234")); // true
-  console.log(isString(undefined)); // false
-  console.log(isString(1)); // false
-  console.log(isString(null)); // false
-  */
-
-
-  function isString(value) {
-    return typeof value === STRING;
   }
   /**
   * Date.now() method
@@ -152,13 +124,56 @@ version: 0.0.5
       element.className = element.className.replace(reg, " ");
     }
   }
+  /**
+  * Sets up a function that will be called whenever the specified event is delivered to the target
+  * @memberof DOM
+  * @param - event target
+  * @param - A case-sensitive string representing the event type to listen for.
+  * @param - The object which receives a notification (an object that implements the Event interface) when an event of the specified type occurs
+  * @param - An options object that specifies characteristics about the event listener. The available options are:
+  * @example
+  import {addEvent} from "@daybrush/utils";
 
+  addEvent(el, "click", e => {
+    console.log(e);
+  });
+  */
+
+
+  function addEvent(el, type, listener, options) {
+    el.addEventListener(type, listener, options);
+  }
+
+  function numberFormat(num, count, isRight) {
+    var length = ("" + num).length;
+    var arr = [];
+
+    if (isRight) {
+      arr.push(num);
+    }
+
+    for (var i = length; i < count; ++i) {
+      arr.push(0);
+    }
+
+    if (!isRight) {
+      arr.push(num);
+    }
+
+    return arr.join("");
+  }
   function applyStyle(el, style) {
     for (var name in style) {
       el.style[name] = style[name];
     }
   }
-  function createElement(structure, parentEl) {
+  function findIndexByProperty(selectedProperty, structures) {
+    return structures.findIndex(function (_a) {
+      var property = _a.dataset.property;
+      return property === selectedProperty;
+    });
+  }
+  function createElement(structure) {
     var selector = structure.selector,
         dataset = structure.dataset,
         attr = structure.attr,
@@ -193,8 +208,32 @@ version: 0.0.5
       el.innerHTML = html;
     }
 
-    parentEl && parentEl.appendChild(el);
     return el;
+  }
+  function updateElement(prevStructure, nextStructure) {
+    var dataset = nextStructure.dataset,
+        attr = nextStructure.attr,
+        style = nextStructure.style,
+        html = nextStructure.html,
+        element = nextStructure.element;
+
+    if (dataset) {
+      for (var name in dataset) {
+        element.setAttribute("data-" + name, dataset[name]);
+      }
+    }
+
+    if (attr) {
+      for (var name in attr) {
+        element.setAttribute(name, attr[name]);
+      }
+    }
+
+    style && applyStyle(element, style);
+
+    if (prevStructure.html !== nextStructure.html) {
+      element.innerHTML = html;
+    }
   }
   function keys(value) {
     var arr = [];
@@ -302,131 +341,11 @@ version: 0.0.5
   function removeClass$1(target, className) {
     return removeClass(target, "" + PREFIX + className);
   }
-  function makeStructure(structure, parentEl, obj) {
-    if (obj === void 0) {
-      obj = {
-        structures: {},
-        elements: {},
-        element: null
-      };
-    }
-
-    var id = structure.id,
-        memberof = structure.memberof,
-        children = structure.children;
-    var el = createElement(structure);
-    var structures = obj.structures;
-    var elements = obj.elements;
-
-    if (id) {
-      [].concat(id).forEach(function (nextId) {
-        var isArrayId = nextId.indexOf("[]") > -1;
-        var isDoubleArrayId = isArrayId && nextId.indexOf("[][]") > -1;
-
-        if (isArrayId) {
-          var objId = nextId.replace(/\[\]/g, "");
-
-          if (!structures[objId]) {
-            structures[objId] = [];
-            elements[objId] = [];
-          }
-
-          if (isDoubleArrayId) {
-            structures[objId].push([]);
-            elements[objId].push([]);
-          } else {
-            structures[objId].push(structure);
-            elements[objId].push(el);
-          }
-        } else {
-          structures[nextId] = structure;
-          elements[nextId] = el;
-        }
-      });
-    }
-
-    if (memberof) {
-      if (!structures[memberof]) {
-        structures[memberof] = [[]];
-        elements[memberof] = [[]];
-      }
-
-      structures[memberof][structures[memberof].length - 1].push(structure);
-      elements[memberof][elements[memberof].length - 1].push(el);
-    }
-
-    if (children) {
-      [].concat(children).filter(function (child) {
-        return child;
-      }).forEach(function (child) {
-        if (isString(child)) {
-          makeStructure({
-            selector: child
-          }, el, obj);
-        } else {
-          makeStructure(child, el, obj);
-        }
-      });
-    }
-
-    parentEl && parentEl.appendChild(el);
-    structure.element = el;
-    obj.element = el;
-    return obj;
-  }
-  function compare(prevArr, nextArr, callback, syncCallback) {
-    var prevKeys = prevArr.map(callback);
-    var nextKeys = nextArr.map(callback);
-    var prevKeysObject = {};
-    var nextKeysObject = {};
-    var added = [];
-    var removed = [];
-    prevKeys.forEach(function (key, i) {
-      prevKeysObject[key] = i;
-    });
-    nextKeys.forEach(function (key, i) {
-      if (!(key in prevKeysObject)) {
-        added.push(i);
-      } else {
-        syncCallback(prevArr[prevKeysObject[key]], nextArr[i]);
-      }
-
-      nextKeysObject[key] = i;
-    });
-    prevKeys.forEach(function (key, i) {
-      if (!(key in nextKeysObject)) {
-        removed.push(i);
-      }
-    });
-    return {
-      added: added,
-      removed: removed
-    };
-  }
-  function makeCompareStructure(prevStructures, nextStructures, parentStructure, callback, syncCallback) {
-    var parentElement = parentStructure.element;
-
-    var _a = compare(prevStructures, nextStructures, callback, function (prev, next) {
-      next.element = prev.element;
-      syncCallback && syncCallback(prev, next);
-    }),
-        added = _a.added,
-        removed = _a.removed;
-
-    removed.reverse().forEach(function (index) {
-      parentElement.removeChild(prevStructures[index].element);
-    });
-    added.forEach(function (index) {
-      var element = makeStructure(nextStructures[index]).element;
-      parentElement.insertBefore(element, nextStructures[index + 1] && nextStructures[index + 1].element);
-    });
-    parentStructure.children = nextStructures;
-  }
   function isSceneItem(value) {
-    return value.constructor.name === "SceneItem";
+    return !!value.constructor.prototype.getFrame;
   }
   function isFrame(value) {
-    return value.constructor.name === "Frame";
+    return !!value.constructor.prototype.toCSS;
   }
   function splitProperty(scene, property) {
     var names = property.split("///");
@@ -447,11 +366,6 @@ version: 0.0.5
       names: names.slice(0, i),
       properties: names.slice(i)
     };
-  }
-  function getSceneItem(scene, names) {
-    return names.reduce(function (nextScene, name) {
-      return nextScene.getItem(name);
-    }, scene);
   }
   function findElementIndexByPosition(elements, pos) {
     var length = elements.length;
@@ -5091,64 +5005,6 @@ version: 0.0.5
     return PinchInput;
   }();
 
-  function updateKeyframesStructure(keyframes, maxTime) {
-    keyframes.forEach(function (keyframe) {
-      var selector = keyframe.selector,
-          dataset = keyframe.dataset,
-          style = keyframe.style;
-
-      if (selector === ".keyframe") {
-        style.left = dataset.time / maxTime * 100 + "%";
-      } else {
-        style.left = dataset.from / maxTime * 100 + "%", style.width = (dataset.to - dataset.from) / maxTime * 100 + "%";
-      }
-    });
-  }
-  function getKeyframesStructure(times, maxTime) {
-    var keyframeLines = [];
-    var keyframes = times.map(function (_a, i) {
-      var time = _a[0],
-          value = _a[1];
-      var valueText = toValue(value);
-
-      if (times[i + 1]) {
-        var _b = times[i + 1],
-            nextTime = _b[0],
-            nextValue = _b[1];
-        var nextValueText = toValue(nextValue);
-
-        if (valueText === nextValueText) {
-          keyframeLines.push({
-            selector: ".keyframe_line",
-            dataset: {
-              time: time + "," + nextTime,
-              from: time,
-              to: nextTime
-            },
-            style: {
-              left: time / maxTime * 100 + "%",
-              width: (nextTime - time) / maxTime * 100 + "%"
-            }
-          });
-        }
-      }
-
-      return {
-        memberof: "keyframesInfoList",
-        selector: ".keyframe",
-        dataset: {
-          time: time,
-          value: valueText
-        },
-        style: {
-          left: time / maxTime * 100 + "%"
-        },
-        html: time + " " + valueText
-      };
-    });
-    return keyframes.concat(keyframeLines);
-  }
-
   var prevTime = 0;
   var prevX = -1;
   var prevY = -1;
@@ -5166,11 +5022,670 @@ version: 0.0.5
     }
   }
 
+  /*
+  Copyright (c) 2019 Daybrush
+  name: keycon
+  license: MIT
+  author: Daybrush
+  repository: git+https://github.com/daybrush/keycon.git
+  version: 0.2.2
+  */
+  /*! *****************************************************************************
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+  this file except in compliance with the License. You may obtain a copy of the
+  License at http://www.apache.org/licenses/LICENSE-2.0
+
+  THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+  WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+  MERCHANTABLITY OR NON-INFRINGEMENT.
+
+  See the Apache Version 2.0 License for specific language governing permissions
+  and limitations under the License.
+  ***************************************************************************** */
+
+  /* global Reflect, Promise */
+
+  var extendStatics$1 = function (d, b) {
+    extendStatics$1 = Object.setPrototypeOf || {
+      __proto__: []
+    } instanceof Array && function (d, b) {
+      d.__proto__ = b;
+    } || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    };
+
+    return extendStatics$1(d, b);
+  };
+
+  function __extends$1(d, b) {
+    extendStatics$1(d, b);
+
+    function __() {
+      this.constructor = d;
+    }
+
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  }
+
+  function createCommonjsModule(fn, module) {
+    return module = {
+      exports: {}
+    }, fn(module, module.exports), module.exports;
+  }
+
+  var keycode = createCommonjsModule(function (module, exports) {
+    // Source: http://jsfiddle.net/vWx8V/
+    // http://stackoverflow.com/questions/5603195/full-list-of-javascript-keycodes
+
+    /**
+     * Conenience method returns corresponding value for given keyName or keyCode.
+     *
+     * @param {Mixed} keyCode {Number} or keyName {String}
+     * @return {Mixed}
+     * @api public
+     */
+    function keyCode(searchInput) {
+      // Keyboard Events
+      if (searchInput && 'object' === typeof searchInput) {
+        var hasKeyCode = searchInput.which || searchInput.keyCode || searchInput.charCode;
+        if (hasKeyCode) searchInput = hasKeyCode;
+      } // Numbers
+
+
+      if ('number' === typeof searchInput) return names[searchInput]; // Everything else (cast to string)
+
+      var search = String(searchInput); // check codes
+
+      var foundNamedKey = codes[search.toLowerCase()];
+      if (foundNamedKey) return foundNamedKey; // check aliases
+
+      var foundNamedKey = aliases[search.toLowerCase()];
+      if (foundNamedKey) return foundNamedKey; // weird character?
+
+      if (search.length === 1) return search.charCodeAt(0);
+      return undefined;
+    }
+    /**
+     * Compares a keyboard event with a given keyCode or keyName.
+     *
+     * @param {Event} event Keyboard event that should be tested
+     * @param {Mixed} keyCode {Number} or keyName {String}
+     * @return {Boolean}
+     * @api public
+     */
+
+
+    keyCode.isEventKey = function isEventKey(event, nameOrCode) {
+      if (event && 'object' === typeof event) {
+        var keyCode = event.which || event.keyCode || event.charCode;
+
+        if (keyCode === null || keyCode === undefined) {
+          return false;
+        }
+
+        if (typeof nameOrCode === 'string') {
+          // check codes
+          var foundNamedKey = codes[nameOrCode.toLowerCase()];
+
+          if (foundNamedKey) {
+            return foundNamedKey === keyCode;
+          } // check aliases
+
+
+          var foundNamedKey = aliases[nameOrCode.toLowerCase()];
+
+          if (foundNamedKey) {
+            return foundNamedKey === keyCode;
+          }
+        } else if (typeof nameOrCode === 'number') {
+          return nameOrCode === keyCode;
+        }
+
+        return false;
+      }
+    };
+
+    exports = module.exports = keyCode;
+    /**
+     * Get by name
+     *
+     *   exports.code['enter'] // => 13
+     */
+
+    var codes = exports.code = exports.codes = {
+      'backspace': 8,
+      'tab': 9,
+      'enter': 13,
+      'shift': 16,
+      'ctrl': 17,
+      'alt': 18,
+      'pause/break': 19,
+      'caps lock': 20,
+      'esc': 27,
+      'space': 32,
+      'page up': 33,
+      'page down': 34,
+      'end': 35,
+      'home': 36,
+      'left': 37,
+      'up': 38,
+      'right': 39,
+      'down': 40,
+      'insert': 45,
+      'delete': 46,
+      'command': 91,
+      'left command': 91,
+      'right command': 93,
+      'numpad *': 106,
+      'numpad +': 107,
+      'numpad -': 109,
+      'numpad .': 110,
+      'numpad /': 111,
+      'num lock': 144,
+      'scroll lock': 145,
+      'my computer': 182,
+      'my calculator': 183,
+      ';': 186,
+      '=': 187,
+      ',': 188,
+      '-': 189,
+      '.': 190,
+      '/': 191,
+      '`': 192,
+      '[': 219,
+      '\\': 220,
+      ']': 221,
+      "'": 222 // Helper aliases
+
+    };
+    var aliases = exports.aliases = {
+      'windows': 91,
+      '⇧': 16,
+      '⌥': 18,
+      '⌃': 17,
+      '⌘': 91,
+      'ctl': 17,
+      'control': 17,
+      'option': 18,
+      'pause': 19,
+      'break': 19,
+      'caps': 20,
+      'return': 13,
+      'escape': 27,
+      'spc': 32,
+      'spacebar': 32,
+      'pgup': 33,
+      'pgdn': 34,
+      'ins': 45,
+      'del': 46,
+      'cmd': 91
+      /*!
+       * Programatically add the following
+       */
+      // lower case chars
+
+    };
+
+    for (i = 97; i < 123; i++) codes[String.fromCharCode(i)] = i - 32; // numbers
+
+
+    for (var i = 48; i < 58; i++) codes[i - 48] = i; // function keys
+
+
+    for (i = 1; i < 13; i++) codes['f' + i] = i + 111; // numpad keys
+
+
+    for (i = 0; i < 10; i++) codes['numpad ' + i] = i + 96;
+    /**
+     * Get by code
+     *
+     *   exports.name[13] // => 'Enter'
+     */
+
+
+    var names = exports.names = exports.title = {}; // title for backward compat
+    // Create reverse mapping
+
+    for (i in codes) names[codes[i]] = i; // Add aliases
+
+
+    for (var alias in aliases) {
+      codes[alias] = aliases[alias];
+    }
+  });
+  var keycode_1 = keycode.code;
+  var keycode_2 = keycode.codes;
+  var keycode_3 = keycode.aliases;
+  var keycode_4 = keycode.names;
+  var keycode_5 = keycode.title;
+  /*
+  Copyright (c) 2018 Daybrush
+  @name: @daybrush/utils
+  license: MIT
+  author: Daybrush
+  repository: https://github.com/daybrush/utils
+  @version 0.7.1
+  */
+
+  /**
+  * get string "string"
+  * @memberof Consts
+  * @example
+  import {STRING} from "@daybrush/utils";
+
+  console.log(STRING); // "string"
+  */
+
+  var STRING = "string";
+  /**
+  * Check the type that the value is isArray.
+  * @memberof Utils
+  * @param {string} value - Value to check the type
+  * @return {} true if the type is correct, false otherwise
+  * @example
+  import {isArray} from "@daybrush/utils";
+
+  console.log(isArray([])); // true
+  console.log(isArray({})); // false
+  console.log(isArray(undefined)); // false
+  console.log(isArray(null)); // false
+  */
+
+  function isArray(value) {
+    return Array.isArray(value);
+  }
+  /**
+  * Check the type that the value is string.
+  * @memberof Utils
+  * @param {string} value - Value to check the type
+  * @return {} true if the type is correct, false otherwise
+  * @example
+  import {isString} from "@daybrush/utils";
+
+  console.log(isString("1234")); // true
+  console.log(isString(undefined)); // false
+  console.log(isString(1)); // false
+  console.log(isString(null)); // false
+  */
+
+
+  function isString(value) {
+    return typeof value === STRING;
+  }
+  /**
+  * Sets up a function that will be called whenever the specified event is delivered to the target
+  * @memberof DOM
+  * @param - event target
+  * @param - A case-sensitive string representing the event type to listen for.
+  * @param - The object which receives a notification (an object that implements the Event interface) when an event of the specified type occurs
+  * @param - An options object that specifies characteristics about the event listener. The available options are:
+  * @example
+  import {addEvent} from "@daybrush/utils";
+
+  addEvent(el, "click", e => {
+    console.log(e);
+  });
+  */
+
+
+  function addEvent$1(el, type, listener, options) {
+    el.addEventListener(type, listener, options);
+  }
+
+  var codeData = {
+    "+": "plus",
+    "left command": "meta",
+    "right command": "meta"
+  };
+  var keysSort = {
+    shift: 1,
+    ctrl: 2,
+    alt: 3,
+    meta: 4
+  };
+
+  function getKey(keyCode) {
+    var key = keycode_4[keyCode] || "";
+
+    for (var name in codeData) {
+      key = key.replace(name, codeData[name]);
+    }
+
+    return key.replace(/\s/g, "");
+  }
+
+  function getCombi(e, key) {
+    var keys = [e.shiftKey && "shift", e.ctrlKey && "ctrl", e.altKey && "alt", e.metaKey && "meta"];
+    keys.indexOf(key) === -1 && keys.push(key);
+    return keys.filter(Boolean);
+  }
+
+  function getArrangeCombi(keys) {
+    var arrangeKeys = keys.slice();
+    arrangeKeys.sort(function (prev, next) {
+      var prevScore = keysSort[prev] || 5;
+      var nextScore = keysSort[next] || 5;
+      return prevScore - nextScore;
+    });
+    return arrangeKeys;
+  }
+  /**
+   */
+
+
+  var KeyController =
+  /*#__PURE__*/
+  function (_super) {
+    __extends$1(KeyController, _super);
+    /**
+     *
+     */
+
+
+    function KeyController(container) {
+      if (container === void 0) {
+        container = window;
+      }
+
+      var _this = _super.call(this) || this;
+      /**
+       */
+
+
+      _this.ctrlKey = false;
+      /**
+       */
+
+      _this.altKey = false;
+      /**
+       *
+       */
+
+      _this.shiftKey = false;
+      /**
+       *
+       */
+
+      _this.metaKey = false;
+
+      _this.clear = function () {
+        _this.ctrlKey = false;
+        _this.altKey = false;
+        _this.shiftKey = false;
+        _this.metaKey = false;
+      };
+
+      _this.keydownEvent = function (e) {
+        _this.triggerEvent("keydown", e);
+      };
+
+      _this.keyupEvent = function (e) {
+        _this.triggerEvent("keyup", e);
+      };
+
+      addEvent$1(container, "blur", _this.clear);
+      addEvent$1(container, "keydown", _this.keydownEvent);
+      addEvent$1(container, "keyup", _this.keyupEvent);
+      return _this;
+    }
+    /**
+     *
+     */
+
+
+    var __proto = KeyController.prototype;
+
+    __proto.keydown = function (comb, callback) {
+      return this.addEvent("keydown", comb, callback);
+    };
+    /**
+     *
+     */
+
+
+    __proto.keyup = function (comb, callback) {
+      return this.addEvent("keyup", comb, callback);
+    };
+
+    __proto.addEvent = function (type, comb, callback) {
+      if (isArray(comb)) {
+        this.on(type + "." + getArrangeCombi(comb).join("."), callback);
+      } else if (isString(comb)) {
+        this.on(type + "." + comb, callback);
+      } else {
+        this.on(type, comb);
+      }
+
+      return this;
+    };
+
+    __proto.triggerEvent = function (type, e) {
+      this.ctrlKey = e.ctrlKey;
+      this.shiftKey = e.shiftKey;
+      this.altKey = e.altKey;
+      this.metaKey = e.metaKey;
+      var key = getKey(e.keyCode);
+      var isToggle = key === "ctrl" || key === "shift" || key === "meta" || key === "alt";
+      var param = {
+        key: key,
+        isToggle: isToggle,
+        inputEvent: e,
+        keyCode: e.keyCode,
+        ctrlKey: e.ctrlKey,
+        altKey: e.altKey,
+        shiftKey: e.shiftKey,
+        metaKey: e.metaKey
+      };
+      this.trigger(type, param);
+      this.trigger(type + "." + key, param);
+      var combi = getCombi(e, key);
+      combi.length > 1 && this.trigger(type + "." + combi.join("."), param);
+    };
+
+    return KeyController;
+  }(Component);
+
+  /*
+  Copyright (c) 2018 Daybrush
+  @name: @daybrush/utils
+  license: MIT
+  author: Daybrush
+  repository: https://github.com/daybrush/utils
+  @version 0.7.1
+  */
+  /**
+  * get string "undefined"
+  * @memberof Consts
+  * @example
+  import {UNDEFINED} from "@daybrush/utils";
+
+  console.log(UNDEFINED); // "undefined"
+  */
+
+  var UNDEFINED = "undefined";
+  /**
+  * @namespace
+  * @name Utils
+  */
+
+  /**
+  * Check the type that the value is undefined.
+  * @memberof Utils
+  * @param {string} value - Value to check the type
+  * @return {boolean} true if the type is correct, false otherwise
+  * @example
+  import {isUndefined} from "@daybrush/utils";
+
+  console.log(isUndefined(undefined)); // true
+  console.log(isUndefined("")); // false
+  console.log(isUndefined(1)); // false
+  console.log(isUndefined(null)); // false
+  */
+
+  function isUndefined$1(value) {
+    return typeof value === UNDEFINED;
+  }
+
+  /*
+  Copyright (c) 2019 Daybrush
+  name: data-dom
+  license: MIT
+  author: Daybrush
+  repository: git+https://github.com/daybrush/data-dom.git
+  version: 0.0.4
+  */
+
+  function concat(arr) {
+    return [].concat(arr);
+  }
+
+  function render(createElement, structure, parentEl, parentStructureIndex) {
+    if (parentStructureIndex === void 0) {
+      parentStructureIndex = 0;
+    }
+
+    var children = structure.children;
+    var el = createElement(structure);
+
+    if (structure.ref) {
+      structure.ref(structure, parentStructureIndex);
+    }
+
+    if (children) {
+      concat(children).filter(function (child) {
+        return child;
+      }).forEach(function (child, i) {
+        render(createElement, child, el, i);
+      });
+    }
+
+    parentEl && parentEl.appendChild(el);
+    structure.element = el;
+    return structure;
+  }
+
+  function compare(prevArr, nextArr, syncCallback) {
+    var prevKeys = prevArr.map(function (_a, i) {
+      var key = _a.key;
+      return isUndefined$1(key) ? i : key;
+    });
+    var nextKeys = nextArr.map(function (_a, i) {
+      var key = _a.key;
+      return isUndefined$1(key) ? i : key;
+    });
+    var prevKeysObject = {};
+    var nextKeysObject = {};
+    var added = [];
+    var removed = [];
+    var changed = [];
+    prevKeys.forEach(function (key, i) {
+      prevKeysObject[key] = i;
+    });
+    nextKeys.forEach(function (key, i) {
+      if (!(key in prevKeysObject)) {
+        added.push(i);
+      } else {
+        syncCallback(prevArr[prevKeysObject[key]], nextArr[i], i);
+      }
+
+      nextKeysObject[key] = i;
+    });
+    prevKeys.forEach(function (key, i) {
+      var index = nextKeysObject[key];
+
+      if (isUndefined$1(index)) {
+        removed.push(i);
+      } else if (i !== index) {
+        changed.push([i, index]);
+      }
+    });
+    changed.sort(function (a, b) {
+      return a[1] > b[1] ? 1 : -1;
+    });
+    var newChanged = [];
+    var prev = [-1, -1];
+    changed.forEach(function (changeInfo) {
+      if (prev[0] > changeInfo[0]) {
+        newChanged.push(prev);
+      }
+
+      prev = changeInfo;
+    });
+    return {
+      added: added,
+      removed: removed,
+      changed: newChanged
+    };
+  }
+
+  function update(createElement, updateElement, prevStructure, nextStructure, parentStructure) {
+    var prevStructures = concat(prevStructure || []);
+    var nextStructures = concat(nextStructure || []);
+
+    var _a = compare(prevStructures, nextStructures || [], function (prev, next, index) {
+      if (next.ref) {
+        next.ref(next, index);
+      }
+
+      next.element = prev.element;
+      updateElement(prev, next);
+      update(createElement, updateElement, prev.children, next.children, next);
+    }),
+        added = _a.added,
+        changed = _a.changed,
+        removed = _a.removed;
+
+    if (parentStructure) {
+      var parentElement_1 = parentStructure.element;
+      changed.forEach(function (_a) {
+        var from = _a[0],
+            to = _a[1];
+        parentElement_1.insertBefore(nextStructures[to].element, nextStructures[to + 1].element);
+      });
+      removed.reverse().forEach(function (index) {
+        parentElement_1.removeChild(prevStructures[index].element);
+      });
+      added.forEach(function (index) {
+        var element = render(createElement, nextStructures[index]).element;
+        parentElement_1.insertBefore(element, nextStructures[index + 1] && nextStructures[index + 1].element);
+      });
+
+      if (nextStructure) {
+        parentStructure.children = nextStructure;
+      }
+    }
+  }
+
+  var DataDOM =
+  /*#__PURE__*/
+  function () {
+    function DataDOM(createElement, updateElement) {
+      this.createElement = createElement;
+      this.updateElement = updateElement;
+    }
+
+    var __proto = DataDOM.prototype;
+
+    __proto.render = function (structure, parentEl) {
+      return render(this.createElement, structure, parentEl);
+    };
+
+    __proto.update = function (prevStructure, nextStructure, parentStructure) {
+      update(this.createElement, this.updateElement, prevStructure, nextStructure, parentStructure);
+      return this;
+    };
+
+    return DataDOM;
+  }();
+
   function getKeytimesStructure(maxTime) {
     var keytimes = [];
 
     for (var time = 0; time <= maxTime; ++time) {
       keytimes.push({
+        key: time,
         dataset: {
           time: time
         },
@@ -5200,6 +5715,7 @@ version: 0.0.5
 
     for (var time = 0; time <= maxTime; ++time) {
       lines.push({
+        key: time,
         selector: ".division_line",
         style: {
           left: 100 / maxTime * time + "%"
@@ -5210,36 +5726,472 @@ version: 0.0.5
     return lines;
   }
 
+  function getHeaderAreaStructure(ids, zoom, maxDuration, maxTime) {
+    return {
+      selector: ".header_area",
+      ref: function (e) {
+        ids.keyframesScrollAreas = [];
+        ids.keyframesAreas = [];
+        ids.propertiesAreas = [];
+      },
+      children: [{
+        ref: function (e) {
+          ids.propertiesAreas[0] = e;
+        },
+        selector: ".properties_area",
+        children: [{
+          selector: ".property",
+          html: "Name"
+        }]
+      }, {
+        selector: ".values_area",
+        children: {
+          selector: ".value",
+          html: "+"
+        }
+      }, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime)]
+    };
+  }
+  function getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime) {
+    return {
+      ref: function (e) {
+        ids.keyframesAreas[0] = e;
+      },
+      selector: ".keyframes_area",
+      children: {
+        style: {
+          minWidth: 50 * maxTime + "px",
+          width: Math.min(maxDuration ? maxTime / maxDuration : 1, 2) * zoom * 100 + "%"
+        },
+        dataset: {
+          width: Math.min(maxDuration ? maxTime / maxDuration : 1, 2)
+        },
+        ref: function (e) {
+          ids.keyframesScrollAreas[0] = e;
+        },
+        selector: ".keyframes_scroll_area",
+        children: {
+          ref: function (e) {
+            ids.cursors = [];
+          },
+          selector: ".keyframes",
+          children: [{
+            ref: function (e) {
+              ids.keytimesContainer = e;
+            },
+            selector: ".keyframes_container",
+            children: getKeytimesStructure(maxTime)
+          }, {
+            selector: ".keyframe_cursor",
+            ref: function (e) {
+              ids.cursors[0] = e;
+            }
+          }]
+        }
+      }
+    };
+  }
+
+  function getKeyframesAreaStructure(ids, keyframesList, zoom, maxDuration, maxTime) {
+    var width = Math.min(maxDuration ? maxTime / maxDuration : 1, 2);
+    return {
+      ref: function (e) {
+        ids.keyframesAreas[1] = e;
+      },
+      selector: ".keyframes_area",
+      children: {
+        style: {
+          minWidth: 50 * maxTime + "px",
+          width: width * zoom * 100 + "%"
+        },
+        dataset: {
+          width: width
+        },
+        ref: function (e) {
+          ids.keyframesScrollAreas[1] = e;
+        },
+        selector: ".keyframes_scroll_area",
+        children: getKeyframesScrollAreaChildrenStructure(ids, keyframesList, maxTime)
+      }
+    };
+  }
+  function getKeyframesScrollAreaChildrenStructure(ids, keyframesList, maxTime) {
+    return keyframesList.concat([{
+      key: "cursor",
+      selector: ".keyframe_cursor",
+      ref: function (e) {
+        ids.cursors[1] = e;
+      }
+    }, {
+      key: "lineArea",
+      ref: function (e) {
+        ids.lineArea = e;
+      },
+      selector: ".line_area",
+      children: getLinesStructure(maxTime)
+    }]);
+  }
+  function getKeyframesListStructure(ids, timelineInfo, maxTime) {
+    var keyframesList = [];
+
+    for (var property in timelineInfo) {
+      var times = timelineInfo[property];
+      var keyframes = getKeyframesStructure(times, maxTime);
+      keyframesList.push({
+        ref: function (e, i) {
+          ids.keyframesList[i] = e;
+          ids.keyframesContainers[i] = e.children;
+        },
+        selector: ".keyframes",
+        key: property,
+        dataset: {
+          property: property
+        },
+        children: {
+          selector: ".keyframes_container",
+          children: keyframes
+        }
+      });
+    }
+
+    return keyframesList;
+  }
+  function getKeyframesStructure(times, maxTime) {
+    var keyframeLines = [];
+    var keyframes = times.map(function (_a, i) {
+      var time = _a[0],
+          value = _a[1];
+      var valueText = toValue(value);
+
+      if (times[i + 1]) {
+        var _b = times[i + 1],
+            nextTime = _b[0],
+            nextValue = _b[1];
+        var nextValueText = toValue(nextValue);
+
+        if (valueText !== nextValueText) {
+          keyframeLines.push({
+            selector: ".keyframe_line",
+            key: time + "," + nextTime,
+            dataset: {
+              time: time + "," + nextTime,
+              from: time,
+              to: nextTime
+            },
+            style: {
+              left: time / maxTime * 100 + "%",
+              width: (nextTime - time) / maxTime * 100 + "%"
+            }
+          });
+        }
+      }
+
+      return {
+        key: time,
+        selector: ".keyframe",
+        dataset: {
+          time: time,
+          value: valueText
+        },
+        style: {
+          left: time / maxTime * 100 + "%"
+        },
+        html: time + " " + valueText
+      };
+    });
+    return keyframes.concat(keyframeLines);
+  }
+
+  function getPropertiesStructure(ids, timelineInfo) {
+    var properties = [];
+
+    var _loop_1 = function (property) {
+      var propertyNames = property.split("///");
+      var length = propertyNames.length;
+      var id = propertyNames[length - 1];
+      properties.push({
+        ref: function (e, i) {
+          ids.properties[i] = e;
+        },
+        key: property,
+        selector: ".property",
+        dataset: {
+          id: id,
+          property: property,
+          parent: propertyNames[length - 2] || "",
+          object: "0",
+          item: propertyNames[0]
+        },
+        style: {
+          paddingLeft: 10 + (length - 1) * 20 + "px"
+        },
+        children: [{
+          selector: ".arrow"
+        }, {
+          selector: "span",
+          html: id
+        }]
+      });
+      var parentProperty = propertyNames.slice(0, -1).join("///");
+      properties.forEach(function (_a) {
+        var dataset = _a.dataset;
+
+        if (dataset.property === parentProperty) {
+          dataset.object = "1";
+        }
+      });
+    };
+
+    for (var property in timelineInfo) {
+      _loop_1(property);
+    }
+
+    return properties;
+  }
+
+  function getValuesStructure(ids, timelineInfo) {
+    var values = [];
+
+    for (var property in timelineInfo) {
+      var times = timelineInfo[property];
+      var isHasObject = times[0] && isObject(times[0][1]);
+      values.push({
+        ref: function (e, i) {
+          ids.values[i] = e;
+        },
+        key: property,
+        selector: ".value",
+        dataset: {
+          property: property,
+          object: isHasObject ? "1" : "0"
+        },
+        children: {
+          selector: "input",
+          attr: {
+            value: times[0] ? times[0][1] : ""
+          }
+        }
+      });
+    }
+
+    return values;
+  }
+
+  function getScrollAreaStructure(ids, timelineInfo, zoom, maxDuration, maxTime) {
+    var keyframesList = getKeyframesListStructure(ids, timelineInfo, maxTime);
+    return {
+      ref: function (e) {
+        ids.scrollArea = e;
+        ids.keyframesList = [];
+        ids.keyframesContainers = [];
+      },
+      selector: ".scroll_area",
+      children: [{
+        ref: function (e) {
+          ids.propertiesAreas[1] = e;
+          ids.properties = [];
+        },
+        selector: ".properties_area",
+        children: [{
+          selector: ".properties_scroll_area",
+          children: getPropertiesStructure(ids, timelineInfo)
+        }]
+      }, {
+        ref: function (e) {
+          ids.valuesArea = e;
+          ids.values = [];
+        },
+        selector: ".values_area",
+        children: getValuesStructure(ids, timelineInfo)
+      }, getKeyframesAreaStructure(ids, keyframesList, zoom, maxDuration, maxTime)]
+    };
+  }
+
+  function getControlAreaStructure(ids) {
+    return {
+      selector: ".header_area.control_area",
+      children: [{
+        selector: ".properties_area",
+        children: {
+          selector: ".property"
+        }
+      }, {
+        selector: ".values_area",
+        children: {
+          selector: ".value"
+        }
+      }, {
+        selector: ".keyframes_area",
+        children: {
+          selector: ".keyframes",
+          children: [{
+            selector: "input.time_area",
+            ref: function (e) {
+              ids.timeArea = e;
+            },
+            html: "???"
+          }, {
+            selector: ".play_control_area",
+            children: [{
+              ref: function (e) {
+                ids.prevBtn = e;
+              },
+              selector: ".control.prev"
+            }, {
+              ref: function (e) {
+                ids.playBtn = e;
+              },
+              selector: ".control.play"
+            }, {
+              ref: function (e) {
+                ids.nextBtn = e;
+              },
+              selector: ".control.next"
+            }]
+          }]
+        }
+      }]
+    };
+  }
+
   var isExportCSS = false;
 
   var Timeline =
   /*#__PURE__*/
   function () {
     function Timeline(scene, parentEl) {
-      this.propertiesNames = [];
       this.maxTime = 0;
-      this.selectedIndex = -1;
+      this.selectedProperty = "";
+      this.selectedTime = -1;
+      this.ids = {};
       scene.finish();
       this.scene = scene;
-      this.initElement(scene, parentEl);
-      this.editor();
+      this.initStructure(scene, parentEl);
+      this.initEditor();
+      this.initScroll();
+      this.initWheelZoom();
+      this.initDragKeyframes();
+      this.initClickProperty();
+      this.initController();
+      this.initDragValues();
+      this.initKeyController();
+      scene.setTime(0);
     }
 
     var __proto = Timeline.prototype;
 
     __proto.getElement = function () {
-      return this.elements.timeline;
+      return this.structure.element;
+    }; // scene control
+
+
+    __proto.prev = function () {
+      this.scene.setTime(this.scene.getTime() - 0.05);
     };
 
-    __proto.initElement = function (scene, parentEl) {
-      var duration = scene.getDuration();
+    __proto.next = function () {
+      this.scene.setTime(this.scene.getTime() + 0.05);
+    };
+
+    __proto.finish = function () {
+      this.scene.finish();
+    };
+
+    __proto.togglePlay = function () {
+      var scene = this.scene;
+
+      if (scene.getPlayState() === "running") {
+        scene.pause();
+      } else {
+        scene.play();
+      }
+    }; // init
+
+
+    __proto.initController = function () {
+      var _this = this;
+
+      var ids = this.ids;
+      var playBtn = this.ids.playBtn.element;
+      var scene = this.scene;
+      playBtn.addEventListener("click", function (e) {
+        _this.togglePlay();
+
+        e.preventDefault();
+      });
+      ids.prevBtn.element.addEventListener("click", function (e) {
+        _this.prev();
+
+        e.preventDefault();
+      });
+      ids.nextBtn.element.addEventListener("click", function (e) {
+        _this.next();
+
+        e.preventDefault();
+      });
+      scene.on("play", function () {
+        addClass$1(playBtn, "pause");
+        removeClass$1(playBtn, "play"); // playBtn.innerHTML = "pause";
+      });
+      scene.on("paused", function () {
+        addClass$1(playBtn, "play");
+        removeClass$1(playBtn, "pause"); // playBtn.innerHTML = "play";
+      });
+      new KeyController(ids.timeArea.element).keydown(function (e) {
+        !e.isToggle && e.inputEvent.stopPropagation();
+      }).keyup(function (e) {
+        !e.isToggle && e.inputEvent.stopPropagation();
+      }).keyup("enter", function (e) {
+        // go to time
+        var element = ids.timeArea.element;
+        var value = element.value;
+        var result = /(\d+):(\d+):(\d+)/g.exec(value);
+
+        if (!result) {
+          return;
+        }
+
+        var minute = parseFloat(result[1]);
+        var second = parseFloat(result[2]);
+        var milisecond = parseFloat("0." + result[3]);
+        var time = minute * 60 + second + milisecond;
+        scene.setTime(time);
+      });
+    };
+
+    __proto.initKeyController = function () {
+      var _this = this;
+
+      var ids = this.ids;
+      window.addEventListener("blur", function () {
+        removeClass$1(ids.timeline.element, "alt");
+      });
+      this.keycon = new KeyController().keydown("space", function (_a) {
+        var inputEvent = _a.inputEvent;
+        inputEvent.preventDefault();
+      }).keydown("left", function (e) {
+        _this.prev();
+      }).keydown("right", function (e) {
+        _this.next();
+      }).keyup("backspace", function () {
+        _this.removeKeyframe(_this.selectedProperty, _this.scene.getTime());
+      }).keydown("alt", function () {
+        addClass$1(ids.timeline.element, "alt");
+      }).keyup("alt", function () {
+        removeClass$1(ids.timeline.element, "alt");
+      }).keyup("esc", function () {
+        _this.finish();
+      }).keyup("space", function () {
+        _this.togglePlay();
+      });
+    };
+
+    __proto.initStructure = function (scene, parentEl) {
+      var duration = Math.ceil(scene.getDuration());
       var timelineInfo = getTimelineInfo(scene);
       var maxDuration = Math.ceil(duration);
       var maxTime = maxDuration + 5;
-      var propertiesNames = this.propertiesNames;
-      var properties = [];
-      var values = [];
-      var keyframesList = [];
+      var ids = this.ids;
       var timelineCSS;
       this.maxTime = maxTime;
 
@@ -5251,249 +6203,71 @@ version: 0.0.5
         isExportCSS = true;
       }
 
-      var _loop_1 = function (property) {
-        var propertyNames = property.split("///");
-        var length = propertyNames.length;
-        var times = timelineInfo[property];
-        var id = propertyNames[length - 1];
-        propertiesNames.push(property);
-        properties.push({
-          id: "properties[]",
-          selector: ".property",
-          dataset: {
-            id: id,
-            property: property,
-            parent: propertyNames[length - 2] || "",
-            object: "0",
-            item: propertyNames[0]
-          },
-          style: {
-            paddingLeft: 10 + (length - 1) * 20 + "px"
-          },
-          children: [{
-            selector: ".arrow"
-          }, {
-            selector: "span",
-            html: id
-          }]
-        });
-        var isHasObject = times[0] && isObject(times[0][1]);
-        values.push({
-          id: "values[]",
-          selector: ".value",
-          dataset: {
-            property: property,
-            object: isHasObject ? "1" : "0"
-          },
-          children: {
-            id: "inputs[]",
-            selector: "input",
-            attr: {
-              value: times[0] ? times[0][1] : ""
-            }
-          }
-        });
-        var parentProperty = propertyNames.slice(0, -1).join("///");
-        properties.forEach(function (_a) {
-          var dataset = _a.dataset;
-
-          if (dataset.property === parentProperty) {
-            dataset.object = "1";
-          }
-        });
-        var keyframes = getKeyframesStructure(times, maxTime);
-        keyframesList.push({
-          id: ["keyframesList[]", "keyframesInfoList[][]"],
-          selector: ".keyframes",
-          dataset: {
-            property: property
-          },
-          children: {
-            id: "keyframesContainers[]",
-            selector: ".keyframes_container",
-            children: keyframes
-          }
-        });
-      };
-
-      for (var property in timelineInfo) {
-        _loop_1(property);
-      }
-
       var structure = {
         selector: ".timeline",
-        id: "timeline",
-        children: [timelineCSS, {
-          selector: ".header_area.control_area",
-          children: [{
-            selector: ".properties_area",
-            children: {
-              selector: ".property"
-            }
-          }, {
-            selector: ".values_area",
-            children: {
-              selector: ".value"
-            }
-          }, {
-            selector: ".keyframes_area",
-            children: {
-              selector: ".keyframes",
-              children: [{
-                selector: ".time_area",
-                id: "timeArea",
-                html: "0"
-              }, {
-                selector: ".play_control_area",
-                id: "playControlArea",
-                children: [{
-                  selector: ".control.prev",
-                  html: "prev"
-                }, {
-                  selector: ".control.play",
-                  html: "play"
-                }, {
-                  selector: ".control.next",
-                  html: "next"
-                }]
-              }]
-            }
-          }]
-        }, {
-          selector: ".header_area",
-          children: [{
-            id: ["propertiesAreas[]"],
-            selector: ".properties_area",
-            children: [{
-              selector: ".property",
-              html: "Name"
-            }]
-          }, {
-            selector: ".values_area",
-            children: {
-              selector: ".value",
-              html: "+"
-            }
-          }, {
-            id: "keyframesAreas[]",
-            selector: ".keyframes_area",
-            children: {
-              style: {
-                minWidth: 50 * maxTime + "px",
-                width: (maxDuration ? maxTime / maxDuration : 1) * 100 + "%"
-              },
-              id: "keyframesScrollAreas[]",
-              selector: ".keyframes_scroll_area",
-              children: {
-                selector: ".keyframes",
-                children: [{
-                  id: "keytimesContainer",
-                  selector: ".keyframes_container",
-                  children: getKeytimesStructure(maxTime)
-                }, {
-                  selector: ".keyframe_cursor",
-                  id: "cursors[]"
-                }]
-              }
-            }
-          }]
-        }, {
-          id: "scrollArea",
-          selector: ".scroll_area",
-          children: [{
-            id: "propertiesAreas[]",
-            selector: ".properties_area",
-            children: [{
-              selector: ".properties_scroll_area",
-              children: properties
-            }]
-          }, {
-            id: "valuesArea",
-            selector: ".values_area",
-            children: values
-          }, {
-            id: "keyframesAreas[]",
-            selector: ".keyframes_area",
-            children: {
-              style: {
-                minWidth: 50 * maxTime + "px",
-                width: (maxDuration ? maxTime / maxDuration : 1) * 100 + "%"
-              },
-              id: "keyframesScrollAreas[]",
-              selector: ".keyframes_scroll_area",
-              children: keyframesList.concat([{
-                selector: ".keyframe_cursor",
-                id: "cursors[]"
-              }, {
-                id: "lineArea",
-                selector: ".line_area",
-                children: getLinesStructure(maxTime)
-              }])
-            }
-          }]
-        }]
+        ref: function (e) {
+          ids.timeline = e;
+        },
+        children: [timelineCSS, getControlAreaStructure(ids), getHeaderAreaStructure(ids, 1, maxDuration, maxTime), getScrollAreaStructure(ids, timelineInfo, 1, maxDuration, maxTime)]
       };
-
-      var _a = makeStructure(structure, parentEl),
-          structures = _a.structures,
-          elements = _a.elements;
-
-      this.structures = structures;
-      this.elements = elements;
-      this.syncScroll();
-      this.wheelZoom();
-      this.dragKeyframes();
-      this.clickProperty();
+      this.datadom = new DataDOM(createElement, updateElement);
+      this.structure = this.datadom.render(structure, parentEl);
     };
 
-    __proto.syncScroll = function () {
-      var keyframesAreas = this.elements.keyframesAreas;
+    __proto.initScroll = function () {
+      var keyframesAreas = this.ids.keyframesAreas;
       var isScrollKeyframe = false;
-      keyframesAreas[0].addEventListener("scroll", function () {
+      var headerKeyframesArea = keyframesAreas[0].element;
+      var scrollKeyframesArea = keyframesAreas[1].element;
+      headerKeyframesArea.addEventListener("scroll", function () {
         if (isScrollKeyframe) {
           isScrollKeyframe = false;
         } else {
           isScrollKeyframe = true;
-          keyframesAreas[1].scrollLeft = keyframesAreas[0].scrollLeft;
+          scrollKeyframesArea.scrollLeft = headerKeyframesArea.scrollLeft;
         }
       });
-      keyframesAreas[1].addEventListener("scroll", function () {
+      scrollKeyframesArea.addEventListener("scroll", function () {
         if (isScrollKeyframe) {
           isScrollKeyframe = false;
         } else {
           isScrollKeyframe = true;
-          keyframesAreas[0].scrollLeft = keyframesAreas[1].scrollLeft;
+          headerKeyframesArea.scrollLeft = scrollKeyframesArea.scrollLeft;
         }
       });
     };
 
-    __proto.wheelZoom = function () {
-      var keyframesScrollAreas = this.elements.keyframesScrollAreas;
-      var originalWidth = parseFloat(keyframesScrollAreas[0].style.width);
+    __proto.initWheelZoom = function () {
+      var _this = this;
+
+      var ids = this.ids;
+      var keyframesScrollAreas = ids.keyframesScrollAreas;
+      var headerArea = keyframesScrollAreas[0].element;
+      var scrollArea = keyframesScrollAreas[1].element;
       var axes = new Axes({
         zoom: {
-          range: [100, Infinity]
+          range: [1, Infinity]
         }
       }, {}, {
-        zoom: originalWidth
+        zoom: 1
       });
-      axes.connect("zoom", new PinchInput(keyframesScrollAreas[1], {
-        scale: 0.7,
+      axes.connect("zoom", new PinchInput(scrollArea, {
+        scale: 0.1,
         hammerManagerOptions: {
           touchAction: "auto"
         }
       }));
       axes.on("hold", function (e) {
-        console.log("hold");
-
         if (e.inputEvent) {
           e.inputEvent.preventDefault();
         }
       });
       axes.on("change", function (e) {
-        var width = e.pos.zoom;
-        keyframesScrollAreas.forEach(function (el) {
-          el.style.width = width + "%";
+        var scale = ids.keyframesScrollAreas[0].dataset.width;
+        var width = e.pos.zoom * scale * 100;
+        ids.keyframesScrollAreas.forEach(function (_a) {
+          var element = _a.element;
+          element.style.width = width + "%";
         });
 
         if (e.inputEvent) {
@@ -5501,44 +6275,86 @@ version: 0.0.5
         }
       });
       this.axes = axes;
-      keyframesScrollAreas[0].addEventListener("wheel", function (e) {
+      headerArea.addEventListener("wheel", function (e) {
         var delta = e.deltaY;
         axes.setBy({
-          zoom: delta / originalWidth * 5
+          zoom: delta / 5000
         });
         !e.deltaX && e.preventDefault();
       });
+      addEvent(scrollArea, "wheel", function (e) {
+        if (!_this.keycon.altKey) {
+          return;
+        }
+
+        e.preventDefault();
+        var delta = e.deltaY;
+        axes.setBy({
+          zoom: delta / 5000
+        });
+      });
     };
 
-    __proto.select = function (index) {
-      var prevSelectedIndex = this.selectedIndex;
-      var values = this.structures.values;
-      var properties = this.structures.properties;
-      var keyframesList = this.structures.keyframesList;
-      this.selectedIndex = index;
+    __proto.select = function (selectedProperty, keyframeTime) {
+      var prevSelectedProperty = this.selectedProperty;
+      var prevSelectedTime = this.selectedTime;
+      var ids = this.ids;
+      var values = ids.values;
+      var properties = ids.properties;
+      var keyframesList = ids.keyframesList;
+      this.selectedProperty = selectedProperty;
 
-      if (prevSelectedIndex > -1) {
+      if (prevSelectedProperty) {
+        var prevSelectedIndex = findIndexByProperty(prevSelectedProperty, properties);
         removeClass$1(properties[prevSelectedIndex].element, "select");
         removeClass$1(values[prevSelectedIndex].element, "select");
         removeClass$1(keyframesList[prevSelectedIndex].element, "select");
+
+        if (prevSelectedTime >= 0) {
+          var keyframes = ids.keyframesContainers[prevSelectedIndex].children;
+          keyframes.forEach(function (keyframe) {
+            if (keyframe.dataset.time === prevSelectedTime) {
+              removeClass$1(keyframe.element, "select");
+            }
+          });
+          this.selectedTime = -1;
+        }
       }
 
-      if (index > -1) {
-        addClass$1(properties[index].element, "select");
-        addClass$1(values[index].element, "select");
-        addClass$1(keyframesList[index].element, "select");
+      if (selectedProperty) {
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+
+        var selectedIndex = findIndexByProperty(selectedProperty, properties);
+        addClass$1(properties[selectedIndex].element, "select");
+        addClass$1(values[selectedIndex].element, "select");
+        addClass$1(keyframesList[selectedIndex].element, "select");
+
+        if (keyframeTime >= 0) {
+          var keyframes = ids.keyframesContainers[selectedIndex].children;
+          console.log(ids.keyframesContainers, selectedIndex);
+          keyframes.forEach(function (keyframe) {
+            console.log(keyframe.dataset.time, keyframeTime);
+
+            if (keyframe.dataset.time === keyframeTime) {
+              addClass$1(keyframe.element, "select");
+            }
+          });
+          this.selectedTime = keyframeTime;
+        }
       }
     };
 
-    __proto.clickProperty = function () {
+    __proto.initClickProperty = function () {
       var _this = this;
 
-      var _a = this.elements,
-          keyframesList = _a.keyframesList,
-          values = _a.values,
-          propertiesAreas = _a.propertiesAreas;
-      propertiesAreas[1].addEventListener("click", function (e) {
-        var properties = _this.elements.properties;
+      var ids = this.ids;
+      var propertiesAreas = ids.propertiesAreas;
+      propertiesAreas[1].element.addEventListener("click", function (e) {
+        var properties = ids.properties.map(function (property) {
+          return property.element;
+        });
         var length = properties.length;
         var arrow = getTarget(e.target, function (el) {
           return hasClass$1(el, "arrow");
@@ -5559,64 +6375,15 @@ version: 0.0.5
 
 
         if (!arrow) {
-          _this.select(index);
+          _this.select(properties[index].dataset.property);
 
           return;
-        } // fold
-
-
-        if (target.getAttribute("data-object") === "0") {
-          return;
         }
-
-        var isFold = target.getAttribute("data-fold") === "1";
-
-        function fold(isPrevFold) {
-          var nextTarget = properties[index];
-          var nextProperty = nextTarget.getAttribute("data-property");
-          var isNextFold = nextTarget.getAttribute("data-fold") === "1";
-          var isNextObject = nextTarget.getAttribute("data-object") === "1";
-
-          if (target !== nextTarget) {
-            if (isFold) {
-              if (!isPrevFold) {
-                removeClass$1(keyframesList[index], "fold");
-                removeClass$1(values[index], "fold");
-                removeClass$1(nextTarget, "fold");
-              }
-            } else {
-              addClass$1(keyframesList[index], "fold");
-              addClass$1(values[index], "fold");
-              addClass$1(nextTarget, "fold");
-            }
-          }
-
-          if (!isNextObject) {
-            return;
-          }
-
-          for (++index; index < length; ++index) {
-            var el = properties[index];
-
-            if ( // itemProperties
-            el.getAttribute("data-property").indexOf(nextProperty) > -1) {
-              // isChild
-              fold(!isPrevFold && isNextFold);
-            } else {
-              --index; // not child
-
-              break;
-            }
-          }
-        }
-
-        fold(isFold);
-        target.setAttribute("data-fold", isFold ? "0" : "1");
       });
     };
 
     __proto.setInputs = function (obj) {
-      var valuesArea = this.elements.valuesArea;
+      var valuesArea = this.ids.valuesArea.element;
 
       for (var name in obj) {
         valuesArea.querySelector("[data-property=\"" + name + "\"] input").value = obj[name];
@@ -5624,26 +6391,25 @@ version: 0.0.5
     };
 
     __proto.moveCursor = function (time) {
-      var cursors = this.elements.cursors;
+      var cursors = this.ids.cursors;
       var maxTime = this.maxTime;
       var px = 15 - 30 * time / maxTime;
       var percent = 100 * time / maxTime;
       var left = "calc(" + percent + "% + " + px + "px)";
       cursors.forEach(function (cursor) {
-        cursor.style.left = left;
+        cursor.element.style.left = left;
       });
     };
 
-    __proto.dragKeyframes = function () {
+    __proto.initDragKeyframes = function () {
       var _this = this;
 
-      var structures = this.structures;
-      var _a = this.elements,
-          scrollArea = _a.scrollArea,
-          timeArea = _a.timeArea,
-          cursors = _a.cursors,
-          keyframesAreas = _a.keyframesAreas,
-          keyframesScrollAreas = _a.keyframesScrollAreas;
+      var ids = this.ids;
+      var scrollArea = ids.scrollArea,
+          timeArea = ids.timeArea,
+          cursors = ids.cursors,
+          keyframesAreas = ids.keyframesAreas,
+          keyframesScrollAreas = ids.keyframesScrollAreas;
       var scene = this.scene;
       scene.on("animate", function (e) {
         var time = e.time;
@@ -5652,11 +6418,14 @@ version: 0.0.5
 
         _this.setInputs(flatObject(e.frames));
 
-        timeArea.innerHTML = "" + time;
+        var minute = numberFormat(Math.floor(time / 60), 2);
+        var second = numberFormat(Math.floor(time % 60), 2);
+        var milisecond = numberFormat(Math.floor(time % 1 * 100), 3, true);
+        timeArea.element.value = minute + ":" + second + ":" + milisecond;
       });
 
       var getTime = function (clientX) {
-        var rect = keyframesScrollAreas[1].getBoundingClientRect();
+        var rect = keyframesScrollAreas[1].element.getBoundingClientRect();
         var scrollAreaWidth = rect.width - 30;
         var scrollAreaX = rect.left + 15;
         var x = Math.min(scrollAreaWidth, Math.max(clientX - scrollAreaX, 0));
@@ -5674,26 +6443,23 @@ version: 0.0.5
         var target = getTarget(e.target, function (el) {
           return hasClass$1(el, "keyframe");
         });
-
-        if (target) {
-          scene.setTime(target.getAttribute("data-time"));
-        } else if (!hasClass$1(e.target, "keyframe_cursor")) {
-          move(clientX);
-        }
-
-        var list = structures.keyframesList;
+        var time = target ? parseFloat(target.getAttribute("data-time")) : getTime(clientX);
+        scene.setTime(time);
+        var list = ids.keyframesList;
         var index = findElementIndexByPosition(list.map(function (_a) {
           var element = _a.element;
           return element;
         }), clientY);
 
-        _this.select(index);
+        if (index > -1) {
+          _this.select(list[index].dataset.property, time);
+        }
 
         e.preventDefault();
       };
 
       var dblclick = function (e, clientX, clientY) {
-        var list = _this.structures.keyframesList;
+        var list = ids.keyframesList;
         var index = findElementIndexByPosition(list.map(function (_a) {
           var element = _a.element;
           return element;
@@ -5703,18 +6469,10 @@ version: 0.0.5
           return;
         }
 
-        var time = getTime(clientX);
-
-        var _a = splitProperty(scene, list[index].dataset.property),
-            item = _a.item,
-            properties = _a.properties;
-
-        _this.editKeyframe(time, item.getNowValue(time, properties), index, true);
-
-        _this.updateKeytimes();
+        _this.addKeyframe(index, getTime(clientX));
       };
 
-      setDrag(cursors[0], {
+      setDrag(cursors[0].element, {
         dragstart: function (_a) {
           var inputEvent = _a.inputEvent;
           inputEvent.stopPropagation();
@@ -5725,15 +6483,16 @@ version: 0.0.5
         },
         container: window
       });
-      keyframesScrollAreas.forEach(function (el) {
-        setDrag(el, {
+      keyframesScrollAreas.forEach(function (_a) {
+        var element = _a.element;
+        setDrag(element, {
           container: window,
           drag: function (_a) {
             var deltaX = _a.deltaX,
                 deltaY = _a.deltaY,
                 inputEvent = _a.inputEvent;
-            keyframesAreas[1].scrollLeft -= deltaX;
-            scrollArea.scrollTop -= deltaY;
+            keyframesAreas[1].element.scrollLeft -= deltaX;
+            scrollArea.element.scrollTop -= deltaY;
             inputEvent.preventDefault();
           },
           dragend: function (_a) {
@@ -5748,115 +6507,115 @@ version: 0.0.5
       });
     };
 
-    __proto.updateKeytimes = function () {
-      var maxTime = this.scene.getDuration() + 5;
-      var currentMaxTime = this.maxTime;
+    __proto.initDragValues = function () {
+      var _this = this;
 
-      if (maxTime === currentMaxTime) {
+      var dragTarget = null;
+      var dragTargetValue;
+      setDrag(this.ids.valuesArea.element, {
+        container: window,
+        dragstart: function (e) {
+          dragTarget = e.inputEvent.target;
+          dragTargetValue = dragTarget.value;
+          console.log(_this.keycon.altKey, getTarget(dragTarget, function (el) {
+            return el.nodeName === "INPUT";
+          }));
+
+          if (!_this.keycon.altKey || !getTarget(dragTarget, function (el) {
+            return el.nodeName === "INPUT";
+          })) {
+            return false;
+          }
+        },
+        drag: function (e) {
+          var nextValue = dragTargetValue.replace(/-?\d+/g, function (num) {
+            return "" + (parseFloat(num) + Math.round(e.distX / 2));
+          });
+          dragTarget.value = nextValue;
+        },
+        dragend: function (e) {
+          _this.edit(dragTarget, dragTarget.value);
+        }
+      });
+    };
+
+    __proto.addKeyframe = function (index, time) {
+      var list = this.ids.keyframesList;
+      var scene = this.scene;
+      var property = list[index].dataset.property;
+
+      var _a = splitProperty(scene, property),
+          item = _a.item,
+          properties = _a.properties;
+
+      this.editKeyframe(time, item.getNowValue(time, properties), index);
+      this.select(property, time);
+    };
+
+    __proto.removeKeyframe = function (property, time) {
+      if (!property) {
         return;
       }
 
-      this.maxTime = maxTime;
-      var keytimesContainer = this.structures.keytimesContainer;
-      var lineArea = this.structures.lineArea;
-      var keytimes = keytimesContainer.children;
-      var lines = lineArea.children;
-      var nextKeytimes = getKeytimesStructure(maxTime);
-      var nextLines = getLinesStructure(maxTime);
-      makeCompareStructure(keytimes, nextKeytimes, keytimesContainer, function (_a) {
-        var dataset = _a.dataset;
-        return dataset.time;
-      }, function (prev, cur) {
-        applyStyle(cur.element, cur.style);
-      });
-      makeCompareStructure(lines, nextLines, lineArea, function (_, i) {
-        return i;
-      }, function (prev, cur) {
-        applyStyle(cur.element, cur.style);
-      });
-      var keyframesContainers = this.structures.keyframesContainers;
-      keyframesContainers.forEach(function (keyframesContainer) {
-        var children = keyframesContainer.children;
-        updateKeyframesStructure(children, maxTime);
-        children.forEach(function (structure) {
-          applyStyle(structure.element, structure.style);
-        });
-      });
-      this.moveCursor(this.scene.getTime());
+      var scene = this.scene;
 
-      if (currentMaxTime && currentMaxTime < maxTime) {
-        this.axes.setTo({
-          zoom: this.axes.get(["zoom"]).zoom * maxTime / currentMaxTime
-        });
+      var _a = splitProperty(scene, property),
+          item = _a.item,
+          properties = _a.properties;
+
+      if (properties.length) {
+        item.remove.apply(item, [time].concat(properties));
+      } else {
+        item.removeFrame(time);
       }
+
+      this.update();
     };
 
-    __proto.updateKeyframes = function (names, properties, index) {
-      var keyframesContainer = this.structures.keyframesContainers[index];
-      var keyframes = keyframesContainer.children;
-      var length = properties.length;
+    __proto.update = function () {
       var scene = this.scene;
-      var item = getSceneItem(scene, names);
-      var times = item.times.filter(function (time) {
-        var _a;
+      var timelineInfo = getTimelineInfo(scene);
+      var maxDuration = Math.ceil(scene.getDuration());
+      var maxTime = maxDuration + 5;
+      var zoom = this.axes.get(["zoom"]).zoom;
+      var currentMaxTime = this.maxTime;
+      this.maxTime = maxTime;
+      var ids = this.ids;
+      var prevKeytimesArea = ids.keyframesAreas[0];
+      var nextZoom = currentMaxTime > 5 ? maxDuration / (currentMaxTime - 5) : 1;
+      zoom = zoom * nextZoom;
+      this.axes.axm.set({
+        zoom: zoom
+      }); // update keytimes
 
-        return length ? (_a = item.getFrame(time)).has.apply(_a, properties) : true;
-      });
-      var delay = item.getDelay();
-      var nextKeyframes = getKeyframesStructure(times.map(function (time) {
-        var _a;
-
-        return [delay + time, (_a = item.getFrame(time)).get.apply(_a, properties)];
-      }), this.maxTime);
-      makeCompareStructure(keyframes, nextKeyframes, keyframesContainer, function (_a) {
-        var dataset = _a.dataset;
-        return dataset.time;
-      });
-
-      if (length) {
-        var nextProperties = properties.slice(0, -1);
-        var nextProperty = names.concat(nextProperties).join("///");
-        var nextIndex = this.propertiesNames.indexOf(nextProperty);
-
-        if (nextIndex !== -1) {
-          this.updateKeyframes(names, nextProperties, nextIndex);
-          return;
-        }
-      }
-
+      this.datadom.update(prevKeytimesArea, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime));
+      var nextScrollAreaStructure = getScrollAreaStructure(ids, timelineInfo, this.axes.get(["zoom"]).zoom, maxDuration, this.maxTime);
+      this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
       scene.setTime(scene.getTime());
     };
 
-    __proto.editKeyframe = function (time, value, index, isForce) {
-      var valuesStructure = this.structures.values;
-      var isObjectData = this.structures.properties[index].dataset.object === "1";
+    __proto.editKeyframe = function (time, value, index) {
+      var ids = this.ids;
+      var valuesStructure = ids.values;
+      var isObjectData = ids.properties[index].dataset.object === "1";
 
       if (isObjectData) {
         return;
       }
 
       var property = valuesStructure[index].dataset.property;
+      var properties = property.split("///");
       var scene = this.scene;
-
-      var _a = splitProperty(scene, property),
-          names = _a.names,
-          properties = _a.properties,
-          item = _a.item;
-
-      if (!isForce) {
-        var prevValue = item.getNowValue(time, properties);
-
-        if ("" + prevValue === value) {
-          return;
-        }
-      }
-
-      item.set.apply(item, [time].concat(properties, [value]));
+      scene.set.apply(scene, [time].concat(properties, [value]));
       scene.setTime(time);
-      this.updateKeyframes(names, properties, index);
+      this.update();
     };
 
-    __proto.edit = function (target, value, isForce) {
+    __proto.restoreKeyframes = function () {
+      this.scene.setTime(this.scene.getTime());
+    };
+
+    __proto.edit = function (target, value) {
       var parentEl = getTarget(target, function (el) {
         return hasClass$1(el, "value");
       });
@@ -5865,33 +6624,37 @@ version: 0.0.5
         return;
       }
 
-      var values = this.elements.values;
+      var values = this.ids.values.map(function (_a) {
+        var element = _a.element;
+        return element;
+      });
       var index = values.indexOf(parentEl);
 
       if (index === -1) {
         return;
       }
 
-      this.editKeyframe(this.scene.getTime(), value, index, isForce);
+      this.editKeyframe(this.scene.getTime(), value, index);
     };
 
-    __proto.editor = function () {
+    __proto.initEditor = function () {
       var _this = this;
 
-      var valuesArea = this.elements.valuesArea;
-      valuesArea.addEventListener("keyup", function (e) {
-        if (e.keyCode !== 13) {
-          return;
-        }
-
-        var target = e.target;
-
-        _this.edit(target, target.value, true);
-      });
-      valuesArea.addEventListener("focusout", function (e) {
-        var target = e.target;
+      var valuesArea = this.ids.valuesArea.element;
+      new KeyController(valuesArea).keydown(function (e) {
+        !e.isToggle && e.inputEvent.stopPropagation();
+      }).keyup(function (e) {
+        !e.isToggle && e.inputEvent.stopPropagation();
+      }).keyup("enter", function (e) {
+        var target = e.inputEvent.target;
 
         _this.edit(target, target.value);
+      }).keyup("esc", function (e) {
+        var target = e.inputEvent.target;
+        target.blur();
+      });
+      valuesArea.addEventListener("focusout", function (e) {
+        _this.restoreKeyframes();
       });
     };
 
