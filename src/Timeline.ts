@@ -136,7 +136,7 @@ export default class Timeline {
             this.next();
         })
         .keyup("backspace", () => {
-            this.removeKeyframe(this.selectedProperty, this.scene.getTime());
+            this.removeKeyframe(this.selectedProperty, this.selectedTime);
         })
         .keydown("alt", () => {
             addClass(ids.timeline.element, "alt");
@@ -277,7 +277,7 @@ export default class Timeline {
         const keyframesList = ids.keyframesList;
 
         this.selectedProperty = selectedProperty;
-
+        this.scene.pause();
         if (prevSelectedProperty) {
             const prevSelectedIndex = findIndexByProperty(prevSelectedProperty, properties);
 
@@ -309,9 +309,7 @@ export default class Timeline {
             if (keyframeTime >= 0) {
                 const keyframes = ids.keyframesContainers[selectedIndex].children as ElementStructure[];
 
-                console.log(ids.keyframesContainers, selectedIndex);
                 keyframes.forEach(keyframe => {
-                    console.log(keyframe.dataset.time, keyframeTime);
                     if (keyframe.dataset.time === keyframeTime) {
                         addClass(keyframe.element, "select");
                     }
@@ -491,6 +489,7 @@ export default class Timeline {
         if (!property) {
             return;
         }
+        console.log(time);
         const scene = this.scene;
         const {item, properties} = splitProperty(scene, property);
 
@@ -546,6 +545,7 @@ export default class Timeline {
         const properties = property.split("///");
         const scene = this.scene;
 
+        console.log(time, properties, value);
         scene.set(time, ...properties, value);
         scene.setTime(time);
         this.update();

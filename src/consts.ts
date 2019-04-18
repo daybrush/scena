@@ -2,7 +2,11 @@ export const PREFIX = `scenejs_timeline_`;
 
 export const CSS = `
 .timeline {
-  position: relative;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
   font-size: 0;
   background: #000;
   display: flex;
