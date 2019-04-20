@@ -9,7 +9,7 @@ import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
 import { IObject, addEvent } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
-import { ElementStructure, Ids } from "./types";
+import { ElementStructure, Ids, PropertiesInfo } from "./types";
 import { dblCheck } from "./dblcheck";
 import KeyController from "keycon";
 import DataDOM from "data-dom";
@@ -340,7 +340,7 @@ export default class Timeline {
             }
             // select
             if (!arrow) {
-                this.select(properties[index].dataset.property);
+                this.select(properties[index].dataset.key);
                 return;
             }
         });
@@ -348,7 +348,7 @@ export default class Timeline {
     private setInputs(obj: IObject<any>) {
         const valuesArea = this.ids.valuesArea.element;
         for (const name in obj) {
-            valuesArea.querySelector<HTMLInputElement>(`[data-property="${name}"] input`).value = obj[name];
+            valuesArea.querySelector<HTMLInputElement>(`[data-key="${name}"] input`).value = obj[name];
         }
     }
     private moveCursor(time: number) {
@@ -410,7 +410,7 @@ export default class Timeline {
             );
 
             if (index > -1) {
-                this.select(list[index].dataset.property, time);
+                this.select(list[index].dataset.key, time);
             }
             e.preventDefault();
         };
@@ -478,10 +478,8 @@ export default class Timeline {
     }
     private addKeyframe(index: number, time: number) {
         const list = this.ids.keyframesList;
-        const scene = this.scene;
-        const property = list[index].dataset.property;
-        const {item, properties} = splitProperty(scene, property);
-
+        const property = list[index].dataset.key;
+        const {item, properties} = list[index].datas as PropertiesInfo;
         this.editKeyframe(time, item.getNowValue(time, properties), index);
         this.select(property, time);
     }
@@ -489,15 +487,7 @@ export default class Timeline {
         if (!property) {
             return;
         }
-        console.log(time);
-        const scene = this.scene;
-        const {item, properties} = splitProperty(scene, property);
-
-        if (properties.length) {
-            item.remove(time, ...properties);
-        } else {
-            item.removeFrame(time);
-        }
+        this.scene.remove(time, ...property.split("///"));
         this.update();
     }
 
@@ -522,7 +512,8 @@ export default class Timeline {
         );
 
         const nextScrollAreaStructure = getScrollAreaStructure(
-            ids, timelineInfo,
+            ids,
+            timelineInfo,
             this.axes.get(["zoom"]).zoom,
             maxDuration, this.maxTime,
         );
@@ -541,11 +532,8 @@ export default class Timeline {
         if (isObjectData) {
             return;
         }
-        const property = valuesStructure[index].dataset.property as string;
-        const properties = property.split("///");
+        const properties = valuesStructure[index].dataset.key.split("///");
         const scene = this.scene;
-
-        console.log(time, properties, value);
         scene.set(time, ...properties, value);
         scene.setTime(time);
         this.update();

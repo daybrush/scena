@@ -1,8 +1,8 @@
 import { toValue, applyStyle } from "./utils";
-import { ElementStructure, Ids } from "./types";
+import { ElementStructure, Ids, TimelineInfo, PropertiesInfo } from "./types";
 import { getLinesStructure } from "./KeytimesStructure";
 
-export function updateKeyframesStructure(keyframes: ElementStructure[], maxTime) {
+export function updateKeyframesStructure(keyframes: ElementStructure[], maxTime: number) {
     keyframes.forEach(keyframe => {
         const {selector, dataset, style, element} = keyframe;
         if (selector === ".keyframe") {
@@ -17,7 +17,7 @@ export function updateKeyframesStructure(keyframes: ElementStructure[], maxTime)
 
 export function getKeyframesAreaStructure(
     ids: Ids,
-    keyframesList,
+    keyframesList: ElementStructure[],
     zoom: number,
     maxDuration: number,
     maxTime: number,
@@ -44,7 +44,11 @@ export function getKeyframesAreaStructure(
         },
     };
 }
-export function getKeyframesScrollAreaChildrenStructure(ids: Ids, keyframesList, maxTime): ElementStructure[] {
+export function getKeyframesScrollAreaChildrenStructure(
+    ids: Ids,
+    keyframesList: ElementStructure[],
+    maxTime: number,
+): ElementStructure[] {
     return [
         ...keyframesList,
         {
@@ -64,12 +68,16 @@ export function getKeyframesScrollAreaChildrenStructure(ids: Ids, keyframesList,
         },
     ];
 }
-export function getKeyframesListStructure(ids: Ids, timelineInfo, maxTime: number): ElementStructure[] {
+export function getKeyframesListStructure(
+    ids: Ids,
+    timelineInfo: TimelineInfo,
+    maxTime: number,
+): ElementStructure[] {
     const keyframesList: ElementStructure[] = [];
 
-    for (const property in timelineInfo) {
-        const times = timelineInfo[property];
-        const keyframes = getKeyframesStructure(times, maxTime);
+    for (const key in timelineInfo) {
+        const propertiesInfo = timelineInfo[key];
+        const keyframes = getKeyframesStructure(propertiesInfo, maxTime);
 
         keyframesList.push({
             ref: (e, i) => {
@@ -77,10 +85,11 @@ export function getKeyframesListStructure(ids: Ids, timelineInfo, maxTime: numbe
                 ids.keyframesContainers[i] = e.children as ElementStructure;
             },
             selector: ".keyframes",
-            key: property,
+            key,
             dataset: {
-                property,
+                key,
             },
+            datas: propertiesInfo,
             children: {
                 selector: ".keyframes_container",
                 children: keyframes,
@@ -89,14 +98,17 @@ export function getKeyframesListStructure(ids: Ids, timelineInfo, maxTime: numbe
     }
     return keyframesList;
 }
-export function getKeyframesStructure(times: any[][], maxTime): ElementStructure[] {
+export function getKeyframesStructure(
+    propertiesInfo: PropertiesInfo,
+    maxTime: number,
+): ElementStructure[] {
     const keyframeLines: ElementStructure[] = [];
-
-    const keyframes: ElementStructure[] = times.map(([time, value], i): ElementStructure => {
+    const frames = propertiesInfo.frames;
+    const keyframes: ElementStructure[] = frames.map(([time, value], i): ElementStructure => {
         const valueText = toValue(value);
 
-        if (times[i + 1]) {
-            const [nextTime, nextValue] = times[i + 1];
+        if (frames[i + 1]) {
+            const [nextTime, nextValue] = frames[i + 1];
             const nextValueText = toValue(nextValue);
 
             if (valueText !== nextValueText) {

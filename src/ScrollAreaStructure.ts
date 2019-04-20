@@ -1,11 +1,11 @@
 import { getKeyframesAreaStructure, getKeyframesListStructure } from "./KeyframesStructure";
-import { ElementStructure, Ids } from "./types";
+import { ElementStructure, Ids, TimelineInfo } from "./types";
 import { getPropertiesStructure } from "./PropertiesStructure";
 import { getValuesStructure } from "./ValuesStructure";
 
 export function getScrollAreaStructure(
     ids: Ids,
-    timelineInfo,
+    timelineInfo: TimelineInfo,
     zoom: number,
     maxDuration: number,
     maxTime: number,

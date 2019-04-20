@@ -1,4 +1,4 @@
-export function getKeytimesStructure(maxTime) {
+export function getKeytimesStructure(maxTime: number) {
     const keytimes = [];
 
     for (let time = 0; time <= maxTime; ++time) {

@@ -4,13 +4,12 @@ import {
     hasClass as hasClass2,
     addClass as addClass2,
     removeClass as removeClass2,
-    isString,
     IObject,
     isObject,
     isArray,
     isUndefined,
 } from "@daybrush/utils";
-import { ElementStructure } from "./types";
+import { ElementStructure, TimelineInfo } from "./types";
 
 export function numberFormat(num: number, count: number, isRight?: boolean) {
     const length = `${num}`.length;
@@ -34,12 +33,12 @@ export function applyStyle(el: HTMLElement, style: IObject<any>) {
 }
 export function findIndexByProperty(selectedProperty: string, structures: ElementStructure[]) {
     return structures.findIndex(
-        ({dataset: {property}}) => property === selectedProperty,
+        ({ dataset: { key } }) => key === selectedProperty,
     );
 }
 
 export function createElement(structure: ElementStructure) {
-    const {selector, dataset, attr, style, html} = structure;
+    const { selector, dataset, attr, style, html } = structure;
 
     const classNames = selector.match(/\.([^.#\s])+/g) || [];
     const tag = (selector.match(/^[^.#\s]+/g) || [])[0] || "div";
@@ -68,7 +67,7 @@ export function createElement(structure: ElementStructure) {
     return el;
 }
 export function updateElement(prevStructure: ElementStructure, nextStructure: ElementStructure) {
-    const {dataset, attr, style, html, element} = nextStructure;
+    const { dataset, attr, style, html, element } = nextStructure;
     if (dataset) {
         for (const name in dataset) {
             element.setAttribute(`data-${name}`, dataset[name]);
@@ -118,39 +117,63 @@ export function flatObject(obj: IObject<any>, newObj: IObject<any> = {}) {
     }
     return newObj;
 }
-export function getTimelineInfo(scene: Scene) {
-  const timelineInfo = {};
-  scene.forEach((item: SceneItem) => {
-    const delay = item.getDelay();
+export function getItemInfo(
+    timelineInfo: TimelineInfo,
+    names: Array<string | number>,
+    item: SceneItem, delay: number, playSpeed: number) {
+    item.update();
     const times = item.times;
 
-    times.forEach(time => {
-      const frame = item.getFrame(time);
-      (function forEach(...objs: any[]) {
-        const length = objs.length;
-        const lastObj = objs[length - 1];
-        const properties = objs.slice(0, -1);
-
-        const name = properties.join("///");
-
-        if (name) {
-            if (!timelineInfo[name]) {
-                timelineInfo[name] = [];
+    (function getPropertyInfo(itemNames: any, ...properties: any[]) {
+        const frames = [];
+        const isParent = isObject(itemNames);
+        times.forEach(time => {
+            const value = item.get(time, ...properties);
+            if (isUndefined(value)) {
+                return;
             }
-            const info = timelineInfo[name];
-
-            info.push([delay + time, lastObj]);
+            frames.push([delay + time * playSpeed, value]);
+        });
+        timelineInfo[[...names, ...properties].join("///")] = {
+            isParent,
+            item,
+            names,
+            properties,
+            frames,
+        };
+        if (isParent) {
+            for (const property in itemNames) {
+                getPropertyInfo(itemNames[property], ...properties, property);
+            }
         }
+    })(item.names);
+}
+export function getTimelineInfo(scene: Scene): TimelineInfo {
+    const timelineInfo: TimelineInfo = {};
+    (function sceneForEach(...items: Array<Scene | SceneItem>) {
+        const lastItem = items[items.length - 1];
 
-        if (typeof lastObj === "object") {
-            Object.keys(lastObj).forEach(name2 => {
-                forEach(...properties, name2, lastObj[name2]);
+        if (isScene(lastItem)) {
+            lastItem.forEach((item: Scene | SceneItem) => {
+                sceneForEach(...items, item);
             });
+            return;
         }
-      })(item.getId(), frame.get());
-    });
-  });
-  return timelineInfo;
+        let delay = 0;
+        let playSpeed = 1;
+        const nextItems = items.slice(1);
+
+        nextItems.forEach(item => {
+            delay += item.getDelay() * item.getPlaySpeed();
+            playSpeed *= item.getPlaySpeed();
+        });
+        const names = items.slice(1).map(item => item.getId());
+
+        getItemInfo(timelineInfo, names, lastItem, delay, playSpeed);
+
+    })(scene);
+
+    return timelineInfo;
 }
 
 export function getTarget(target: HTMLElement, conditionCallback: (el: Element) => boolean): HTMLElement {

@@ -4,6 +4,7 @@
 		"tslint:recommended"
 	],
 	"rules": {
+		"typedef": [true, "parameter"],
 		"jsdoc-format": false,
 		"forin": false,
 		"no-console": false,

@@ -1,10 +1,11 @@
-import { ElementStructure, Ids } from "./types";
+import { ElementStructure, Ids, TimelineInfo } from "./types";
 
-export function getPropertiesStructure(ids: Ids, timelineInfo) {
+export function getPropertiesStructure(ids: Ids, timelineInfo: TimelineInfo) {
     const properties: ElementStructure[] = [];
 
-    for (const property in timelineInfo) {
-        const propertyNames = property.split("///");
+    for (const key in timelineInfo) {
+        const propertiesInfo = timelineInfo[key];
+        const propertyNames = key.split("///");
         const length = propertyNames.length;
         const id = propertyNames[length - 1];
 
@@ -12,31 +13,23 @@ export function getPropertiesStructure(ids: Ids, timelineInfo) {
             ref: (e, i) => {
                 ids.properties[i] = e;
             },
-            key: property,
+            key,
             selector: ".property",
             dataset: {
-                id,
-                property,
-                parent: propertyNames[length - 2] || "",
-                object: "0",
-                item: propertyNames[0],
+                key,
+                object: propertiesInfo.isParent ? "1" : "0",
             },
+            datas: propertiesInfo,
             style: {
                 paddingLeft: `${10 + (length - 1) * 20}px`,
             },
             children: [
-                // { selector: ".arrow"},
+                { selector: ".arrow"},
                 {
                     selector: "span",
                     html: id,
                 },
             ],
-        });
-        const parentProperty = propertyNames.slice(0, -1).join("///");
-        properties.forEach(({dataset}) => {
-            if (dataset.property === parentProperty) {
-                dataset.object = "1";
-            }
         });
     }
     return properties;
