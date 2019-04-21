@@ -135,6 +135,7 @@ export function getItemInfo(
             frames.push([delay + time * playSpeed, value]);
         });
         timelineInfo[[...names, ...properties].join("///")] = {
+            delay,
             isParent,
             item,
             names,
@@ -152,13 +153,6 @@ export function getTimelineInfo(scene: Scene): TimelineInfo {
     const timelineInfo: TimelineInfo = {};
     (function sceneForEach(...items: Array<Scene | SceneItem>) {
         const lastItem = items[items.length - 1];
-
-        if (isScene(lastItem)) {
-            lastItem.forEach((item: Scene | SceneItem) => {
-                sceneForEach(...items, item);
-            });
-            return;
-        }
         let delay = 0;
         let playSpeed = 1;
         const nextItems = items.slice(1);
@@ -168,22 +162,37 @@ export function getTimelineInfo(scene: Scene): TimelineInfo {
             playSpeed *= item.getPlaySpeed();
         });
         const names = items.slice(1).map(item => item.getId());
-
-        getItemInfo(timelineInfo, names, lastItem, delay, playSpeed);
-
+        if (isScene(lastItem)) {
+            if (names.length) {
+                timelineInfo[names.join("///")] = {
+                    delay,
+                    isParent: true,
+                    item: lastItem,
+                    names: [],
+                    properties: [],
+                    frames: [],
+                };
+            }
+            lastItem.forEach((item: Scene | SceneItem) => {
+                sceneForEach(...items, item);
+            });
+            return;
+        } else {
+            getItemInfo(timelineInfo, names, lastItem, delay, playSpeed);
+        }
     })(scene);
 
     return timelineInfo;
 }
 
-export function getTarget(target: HTMLElement, conditionCallback: (el: Element) => boolean): HTMLElement {
+export function getTarget<T extends HTMLElement>(target: T, conditionCallback: (el: Element) => boolean): T {
     let parentTarget = target;
 
     while (parentTarget && parentTarget !== document.body) {
         if (conditionCallback(parentTarget)) {
             return parentTarget;
         }
-        parentTarget = parentTarget.parentNode as HTMLElement;
+        parentTarget = parentTarget.parentNode as T;
     }
     return null;
 }
