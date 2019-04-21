@@ -104,6 +104,19 @@ export function getKeyframesStructure(
 ): ElementStructure[] {
     const keyframeLines: ElementStructure[] = [];
     const frames = propertiesInfo.frames;
+    const delay = propertiesInfo.delay;
+    const delayFrame: ElementStructure[] = delay ? [{
+        selector: ".keyframe_delay",
+        key: "delay",
+        dataset: {
+            time: -1,
+        },
+        style: {
+            width: `${delay / maxTime * 100}%`,
+        },
+    }] : [];
+
+    console.log(propertiesInfo);
     const keyframes: ElementStructure[] = frames.map(([time, value], i): ElementStructure => {
         const valueText = toValue(value);
 
@@ -142,5 +155,5 @@ export function getKeyframesStructure(
         };
     });
 
-    return [...keyframes, ...keyframeLines];
+    return [...keyframes, ...delayFrame, ...keyframeLines];
 }
