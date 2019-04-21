@@ -20,11 +20,13 @@ export interface Ids {
     prevBtn?: ElementStructure;
     playBtn?: ElementStructure;
     nextBtn?: ElementStructure;
+    unselectedArea?: ElementStructure;
 }
 export interface PropertiesInfo {
     isParent: boolean;
     item: SceneItem;
     names: Array<number | string>;
+    delay: number;
     properties: string[];
     frames: Array<[number, any]>;
 }

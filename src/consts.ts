@@ -1,4 +1,53 @@
-export const PREFIX = `scenejs_timeline_`;
+export const PREFIX = `scenejs_editor_`;
+
+export const CSS2 = `
+.item_info {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 200px;
+    background: #000;
+}
+.options_area {
+
+}
+.option_area {
+    position: relative;
+    border-bottom: 1px solid #777;
+    box-sizing: border-box;
+    white-space: nowrap;
+    background: rgba(90, 90, 90, 0.7);
+    font-size: 13px;
+    font-weight: bold;
+    color: #eee;
+    display: flex;
+}
+.option_name, .option_value {
+    width: 50%;
+    height: 30px;
+    line-height: 20px;
+    box-sizing: border-box;
+    padding: 5px;
+}
+.option_name {
+    border-right: 1px solid #999;
+}
+.option_value input {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: #4af;
+    font-weight: bold;
+    background: none;
+    border: 0;
+    box-sizing: border-box;
+}
+`.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
 
 export const CSS = `
 .timeline {
@@ -280,6 +329,15 @@ export const CSS = `
 }
 .keyframes {
 
+}
+.keyframe_delay {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: #4af;
+  opacity: 0.2;
+  z-index: 0;
 }
 .keyframe_line {
   position: absolute;
