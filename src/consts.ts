@@ -364,6 +364,9 @@ export const CSS = `
   z-index: 1;
   cursor: pointer;
 }
+.keyframe[data-no="1"] {
+    opacity: 0.2;
+}
 .select .keyframe {
     border-color: #555;
 }
@@ -399,3 +402,34 @@ export const CSS = `
   transform: translate(-50%);
 }
 `.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
+
+export const DURATION = "duration";
+export const FILL_MODE = "fillMode";
+export const DIRECTION = "direction";
+export const ITERATION_COUNT = "iterationCount";
+export const DELAY = "delay";
+export const EASING = "easing";
+export const PLAY_SPEED = "playSpeed";
+export const EASING_NAME = "easingName";
+export const ITERATION_TIME = "iterationTime";
+export const PAUSED = "paused";
+export const ENDED = "ended";
+export const TIMEUPDATE = "timeupdate";
+export const ANIMATE = "animate";
+export const PLAY = "play";
+export const RUNNING = "running";
+export const ITERATION = "iteration";
+export const START_ANIMATION = "startAnimation";
+export const PAUSE_ANIMATION = "pauseAnimation";
+export const ALTERNATE = "alternate";
+export const REVERSE = "reverse";
+export const ALTERNATE_REVERSE = "alternate-reverse";
+export const NORMAL = "normal";
+export const INFINITE = "infinite";
+export const PLAY_STATE = "playState";
+export const PLAY_CSS = "playCSS";
+export const PREV_TIME = "prevTime";
+export const TICK_TIME = "tickTime";
+export const CURRENT_TIME = "currentTime";
+export const SELECTOR = "selector";
+export const TRANSFORM_NAME = "transform";

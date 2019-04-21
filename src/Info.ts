@@ -1,6 +1,6 @@
 import Timeline from "./Timeline";
-import Scene, { SceneItem, Animator } from "scenejs";
-import { createElement, updateElement, getTarget } from "./utils";
+import Scene, { SceneItem, Animator, DirectionType } from "scenejs";
+import { createElement, updateElement, getTarget, isSceneItem } from "./utils";
 import DataDOM, { DataStructure } from "data-dom";
 import { ElementStructure } from "./types";
 import { CSS2 } from "./consts";
@@ -32,8 +32,8 @@ export function getOptionAreaStructure(option: string, value: any): ElementStruc
                     dataset: {
                         option,
                     },
-                    attr: {
-                        value: isUndefined(value) ? "" : value,
+                    ref: e => {
+                        (e.element as HTMLInputElement).value = isUndefined(value) ? "" : value;
                     },
                 },
             },
@@ -48,6 +48,8 @@ export function getOptionsStructure(item?: Animator): ElementStructure[] {
         getOptionAreaStructure("playSpeed", item && item.getPlaySpeed()),
         getOptionAreaStructure("fillMode", item && item.getFillMode()),
         getOptionAreaStructure("direction", item && item.getDirection()),
+        getOptionAreaStructure("duration", item && item.getDuration()),
+        getOptionAreaStructure("lastFrame", item && item.getDuration()),
     ];
 }
 export class Info {
@@ -85,14 +87,16 @@ export class Info {
         );
         this.init();
     }
-    public select = (info: SelectEvent) => {
-        console.log(info);
+    public update() {
         this.datadom.update(
             this.optionArea.children,
-            getOptionsStructure(info.selectedItem),
+            getOptionsStructure(this.selectedItem),
             this.optionArea,
         );
+    }
+    public select = (info: SelectEvent) => {
         this.selectedItem = info.selectedItem;
+        this.update();
     }
     private init() {
         new KeyController(this.infoArea.element)
@@ -103,6 +107,7 @@ export class Info {
             e.inputEvent.stopPropagation();
         })
         .keyup("enter", e => {
+            const selectedItem = this.selectedItem;
             if (!this.selectedItem) {
                 return;
             }
@@ -115,10 +120,23 @@ export class Info {
             const value = target.value;
 
             if (option === "delay") {
-                this.selectedItem.setDelay(parseFloat(value));
+                selectedItem.setDelay(parseFloat(value));
+            } else if (option === "lastFrame") {
+                const nextDuration = parseFloat(value);
+                if (isSceneItem(selectedItem) && selectedItem.getDuration() < nextDuration) {
+                    selectedItem.newFrame(nextDuration);
+                }
+            } else if (option === "playSpeed") {
+                selectedItem.setPlaySpeed(parseFloat(value));
+            } else if (option === "direction") {
+                selectedItem.setDirection(value as DirectionType);
+            } else if (option === "iterationCount") {
+                selectedItem.setIterationCount(value === "infinite" ? value : parseFloat(value));
+            } else if (option === "easing") {
+                selectedItem.setEasing(value);
             }
-
             this.timeline.update();
+            this.update();
         });
     }
 }

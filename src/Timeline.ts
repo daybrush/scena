@@ -1,15 +1,15 @@
 import Scene, { SceneItem } from "scenejs";
 import {
-    getTimelineInfo, getTarget,
+    getTarget,
     hasClass, removeClass, addClass,
     flatObject, splitProperty, findElementIndexByPosition,
-    createElement, updateElement, findIndexByProperty, findStructure, numberFormat,
+    createElement, updateElement, findIndexByProperty, findStructure, numberFormat, isScene,
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
 import { IObject, addEvent } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
-import { ElementStructure, Ids, PropertiesInfo } from "./types";
+import { ElementStructure, Ids, PropertiesInfo, TimelineInfo } from "./types";
 import { dblCheck } from "./dblcheck";
 import KeyController from "keycon";
 import DataDOM from "data-dom";
@@ -18,6 +18,7 @@ import { getScrollAreaStructure } from "./ScrollAreaStructure";
 import { getControlAreaStructure } from "./ControlAreaStructure";
 import Component from "@egjs/component";
 import { Info } from "./Info";
+import { getTimelineInfo } from "./TimelineInfo";
 
 let isExportCSS = false;
 
@@ -31,6 +32,7 @@ export default class Timeline extends Component {
     private datadom: DataDOM<ElementStructure>;
     private structure: ElementStructure;
     private ids: Ids = {};
+    private timelineInfo: TimelineInfo;
     constructor(scene: Scene, parentEl: HTMLElement) {
         super();
 
@@ -73,15 +75,15 @@ export default class Timeline extends Component {
     }
     public update() {
         const scene = this.scene;
-        const timelineInfo = getTimelineInfo(scene);
+        this.timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(scene.getDuration());
-        const maxTime = maxDuration + 5;
+        const maxTime = maxDuration;
         let zoom = this.axes.get(["zoom"]).zoom;
         const currentMaxTime = this.maxTime;
         this.maxTime = maxTime;
         const ids = this.ids;
         const prevKeytimesArea = ids.keyframesAreas[0];
-        const nextZoom = currentMaxTime > 5 ? maxDuration / (currentMaxTime - 5) : 1;
+        const nextZoom = currentMaxTime > 5 ? maxDuration / currentMaxTime : 1;
 
         zoom = zoom * nextZoom;
         this.axes.axm.set({ zoom });
@@ -93,7 +95,7 @@ export default class Timeline extends Component {
 
         const nextScrollAreaStructure = getScrollAreaStructure(
             ids,
-            timelineInfo,
+            this.timelineInfo,
             this.axes.get(["zoom"]).zoom,
             maxDuration, this.maxTime,
         );
@@ -176,7 +178,7 @@ export default class Timeline extends Component {
             this.next();
         })
         .keyup("backspace", () => {
-            this.removeKeyframe(this.selectedProperty, this.selectedTime);
+            this.removeKeyframe(this.selectedProperty);
         })
         .keydown("alt", () => {
             addClass(ids.timeline.element, "alt");
@@ -192,10 +194,10 @@ export default class Timeline extends Component {
         });
     }
     private initStructure(scene: Scene, parentEl: HTMLElement) {
+        this.timelineInfo = getTimelineInfo(scene);
         const duration = Math.ceil(scene.getDuration());
-        const timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(duration);
-        const maxTime = maxDuration + 5;
+        const maxTime = maxDuration;
         const ids = this.ids;
         let timelineCSS: ElementStructure;
 
@@ -217,7 +219,7 @@ export default class Timeline extends Component {
                 timelineCSS,
                 getControlAreaStructure(ids),
                 getHeaderAreaStructure(ids, 1, maxDuration, maxTime),
-                getScrollAreaStructure(ids, timelineInfo, 1, maxDuration, maxTime),
+                getScrollAreaStructure(ids, this.timelineInfo, 1, maxDuration, maxTime),
             ],
         };
         this.datadom = new DataDOM(
@@ -329,7 +331,7 @@ export default class Timeline extends Component {
                 const keyframes = ids.keyframesContainers[prevSelectedIndex].children as ElementStructure[];
 
                 keyframes.forEach(keyframe => {
-                    if (keyframe.dataset.time === prevSelectedTime) {
+                    if (keyframe.datas.time === prevSelectedTime) {
                         removeClass(keyframe.element, "select");
                     }
                 });
@@ -352,7 +354,7 @@ export default class Timeline extends Component {
                 const keyframes = selectedPropertyStructure.children as ElementStructure[];
 
                 keyframes.forEach(keyframe => {
-                    if (keyframe.dataset.time === keyframeTime) {
+                    if (keyframe.datas.time === keyframeTime) {
                         addClass(keyframe.element, "select");
                     }
                 });
@@ -529,28 +531,38 @@ export default class Timeline extends Component {
         const list = this.ids.keyframesList;
         const property = list[index].dataset.key;
         const {item, properties} = list[index].datas as PropertiesInfo;
-        this.editKeyframe(time, item.getNowValue(time, properties), index);
+
         this.select(property, time);
+
+        const value = ((this.ids.values[index].children as ElementStructure).element as HTMLInputElement).value;
+
+        this.editKeyframe(index, value);
     }
-    private removeKeyframe(property: string, time: number) {
-        if (!property) {
+    private removeKeyframe(property: string) {
+        const propertiesInfo = this.timelineInfo[property];
+        if (!property || !propertiesInfo || isScene(propertiesInfo.item)) {
             return;
         }
-        this.scene.remove(time, ...property.split("///"));
+
+        const properties = propertiesInfo.properties;
+        const item = propertiesInfo.item;
+
+        item.remove(item.getIterationTime(), ...properties);
         this.update();
     }
-    private editKeyframe(time: number, value: any, index: number) {
+    private editKeyframe(index: number, value: any) {
         const ids = this.ids;
-        const valuesStructure = ids.values;
         const isObjectData = ids.properties[index].dataset.object === "1";
 
         if (isObjectData) {
             return;
         }
-        const properties = valuesStructure[index].dataset.key.split("///");
-        const scene = this.scene;
-        scene.set(time, ...properties, value);
-        scene.setTime(time);
+        const propertiesInfo = ids.keyframesList[index].datas as PropertiesInfo;
+        const item = propertiesInfo.item;
+        const properties = propertiesInfo.properties;
+
+        console.log(properties);
+        item.set(item.getIterationTime(), ...properties, value);
         this.update();
     }
     private restoreKeyframes() {
@@ -568,7 +580,7 @@ export default class Timeline extends Component {
         if (index === -1) {
             return;
         }
-        this.editKeyframe(this.scene.getTime(), value, index);
+        this.editKeyframe(index, value);
     }
     private initEditor() {
         const valuesArea = this.ids.valuesArea.element;

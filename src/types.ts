@@ -1,6 +1,6 @@
 import { IObject } from "@daybrush/utils";
 import { DataStructure } from "data-dom";
-import { SceneItem } from "scenejs";
+import Scene, { SceneItem } from "scenejs";
 
 export interface Ids {
     timeArea?: ElementStructure;
@@ -23,12 +23,11 @@ export interface Ids {
     unselectedArea?: ElementStructure;
 }
 export interface PropertiesInfo {
+    item: Scene | SceneItem;
     isParent: boolean;
-    item: SceneItem;
     names: Array<number | string>;
-    delay: number;
     properties: string[];
-    frames: Array<[number, any]>;
+    frames: Array<[number, number, any]>;
 }
 export interface TimelineInfo {
     [key: string]: PropertiesInfo;
