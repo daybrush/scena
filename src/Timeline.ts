@@ -16,11 +16,13 @@ import DataDOM from "data-dom";
 import { getHeaderAreaStructure, getKeytimesAreaStructure } from "./HeaderAreaStructure";
 import { getScrollAreaStructure } from "./ScrollAreaStructure";
 import { getControlAreaStructure } from "./ControlAreaStructure";
+import Component from "@egjs/component";
+import { Info } from "./Info";
 
 let isExportCSS = false;
 
-export default class Timeline {
-    private scene: Scene;
+export default class Timeline extends Component {
+    public scene: Scene;
     private maxTime: number = 0;
     private axes: Axes;
     private selectedProperty: string = "";
@@ -30,8 +32,9 @@ export default class Timeline {
     private structure: ElementStructure;
     private ids: Ids = {};
     constructor(scene: Scene, parentEl: HTMLElement) {
-        scene.finish();
+        super();
 
+        scene.finish();
         this.scene = scene;
         this.initStructure(scene, parentEl);
         this.initEditor();
@@ -44,6 +47,8 @@ export default class Timeline {
         this.initKeyController();
 
         scene.setTime(0);
+
+        new Info(this, parentEl);
     }
     public getElement() {
         return this.structure.element;
@@ -66,7 +71,39 @@ export default class Timeline {
             scene.play();
         }
     }
+    public update() {
+        const scene = this.scene;
+        const timelineInfo = getTimelineInfo(scene);
+        const maxDuration = Math.ceil(scene.getDuration());
+        const maxTime = maxDuration + 5;
+        let zoom = this.axes.get(["zoom"]).zoom;
+        const currentMaxTime = this.maxTime;
+        this.maxTime = maxTime;
+        const ids = this.ids;
+        const prevKeytimesArea = ids.keyframesAreas[0];
+        const nextZoom = currentMaxTime > 5 ? maxDuration / (currentMaxTime - 5) : 1;
 
+        zoom = zoom * nextZoom;
+        this.axes.axm.set({ zoom });
+        // update keytimes
+        this.datadom.update(
+            prevKeytimesArea,
+            getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime),
+        );
+
+        const nextScrollAreaStructure = getScrollAreaStructure(
+            ids,
+            timelineInfo,
+            this.axes.get(["zoom"]).zoom,
+            maxDuration, this.maxTime,
+        );
+
+        this.datadom.update(
+            ids.scrollArea,
+            nextScrollAreaStructure,
+        );
+        scene.setTime(scene.getTime());
+    }
     // init
     private initController() {
         const ids = this.ids;
@@ -76,6 +113,9 @@ export default class Timeline {
         playBtn.addEventListener("click", e => {
             this.togglePlay();
             e.preventDefault();
+        });
+        ids.unselectedArea.element.addEventListener("click", e => {
+            this.select("", -1);
         });
         ids.prevBtn.element.addEventListener("click", e => {
             this.prev();
@@ -296,7 +336,7 @@ export default class Timeline {
                 this.selectedTime = -1;
             }
         }
-
+        let selectedItem = this.scene;
         if (selectedProperty) {
             if (document.activeElement) {
                 (document.activeElement as HTMLElement).blur();
@@ -306,8 +346,10 @@ export default class Timeline {
             addClass(values[selectedIndex].element, "select");
             addClass(keyframesList[selectedIndex].element, "select");
 
+            selectedItem = (ids.keyframesList[selectedIndex].datas as PropertiesInfo).item;
             if (keyframeTime >= 0) {
-                const keyframes = ids.keyframesContainers[selectedIndex].children as ElementStructure[];
+                const selectedPropertyStructure = ids.keyframesContainers[selectedIndex];
+                const keyframes = selectedPropertyStructure.children as ElementStructure[];
 
                 keyframes.forEach(keyframe => {
                     if (keyframe.dataset.time === keyframeTime) {
@@ -317,6 +359,13 @@ export default class Timeline {
                 this.selectedTime = keyframeTime;
             }
         }
+        this.trigger("select", {
+            selectedItem,
+            selectedProperty: this.selectedProperty,
+            selectedTime: this.selectedTime,
+            prevSelectedProperty,
+            prevSelectedTime,
+        });
     }
     private initClickProperty() {
         const ids = this.ids;
@@ -489,40 +538,6 @@ export default class Timeline {
         }
         this.scene.remove(time, ...property.split("///"));
         this.update();
-    }
-
-    private update() {
-        const scene = this.scene;
-        const timelineInfo = getTimelineInfo(scene);
-        const maxDuration = Math.ceil(scene.getDuration());
-        const maxTime = maxDuration + 5;
-        let zoom = this.axes.get(["zoom"]).zoom;
-        const currentMaxTime = this.maxTime;
-        this.maxTime = maxTime;
-        const ids = this.ids;
-        const prevKeytimesArea = ids.keyframesAreas[0];
-        const nextZoom = currentMaxTime > 5 ? maxDuration / (currentMaxTime - 5) : 1;
-
-        zoom = zoom * nextZoom;
-        this.axes.axm.set({ zoom });
-        // update keytimes
-        this.datadom.update(
-            prevKeytimesArea,
-            getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime),
-        );
-
-        const nextScrollAreaStructure = getScrollAreaStructure(
-            ids,
-            timelineInfo,
-            this.axes.get(["zoom"]).zoom,
-            maxDuration, this.maxTime,
-        );
-
-        this.datadom.update(
-            ids.scrollArea,
-            nextScrollAreaStructure,
-        );
-        scene.setTime(scene.getTime());
     }
     private editKeyframe(time: number, value: any, index: number) {
         const ids = this.ids;
