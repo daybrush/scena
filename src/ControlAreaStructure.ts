@@ -6,6 +6,9 @@ export function getControlAreaStructure(ids: Ids): ElementStructure {
         children: [
             {
                 selector: ".properties_area",
+                ref: (e: ElementStructure) => {
+                    ids.unselectedArea = e;
+                },
                 children: {
                     selector: ".property",
                 },
