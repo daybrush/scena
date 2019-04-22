@@ -338,7 +338,7 @@ export default class Timeline extends Component {
                 this.selectedTime = -1;
             }
         }
-        let selectedItem = this.scene;
+        let selectedItem: Scene | SceneItem = this.scene;
         if (selectedProperty) {
             if (document.activeElement) {
                 (document.activeElement as HTMLElement).blur();
