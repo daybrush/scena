@@ -23,6 +23,10 @@ export function getEntries(times: number[], states: AnimatorState[]) {
     }
     let entries = times.map(time => ([time, time]));
     let nextEntries = [];
+    const firstEntry = entries[0];
+    if (firstEntry[0] !== 0 && states[states.length - 1][DELAY]) {
+        entries.unshift([0, 0]);
+    }
 
     states.forEach(state => {
         const iterationCount = state[ITERATION_COUNT] as number;
@@ -79,13 +83,14 @@ export function getItemInfo(
     const times = item.times;
     const entries = getEntries(times, items.map(animator => animator.state));
 
+    console.log(entries);
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
         const frames = [];
         const isParent = isObject(itemNames);
         const isItem = properties.length === 0;
         entries.forEach(([time, iterationTime]) => {
             const value = item.get(iterationTime, ...properties);
-            if (isUndefined(value)) {
+            if (isUndefined(value) && properties.length) {
                 return;
             }
             frames.push([time, iterationTime, value]);

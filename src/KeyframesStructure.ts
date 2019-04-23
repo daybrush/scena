@@ -1,4 +1,4 @@
-import { toValue, applyStyle } from "./utils";
+import { toValue, applyStyle, isSceneItem } from "./utils";
 import { ElementStructure, Ids, TimelineInfo, PropertiesInfo } from "./types";
 import { getLinesStructure } from "./KeytimesStructure";
 import { isUndefined } from "@daybrush/utils";
@@ -122,7 +122,8 @@ export function getKeyframesStructure(
     maxTime: number,
 ): ElementStructure[] {
     const keyframeLines: ElementStructure[] = [];
-    const duration = propertiesInfo.item.getDuration();
+    const item = propertiesInfo.item;
+    const duration = item.getDuration();
     const frames = propertiesInfo.frames;
     const delayFrames: ElementStructure[] = [];
 
