@@ -26,7 +26,14 @@ export function getHeaderAreaStructure(ids: Ids, zoom: number, maxDuration: numb
                 selector: ".values_area",
                 children: {
                     selector: ".value",
-                    html: "+",
+                    children: {
+                        key: "add",
+                        selector: ".add",
+                        html: "+",
+                        ref: (e: ElementStructure) => {
+                            ids.addItem = e;
+                        },
+                    },
                 },
             },
             getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime),

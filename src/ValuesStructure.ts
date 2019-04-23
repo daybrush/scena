@@ -18,7 +18,14 @@ export function getValuesStructure(ids: Ids, timelineInfo: TimelineInfo): Elemen
                 object: propertiesInfo.isParent ? "1" : "0",
             },
             datas: propertiesInfo,
-            children: {
+            children: propertiesInfo.isParent
+            ? {
+                key: "add",
+                selector: ".add",
+                html: "+",
+            }
+            : {
+                key: "input",
                 selector: "input",
                 attr: {
                     value: frames[0] ? frames[0][1] : "",

@@ -18,6 +18,9 @@ export function dotNumber(a1: number, a2: number, b1: number, b2: number) {
     return (a1 * b2 + a2 * b1) / (b1 + b2);
   }
 export function getEntries(times: number[], states: AnimatorState[]) {
+    if (!times.length) {
+        return [];
+    }
     let entries = times.map(time => ([time, time]));
     let nextEntries = [];
 

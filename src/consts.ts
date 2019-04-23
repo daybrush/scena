@@ -90,12 +90,13 @@ export const CSS = `
 .header_area .property {
     line-height: 30px;
 }
-.header_area .value {
+.value .add {
     text-align: center;
     color: #fff;
     line-height: 30px;
     font-weight: bold;
     font-size: 20px;
+    cursor: pointer;
 }
 .header_area .keyframes_area::-webkit-scrollbar {
     display: none; // Safari and Chrome
@@ -250,6 +251,9 @@ export const CSS = `
     border: 0;
     box-sizing: border-box;
     text-align: center;
+}
+.value {
+
 }
 .alt .value input {
     cursor: ew-resize;

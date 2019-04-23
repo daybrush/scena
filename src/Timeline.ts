@@ -112,6 +112,15 @@ export default class Timeline extends Component {
         const playBtn = this.ids.playBtn.element;
         const scene = this.scene;
 
+        this.ids.addItem.element.addEventListener("click", e => {
+            const name = prompt("Add Item");
+
+            if (!name) {
+                return;
+            }
+            this.scene.newItem(name);
+            this.update();
+        });
         playBtn.addEventListener("click", e => {
             this.togglePlay();
             e.preventDefault();

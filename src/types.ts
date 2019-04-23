@@ -21,6 +21,7 @@ export interface Ids {
     playBtn?: ElementStructure;
     nextBtn?: ElementStructure;
     unselectedArea?: ElementStructure;
+    addItem?: ElementStructure;
 }
 export interface PropertiesInfo {
     item: Scene | SceneItem;
