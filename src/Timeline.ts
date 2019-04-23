@@ -20,6 +20,7 @@ import Component from "@egjs/component";
 import { Info } from "./Info";
 import { getTimelineInfo } from "./TimelineInfo";
 import { isDate } from "util";
+import { Property } from "estree";
 
 let isExportCSS = false;
 
@@ -101,6 +102,8 @@ export default class Timeline extends Component {
             maxDuration, this.maxTime,
         );
 
+        console.log(ids.scrollArea.children[0].children[0].children.map(e => e.key));
+        console.log(nextScrollAreaStructure.children[0].children[0].children.map(e => e.key));
         this.datadom.update(
             ids.scrollArea,
             nextScrollAreaStructure,
@@ -518,15 +521,39 @@ export default class Timeline extends Component {
         });
     }
     private initDragValues() {
+        const ids = this.ids;
+        const element = ids.valuesArea.element;
         let dragTarget: HTMLInputElement = null;
         let dragTargetValue: any;
-        drag(this.ids.valuesArea.element, {
+
+        addEvent(element, "click", e => {
+            const addedElement = getTarget(dragTarget, el => hasClass(el, "add"));
+            if (!addedElement) {
+                return;
+            }
+            const valueElement = addedElement.parentElement as HTMLElement;
+            const index = findIndexByProperty(valueElement.getAttribute("data-key"), ids.values);
+
+            if (index < 0) {
+                return;
+            }
+            const property = prompt("add property");
+
+            const propertiesInfo = ids.properties[index].datas as PropertiesInfo;
+            const properties = propertiesInfo.properties.slice();
+            const item = propertiesInfo.item;
+
+            item.set(item.getIterationTime(), ...properties, property, 0);
+
+            this.update();
+
+        });
+        drag(element, {
             container: window,
             dragstart: e => {
                 dragTarget = e.inputEvent.target;
                 dragTargetValue = dragTarget.value;
 
-                console.log(this.keycon.altKey, getTarget(dragTarget, el => el.nodeName === "INPUT"));
                 if (!this.keycon.altKey || !getTarget(dragTarget, el => el.nodeName === "INPUT")) {
                     return false;
                 }
