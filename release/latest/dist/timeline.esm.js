@@ -53,7 +53,7 @@ function __extends(d, b) {
 
 var PREFIX = "scenejs_editor_";
 var CSS2 = "\n.item_info {\n    position: fixed;\n    right: 0;\n    top: 0;\n    width: 200px;\n    background: #000;\n}\n.options_area {\n\n}\n.option_area {\n    position: relative;\n    border-bottom: 1px solid #777;\n    box-sizing: border-box;\n    white-space: nowrap;\n    background: rgba(90, 90, 90, 0.7);\n    font-size: 13px;\n    font-weight: bold;\n    color: #eee;\n    display: flex;\n}\n.option_name, .option_value {\n    width: 50%;\n    height: 30px;\n    line-height: 20px;\n    box-sizing: border-box;\n    padding: 5px;\n}\n.option_name {\n    border-right: 1px solid #999;\n}\n.option_value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
-var CSS = "\n.timeline {\n  position: fixed;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  width: 100%;\n  font-size: 0;\n  background: #000;\n  display: flex;\n  flex-direction: column;\n}\n.header_area, .scroll_area {\n   width: 100%;\n   position: relative;\n  display: flex;\n  -webkit-align-items: flex-start;\n  align-items: flex-start;\n}\n.header_area {\n  position: relative;\n  z-index: 10;\n  top: 0;\n  height: 30px;\n  min-height: 30px;\n}\n.header_area .keyframes {\n  padding: 0px;\n}\n.header_area .properties_area,\n.header_area .keyframes_area,\n.header_area .values_area,\n.header_area .keyframes_scroll_area {\n    height: 100%;\n}\n.header_area .property, .header_area .value, .header_area .keyframes {\n  height: 100%;\n}\n.header_area .property {\n    line-height: 30px;\n}\n.header_area .value {\n    text-align: center;\n    color: #fff;\n    line-height: 30px;\n    font-weight: bold;\n    font-size: 20px;\n}\n.header_area .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.header_area .keyframe_cursor {\n    position: absolute;\n    border-top: 10px solid #4af;\n    border-left: 6px solid transparent;\n    border-right: 6px solid transparent;\n    width: 0;\n    height: 0;\n    bottom: 0;\n    top: auto;\n    background: none;\n    cursor: pointer;\n}\n.control_area .keyframes {\n    padding-left: 10px;\n}\n.play_control_area {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n}\n.play_control_area .control {\n    position: relative;\n    display: inline-block;\n    vertical-align: middle;\n    color: white;\n    margin: 0px 15px;\n}\n.play {\n    border-left: 14px solid white;\n    border-top: 8px solid transparent;\n    border-bottom: 8px solid transparent;\n}\n.pause {\n    border-left: 4px solid #fff;\n    border-right: 4px solid #fff;\n    width: 6px;\n    height: 16px;\n}\n.prev {\n    border-right: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.prev:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    right: 100%;\n    transform: translate(0, -50%);\n    background: white;\n}\n.next {\n    border-left: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.next:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    transform: translate(0, -50%);\n    background: white;\n}\n.keytime {\n  position: relative;\n  display: inline-block;\n  height: 100%;\n  font-size: 13px;\n  font-weight: bold;\n  color: #777;\n}\n.keytime:last-child {\n  max-width: 0px;\n}\n.keytime span {\n  position: absolute;\n  top: 2px;\n  left: 0;\n  display: inline-block;\n  transform: translate(-50%);\n  color: #eee;\n}\n.keytime .graduation {\n  position: absolute;\n  bottom: 0;\n  width: 1px;\n  height: 10px;\n  background: #777;\n  transform: translate(-50%);\n}\n.keytime .graduation.half {\n  left: 50%;\n  height: 7px;\n}\n.keytime .graduation.quarter {\n  left: 25%;\n  height: 5px;\n}\n.keytime .graduation.quarter3 {\n  left: 75%;\n  height: 5px;\n}\n.scroll_area {\n  position: relative;\n  width: 100%;\n  height: calc(100% - 60px);\n  overflow: auto;\n}\n.properties_area, .keyframes_area, .values_area {\n  display: inline-block;\n  position: relative;\n  font-size: 16px;\n  overflow: auto;\n}\n\n.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.properties_area {\n  width: 30%;\n  max-width: 200px;\n  box-sizing: border-box;\n}\n.values_area {\n    width: 50px;\n    min-width: 50px;\n    display: inline-block;\n    border-right: 1px solid #999;\n    box-sizing: border-box;\n}\n.value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n    text-align: center;\n}\n.alt .value input {\n    cursor: ew-resize;\n}\n.value[data-object=\"1\"] input {\n    display: none;\n}\n.properties_scroll_area {\n  display: inline-block;\n  min-width: 100%;\n}\n.keyframes_area {\n  flex: 1;\n}\n.keyframes_scroll_area {\n  position: relative;\n  min-width: 300px;\n}\n.keyframes, .property, .value {\n  position: relative;\n  height: 25px;\n  border-bottom: 1px solid #777;\n  box-sizing: border-box;\n  white-space: nowrap;\n  background: rgba(90, 90, 90, 0.7);\n  z-index: 1;\n}\n\n.property {\n  line-height: 25px;\n  padding-left: 10px;\n  box-sizing: border-box;\n  font-size: 13px;\n  font-weight: bold;\n  color: #eee;\n}\n.time_area {\n    font-size: 13px;\n    color: #4af;\n    line-height: 30px;\n    font-weight: bold;\n    height: 100%;\n    line-height: 30px;\n    border: 0;\n    background: transparent;\n    outline: 0;\n}\n.time_area:after {\n    content: \"s\";\n}\n.property .arrow {\n    position: relative;\n    display: inline-block;\n    margin-right: 5px;\n    width: 0;\n    vertical-align: middle;\n    cursor: pointer;\n    border-top: 6px solid #eee;\n    border-left: 4px solid transparent;\n    border-right: 4px solid transparent;\n}\n.property[data-fold=\"1\"] .arrow {\n    border-top: 4px solid transparent;\n    border-bottom: 4px solid transparent;\n    border-right: 0;\n    border-left: 6px solid #eee;\n    margin-left: 2px;\n}\n.property[data-object=\"0\"] .arrow {\n    display: none;\n}\n.property.fold, .keyframes.fold, .value.fold {\n    display: none;\n}\n.property.select, .value.select, .keyframes.select {\n    background: rgba(120, 120, 120, 0.7);\n}\n.keyframes {\n\n}\n.keyframe_delay {\n  position: absolute;\n  height: 100%;\n  top: 0;\n  left: 0;\n  background: #4af;\n  opacity: 0.2;\n  z-index: 0;\n}\n.keyframe_line {\n  position: absolute;\n  height: 8px;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  background: #666;\n  z-index: 0;\n}\n.keyframe {\n  position: absolute;\n  font-size: 0px;\n  width: 12px;\n  height: 12px;\n  top: 0px;\n  bottom: 0px;\n  margin: auto;\n  background: #fff;\n  border: 2px solid #383838;\n  border-radius: 2px;\n  box-sizing: border-box;\n  transform: translate(-50%) rotate(45deg);\n  z-index: 1;\n  cursor: pointer;\n}\n.keyframe[data-no=\"1\"] {\n    opacity: 0.2;\n}\n.select .keyframe {\n    border-color: #555;\n}\n.keyframe.select {\n    background: #4af;\n}\n.keyframes_container, .line_area {\n  position: relative;\n  width: calc(100% - 30px);\n  left: 15px;\n  height: 100%;\n}\n.line_area {\n  position: absolute;\n  top: 0;\n  z-index: 0;\n}\n.keyframe_cursor {\n  position: absolute;\n  top: 0;\n  z-index: 1;\n  background: #4af;\n  width: 1px;\n  height: 100%;\n  left: 15px;\n  transform: translate(-50%);\n}\n.division_line {\n  position: absolute;\n  background: #333;\n  width: 1px;\n  height: 100%;\n  transform: translate(-50%);\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
+var CSS = "\n.timeline {\n  position: fixed;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  width: 100%;\n  font-size: 0;\n  background: #000;\n  display: flex;\n  flex-direction: column;\n}\n.header_area, .scroll_area {\n   width: 100%;\n   position: relative;\n  display: flex;\n  -webkit-align-items: flex-start;\n  align-items: flex-start;\n}\n.header_area {\n  position: relative;\n  z-index: 10;\n  top: 0;\n  height: 30px;\n  min-height: 30px;\n}\n.header_area .keyframes {\n  padding: 0px;\n}\n.header_area .properties_area,\n.header_area .keyframes_area,\n.header_area .values_area,\n.header_area .keyframes_scroll_area {\n    height: 100%;\n}\n.header_area .property, .header_area .value, .header_area .keyframes {\n  height: 100%;\n}\n.header_area .property {\n    line-height: 30px;\n}\n.value .add {\n    text-align: center;\n    color: #fff;\n    line-height: 30px;\n    font-weight: bold;\n    font-size: 20px;\n    cursor: pointer;\n}\n.header_area .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.header_area .keyframe_cursor {\n    position: absolute;\n    border-top: 10px solid #4af;\n    border-left: 6px solid transparent;\n    border-right: 6px solid transparent;\n    width: 0;\n    height: 0;\n    bottom: 0;\n    top: auto;\n    background: none;\n    cursor: pointer;\n}\n.control_area .keyframes {\n    padding-left: 10px;\n}\n.play_control_area {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n}\n.play_control_area .control {\n    position: relative;\n    display: inline-block;\n    vertical-align: middle;\n    color: white;\n    margin: 0px 15px;\n}\n.play {\n    border-left: 14px solid white;\n    border-top: 8px solid transparent;\n    border-bottom: 8px solid transparent;\n}\n.pause {\n    border-left: 4px solid #fff;\n    border-right: 4px solid #fff;\n    width: 6px;\n    height: 16px;\n}\n.prev {\n    border-right: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.prev:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    right: 100%;\n    transform: translate(0, -50%);\n    background: white;\n}\n.next {\n    border-left: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.next:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    transform: translate(0, -50%);\n    background: white;\n}\n.keytime {\n  position: relative;\n  display: inline-block;\n  height: 100%;\n  font-size: 13px;\n  font-weight: bold;\n  color: #777;\n}\n.keytime:last-child {\n  max-width: 0px;\n}\n.keytime span {\n  position: absolute;\n  line-height: 1;\n  bottom: 12px;\n  display: inline-block;\n  transform: translate(-50%);\n  color: #eee;\n}\n.keytime .graduation {\n  position: absolute;\n  bottom: 0;\n  width: 1px;\n  height: 10px;\n  background: #777;\n  transform: translate(-50%);\n}\n.keytime .graduation.half {\n  left: 50%;\n  height: 7px;\n}\n.keytime .graduation.quarter {\n  left: 25%;\n  height: 5px;\n}\n.keytime .graduation.quarter3 {\n  left: 75%;\n  height: 5px;\n}\n.scroll_area {\n  position: relative;\n  width: 100%;\n  height: calc(100% - 60px);\n  overflow: auto;\n}\n.properties_area, .keyframes_area, .values_area {\n  display: inline-block;\n  position: relative;\n  font-size: 16px;\n  overflow: auto;\n}\n\n.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.properties_area {\n  width: 30%;\n  max-width: 200px;\n  box-sizing: border-box;\n}\n.values_area {\n    width: 50px;\n    min-width: 50px;\n    display: inline-block;\n    border-right: 1px solid #999;\n    box-sizing: border-box;\n}\n.value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n    text-align: center;\n}\n.value {\n\n}\n.alt .value input {\n    cursor: ew-resize;\n}\n.value[data-object=\"1\"] input {\n    display: none;\n}\n.properties_scroll_area {\n  display: inline-block;\n  min-width: 100%;\n}\n.keyframes_area {\n  flex: 1;\n}\n.keyframes_scroll_area {\n  position: relative;\n  min-width: 300px;\n}\n.keyframes, .property, .value {\n  position: relative;\n  height: 30px;\n  line-height: 30px;\n  border-bottom: 1px solid #777;\n  box-sizing: border-box;\n  white-space: nowrap;\n  background: rgba(90, 90, 90, 0.7);\n  z-index: 1;\n}\n\n.property {\n  padding-left: 10px;\n  box-sizing: border-box;\n  font-size: 13px;\n  font-weight: bold;\n  color: #eee;\n}\n.property .remove {\n    position: absolute;\n    display: inline-block;\n    cursor: pointer;\n    width: 18px;\n    height: 18px;\n    top: 0;\n    bottom: 0;\n    right: 10px;\n    margin: auto;\n    border-radius: 50%;\n    border: 2px solid #fff;\n    vertical-align: middle;\n    display: none;\n    margin-left: 10px;\n    box-sizing: border-box;\n}\n.property .remove:before, .property .remove:after {\n    position: absolute;\n    content: \"\";\n    width: 8px;\n    height: 2px;\n    border-radius: 1px;\n    background: #fff;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n}\n.property .remove:before {\n    transform: rotate(45deg);\n}\n.property .remove:after {\n    transform: rotate(-45deg);\n}\n.property:hover .remove {\n    display: inline-block;\n}\n\n[data-item=\"1\"], [data-item=\"1\"] .add {\n    height: 30px;\n    line-height: 30px;\n}\n.time_area {\n    font-size: 13px;\n    color: #4af;\n    line-height: 30px;\n    font-weight: bold;\n    height: 100%;\n    line-height: 30px;\n    border: 0;\n    background: transparent;\n    outline: 0;\n}\n.time_area:after {\n    content: \"s\";\n}\n.property .arrow {\n    position: relative;\n    display: inline-block;\n    margin-right: 5px;\n    width: 0;\n    vertical-align: middle;\n    cursor: pointer;\n    border-top: 6px solid #eee;\n    border-left: 4px solid transparent;\n    border-right: 4px solid transparent;\n}\n.property[data-fold=\"1\"] .arrow {\n    border-top: 4px solid transparent;\n    border-bottom: 4px solid transparent;\n    border-right: 0;\n    border-left: 6px solid #eee;\n    margin-left: 2px;\n}\n.property[data-object=\"0\"] .arrow {\n    display: none;\n}\n.property.fold, .keyframes.fold, .value.fold {\n    display: none;\n}\n.property.select, .value.select, .keyframes.select {\n    background: rgba(120, 120, 120, 0.7);\n}\n.keyframes {\n\n}\n.keyframe_delay {\n  position: absolute;\n  height: 100%;\n  top: 0;\n  left: 0;\n  background: #4af;\n  opacity: 0.2;\n  z-index: 0;\n}\n.keyframe_line {\n  position: absolute;\n  height: 8px;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  background: #666;\n  z-index: 0;\n}\n.keyframe {\n  position: absolute;\n  font-size: 0px;\n  width: 12px;\n  height: 12px;\n  top: 0px;\n  bottom: 0px;\n  margin: auto;\n  background: #fff;\n  border: 2px solid #383838;\n  border-radius: 2px;\n  box-sizing: border-box;\n  transform: translate(-50%) rotate(45deg);\n  z-index: 1;\n  cursor: pointer;\n}\n.keyframe[data-no=\"1\"] {\n    opacity: 0.2;\n}\n.select .keyframe {\n    border-color: #555;\n}\n.keyframe.select {\n    background: #4af;\n}\n.keyframes_container, .line_area {\n  position: relative;\n  width: calc(100% - 30px);\n  left: 15px;\n  height: 100%;\n}\n.line_area {\n  position: absolute;\n  top: 0;\n  z-index: 0;\n}\n.keyframe_cursor {\n  position: absolute;\n  top: 0;\n  z-index: 1;\n  background: #4af;\n  width: 1px;\n  height: 100%;\n  left: 15px;\n  transform: translate(-50%);\n}\n.division_line {\n  position: absolute;\n  background: #333;\n  width: 1px;\n  height: 100%;\n  transform: translate(-50%);\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
 var DIRECTION = "direction";
 var ITERATION_COUNT = "iterationCount";
 var DELAY = "delay";
@@ -330,7 +330,14 @@ function getHeaderAreaStructure(ids, zoom, maxDuration, maxTime) {
       selector: ".values_area",
       children: {
         selector: ".value",
-        html: "+"
+        children: {
+          key: "add",
+          selector: ".add",
+          html: "+",
+          ref: function (e) {
+            ids.addItem = e;
+          }
+        }
       }
     }, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime)]
   };
@@ -428,6 +435,7 @@ function getKeyframesListStructure(ids, timelineInfo, maxTime) {
       selector: ".keyframes",
       key: key,
       dataset: {
+        item: propertiesInfo.isItem ? "1" : "0",
         key: key
       },
       datas: propertiesInfo,
@@ -455,7 +463,8 @@ function getDelayFrameStructure(time, nextTime, maxTime) {
 }
 function getKeyframesStructure(propertiesInfo, maxTime) {
   var keyframeLines = [];
-  var duration = propertiesInfo.item.getDuration();
+  var item = propertiesInfo.item;
+  var duration = item.getDuration();
   var frames = propertiesInfo.frames;
   var delayFrames = [];
   var keyframes = frames.map(function (_a, i) {
@@ -528,7 +537,8 @@ function getPropertiesStructure(ids, timelineInfo) {
       selector: ".property",
       dataset: {
         key: key,
-        object: propertiesInfo.isParent ? "1" : "0"
+        object: propertiesInfo.isParent ? "1" : "0",
+        item: propertiesInfo.isItem ? "1" : "0"
       },
       datas: propertiesInfo,
       style: {
@@ -539,6 +549,8 @@ function getPropertiesStructure(ids, timelineInfo) {
       }, {
         selector: "span",
         html: id
+      }, {
+        selector: ".remove"
       }]
     });
   }
@@ -560,10 +572,16 @@ function getValuesStructure(ids, timelineInfo) {
       selector: ".value",
       dataset: {
         key: key,
+        item: propertiesInfo.isItem ? "1" : "0",
         object: propertiesInfo.isParent ? "1" : "0"
       },
       datas: propertiesInfo,
-      children: {
+      children: propertiesInfo.isParent ? {
+        key: "add",
+        selector: ".add",
+        html: "+"
+      } : {
+        key: "input",
         selector: "input",
         attr: {
           value: frames[0] ? frames[0][1] : ""
@@ -785,10 +803,20 @@ function dotNumber(a1, a2, b1, b2) {
   return (a1 * b2 + a2 * b1) / (b1 + b2);
 }
 function getEntries(times, states) {
+  if (!times.length) {
+    return [];
+  }
+
   var entries = times.map(function (time) {
     return [time, time];
   });
   var nextEntries = [];
+  var firstEntry = entries[0];
+
+  if (firstEntry[0] !== 0 && states[states.length - 1][DELAY]) {
+    entries.unshift([0, 0]);
+  }
+
   states.forEach(function (state) {
     var iterationCount = state[ITERATION_COUNT];
     var delay = state[DELAY];
@@ -837,6 +865,7 @@ function getItemInfo(timelineInfo, items, names, item) {
   var entries = getEntries(times, items.map(function (animator) {
     return animator.state;
   }));
+  console.log(entries);
 
   (function getPropertyInfo(itemNames) {
     var properties = [];
@@ -847,19 +876,24 @@ function getItemInfo(timelineInfo, items, names, item) {
 
     var frames = [];
     var isParent = isObject(itemNames);
+    var isItem = properties.length === 0;
     entries.forEach(function (_a) {
       var time = _a[0],
           iterationTime = _a[1];
       var value = item.get.apply(item, [iterationTime].concat(properties));
 
-      if (isUndefined(value)) {
+      if (isUndefined(value) && properties.length) {
         return;
       }
 
       frames.push([time, iterationTime, value]);
     });
-    timelineInfo[names.concat(properties).join("///")] = {
+    var key = names.concat(properties).join("///");
+    timelineInfo[key] = {
+      key: key,
+      parentItem: null,
       isParent: isParent,
+      isItem: isItem,
       item: item,
       names: names,
       properties: properties,
@@ -883,15 +917,20 @@ function getTimelineInfo(scene) {
       items[_i] = arguments[_i];
     }
 
-    var lastItem = items[items.length - 1];
+    var length = items.length;
+    var lastItem = items[length - 1];
     var names = items.slice(1).map(function (item) {
       return item.getId();
     });
 
     if (isScene(lastItem)) {
       if (names.length) {
-        timelineInfo[names.join("///")] = {
+        var key = names.join("///");
+        timelineInfo[key] = {
+          key: key,
+          isItem: true,
           isParent: true,
+          parentItem: items[length - 2],
           item: lastItem,
           names: [],
           properties: [],
@@ -997,6 +1036,12 @@ function (_super) {
 
     this.datadom.update(prevKeytimesArea, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime));
     var nextScrollAreaStructure = getScrollAreaStructure(ids, this.timelineInfo, this.axes.get(["zoom"]).zoom, maxDuration, this.maxTime);
+    console.log(ids.scrollArea.children[0].children[0].children.map(function (e) {
+      return e.key;
+    }));
+    console.log(nextScrollAreaStructure.children[0].children[0].children.map(function (e) {
+      return e.key;
+    }));
     this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
     scene.setTime(scene.getTime());
   }; // init
@@ -1008,6 +1053,17 @@ function (_super) {
     var ids = this.ids;
     var playBtn = this.ids.playBtn.element;
     var scene = this.scene;
+    this.ids.addItem.element.addEventListener("click", function (e) {
+      var name = prompt("Add Item");
+
+      if (!name) {
+        return;
+      }
+
+      _this.scene.newItem(name);
+
+      _this.update();
+    });
     playBtn.addEventListener("click", function (e) {
       _this.togglePlay();
 
@@ -1266,6 +1322,9 @@ function (_super) {
       var arrow = getTarget(e.target, function (el) {
         return hasClass(el, "arrow");
       });
+      var remove = getTarget(e.target, function (el) {
+        return hasClass(el, "remove");
+      });
       var target = getTarget(e.target, function (el) {
         return hasClass(el, "property");
       });
@@ -1278,13 +1337,18 @@ function (_super) {
 
       if (index === -1) {
         return;
-      } // select
+      }
 
+      var selectedProperty = ids.properties[index];
 
-      if (!arrow) {
-        _this.select(properties[index].dataset.key);
+      if (remove) {
+        _this.remove(selectedProperty.datas);
+      } else {
+        _this.select(selectedProperty.dataset.key);
 
-        return;
+        if (arrow) {
+          _this.fold(index);
+        }
       }
     });
   };
@@ -1417,16 +1481,39 @@ function (_super) {
   __proto.initDragValues = function () {
     var _this = this;
 
+    var ids = this.ids;
+    var element = ids.valuesArea.element;
     var dragTarget = null;
     var dragTargetValue;
-    drag(this.ids.valuesArea.element, {
+    addEvent(element, "click", function (e) {
+      var addedElement = getTarget(dragTarget, function (el) {
+        return hasClass(el, "add");
+      });
+
+      if (!addedElement) {
+        return;
+      }
+
+      var valueElement = addedElement.parentElement;
+      var index = findIndexByProperty(valueElement.getAttribute("data-key"), ids.values);
+
+      if (index < 0) {
+        return;
+      }
+
+      var property = prompt("add property");
+      var propertiesInfo = ids.properties[index].datas;
+      var properties = propertiesInfo.properties.slice();
+      var item = propertiesInfo.item;
+      item.set.apply(item, [item.getIterationTime()].concat(properties, [property, 0]));
+
+      _this.update();
+    });
+    drag(element, {
       container: window,
       dragstart: function (e) {
         dragTarget = e.inputEvent.target;
         dragTargetValue = dragTarget.value;
-        console.log(_this.keycon.altKey, getTarget(dragTarget, function (el) {
-          return el.nodeName === "INPUT";
-        }));
 
         if (!_this.keycon.altKey || !getTarget(dragTarget, function (el) {
           return el.nodeName === "INPUT";
@@ -1455,6 +1542,71 @@ function (_super) {
     this.select(property, time);
     var value = this.ids.values[index].children.element.value;
     this.editKeyframe(index, value);
+  };
+
+  __proto.fold = function (index) {
+    var ids = this.ids;
+    var properties = ids.properties,
+        values = ids.values,
+        keyframesList = ids.keyframesList;
+    var selectedProperty = properties[index];
+    var length = properties.length;
+    var max;
+
+    for (max = index; max < length; ++max) {
+      if (properties[max].datas.key.indexOf(selectedProperty.datas.key) !== 0) {
+        break;
+      }
+    }
+
+    var foldProperties = properties.slice(index + 1, max);
+    var foldValues = values.slice(index + 1, max);
+    var foldKeyframesList = keyframesList.slice(index + 1, max);
+    var selectedElement = selectedProperty.element;
+    var isFold = selectedElement.getAttribute("data-fold") === "1";
+    selectedElement.setAttribute("data-fold", isFold ? "0" : "1");
+    var foldFunction = isFold ? removeClass : addClass;
+    foldProperties.forEach(function (property, i) {
+      foldFunction(property.element, "fold");
+      foldFunction(foldValues[i].element, "fold");
+      foldFunction(foldKeyframesList[i].element, "fold");
+    });
+  };
+
+  __proto.remove = function (propertiesInfo) {
+    var key = propertiesInfo.key,
+        isItem = propertiesInfo.isItem,
+        parentItem = propertiesInfo.parentItem,
+        targetItem = propertiesInfo.item,
+        properties = propertiesInfo.properties;
+
+    if (isItem) {
+      var targetName_1 = null;
+      parentItem.forEach(function (item, name) {
+        if (item === targetItem) {
+          targetName_1 = name;
+          return;
+        }
+      });
+
+      if (targetName_1 != null) {
+        parentItem.removeItem(targetName_1);
+      }
+    } else {
+      var times = targetItem.times;
+      times.forEach(function (time) {
+        var _a;
+
+        (_a = targetItem).remove.apply(_a, [time].concat(properties));
+      });
+    }
+
+    if (this.selectedProperty === key) {
+      this.selectedProperty = "";
+      this.selectedTime = -1;
+    }
+
+    this.update();
   };
 
   __proto.removeKeyframe = function (property) {
