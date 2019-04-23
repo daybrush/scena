@@ -19,6 +19,7 @@ import { getControlAreaStructure } from "./ControlAreaStructure";
 import Component from "@egjs/component";
 import { Info } from "./Info";
 import { getTimelineInfo } from "./TimelineInfo";
+import { isDate } from "util";
 
 let isExportCSS = false;
 
@@ -402,11 +403,12 @@ export default class Timeline extends Component {
             const selectedProperty = ids.properties[index];
             if (remove) {
                 this.remove(selectedProperty.datas as PropertiesInfo);
-            } else if (arrow) {
-                //
-            } else  {
+            } else {
                 this.select(selectedProperty.dataset.key);
-                return;
+
+                if (arrow) {
+                    this.fold(index);
+                }
             }
         });
     }
@@ -551,6 +553,33 @@ export default class Timeline extends Component {
         const value = ((this.ids.values[index].children as ElementStructure).element as HTMLInputElement).value;
 
         this.editKeyframe(index, value);
+    }
+    private fold(index: number) {
+        const ids = this.ids;
+        const {properties, values, keyframesList} = ids;
+        const selectedProperty = properties[index];
+        const length = properties.length;
+        let max;
+        for (max = index; max < length; ++max) {
+            if (properties[max].datas.key.indexOf(selectedProperty.datas.key) !== 0) {
+                break;
+            }
+        }
+        const foldProperties = properties.slice(index + 1, max);
+        const foldValues = values.slice(index + 1, max);
+        const foldKeyframesList = keyframesList.slice(index + 1, max);
+
+        const selectedElement = selectedProperty.element;
+        const isFold = selectedElement.getAttribute("data-fold") === "1";
+
+        selectedElement.setAttribute("data-fold", isFold ? "0" : "1");
+
+        const foldFunction = (isFold ? removeClass : addClass);
+        foldProperties.forEach((property, i) => {
+            foldFunction(property.element, "fold");
+            foldFunction(foldValues[i].element, "fold");
+            foldFunction(foldKeyframesList[i].element, "fold");
+        });
     }
     private remove(propertiesInfo: PropertiesInfo) {
         const {key, isItem, parentItem, item: targetItem, properties} = propertiesInfo;
