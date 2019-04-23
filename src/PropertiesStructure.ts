@@ -18,17 +18,19 @@ export function getPropertiesStructure(ids: Ids, timelineInfo: TimelineInfo) {
             dataset: {
                 key,
                 object: propertiesInfo.isParent ? "1" : "0",
+                item: propertiesInfo.isItem ? "1" : "0",
             },
             datas: propertiesInfo,
             style: {
                 paddingLeft: `${10 + (length - 1) * 20}px`,
             },
             children: [
-                { selector: ".arrow"},
+                { selector: ".arrow" },
                 {
                     selector: "span",
                     html: id,
                 },
+                { selector: ".remove" },
             ],
         });
     }

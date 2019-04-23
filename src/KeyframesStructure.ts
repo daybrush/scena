@@ -88,6 +88,7 @@ export function getKeyframesListStructure(
             selector: ".keyframes",
             key,
             dataset: {
+                item: propertiesInfo.isItem ? "1" : "0",
                 key,
             },
             datas: propertiesInfo,

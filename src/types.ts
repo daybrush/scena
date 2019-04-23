@@ -24,8 +24,11 @@ export interface Ids {
     addItem?: ElementStructure;
 }
 export interface PropertiesInfo {
+    key: string;
+    parentItem: Scene;
     item: Scene | SceneItem;
     isParent: boolean;
+    isItem: boolean;
     names: Array<number | string>;
     properties: string[];
     frames: Array<[number, number, any]>;

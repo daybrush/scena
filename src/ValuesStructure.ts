@@ -15,6 +15,7 @@ export function getValuesStructure(ids: Ids, timelineInfo: TimelineInfo): Elemen
             selector: ".value",
             dataset: {
                 key,
+                item: propertiesInfo.isItem ? "1" : "0",
                 object: propertiesInfo.isParent ? "1" : "0",
             },
             datas: propertiesInfo,

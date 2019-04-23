@@ -388,6 +388,7 @@ export default class Timeline extends Component {
             const properties = ids.properties.map(property => property.element);
             const length = properties.length;
             const arrow = getTarget(e.target as HTMLElement, el => hasClass(el, "arrow"));
+            const remove = getTarget(e.target as HTMLElement, el => hasClass(el, "remove"));
             const target = getTarget(e.target as HTMLElement, el => hasClass(el, "property"));
 
             if (!target) {
@@ -398,9 +399,13 @@ export default class Timeline extends Component {
             if (index === -1) {
                 return;
             }
-            // select
-            if (!arrow) {
-                this.select(properties[index].dataset.key);
+            const selectedProperty = ids.properties[index];
+            if (remove) {
+                this.remove(selectedProperty.datas as PropertiesInfo);
+            } else if (arrow) {
+                //
+            } else  {
+                this.select(selectedProperty.dataset.key);
                 return;
             }
         });
@@ -546,6 +551,32 @@ export default class Timeline extends Component {
         const value = ((this.ids.values[index].children as ElementStructure).element as HTMLInputElement).value;
 
         this.editKeyframe(index, value);
+    }
+    private remove(propertiesInfo: PropertiesInfo) {
+        const {key, isItem, parentItem, item: targetItem, properties} = propertiesInfo;
+        if (isItem) {
+            let targetName: string = null;
+            parentItem.forEach((item, name) => {
+                if (item === targetItem) {
+                    targetName = name;
+                    return;
+                }
+            });
+            if (targetName != null) {
+                parentItem.removeItem(targetName);
+            }
+        } else {
+            const times = (targetItem as SceneItem).times;
+
+            times.forEach(time => {
+                (targetItem as SceneItem).remove(time, ...properties);
+            });
+        }
+        if (this.selectedProperty === key) {
+            this.selectedProperty = "";
+            this.selectedTime = -1;
+        }
+        this.update();
     }
     private removeKeyframe(property: string) {
         const propertiesInfo = this.timelineInfo[property];

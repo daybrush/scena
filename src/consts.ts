@@ -182,8 +182,8 @@ export const CSS = `
 }
 .keytime span {
   position: absolute;
-  top: 2px;
-  left: 0;
+  line-height: 1;
+  bottom: 12px;
   display: inline-block;
   transform: translate(-50%);
   color: #eee;
@@ -274,7 +274,8 @@ export const CSS = `
 }
 .keyframes, .property, .value {
   position: relative;
-  height: 25px;
+  height: 30px;
+  line-height: 30px;
   border-bottom: 1px solid #777;
   box-sizing: border-box;
   white-space: nowrap;
@@ -283,12 +284,55 @@ export const CSS = `
 }
 
 .property {
-  line-height: 25px;
   padding-left: 10px;
   box-sizing: border-box;
   font-size: 13px;
   font-weight: bold;
   color: #eee;
+}
+.property .remove {
+    position: absolute;
+    display: inline-block;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    top: 0;
+    bottom: 0;
+    right: 10px;
+    margin: auto;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    vertical-align: middle;
+    display: none;
+    margin-left: 10px;
+    box-sizing: border-box;
+}
+.property .remove:before, .property .remove:after {
+    position: absolute;
+    content: "";
+    width: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: #fff;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+.property .remove:before {
+    transform: rotate(45deg);
+}
+.property .remove:after {
+    transform: rotate(-45deg);
+}
+.property:hover .remove {
+    display: inline-block;
+}
+
+[data-item="1"], [data-item="1"] .add {
+    height: 30px;
+    line-height: 30px;
 }
 .time_area {
     font-size: 13px;

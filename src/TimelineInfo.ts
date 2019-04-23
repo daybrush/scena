@@ -82,6 +82,7 @@ export function getItemInfo(
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
         const frames = [];
         const isParent = isObject(itemNames);
+        const isItem = properties.length === 0;
         entries.forEach(([time, iterationTime]) => {
             const value = item.get(iterationTime, ...properties);
             if (isUndefined(value)) {
@@ -89,8 +90,13 @@ export function getItemInfo(
             }
             frames.push([time, iterationTime, value]);
         });
-        timelineInfo[[...names, ...properties].join("///")] = {
+        const key = [...names, ...properties].join("///");
+
+        timelineInfo[key] = {
+            key,
+            parentItem: null,
             isParent,
+            isItem,
             item,
             names,
             properties,
@@ -106,12 +112,17 @@ export function getItemInfo(
 export function getTimelineInfo(scene: Scene): TimelineInfo {
     const timelineInfo: TimelineInfo = {};
     (function sceneForEach(...items: Array<Scene | SceneItem>) {
-        const lastItem = items[items.length - 1];
+        const length = items.length;
+        const lastItem = items[length - 1];
         const names = items.slice(1).map(item => item.getId());
         if (isScene(lastItem)) {
             if (names.length) {
-                timelineInfo[names.join("///")] = {
+                const key = names.join("///");
+                timelineInfo[key] = {
+                    key,
+                    isItem: true,
                     isParent: true,
+                    parentItem: items[length - 2] as Scene,
                     item: lastItem,
                     names: [],
                     properties: [],
