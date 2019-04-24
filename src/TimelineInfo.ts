@@ -83,7 +83,6 @@ export function getItemInfo(
     const times = item.times;
     const entries = getEntries(times, items.map(animator => animator.state));
 
-    console.log(entries);
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
         const frames = [];
         const isParent = isObject(itemNames);

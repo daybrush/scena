@@ -26,6 +26,9 @@ let isExportCSS = false;
 
 export default class Timeline extends Component {
     public scene: Scene;
+    public options: {
+        keyboard?: boolean,
+    };
     private maxTime: number = 0;
     private axes: Axes;
     private selectedProperty: string = "";
@@ -35,9 +38,14 @@ export default class Timeline extends Component {
     private structure: ElementStructure;
     private ids: Ids = {};
     private timelineInfo: TimelineInfo;
-    constructor(scene: Scene, parentEl: HTMLElement) {
+    constructor(scene: Scene, parentEl: HTMLElement, options: {
+        keyboard?: boolean,
+    } = {}) {
         super();
-
+        this.options = {
+            keyboard: true,
+            ...options,
+        };
         scene.finish();
         this.scene = scene;
         this.initStructure(scene, parentEl);
@@ -148,29 +156,31 @@ export default class Timeline extends Component {
             removeClass(playBtn, "pause");
             // playBtn.innerHTML = "play";
         });
-        new KeyController(ids.timeArea.element)
-        .keydown(e => {
-            !e.isToggle && e.inputEvent.stopPropagation();
-        })
-        .keyup(e => {
-            !e.isToggle && e.inputEvent.stopPropagation();
-        })
-        .keyup("enter", e => {
-            // go to time
-            const element = ids.timeArea.element;
-            const value = (element as HTMLInputElement).value;
-            const result = /(\d+):(\d+):(\d+)/g.exec(value);
+        if (this.options.keyboard) {
+            new KeyController(ids.timeArea.element)
+            .keydown(e => {
+                !e.isToggle && e.inputEvent.stopPropagation();
+            })
+            .keyup(e => {
+                !e.isToggle && e.inputEvent.stopPropagation();
+            })
+            .keyup("enter", e => {
+                // go to time
+                const element = ids.timeArea.element;
+                const value = (element as HTMLInputElement).value;
+                const result = /(\d+):(\d+):(\d+)/g.exec(value);
 
-            if (!result) {
-                return;
-            }
-            const minute = parseFloat(result[1]);
-            const second = parseFloat(result[2]);
-            const milisecond = parseFloat(`0.${result[3]}`);
-            const time = minute * 60 + second + milisecond;
+                if (!result) {
+                    return;
+                }
+                const minute = parseFloat(result[1]);
+                const second = parseFloat(result[2]);
+                const milisecond = parseFloat(`0.${result[3]}`);
+                const time = minute * 60 + second + milisecond;
 
-            scene.setTime(time);
-        });
+                scene.setTime(time);
+            });
+        }
     }
     private initKeyController() {
         const ids = this.ids;
@@ -178,31 +188,35 @@ export default class Timeline extends Component {
         window.addEventListener("blur", () => {
             removeClass(ids.timeline.element, "alt");
         });
+
         this.keycon = new KeyController()
-        .keydown("space", ({inputEvent}) => {
-            inputEvent.preventDefault();
-        })
-        .keydown("left", e => {
-            this.prev();
-        })
-        .keydown("right", e => {
-            this.next();
-        })
-        .keyup("backspace", () => {
-            this.removeKeyframe(this.selectedProperty);
-        })
         .keydown("alt", () => {
             addClass(ids.timeline.element, "alt");
         })
         .keyup("alt", () => {
             removeClass(ids.timeline.element, "alt");
-        })
-        .keyup("esc", () => {
-            this.finish();
-        })
-        .keyup("space", () => {
-            this.togglePlay();
         });
+
+        if (this.options.keyboard) {
+            this.keycon.keydown("space", ({inputEvent}) => {
+                inputEvent.preventDefault();
+            })
+            .keydown("left", e => {
+                this.prev();
+            })
+            .keydown("right", e => {
+                this.next();
+            })
+            .keyup("backspace", () => {
+                this.removeKeyframe(this.selectedProperty);
+            })
+            .keyup("esc", () => {
+                this.finish();
+            })
+            .keyup("space", () => {
+                this.togglePlay();
+            });
+        }
     }
     private initStructure(scene: Scene, parentEl: HTMLElement) {
         this.timelineInfo = getTimelineInfo(scene);
@@ -355,7 +369,6 @@ export default class Timeline extends Component {
                 (document.activeElement as HTMLElement).blur();
             }
 
-            console.log(selectedProperty, properties);
             const selectedIndex = findIndexByProperty(selectedProperty, properties);
             addClass(properties[selectedIndex].element, "select");
             addClass(values[selectedIndex].element, "select");
@@ -660,7 +673,6 @@ export default class Timeline extends Component {
         const item = propertiesInfo.item;
         const properties = propertiesInfo.properties;
 
-        console.log(properties);
         item.set(item.getIterationTime(), ...properties, value);
         this.update();
     }
