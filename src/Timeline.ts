@@ -102,8 +102,6 @@ export default class Timeline extends Component {
             maxDuration, this.maxTime,
         );
 
-        console.log(ids.scrollArea.children[0].children[0].children.map(e => e.key));
-        console.log(nextScrollAreaStructure.children[0].children[0].children.map(e => e.key));
         this.datadom.update(
             ids.scrollArea,
             nextScrollAreaStructure,
@@ -356,6 +354,8 @@ export default class Timeline extends Component {
             if (document.activeElement) {
                 (document.activeElement as HTMLElement).blur();
             }
+
+            console.log(selectedProperty, properties);
             const selectedIndex = findIndexByProperty(selectedProperty, properties);
             addClass(properties[selectedIndex].element, "select");
             addClass(values[selectedIndex].element, "select");
@@ -539,6 +539,9 @@ export default class Timeline extends Component {
             }
             const property = prompt("add property");
 
+            if (!property) {
+                return;
+            }
             const propertiesInfo = ids.properties[index].datas as PropertiesInfo;
             const properties = propertiesInfo.properties.slice();
             const item = propertiesInfo.item;
