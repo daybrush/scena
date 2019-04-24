@@ -50,6 +50,19 @@ function __extends(d, b) {
 
   d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
+var __assign = function () {
+  __assign = Object.assign || function __assign(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+      s = arguments[i];
+
+      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+    }
+
+    return t;
+  };
+
+  return __assign.apply(this, arguments);
+};
 
 var PREFIX = "scenejs_editor_";
 var CSS2 = "\n.item_info {\n    position: fixed;\n    right: 0;\n    top: 0;\n    width: 200px;\n    background: #000;\n}\n.options_area {\n\n}\n.option_area {\n    position: relative;\n    border-bottom: 1px solid #777;\n    box-sizing: border-box;\n    white-space: nowrap;\n    background: rgba(90, 90, 90, 0.7);\n    font-size: 13px;\n    font-weight: bold;\n    color: #eee;\n    display: flex;\n}\n.option_name, .option_value {\n    width: 50%;\n    height: 30px;\n    line-height: 20px;\n    box-sizing: border-box;\n    padding: 5px;\n}\n.option_name {\n    border-right: 1px solid #999;\n}\n.option_value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
@@ -865,7 +878,6 @@ function getItemInfo(timelineInfo, items, names, item) {
   var entries = getEntries(times, items.map(function (animator) {
     return animator.state;
   }));
-  console.log(entries);
 
   (function getPropertyInfo(itemNames) {
     var properties = [];
@@ -956,13 +968,20 @@ var Timeline =
 function (_super) {
   __extends(Timeline, _super);
 
-  function Timeline(scene, parentEl) {
+  function Timeline(scene, parentEl, options) {
+    if (options === void 0) {
+      options = {};
+    }
+
     var _this = _super.call(this) || this;
 
     _this.maxTime = 0;
     _this.selectedProperty = "";
     _this.selectedTime = -1;
     _this.ids = {};
+    _this.options = __assign({
+      keyboard: true
+    }, options);
     scene.finish();
     _this.scene = scene;
 
@@ -1036,12 +1055,6 @@ function (_super) {
 
     this.datadom.update(prevKeytimesArea, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime));
     var nextScrollAreaStructure = getScrollAreaStructure(ids, this.timelineInfo, this.axes.get(["zoom"]).zoom, maxDuration, this.maxTime);
-    console.log(ids.scrollArea.children[0].children[0].children.map(function (e) {
-      return e.key;
-    }));
-    console.log(nextScrollAreaStructure.children[0].children[0].children.map(function (e) {
-      return e.key;
-    }));
     this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
     scene.setTime(scene.getTime());
   }; // init
@@ -1090,26 +1103,29 @@ function (_super) {
       addClass(playBtn, "play");
       removeClass(playBtn, "pause"); // playBtn.innerHTML = "play";
     });
-    new KeyController(ids.timeArea.element).keydown(function (e) {
-      !e.isToggle && e.inputEvent.stopPropagation();
-    }).keyup(function (e) {
-      !e.isToggle && e.inputEvent.stopPropagation();
-    }).keyup("enter", function (e) {
-      // go to time
-      var element = ids.timeArea.element;
-      var value = element.value;
-      var result = /(\d+):(\d+):(\d+)/g.exec(value);
 
-      if (!result) {
-        return;
-      }
+    if (this.options.keyboard) {
+      new KeyController(ids.timeArea.element).keydown(function (e) {
+        !e.isToggle && e.inputEvent.stopPropagation();
+      }).keyup(function (e) {
+        !e.isToggle && e.inputEvent.stopPropagation();
+      }).keyup("enter", function (e) {
+        // go to time
+        var element = ids.timeArea.element;
+        var value = element.value;
+        var result = /(\d+):(\d+):(\d+)/g.exec(value);
 
-      var minute = parseFloat(result[1]);
-      var second = parseFloat(result[2]);
-      var milisecond = parseFloat("0." + result[3]);
-      var time = minute * 60 + second + milisecond;
-      scene.setTime(time);
-    });
+        if (!result) {
+          return;
+        }
+
+        var minute = parseFloat(result[1]);
+        var second = parseFloat(result[2]);
+        var milisecond = parseFloat("0." + result[3]);
+        var time = minute * 60 + second + milisecond;
+        scene.setTime(time);
+      });
+    }
   };
 
   __proto.initKeyController = function () {
@@ -1119,24 +1135,28 @@ function (_super) {
     window.addEventListener("blur", function () {
       removeClass(ids.timeline.element, "alt");
     });
-    this.keycon = new KeyController().keydown("space", function (_a) {
-      var inputEvent = _a.inputEvent;
-      inputEvent.preventDefault();
-    }).keydown("left", function (e) {
-      _this.prev();
-    }).keydown("right", function (e) {
-      _this.next();
-    }).keyup("backspace", function () {
-      _this.removeKeyframe(_this.selectedProperty);
-    }).keydown("alt", function () {
+    this.keycon = new KeyController().keydown("alt", function () {
       addClass(ids.timeline.element, "alt");
     }).keyup("alt", function () {
       removeClass(ids.timeline.element, "alt");
-    }).keyup("esc", function () {
-      _this.finish();
-    }).keyup("space", function () {
-      _this.togglePlay();
     });
+
+    if (this.options.keyboard) {
+      this.keycon.keydown("space", function (_a) {
+        var inputEvent = _a.inputEvent;
+        inputEvent.preventDefault();
+      }).keydown("left", function (e) {
+        _this.prev();
+      }).keydown("right", function (e) {
+        _this.next();
+      }).keyup("backspace", function () {
+        _this.removeKeyframe(_this.selectedProperty);
+      }).keyup("esc", function () {
+        _this.finish();
+      }).keyup("space", function () {
+        _this.togglePlay();
+      });
+    }
   };
 
   __proto.initStructure = function (scene, parentEl) {
@@ -1502,6 +1522,11 @@ function (_super) {
       }
 
       var property = prompt("add property");
+
+      if (!property) {
+        return;
+      }
+
       var propertiesInfo = ids.properties[index].datas;
       var properties = propertiesInfo.properties.slice();
       var item = propertiesInfo.item;
@@ -1633,7 +1658,6 @@ function (_super) {
     var propertiesInfo = ids.keyframesList[index].datas;
     var item = propertiesInfo.item;
     var properties = propertiesInfo.properties;
-    console.log(properties);
     item.set.apply(item, [item.getIterationTime()].concat(properties, [value]));
     this.update();
   };

@@ -49,6 +49,19 @@ version: 0.0.6
 
       d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
+    var __assign = function () {
+      __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+
+        return t;
+      };
+
+      return __assign.apply(this, arguments);
+    };
 
     var PREFIX = "scenejs_editor_";
     var CSS2 = "\n.item_info {\n    position: fixed;\n    right: 0;\n    top: 0;\n    width: 200px;\n    background: #000;\n}\n.options_area {\n\n}\n.option_area {\n    position: relative;\n    border-bottom: 1px solid #777;\n    box-sizing: border-box;\n    white-space: nowrap;\n    background: rgba(90, 90, 90, 0.7);\n    font-size: 13px;\n    font-weight: bold;\n    color: #eee;\n    display: flex;\n}\n.option_name, .option_value {\n    width: 50%;\n    height: 30px;\n    line-height: 20px;\n    box-sizing: border-box;\n    padding: 5px;\n}\n.option_name {\n    border-right: 1px solid #999;\n}\n.option_value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
@@ -3146,7 +3159,7 @@ version: 0.0.6
       d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
 
-    var __assign = Object.assign || function __assign(t) {
+    var __assign$1 = Object.assign || function __assign(t) {
       for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
 
@@ -3504,7 +3517,7 @@ version: 0.0.6
 
       __proto.animateLoop = function (param, complete) {
         if (param.duration) {
-          this._animateParam = __assign({}, param);
+          this._animateParam = __assign$1({}, param);
           var info_1 = this._animateParam;
           var self_1 = this;
           var prevPos_1 = info_1.depaPos;
@@ -3555,7 +3568,7 @@ version: 0.0.6
 
         var param = this.createAnimationParam(destPos, duration, option);
 
-        var depaPos = __assign({}, param.depaPos);
+        var depaPos = __assign$1({}, param.depaPos);
 
         var retTrigger = this.em.triggerAnimationStart(param); // to control
 
@@ -3943,11 +3956,11 @@ version: 0.0.6
 
 
         var userControl = {
-          destPos: __assign({}, pos),
+          destPos: __assign$1({}, pos),
           duration: duration
         };
         return function (toPos, userDuration) {
-          toPos && (userControl.destPos = __assign({}, toPos));
+          toPos && (userControl.destPos = __assign$1({}, toPos));
           userDuration !== undefined && (userControl.duration = userDuration);
           return userControl;
         };
@@ -4018,7 +4031,7 @@ version: 0.0.6
         var _this = this;
 
         Object.keys(this.axis).forEach(function (axis) {
-          _this.axis[axis] = __assign({
+          _this.axis[axis] = __assign$1({
             range: [0, 100],
             bounce: [0, 0],
             circular: [false, false]
@@ -4053,7 +4066,7 @@ version: 0.0.6
             return acc;
           }, {});
         } else {
-          return __assign({}, this._pos, axes || {});
+          return __assign$1({}, this._pos, axes || {});
         }
       };
 
@@ -4069,7 +4082,7 @@ version: 0.0.6
           return opt ? getCirculatedPos(v, opt.range, opt.circular, isAccurate) : 0;
         }));
         return {
-          pos: __assign({}, this._pos),
+          pos: __assign$1({}, this._pos),
           delta: delta
         };
       };
@@ -4240,7 +4253,7 @@ version: 0.0.6
         var duration = this.am.getDuration(destPos, pos, inputDuration);
 
         if (duration === 0) {
-          destPos = __assign({}, depaPos);
+          destPos = __assign$1({}, depaPos);
         } // prepare params
 
 
@@ -4388,7 +4401,7 @@ version: 0.0.6
 
         _this.axis = axis;
         _this._inputs = [];
-        _this.options = __assign({
+        _this.options = __assign$1({
           easing: function easeOutCubic(x) {
             return 1 - Math.pow(1 - x, 3);
           },
@@ -4759,7 +4772,7 @@ version: 0.0.6
     function createHammer(element, options) {
       try {
         // create Hammer
-        return new Manager(element, __assign({}, options));
+        return new Manager(element, __assign$1({}, options));
       } catch (e) {
         return null;
       }
@@ -4850,7 +4863,7 @@ version: 0.0.6
         }
 
         this.element = $(el);
-        this.options = __assign({
+        this.options = __assign$1({
           scale: 1,
           threshold: 0,
           inputType: ["touch", "pointer"],
@@ -4899,7 +4912,7 @@ version: 0.0.6
             throw new Error("Wrong inputType parameter!");
           }
 
-          this.hammer = createHammer(this.element, __assign({
+          this.hammer = createHammer(this.element, __assign$1({
             inputClass: inputClass
           }, this.options.hammerManagerOptions));
           this.element[UNIQUEKEY] = keyValue;
@@ -5556,14 +5569,14 @@ version: 0.0.6
     license: MIT
     author: Daybrush
     repository: git+https://github.com/daybrush/data-dom.git
-    version: 0.0.6
+    version: 0.0.10
     */
 
     function concat(arr) {
       return [].concat(arr);
     }
 
-    function render(createElement, structure, parentEl, parentStructureIndex) {
+    function render(createElement, structure, parentStructureIndex, parentEl) {
       if (parentStructureIndex === void 0) {
         parentStructureIndex = 0;
       }
@@ -5580,7 +5593,7 @@ version: 0.0.6
         concat(children).filter(function (child) {
           return child;
         }).forEach(function (child, i) {
-          render(createElement, child, el, i);
+          render(createElement, child, i, el);
         });
       }
 
@@ -5626,15 +5639,8 @@ version: 0.0.6
       changed.sort(function (a, b) {
         return a[1] > b[1] ? 1 : -1;
       });
-      changed.length && console.log(changed);
-      var newChanged = [];
-      var prev = [-1, -1];
-      changed.forEach(function (changeInfo) {
-        if (prev[0] > changeInfo[0]) {
-          newChanged.push(prev);
-        }
-
-        prev = changeInfo;
+      var newChanged = changed.filter(function (changeInfo) {
+        return changeInfo[1] < changeInfo[0];
       });
       return {
         added: added,
@@ -5661,24 +5667,36 @@ version: 0.0.6
           changed = _a.changed,
           removed = _a.removed;
 
-      if (added.length && parentStructure.selector === ".properties_scroll_area") {
-        console.log(added, changed, removed);
-      }
-
       if (parentStructure) {
         var parentElement_1 = parentStructure.element;
-        changed.forEach(function (_a) {
-          var from = _a[0],
-              to = _a[1];
-          parentElement_1.insertBefore(nextStructures[to].element, nextStructures[to + 1].element);
-        });
         removed.reverse().forEach(function (index) {
           parentElement_1.removeChild(prevStructures[index].element);
         });
-        added.forEach(function (index) {
-          var element = render(createElement, nextStructures[index]).element;
-          parentElement_1.insertBefore(element, nextStructures[index + 1] && nextStructures[index + 1].element);
-        });
+
+        if (changed.length) {
+          var min_1 = Infinity;
+          var max_1 = -1;
+          changed.forEach(function (_a) {
+            var from = _a[0],
+                to = _a[1];
+            min_1 = Math.min(min_1, to);
+            max_1 = Math.max(max_1, to);
+          });
+          added.forEach(function (index) {
+            render(createElement, nextStructures[index], index);
+            min_1 = Math.min(min_1, index);
+            max_1 = Math.max(max_1, index);
+          });
+
+          for (var i = max_1; i >= min_1; --i) {
+            parentElement_1.insertBefore(nextStructure[i].element, nextStructure[i + 1] && nextStructure[i + 1].element);
+          }
+        } else {
+          added.forEach(function (index) {
+            var element = render(createElement, nextStructures[index], index).element;
+            parentElement_1.insertBefore(element, nextStructures[index + 1] && nextStructures[index + 1].element);
+          });
+        }
 
         if (nextStructure) {
           parentStructure.children = nextStructure;
@@ -5697,7 +5715,7 @@ version: 0.0.6
       var __proto = DataDOM.prototype;
 
       __proto.render = function (structure, parentEl) {
-        return render(this.createElement, structure, parentEl);
+        return render(this.createElement, structure, 0, parentEl);
       };
 
       __proto.update = function (prevStructure, nextStructure, parentStructure) {
@@ -6310,7 +6328,6 @@ version: 0.0.6
       var entries = getEntries(times, items.map(function (animator) {
         return animator.state;
       }));
-      console.log(entries);
 
       (function getPropertyInfo(itemNames) {
         var properties = [];
@@ -6401,13 +6418,20 @@ version: 0.0.6
     function (_super) {
       __extends(Timeline, _super);
 
-      function Timeline(scene, parentEl) {
+      function Timeline(scene, parentEl, options) {
+        if (options === void 0) {
+          options = {};
+        }
+
         var _this = _super.call(this) || this;
 
         _this.maxTime = 0;
         _this.selectedProperty = "";
         _this.selectedTime = -1;
         _this.ids = {};
+        _this.options = __assign({
+          keyboard: true
+        }, options);
         scene.finish();
         _this.scene = scene;
 
@@ -6481,12 +6505,6 @@ version: 0.0.6
 
         this.datadom.update(prevKeytimesArea, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime));
         var nextScrollAreaStructure = getScrollAreaStructure(ids, this.timelineInfo, this.axes.get(["zoom"]).zoom, maxDuration, this.maxTime);
-        console.log(ids.scrollArea.children[0].children[0].children.map(function (e) {
-          return e.key;
-        }));
-        console.log(nextScrollAreaStructure.children[0].children[0].children.map(function (e) {
-          return e.key;
-        }));
         this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
         scene.setTime(scene.getTime());
       }; // init
@@ -6535,26 +6553,29 @@ version: 0.0.6
           addClass$1(playBtn, "play");
           removeClass$1(playBtn, "pause"); // playBtn.innerHTML = "play";
         });
-        new KeyController(ids.timeArea.element).keydown(function (e) {
-          !e.isToggle && e.inputEvent.stopPropagation();
-        }).keyup(function (e) {
-          !e.isToggle && e.inputEvent.stopPropagation();
-        }).keyup("enter", function (e) {
-          // go to time
-          var element = ids.timeArea.element;
-          var value = element.value;
-          var result = /(\d+):(\d+):(\d+)/g.exec(value);
 
-          if (!result) {
-            return;
-          }
+        if (this.options.keyboard) {
+          new KeyController(ids.timeArea.element).keydown(function (e) {
+            !e.isToggle && e.inputEvent.stopPropagation();
+          }).keyup(function (e) {
+            !e.isToggle && e.inputEvent.stopPropagation();
+          }).keyup("enter", function (e) {
+            // go to time
+            var element = ids.timeArea.element;
+            var value = element.value;
+            var result = /(\d+):(\d+):(\d+)/g.exec(value);
 
-          var minute = parseFloat(result[1]);
-          var second = parseFloat(result[2]);
-          var milisecond = parseFloat("0." + result[3]);
-          var time = minute * 60 + second + milisecond;
-          scene.setTime(time);
-        });
+            if (!result) {
+              return;
+            }
+
+            var minute = parseFloat(result[1]);
+            var second = parseFloat(result[2]);
+            var milisecond = parseFloat("0." + result[3]);
+            var time = minute * 60 + second + milisecond;
+            scene.setTime(time);
+          });
+        }
       };
 
       __proto.initKeyController = function () {
@@ -6564,24 +6585,28 @@ version: 0.0.6
         window.addEventListener("blur", function () {
           removeClass$1(ids.timeline.element, "alt");
         });
-        this.keycon = new KeyController().keydown("space", function (_a) {
-          var inputEvent = _a.inputEvent;
-          inputEvent.preventDefault();
-        }).keydown("left", function (e) {
-          _this.prev();
-        }).keydown("right", function (e) {
-          _this.next();
-        }).keyup("backspace", function () {
-          _this.removeKeyframe(_this.selectedProperty);
-        }).keydown("alt", function () {
+        this.keycon = new KeyController().keydown("alt", function () {
           addClass$1(ids.timeline.element, "alt");
         }).keyup("alt", function () {
           removeClass$1(ids.timeline.element, "alt");
-        }).keyup("esc", function () {
-          _this.finish();
-        }).keyup("space", function () {
-          _this.togglePlay();
         });
+
+        if (this.options.keyboard) {
+          this.keycon.keydown("space", function (_a) {
+            var inputEvent = _a.inputEvent;
+            inputEvent.preventDefault();
+          }).keydown("left", function (e) {
+            _this.prev();
+          }).keydown("right", function (e) {
+            _this.next();
+          }).keyup("backspace", function () {
+            _this.removeKeyframe(_this.selectedProperty);
+          }).keyup("esc", function () {
+            _this.finish();
+          }).keyup("space", function () {
+            _this.togglePlay();
+          });
+        }
       };
 
       __proto.initStructure = function (scene, parentEl) {
@@ -6947,6 +6972,11 @@ version: 0.0.6
           }
 
           var property = prompt("add property");
+
+          if (!property) {
+            return;
+          }
+
           var propertiesInfo = ids.properties[index].datas;
           var properties = propertiesInfo.properties.slice();
           var item = propertiesInfo.item;
@@ -7078,7 +7108,6 @@ version: 0.0.6
         var propertiesInfo = ids.keyframesList[index].datas;
         var item = propertiesInfo.item;
         var properties = propertiesInfo.properties;
-        console.log(properties);
         item.set.apply(item, [item.getIterationTime()].concat(properties, [value]));
         this.update();
       };
