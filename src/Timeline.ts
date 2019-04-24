@@ -19,8 +19,6 @@ import { getControlAreaStructure } from "./ControlAreaStructure";
 import Component from "@egjs/component";
 import { Info } from "./Info";
 import { getTimelineInfo } from "./TimelineInfo";
-import { isDate } from "util";
-import { Property } from "estree";
 
 let isExportCSS = false;
 
