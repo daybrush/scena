@@ -236,9 +236,6 @@ function removeClass(target, className) {
 function isScene(value) {
   return !!value.constructor.prototype.getItem;
 }
-function isSceneItem(value) {
-  return !!value.constructor.prototype.getFrame;
-}
 function isFrame(value) {
   return !!value.constructor.prototype.toCSS;
 }
@@ -686,124 +683,6 @@ function getControlAreaStructure(ids) {
   };
 }
 
-function getOptionAreaStructure(option, value) {
-  return {
-    selector: ".option_area",
-    children: [{
-      selector: ".option_name",
-      html: option
-    }, {
-      selector: ".option_value",
-      dataset: {
-        option: option
-      },
-      children: {
-        selector: "input",
-        dataset: {
-          option: option
-        },
-        ref: function (e) {
-          e.element.value = isUndefined(value) ? "" : value;
-        }
-      }
-    }]
-  };
-}
-function getOptionsStructure(item) {
-  return [getOptionAreaStructure("delay", item && item.getDelay()), getOptionAreaStructure("easing", item && item.getEasingName()), getOptionAreaStructure("iterationCount", item && item.getIterationCount()), getOptionAreaStructure("playSpeed", item && item.getPlaySpeed()), getOptionAreaStructure("fillMode", item && item.getFillMode()), getOptionAreaStructure("direction", item && item.getDirection()), getOptionAreaStructure("duration", item && item.getDuration()), getOptionAreaStructure("lastFrame", item && item.getDuration())];
-}
-
-var Info =
-/*#__PURE__*/
-function () {
-  function Info(timeline, parentEl) {
-    var _this = this;
-
-    this.timeline = timeline;
-
-    this.select = function (info) {
-      _this.selectedItem = info.selectedItem;
-
-      _this.update();
-    };
-
-    timeline.on("select", this.select);
-    this.datadom = new DataDOM(createElement, updateElement);
-    this.selectedItem = timeline.scene;
-    this.infoArea = this.datadom.render({
-      selector: ".item_info",
-      children: [{
-        selector: "style",
-        html: CSS2
-      }, {
-        ref: function (e) {
-          _this.optionArea = e;
-        },
-        selector: ".options_area",
-        children: getOptionsStructure(timeline.scene)
-      }]
-    }, parentEl);
-    this.init();
-  }
-
-  var __proto = Info.prototype;
-
-  __proto.update = function () {
-    this.datadom.update(this.optionArea.children, getOptionsStructure(this.selectedItem), this.optionArea);
-  };
-
-  __proto.init = function () {
-    var _this = this;
-
-    new KeyController(this.infoArea.element).keydown(function (e) {
-      e.inputEvent.stopPropagation();
-    }).keyup(function (e) {
-      e.inputEvent.stopPropagation();
-    }).keyup("enter", function (e) {
-      var selectedItem = _this.selectedItem;
-
-      if (!_this.selectedItem) {
-        return;
-      }
-
-      var target = getTarget(e.inputEvent.target, function (el) {
-        return el.nodeName === "INPUT";
-      });
-
-      if (!target) {
-        return;
-      }
-
-      var option = target.getAttribute("data-option");
-      var value = target.value;
-
-      if (option === "delay") {
-        selectedItem.setDelay(parseFloat(value));
-      } else if (option === "lastFrame") {
-        var nextDuration = parseFloat(value);
-
-        if (isSceneItem(selectedItem) && selectedItem.getDuration() < nextDuration) {
-          selectedItem.newFrame(nextDuration);
-        }
-      } else if (option === "playSpeed") {
-        selectedItem.setPlaySpeed(parseFloat(value));
-      } else if (option === "direction") {
-        selectedItem.setDirection(value);
-      } else if (option === "iterationCount") {
-        selectedItem.setIterationCount(value === "infinite" ? value : parseFloat(value));
-      } else if (option === "easing") {
-        selectedItem.setEasing(value);
-      }
-
-      _this.timeline.update();
-
-      _this.update();
-    });
-  };
-
-  return Info;
-}();
-
 var MAXIMUM = 1000000;
 function toFixed(num) {
   return Math.round(num * MAXIMUM) / MAXIMUM;
@@ -1004,8 +883,7 @@ function (_super) {
     _this.initKeyController();
 
     scene.setTime(0);
-    new Info(_this, parentEl);
-    return _this;
+    return _this; // new Info(this, parentEl);
   }
 
   var __proto = Timeline.prototype;
