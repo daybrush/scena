@@ -17,7 +17,6 @@ import { getHeaderAreaStructure, getKeytimesAreaStructure } from "./HeaderAreaSt
 import { getScrollAreaStructure } from "./ScrollAreaStructure";
 import { getControlAreaStructure } from "./ControlAreaStructure";
 import Component from "@egjs/component";
-import { Info } from "./Info";
 import { getTimelineInfo } from "./TimelineInfo";
 
 let isExportCSS = false;
@@ -58,7 +57,7 @@ export default class Timeline extends Component {
 
         scene.setTime(0);
 
-        new Info(this, parentEl);
+        // new Info(this, parentEl);
     }
     public getElement() {
         return this.structure.element;
