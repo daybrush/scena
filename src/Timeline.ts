@@ -55,7 +55,7 @@ export default class Timeline extends Component {
         this.initDragValues();
         this.initKeyController();
 
-        scene.setTime(0);
+        this.setTime(0);
 
         // new Info(this, parentEl);
     }
@@ -64,10 +64,10 @@ export default class Timeline extends Component {
     }
     // scene control
     public prev() {
-        this.scene.setTime(this.scene.getTime() - 0.05);
+        this.setTime(this.scene.getTime() - 0.05);
     }
     public next() {
-        this.scene.setTime(this.scene.getTime() + 0.05);
+        this.setTime(this.scene.getTime() + 0.05);
     }
     public finish() {
         this.scene.finish();
@@ -78,6 +78,16 @@ export default class Timeline extends Component {
             scene.pause();
         } else {
             scene.play();
+        }
+    }
+    public setTime(time: number) {
+        const scene = this.scene;
+        const direction = scene.getDirection();
+
+        if (direction === "normal" || direction === "alternate") {
+            scene.setTime(time);
+        } else {
+            scene.setTime(scene.getDuration() - time);
         }
     }
     public update() {
@@ -111,7 +121,7 @@ export default class Timeline extends Component {
             ids.scrollArea,
             nextScrollAreaStructure,
         );
-        scene.setTime(scene.getTime());
+        this.setTime(scene.getTime());
     }
     // init
     private initController() {
@@ -175,7 +185,7 @@ export default class Timeline extends Component {
                 const milisecond = parseFloat(`0.${result[3]}`);
                 const time = minute * 60 + second + milisecond;
 
-                scene.setTime(time);
+                this.setTime(time);
             });
         }
     }
@@ -454,6 +464,7 @@ export default class Timeline extends Component {
         const scene = this.scene;
 
         scene.on("animate", e => {
+            console.log(e);
             const time = e.time;
             this.moveCursor(time);
 
@@ -476,13 +487,13 @@ export default class Timeline extends Component {
             return time;
         };
         const move = (clientX: number) => {
-            scene.setTime(getTime(clientX));
+            this.setTime(getTime(clientX));
         };
         const click = (e, clientX, clientY) => {
             const target = getTarget(e.target as HTMLElement, el => hasClass(el, "keyframe"));
             const time = target ? parseFloat(target.getAttribute("data-time")) : getTime(clientX);
 
-            scene.setTime(time);
+            this.setTime(time);
             const list = ids.keyframesList;
             const index = findElementIndexByPosition(
                 list.map(({element}) => element),
@@ -674,7 +685,7 @@ export default class Timeline extends Component {
         this.update();
     }
     private restoreKeyframes() {
-        this.scene.setTime(this.scene.getTime());
+        this.setTime(this.scene.getTime());
     }
     private edit(target: HTMLInputElement, value: any) {
         const parentEl = getTarget(target, el => hasClass(el, "value"));

@@ -50,6 +50,9 @@ export const CSS2 = `
 `.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
 
 export const CSS = `
+.timeline * {
+    box-sizing: border-box;
+}
 .timeline {
   position: fixed;
   left: 0;
@@ -137,7 +140,7 @@ export const CSS = `
 .pause {
     border-left: 4px solid #fff;
     border-right: 4px solid #fff;
-    width: 6px;
+    width: 14px;
     height: 16px;
 }
 .prev {
