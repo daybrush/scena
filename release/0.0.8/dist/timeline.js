@@ -881,7 +881,8 @@ version: 0.0.8
 
         _this.initKeyController();
 
-        scene.setTime(0);
+        _this.setTime(0);
+
         return _this; // new Info(this, parentEl);
       }
 
@@ -893,11 +894,11 @@ version: 0.0.8
 
 
       __proto.prev = function () {
-        this.scene.setTime(this.scene.getTime() - 0.05);
+        this.setTime(this.scene.getTime() - 0.05);
       };
 
       __proto.next = function () {
-        this.scene.setTime(this.scene.getTime() + 0.05);
+        this.setTime(this.scene.getTime() + 0.05);
       };
 
       __proto.finish = function () {
@@ -911,6 +912,17 @@ version: 0.0.8
           scene.pause();
         } else {
           scene.play();
+        }
+      };
+
+      __proto.setTime = function (time) {
+        var scene = this.scene;
+        var direction = scene.getDirection();
+
+        if (direction === "normal" || direction === "alternate") {
+          scene.setTime(time);
+        } else {
+          scene.setTime(scene.getDuration() - time);
         }
       };
 
@@ -933,7 +945,7 @@ version: 0.0.8
         this.datadom.update(prevKeytimesArea, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime));
         var nextScrollAreaStructure = getScrollAreaStructure(ids, this.timelineInfo, this.axes.get(["zoom"]).zoom, maxDuration, this.maxTime);
         this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
-        scene.setTime(scene.getTime());
+        this.setTime(scene.getTime());
       }; // init
 
 
@@ -1000,7 +1012,8 @@ version: 0.0.8
             var second = parseFloat(result[2]);
             var milisecond = parseFloat("0." + result[3]);
             var time = minute * 60 + second + milisecond;
-            scene.setTime(time);
+
+            _this.setTime(time);
           });
         }
       };
@@ -1280,6 +1293,7 @@ version: 0.0.8
             keyframesScrollAreas = ids.keyframesScrollAreas;
         var scene = this.scene;
         scene.on("animate", function (e) {
+          console.log(e);
           var time = e.time;
 
           _this.moveCursor(time);
@@ -1304,7 +1318,7 @@ version: 0.0.8
         };
 
         var move = function (clientX) {
-          scene.setTime(getTime(clientX));
+          _this.setTime(getTime(clientX));
         };
 
         var click = function (e, clientX, clientY) {
@@ -1312,7 +1326,9 @@ version: 0.0.8
             return hasClass(el, "keyframe");
           });
           var time = target ? parseFloat(target.getAttribute("data-time")) : getTime(clientX);
-          scene.setTime(time);
+
+          _this.setTime(time);
+
           var list = ids.keyframesList;
           var index = findElementIndexByPosition(list.map(function (_a) {
             var element = _a.element;
@@ -1540,7 +1556,7 @@ version: 0.0.8
       };
 
       __proto.restoreKeyframes = function () {
-        this.scene.setTime(this.scene.getTime());
+        this.setTime(this.scene.getTime());
       };
 
       __proto.edit = function (target, value) {
