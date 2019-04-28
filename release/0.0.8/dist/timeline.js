@@ -939,7 +939,7 @@ version: 0.0.8
         this.maxTime = maxTime;
         var ids = this.ids;
         var prevKeytimesArea = ids.keyframesAreas[0];
-        var nextZoom = currentMaxTime > 5 ? maxDuration / currentMaxTime : 1;
+        var nextZoom = currentMaxTime > 1 ? maxDuration / currentMaxTime : 1;
         zoom = zoom * nextZoom;
         this.axes.axm.set({
           zoom: zoom
