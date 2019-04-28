@@ -100,7 +100,7 @@ export default class Timeline extends Component {
         this.maxTime = maxTime;
         const ids = this.ids;
         const prevKeytimesArea = ids.keyframesAreas[0];
-        const nextZoom = currentMaxTime > 5 ? maxDuration / currentMaxTime : 1;
+        const nextZoom = currentMaxTime > 1 ? maxDuration / currentMaxTime : 1;
 
         zoom = zoom * nextZoom;
         this.axes.axm.set({ zoom });
