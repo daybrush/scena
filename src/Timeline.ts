@@ -22,7 +22,7 @@ import { getTimelineInfo } from "./TimelineInfo";
 let isExportCSS = false;
 
 export default class Timeline extends Component {
-    public scene: Scene;
+    public scene: Scene | SceneItem;
     public options: {
         keyboard?: boolean,
     };
@@ -35,7 +35,7 @@ export default class Timeline extends Component {
     private structure: ElementStructure;
     private ids: Ids = {};
     private timelineInfo: TimelineInfo;
-    constructor(scene: Scene, parentEl: HTMLElement, options: {
+    constructor(scene: Scene | SceneItem, parentEl: HTMLElement, options: {
         keyboard?: boolean,
     } = {}) {
         super();
@@ -123,6 +123,24 @@ export default class Timeline extends Component {
         );
         this.setTime(scene.getTime());
     }
+    private newItem(scene: Scene) {
+        const name = prompt("Add Item");
+
+        if (!name) {
+            return;
+        }
+        (this.scene as Scene).newItem(name);
+        this.update();
+    }
+    private newProperty(item: SceneItem, properties: string[]) {
+        const property = prompt("new property");
+
+        if (!property) {
+            return;
+        }
+        item.set(item.getIterationTime(), ...properties, property, 0);
+        this.update();
+    }
     // init
     private initController() {
         const ids = this.ids;
@@ -130,13 +148,11 @@ export default class Timeline extends Component {
         const scene = this.scene;
 
         this.ids.addItem.element.addEventListener("click", e => {
-            const name = prompt("Add Item");
-
-            if (!name) {
-                return;
+            if (isScene(this.scene)) {
+                this.newItem(this.scene);
+            } else {
+                this.newProperty(this.scene, []);
             }
-            this.scene.newItem(name);
-            this.update();
         });
         playBtn.addEventListener("click", e => {
             this.togglePlay();
@@ -225,7 +241,7 @@ export default class Timeline extends Component {
             });
         }
     }
-    private initStructure(scene: Scene, parentEl: HTMLElement) {
+    private initStructure(scene: Scene | SceneItem, parentEl: HTMLElement) {
         this.timelineInfo = getTimelineInfo(scene);
         const duration = Math.ceil(scene.getDuration());
         const maxDuration = Math.ceil(duration);
@@ -464,11 +480,9 @@ export default class Timeline extends Component {
         const scene = this.scene;
 
         scene.on("animate", e => {
-            console.log(e);
             const time = e.time;
             this.moveCursor(time);
-
-            this.setInputs(flatObject(e.frames));
+            this.setInputs(flatObject(e.frames || e.frame.get()));
             const minute = numberFormat(Math.floor(time / 60), 2);
             const second = numberFormat(Math.floor(time % 60), 2);
             const milisecond = numberFormat(Math.floor((time % 1) * 100), 3, true);
@@ -558,18 +572,16 @@ export default class Timeline extends Component {
             if (index < 0) {
                 return;
             }
-            const property = prompt("add property");
 
-            if (!property) {
-                return;
-            }
             const propertiesInfo = ids.properties[index].datas as PropertiesInfo;
             const properties = propertiesInfo.properties.slice();
             const item = propertiesInfo.item;
 
-            item.set(item.getIterationTime(), ...properties, property, 0);
-
-            this.update();
+            if (isScene(item)) {
+                this.newItem(item);
+            } else {
+                this.newProperty(item, properties);
+            }
 
         });
         drag(element, {

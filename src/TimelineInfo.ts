@@ -81,7 +81,7 @@ export function getItemInfo(
     item: SceneItem) {
     item.update();
     const times = item.times;
-    const entries = getEntries(times, items.map(animator => animator.state));
+    const entries = getEntries(times, items.slice(1).map(animator => animator.state));
 
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
         const frames = [];
@@ -96,16 +96,18 @@ export function getItemInfo(
         });
         const key = [...names, ...properties].join("///");
 
-        timelineInfo[key] = {
-            key,
-            parentItem: null,
-            isParent,
-            isItem,
-            item,
-            names,
-            properties,
-            frames,
-        };
+        if (key) {
+            timelineInfo[key] = {
+                key,
+                parentItem: null,
+                isParent,
+                isItem,
+                item,
+                names,
+                properties,
+                frames,
+            };
+        }
         if (isParent) {
             for (const property in itemNames) {
                 getPropertyInfo(itemNames[property], ...properties, property);
@@ -113,7 +115,7 @@ export function getItemInfo(
         }
     })(item.names);
 }
-export function getTimelineInfo(scene: Scene): TimelineInfo {
+export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
     const timelineInfo: TimelineInfo = {};
     (function sceneForEach(...items: Array<Scene | SceneItem>) {
         const length = items.length;
@@ -140,6 +142,5 @@ export function getTimelineInfo(scene: Scene): TimelineInfo {
             getItemInfo(timelineInfo, items, names, lastItem);
         }
     })(scene);
-
     return timelineInfo;
 }
