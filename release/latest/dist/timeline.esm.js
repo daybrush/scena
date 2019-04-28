@@ -754,7 +754,7 @@ function getEntries(times, states) {
 function getItemInfo(timelineInfo, items, names, item) {
   item.update();
   var times = item.times;
-  var entries = getEntries(times, items.map(function (animator) {
+  var entries = getEntries(times, items.slice(1).map(function (animator) {
     return animator.state;
   }));
 
@@ -780,16 +780,19 @@ function getItemInfo(timelineInfo, items, names, item) {
       frames.push([time, iterationTime, value]);
     });
     var key = names.concat(properties).join("///");
-    timelineInfo[key] = {
-      key: key,
-      parentItem: null,
-      isParent: isParent,
-      isItem: isItem,
-      item: item,
-      names: names,
-      properties: properties,
-      frames: frames
-    };
+
+    if (key) {
+      timelineInfo[key] = {
+        key: key,
+        parentItem: null,
+        isParent: isParent,
+        isItem: isItem,
+        item: item,
+        names: names,
+        properties: properties,
+        frames: frames
+      };
+    }
 
     if (isParent) {
       for (var property in itemNames) {
@@ -947,6 +950,28 @@ function (_super) {
     var nextScrollAreaStructure = getScrollAreaStructure(ids, this.timelineInfo, this.axes.get(["zoom"]).zoom, maxDuration, this.maxTime);
     this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
     this.setTime(scene.getTime());
+  };
+
+  __proto.newItem = function (scene) {
+    var name = prompt("Add Item");
+
+    if (!name) {
+      return;
+    }
+
+    this.scene.newItem(name);
+    this.update();
+  };
+
+  __proto.newProperty = function (item, properties) {
+    var property = prompt("new property");
+
+    if (!property) {
+      return;
+    }
+
+    item.set.apply(item, [item.getIterationTime()].concat(properties, [property, 0]));
+    this.update();
   }; // init
 
 
@@ -957,15 +982,11 @@ function (_super) {
     var playBtn = this.ids.playBtn.element;
     var scene = this.scene;
     this.ids.addItem.element.addEventListener("click", function (e) {
-      var name = prompt("Add Item");
-
-      if (!name) {
-        return;
+      if (isScene(_this.scene)) {
+        _this.newItem(_this.scene);
+      } else {
+        _this.newProperty(_this.scene, []);
       }
-
-      _this.scene.newItem(name);
-
-      _this.update();
     });
     playBtn.addEventListener("click", function (e) {
       _this.togglePlay();
@@ -1294,12 +1315,11 @@ function (_super) {
         keyframesScrollAreas = ids.keyframesScrollAreas;
     var scene = this.scene;
     scene.on("animate", function (e) {
-      console.log(e);
       var time = e.time;
 
       _this.moveCursor(time);
 
-      _this.setInputs(flatObject(e.frames));
+      _this.setInputs(flatObject(e.frames || e.frame.get()));
 
       var minute = numberFormat(Math.floor(time / 60), 2);
       var second = numberFormat(Math.floor(time % 60), 2);
@@ -1415,18 +1435,15 @@ function (_super) {
         return;
       }
 
-      var property = prompt("add property");
-
-      if (!property) {
-        return;
-      }
-
       var propertiesInfo = ids.properties[index].datas;
       var properties = propertiesInfo.properties.slice();
       var item = propertiesInfo.item;
-      item.set.apply(item, [item.getIterationTime()].concat(properties, [property, 0]));
 
-      _this.update();
+      if (isScene(item)) {
+        _this.newItem(item);
+      } else {
+        _this.newProperty(item, properties);
+      }
     });
     drag(element, {
       container: window,
