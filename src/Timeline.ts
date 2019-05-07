@@ -7,7 +7,7 @@ import {
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
-import { IObject, addEvent } from "@daybrush/utils";
+import { IObject, addEvent, isUndefined } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import { ElementStructure, Ids, PropertiesInfo, TimelineInfo } from "./types";
 import { dblCheck } from "./dblcheck";
@@ -618,31 +618,46 @@ export default class Timeline extends Component {
 
         this.editKeyframe(index, value);
     }
-    private fold(index: number) {
+    private fold(index: number, forceFold?: boolean) {
         const ids = this.ids;
         const {properties, values, keyframesList} = ids;
         const selectedProperty = properties[index];
         const length = properties.length;
         let max;
-        for (max = index; max < length; ++max) {
-            if (properties[max].datas.key.indexOf(selectedProperty.datas.key) !== 0) {
+        for (max = index + 1; max < length; ++max) {
+            if (properties[max].datas.key.indexOf(selectedProperty.datas.key + "///") !== 0) {
                 break;
             }
         }
         const foldProperties = properties.slice(index + 1, max);
         const foldValues = values.slice(index + 1, max);
         const foldKeyframesList = keyframesList.slice(index + 1, max);
-
         const selectedElement = selectedProperty.element;
-        const isFold = selectedElement.getAttribute("data-fold") === "1";
+        // true : unfold, false: fold
+        const isFold = isUndefined(forceFold) ? selectedElement.getAttribute("data-fold") === "1" : forceFold;
 
         selectedElement.setAttribute("data-fold", isFold ? "0" : "1");
-
         const foldFunction = (isFold ? removeClass : addClass);
+        const depth = selectedProperty.datas.keys.length;
+
         foldProperties.forEach((property, i) => {
+            const datas = property.datas as PropertiesInfo;
+            if (depth + 1 < datas.keys.length) {
+                return;
+            }
             foldFunction(property.element, "fold");
             foldFunction(foldValues[i].element, "fold");
             foldFunction(foldKeyframesList[i].element, "fold");
+            if (datas.isParent) {
+                if (!isFold) {
+                    this.fold(index + 1 + i, false);
+                } else {
+                    // always fold
+                    property.element.setAttribute("data-fold", "1");
+                }
+            } else {
+                property.element.setAttribute("data-fold", isFold ? "0" : "1");
+            }
         });
     }
     private remove(propertiesInfo: PropertiesInfo) {

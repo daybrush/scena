@@ -25,6 +25,7 @@ export interface Ids {
 }
 export interface PropertiesInfo {
     key: string;
+    keys: Array<number | string>,
     parentItem: Scene;
     item: Scene | SceneItem;
     isParent: boolean;

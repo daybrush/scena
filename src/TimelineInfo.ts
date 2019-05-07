@@ -98,11 +98,13 @@ export function getItemInfo(
             }
             frames.push([time, iterationTime, value]);
         });
-        const key = [...names, ...properties].join("///");
+        const keys = [...names, ...properties];
+        const key = keys.join("///");
 
         if (key) {
             timelineInfo[key] = {
                 key,
+                keys,
                 parentItem: null,
                 isParent,
                 isItem,
@@ -137,6 +139,7 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
                 });
                 timelineInfo[key] = {
                     key,
+                    keys: names,
                     isItem: true,
                     isParent: true,
                     parentItem: items[length - 2] as Scene,
