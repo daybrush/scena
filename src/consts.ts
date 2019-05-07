@@ -390,6 +390,18 @@ export const CSS = `
   opacity: 0.2;
   z-index: 0;
 }
+.keyframe_group {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: #4af;
+    opacity: 0.6;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.2);
+    z-index: 0;
+}
 .keyframe_line {
   position: absolute;
   height: 8px;

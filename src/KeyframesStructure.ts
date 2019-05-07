@@ -1,16 +1,16 @@
-import { toValue, applyStyle, isSceneItem } from "./utils";
+import { toValue, applyStyle, isSceneItem, isScene } from "./utils";
 import { ElementStructure, Ids, TimelineInfo, PropertiesInfo } from "./types";
 import { getLinesStructure } from "./KeytimesStructure";
 import { isUndefined } from "@daybrush/utils";
 
 export function updateKeyframesStructure(keyframes: ElementStructure[], maxTime: number) {
     keyframes.forEach(keyframe => {
-        const {selector, dataset, style, element} = keyframe;
+        const { selector, dataset, style, element } = keyframe;
         if (selector === ".keyframe") {
             style.left = `${dataset.time / maxTime * 100}%`;
         } else {
             style.left = `${dataset.from / maxTime * 100}%`,
-            style.width = `${(dataset.to - dataset.from) / maxTime * 100}%`;
+                style.width = `${(dataset.to - dataset.from) / maxTime * 100}%`;
         }
         applyStyle(element, style);
     });
@@ -122,10 +122,10 @@ export function getKeyframesStructure(
     maxTime: number,
 ): ElementStructure[] {
     const keyframeLines: ElementStructure[] = [];
-    const item = propertiesInfo.item;
+    const { item, frames, properties } = propertiesInfo;
     const duration = item.getDuration();
-    const frames = propertiesInfo.frames;
     const delayFrames: ElementStructure[] = [];
+    const isItScene = isScene(item);
 
     const keyframes: ElementStructure[] = frames.map(([time, iterationTime, value], i): ElementStructure => {
         const valueText = toValue(value);
@@ -142,10 +142,29 @@ export function getKeyframesStructure(
                     getDelayFrameStructure(time, nextTime, maxTime),
                 );
             }
+            if (isItScene) {
+                if (valueText !== nextValueText) {
+                    return {
+                        selector: ".keyframe_group",
+                        key: `group${time},${nextTime}`,
+                        datas: {
+                            time: `${time},${nextTime}`,
+                            from: time,
+                            to: nextTime,
+                        },
+                        style: {
+                            left: `${time / maxTime * 100}%`,
+                            width: `${(nextTime - time) / maxTime * 100}%`,
+                        },
+                    };
+                } else {
+                    return;
+                }
+            }
             if (!isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText) {
                 keyframeLines.push({
                     selector: ".keyframe_line",
-                    key: `${time},${nextTime}`,
+                    key: `line${time},${nextTime}`,
                     datas: {
                         time: `${time},${nextTime}`,
                         from: time,
@@ -157,6 +176,10 @@ export function getKeyframesStructure(
                     },
                 });
             }
+        }
+
+        if (isItScene) {
+            return;
         }
 
         return {
@@ -175,7 +198,7 @@ export function getKeyframesStructure(
             },
             html: `${time} ${valueText}`,
         };
-    });
+    }).filter(keyframe => keyframe);
 
     return [...keyframes, ...delayFrames, ...keyframeLines];
 }

@@ -80,8 +80,12 @@ export function getItemInfo(
     names: Array<string | number>,
     item: SceneItem) {
     item.update();
-    const times = item.times;
-    const entries = getEntries(times, items.slice(1).map(animator => animator.state));
+    const times = item.times.slice();
+
+    const originalDuration = item.getDuration();
+    (!item.getFrame(0)) && times.unshift(0);
+    (!item.getFrame(originalDuration)) && times.push(originalDuration);
+    const entries = getEntries(times, items.slice(1).map(animator => animator.state).reverse());
 
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
         const frames = [];
@@ -124,6 +128,13 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
         if (isScene(lastItem)) {
             if (names.length) {
                 const key = names.join("///");
+
+                const times = [0, lastItem.getDuration()];
+                const entries = getEntries(times, items.slice(1).map(animator => animator.state).reverse());
+                const frames = [];
+                entries.forEach(([time, iterationTime]) => {
+                    frames.push([time, iterationTime, iterationTime]);
+                });
                 timelineInfo[key] = {
                     key,
                     isItem: true,
@@ -132,7 +143,7 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
                     item: lastItem,
                     names: [],
                     properties: [],
-                    frames: [],
+                    frames,
                 };
             }
             lastItem.forEach((item: Scene | SceneItem) => {
@@ -142,5 +153,7 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
             getItemInfo(timelineInfo, items, names, lastItem);
         }
     })(scene);
+
+    console.log(timelineInfo);
     return timelineInfo;
 }

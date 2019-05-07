@@ -18,6 +18,7 @@ import { getScrollAreaStructure } from "./ScrollAreaStructure";
 import { getControlAreaStructure } from "./ControlAreaStructure";
 import Component from "@egjs/component";
 import { getTimelineInfo } from "./TimelineInfo";
+import { Info } from "./Info";
 
 let isExportCSS = false;
 
