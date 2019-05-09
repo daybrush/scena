@@ -573,8 +573,8 @@ export default class Timeline extends Component {
                 },
                 drag: ({ distX, deltaX, deltaY, inputEvent }) => {
                     if (dragTarget) {
-                        // dragItem.setDelay(dragDelay + distX / 100);
-                        console.log(dragDelay + distX / 100);
+                        dragItem.setDelay(Math.max(dragDelay + distX / 100, 0));
+                        this.update();
                     } else {
                         keyframesAreas[1].element.scrollLeft -= deltaX;
                         scrollArea.element.scrollTop -= deltaY;
