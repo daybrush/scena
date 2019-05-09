@@ -86,6 +86,7 @@ export function getItemInfo(
     (!item.getFrame(0)) && times.unshift(0);
     (!item.getFrame(originalDuration)) && times.push(originalDuration);
     const entries = getEntries(times, items.slice(1).map(animator => animator.state).reverse());
+    const parentItem = items[items.length - 2] as Scene;
 
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
         const frames = [];
@@ -105,7 +106,7 @@ export function getItemInfo(
             timelineInfo[key] = {
                 key,
                 keys,
-                parentItem: null,
+                parentItem,
                 isParent,
                 isItem,
                 item,
