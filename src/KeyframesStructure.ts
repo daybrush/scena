@@ -130,6 +130,15 @@ export function getKeyframesStructure(
     const keyframes: ElementStructure[] = frames.map(([time, iterationTime, value], i): ElementStructure => {
         const valueText = toValue(value);
 
+        if (
+            i === 0
+            && time === 0
+            && iterationTime === 0
+            && isUndefined(value)
+            && !properties.length
+        ) {
+            return;
+        }
         if (frames[i + 1]) {
             const [nextTime, nextIterationTime, nextValue] = frames[i + 1];
             const nextValueText = toValue(nextValue);

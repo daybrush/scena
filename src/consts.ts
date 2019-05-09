@@ -338,6 +338,9 @@ export const CSS = `
     line-height: 30px;
 }
 .time_area {
+    position: absolute;
+    top: 0;
+    left: 10px;
     font-size: 13px;
     color: #4af;
     line-height: 30px;
@@ -383,8 +386,8 @@ export const CSS = `
 }
 .keyframe_delay {
   position: absolute;
-  height: 100%;
-  top: 0;
+  top: 3px;
+  bottom: 3px;
   left: 0;
   background: #4af;
   opacity: 0.2;
