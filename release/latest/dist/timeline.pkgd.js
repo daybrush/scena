@@ -6251,6 +6251,7 @@ version: 0.0.9
       var entries = getEntries(times, items.slice(1).map(function (animator) {
         return animator.state;
       }).reverse());
+      var parentItem = items[items.length - 2];
 
       (function getPropertyInfo(itemNames) {
         var properties = [];
@@ -6280,7 +6281,7 @@ version: 0.0.9
           timelineInfo[key] = {
             key: key,
             keys: keys,
-            parentItem: null,
+            parentItem: parentItem,
             isParent: isParent,
             isItem: isItem,
             item: item,

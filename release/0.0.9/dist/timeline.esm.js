@@ -797,6 +797,7 @@ function getItemInfo(timelineInfo, items, names, item) {
   var entries = getEntries(times, items.slice(1).map(function (animator) {
     return animator.state;
   }).reverse());
+  var parentItem = items[items.length - 2];
 
   (function getPropertyInfo(itemNames) {
     var properties = [];
@@ -826,7 +827,7 @@ function getItemInfo(timelineInfo, items, names, item) {
       timelineInfo[key] = {
         key: key,
         keys: keys,
-        parentItem: null,
+        parentItem: parentItem,
         isParent: isParent,
         isItem: isItem,
         item: item,
