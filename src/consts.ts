@@ -392,8 +392,8 @@ export const CSS = `
 }
 .keyframe_group {
     position: absolute;
-    height: 100%;
-    top: 0;
+    top: 3px;
+    bottom: 3px;
     left: 0;
     background: #4af;
     opacity: 0.6;
@@ -456,6 +456,9 @@ export const CSS = `
   height: 100%;
   left: 15px;
   transform: translate(-50%);
+}
+.scroll_aare .keyframe_cursor {
+  pointer-events: none;
 }
 .division_line {
   position: absolute;

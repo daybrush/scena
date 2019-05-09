@@ -43,5 +43,5 @@ export interface ElementStructure extends DataStructure {
     dataset?: IObject<any>;
     datas?: IObject<any>;
     style?: Partial<CSSStyleDeclaration>;
-    html?: string;
+    html?: any;
 }

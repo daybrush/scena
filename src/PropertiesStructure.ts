@@ -5,7 +5,7 @@ export function getPropertiesStructure(ids: Ids, timelineInfo: TimelineInfo) {
 
     for (const key in timelineInfo) {
         const propertiesInfo = timelineInfo[key];
-        const propertyNames = key.split("///");
+        const propertyNames = propertiesInfo.keys;
         const length = propertyNames.length;
         const id = propertyNames[length - 1];
 

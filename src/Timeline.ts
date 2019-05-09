@@ -3,7 +3,7 @@ import {
     getTarget,
     hasClass, removeClass, addClass,
     flatObject, splitProperty, findElementIndexByPosition,
-    createElement, updateElement, findIndexByProperty, findStructure, numberFormat, isScene,
+    createElement, updateElement, findIndexByProperty, findStructure, numberFormat, isScene, findStructureByProperty,
 } from "./utils";
 import { drag } from "@daybrush/drag";
 import { CSS } from "./consts";
@@ -276,6 +276,16 @@ export default class Timeline extends Component {
             updateElement,
         );
         this.structure = this.datadom.render(structure, parentEl);
+
+
+        // fold all
+        this.ids.properties.forEach((property, i) => {
+            const propertiesInfo = property.datas as PropertiesInfo;
+            const {keys, isParent} = propertiesInfo;
+            if (keys.length === 1 && isParent) {
+                this.fold(i);
+            }
+        });
     }
     private initScroll() {
         const {
@@ -541,15 +551,40 @@ export default class Timeline extends Component {
             },
             container: window,
         });
+
+        let dragItem: Scene | SceneItem = null;
+        let dragDelay: number = 0;
+        let dragTarget: HTMLElement = null;
         keyframesScrollAreas.forEach(({ element }) => {
             drag(element, {
                 container: window,
-                drag: ({ deltaX, deltaY, inputEvent }) => {
-                    keyframesAreas[1].element.scrollLeft -= deltaX;
-                    scrollArea.element.scrollTop -= deltaY;
-                    inputEvent.preventDefault();
+                dragstart: ({ inputEvent }) => {
+                    dragTarget = getTarget(inputEvent.target, el => hasClass(el, "keyframe_group"));
+                    if (dragTarget) {
+                        const properties = this.ids.properties;
+                        const keyframesTarget = getTarget(dragTarget, el => hasClass(el, "keyframes"));
+                        const key = keyframesTarget.getAttribute("data-key");
+                        const property = findStructureByProperty(key, properties);
+                        const propertiesInfo = property.datas as PropertiesInfo;
+
+                        dragItem = propertiesInfo.item;
+                        dragDelay = dragItem.getDelay();
+                    }
+                },
+                drag: ({ distX, deltaX, deltaY, inputEvent }) => {
+                    if (dragTarget) {
+                        // dragItem.setDelay(dragDelay + distX / 100);
+                        console.log(dragDelay + distX / 100);
+                    } else {
+                        keyframesAreas[1].element.scrollLeft -= deltaX;
+                        scrollArea.element.scrollTop -= deltaY;
+                        inputEvent.preventDefault();
+                    }
                 },
                 dragend: ({ isDrag, clientX, clientY, inputEvent }) => {
+                    dragTarget = null;
+                    dragItem = null;
+                    dragDelay = null;
                     !isDrag && click(inputEvent, clientX, clientY);
                     dblCheck(isDrag, inputEvent, clientX, clientY, dblclick);
                 },

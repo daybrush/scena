@@ -36,6 +36,11 @@ export function findIndexByProperty(selectedProperty: string, structures: Elemen
         ({ dataset: { key } }) => key === selectedProperty,
     );
 }
+export function findStructureByProperty(selectedProperty: string, structures: ElementStructure[]) {
+    return structures.find(
+        ({ dataset: { key } }) => key === selectedProperty,
+    );
+}
 
 export function createElement(structure: ElementStructure) {
     const { selector, dataset, attr, style, html } = structure;

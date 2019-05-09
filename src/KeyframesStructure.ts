@@ -152,6 +152,9 @@ export function getKeyframesStructure(
                             from: time,
                             to: nextTime,
                         },
+                        dataset: {
+                            time,
+                        },
                         style: {
                             left: `${time / maxTime * 100}%`,
                             width: `${(nextTime - time) / maxTime * 100}%`,
