@@ -157,7 +157,5 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
             getItemInfo(timelineInfo, items, names, lastItem);
         }
     })(scene);
-
-    console.log(timelineInfo);
     return timelineInfo;
 }
