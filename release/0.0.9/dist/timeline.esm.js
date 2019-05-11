@@ -898,7 +898,6 @@ function getTimelineInfo(scene) {
     }
   })(scene);
 
-  console.log(timelineInfo);
   return timelineInfo;
 }
 

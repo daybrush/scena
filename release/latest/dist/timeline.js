@@ -897,7 +897,6 @@ version: 0.0.9
         }
       })(scene);
 
-      console.log(timelineInfo);
       return timelineInfo;
     }
 
