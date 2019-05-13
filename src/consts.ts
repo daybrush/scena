@@ -357,20 +357,30 @@ export const CSS = `
 .property .arrow {
     position: relative;
     display: inline-block;
-    margin-right: 5px;
-    width: 0;
-    vertical-align: middle;
+    width: 25px;
+    height: 25px;
     cursor: pointer;
+    vertical-align: middle;
+}
+.property .arrow:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    width: 0;
+    height: 0;
     border-top: 6px solid #eee;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
 }
-.property[data-fold="1"] .arrow {
+.property[data-fold="1"] .arrow:after {
     border-top: 4px solid transparent;
     border-bottom: 4px solid transparent;
     border-right: 0;
     border-left: 6px solid #eee;
-    margin-left: 2px;
 }
 .property[data-object="0"] .arrow {
     display: none;
