@@ -121,13 +121,15 @@ export function getKeyframesStructure(
     propertiesInfo: PropertiesInfo,
     maxTime: number,
 ): ElementStructure[] {
-    const keyframeLines: ElementStructure[] = [];
     const { item, frames, properties } = propertiesInfo;
-    const duration = item.getDuration();
-    const delayFrames: ElementStructure[] = [];
     const isItScene = isScene(item);
+    const duration = item.getDuration();
 
-    const keyframes: ElementStructure[] = frames.map(([time, iterationTime, value], i): ElementStructure => {
+    const keyframes: ElementStructure[] = [];
+    const delayFrames: ElementStructure[] = [];
+    const keyframeLines: ElementStructure[] = [];
+
+    frames.forEach(([time, iterationTime, value], i): ElementStructure => {
         const valueText = toValue(value);
 
         if (
@@ -153,9 +155,9 @@ export function getKeyframesStructure(
             }
             if (isItScene) {
                 if (valueText !== nextValueText) {
-                    return {
+                    keyframes.push({
                         selector: ".keyframe_group",
-                        key: `group${time},${nextTime}`,
+                        key: `group${keyframes.length}`,
                         datas: {
                             time: `${time},${nextTime}`,
                             from: time,
@@ -168,15 +170,14 @@ export function getKeyframesStructure(
                             left: `${time / maxTime * 100}%`,
                             width: `${(nextTime - time) / maxTime * 100}%`,
                         },
-                    };
-                } else {
-                    return;
+                    });
                 }
+                return;
             }
             if (!isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText) {
                 keyframeLines.push({
                     selector: ".keyframe_line",
-                    key: `line${time},${nextTime}`,
+                    key: `line${keyframeLines.length}`,
                     datas: {
                         time: `${time},${nextTime}`,
                         from: time,
@@ -194,8 +195,8 @@ export function getKeyframesStructure(
             return;
         }
 
-        return {
-            key: time,
+        keyframes.push({
+            key: `keyframe${keyframes.length}`,
             selector: ".keyframe",
             dataset: {
                 time,
@@ -209,8 +210,8 @@ export function getKeyframesStructure(
                 left: `${time / maxTime * 100}%`,
             },
             html: `${time} ${valueText}`,
-        };
-    }).filter(keyframe => keyframe);
+        });
+    });
 
     return [...keyframes, ...delayFrames, ...keyframeLines];
 }
