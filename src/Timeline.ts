@@ -499,17 +499,22 @@ export default class Timeline extends Component {
             const milisecond = numberFormat(Math.floor((time % 1) * 100), 3, true);
             (timeArea.element as HTMLInputElement).value = `${minute}:${second}:${milisecond}`;
         });
+        const getDistTime = (
+            distX: number,
+            rect: ClientRect = keyframesScrollAreas[1].element.getBoundingClientRect(),
+        ) => {
+            const scrollAreaWidth = rect.width - 30;
+            const percentage = Math.min(scrollAreaWidth, distX) / scrollAreaWidth;
+            const time = this.maxTime * percentage;
+
+            return Math.round(time * 20) / 20;
+        };
         const getTime = (clientX: number) => {
             const rect = keyframesScrollAreas[1].element.getBoundingClientRect();
-            const scrollAreaWidth = rect.width - 30;
             const scrollAreaX = rect.left + 15;
-            const x = Math.min(scrollAreaWidth, Math.max(clientX - scrollAreaX, 0));
-            const percentage = x / scrollAreaWidth;
-            let time = this.maxTime * percentage;
+            const x = Math.max(clientX - scrollAreaX, 0);
 
-            time = Math.round(time * 20) / 20;
-
-            return time;
+            return getDistTime(x, rect);
         };
         const move = (clientX: number) => {
             this.setTime(getTime(clientX));
@@ -555,6 +560,7 @@ export default class Timeline extends Component {
         let dragItem: Scene | SceneItem = null;
         let dragDelay: number = 0;
         let dragTarget: HTMLElement = null;
+
         keyframesScrollAreas.forEach(({ element }) => {
             drag(element, {
                 container: window,
@@ -573,7 +579,7 @@ export default class Timeline extends Component {
                 },
                 drag: ({ distX, deltaX, deltaY, inputEvent }) => {
                     if (dragTarget) {
-                        dragItem.setDelay(Math.max(dragDelay + distX / 100, 0));
+                        dragItem.setDelay(Math.max(dragDelay + getDistTime(distX), 0));
                         this.update();
                     } else {
                         keyframesAreas[1].element.scrollLeft -= deltaX;
