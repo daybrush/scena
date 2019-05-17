@@ -357,7 +357,7 @@ export const CSS = `
 .property .arrow {
     position: relative;
     display: inline-block;
-    width: 25px;
+    width: 20px;
     height: 25px;
     cursor: pointer;
     vertical-align: middle;

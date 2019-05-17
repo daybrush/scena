@@ -95,27 +95,27 @@ export default class Timeline extends Component {
         const scene = this.scene;
         this.timelineInfo = getTimelineInfo(scene);
         const maxDuration = Math.ceil(scene.getDuration());
-        const maxTime = maxDuration;
+        const maxTime = Math.max(this.maxTime, maxDuration);
         let zoom = this.axes.get(["zoom"]).zoom;
         const currentMaxTime = this.maxTime;
         this.maxTime = maxTime;
         const ids = this.ids;
         const prevKeytimesArea = ids.keyframesAreas[0];
-        const nextZoom = currentMaxTime > 1 ? maxDuration / currentMaxTime : 1;
+        const nextZoom = currentMaxTime > 1 ? maxTime / currentMaxTime : 1;
 
-        zoom = zoom * nextZoom;
+        zoom = Math.max(1, zoom * nextZoom);
         this.axes.axm.set({ zoom });
         // update keytimes
         this.datadom.update(
             prevKeytimesArea,
-            getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime),
+            getKeytimesAreaStructure(ids, zoom, maxTime, maxTime),
         );
 
         const nextScrollAreaStructure = getScrollAreaStructure(
             ids,
             this.timelineInfo,
             this.axes.get(["zoom"]).zoom,
-            maxDuration, this.maxTime,
+            maxTime, maxTime,
         );
 
         this.datadom.update(
