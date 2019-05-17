@@ -530,7 +530,9 @@ version: 0.0.9
 
       if (isTouch) {
         el.addEventListener("touchstart", onDragStart);
-        container.addEventListener("touchmove", onDrag);
+        container.addEventListener("touchmove", onDrag, {
+          passive: false
+        });
         container.addEventListener("touchend", onDragEnd);
       }
     }
@@ -5932,14 +5934,15 @@ version: 0.0.9
       };
     }
     function getKeyframesStructure(propertiesInfo, maxTime) {
-      var keyframeLines = [];
       var item = propertiesInfo.item,
           frames = propertiesInfo.frames,
           properties = propertiesInfo.properties;
-      var duration = item.getDuration();
-      var delayFrames = [];
       var isItScene = isScene(item);
-      var keyframes = frames.map(function (_a, i) {
+      var duration = item.getDuration();
+      var keyframes = [];
+      var delayFrames = [];
+      var keyframeLines = [];
+      frames.forEach(function (_a, i) {
         var time = _a[0],
             iterationTime = _a[1],
             value = _a[2];
@@ -5962,9 +5965,9 @@ version: 0.0.9
 
           if (isItScene) {
             if (valueText !== nextValueText) {
-              return {
+              keyframes.push({
                 selector: ".keyframe_group",
-                key: "group" + time + "," + nextTime,
+                key: "group" + keyframes.length,
                 datas: {
                   time: time + "," + nextTime,
                   from: time,
@@ -5977,16 +5980,16 @@ version: 0.0.9
                   left: time / maxTime * 100 + "%",
                   width: (nextTime - time) / maxTime * 100 + "%"
                 }
-              };
-            } else {
-              return;
+              });
             }
+
+            return;
           }
 
           if (!isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText) {
             keyframeLines.push({
               selector: ".keyframe_line",
-              key: "line" + time + "," + nextTime,
+              key: "line" + keyframeLines.length,
               datas: {
                 time: time + "," + nextTime,
                 from: time,
@@ -6004,8 +6007,8 @@ version: 0.0.9
           return;
         }
 
-        return {
-          key: time,
+        keyframes.push({
+          key: "keyframe" + keyframes.length,
           selector: ".keyframe",
           dataset: {
             time: time
@@ -6019,9 +6022,7 @@ version: 0.0.9
             left: time / maxTime * 100 + "%"
           },
           html: time + " " + valueText
-        };
-      }).filter(function (keyframe) {
-        return keyframe;
+        });
       });
       return keyframes.concat(delayFrames, keyframeLines);
     }
@@ -6851,15 +6852,22 @@ version: 0.0.9
           timeArea.element.value = minute + ":" + second + ":" + milisecond;
         });
 
+        var getDistTime = function (distX, rect) {
+          if (rect === void 0) {
+            rect = keyframesScrollAreas[1].element.getBoundingClientRect();
+          }
+
+          var scrollAreaWidth = rect.width - 30;
+          var percentage = Math.min(scrollAreaWidth, distX) / scrollAreaWidth;
+          var time = _this.maxTime * percentage;
+          return Math.round(time * 20) / 20;
+        };
+
         var getTime = function (clientX) {
           var rect = keyframesScrollAreas[1].element.getBoundingClientRect();
-          var scrollAreaWidth = rect.width - 30;
           var scrollAreaX = rect.left + 15;
-          var x = Math.min(scrollAreaWidth, Math.max(clientX - scrollAreaX, 0));
-          var percentage = x / scrollAreaWidth;
-          var time = _this.maxTime * percentage;
-          time = Math.round(time * 20) / 20;
-          return time;
+          var x = Math.max(clientX - scrollAreaX, 0);
+          return getDistTime(x, rect);
         };
 
         var move = function (clientX) {
@@ -6944,7 +6952,7 @@ version: 0.0.9
                   inputEvent = _a.inputEvent;
 
               if (dragTarget) {
-                dragItem.setDelay(Math.max(dragDelay + distX / 100, 0));
+                dragItem.setDelay(Math.max(dragDelay + getDistTime(distX), 0));
 
                 _this.update();
               } else {
