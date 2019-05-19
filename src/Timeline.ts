@@ -85,6 +85,8 @@ export default class Timeline extends Component {
         const scene = this.scene;
         const direction = scene.getDirection();
 
+        scene.pause();
+
         if (direction === "normal" || direction === "alternate") {
             scene.setTime(time);
         } else {
