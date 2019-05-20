@@ -126,6 +126,7 @@ export function getKeyframesStructure(
     const duration = item.getDuration();
 
     const keyframes: ElementStructure[] = [];
+    const keyframeGroups: ElementStructure[] = [];
     const delayFrames: ElementStructure[] = [];
     const keyframeLines: ElementStructure[] = [];
 
@@ -153,9 +154,9 @@ export function getKeyframesStructure(
                     getDelayFrameStructure(time, nextTime, maxTime),
                 );
             }
-            if (isItScene) {
+            if (isItScene || !properties.length) {
                 if (valueText !== nextValueText) {
-                    keyframes.push({
+                    keyframeGroups.push({
                         selector: ".keyframe_group",
                         key: `group${keyframes.length}`,
                         datas: {
@@ -172,22 +173,22 @@ export function getKeyframesStructure(
                         },
                     });
                 }
-                return;
-            }
-            if (!isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText) {
-                keyframeLines.push({
-                    selector: ".keyframe_line",
-                    key: `line${keyframeLines.length}`,
-                    datas: {
-                        time: `${time},${nextTime}`,
-                        from: time,
-                        to: nextTime,
-                    },
-                    style: {
-                        left: `${time / maxTime * 100}%`,
-                        width: `${(nextTime - time) / maxTime * 100}%`,
-                    },
-                });
+            } else {
+                if (!isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText) {
+                    keyframeLines.push({
+                        selector: ".keyframe_line",
+                        key: `line${keyframeLines.length}`,
+                        datas: {
+                            time: `${time},${nextTime}`,
+                            from: time,
+                            to: nextTime,
+                        },
+                        style: {
+                            left: `${time / maxTime * 100}%`,
+                            width: `${(nextTime - time) / maxTime * 100}%`,
+                        },
+                    });
+                }
             }
         }
 
@@ -213,5 +214,5 @@ export function getKeyframesStructure(
         });
     });
 
-    return [...keyframes, ...delayFrames, ...keyframeLines];
+    return [...keyframeGroups, ...keyframes, ...delayFrames, ...keyframeLines];
 }

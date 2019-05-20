@@ -1,8 +1,8 @@
 {
   "name": "@scenejs/timeline",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "",
-  "main": "./dist/timeline.js",
+  "main": "./dist3timeline.js",
   "module": "./dist/timeline.esm.js",
   "sideEffects": false,
   "types": "declaration/Timeline.d.ts",
