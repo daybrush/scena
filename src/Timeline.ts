@@ -6,7 +6,7 @@ import {
     createElement, updateElement, findIndexByProperty, findStructure, numberFormat, isScene, findStructureByProperty,
 } from "./utils";
 import { drag } from "@daybrush/drag";
-import { CSS } from "./consts";
+import { CSS, SUPPORT_TOUCH, SUPPORT_POINTER_EVENTS } from "./consts";
 import { IObject, addEvent, isUndefined } from "@daybrush/utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import { ElementStructure, Ids, PropertiesInfo, TimelineInfo } from "./types";
@@ -279,7 +279,6 @@ export default class Timeline extends Component {
         );
         this.structure = this.datadom.render(structure, parentEl);
 
-
         // fold all
         this.ids.properties.forEach((property, i) => {
             const propertiesInfo = property.datas as PropertiesInfo;
@@ -329,12 +328,15 @@ export default class Timeline extends Component {
             {},
             { zoom: 1 },
         );
-        axes.connect("zoom", new PinchInput(scrollArea, {
-            scale: 0.1,
-            hammerManagerOptions: {
-                touchAction: "auto",
-            },
-        }));
+
+        if (SUPPORT_TOUCH || SUPPORT_POINTER_EVENTS) {
+            axes.connect("zoom", new PinchInput(scrollArea, {
+                scale: 0.1,
+                hammerManagerOptions: {
+                    touchAction: "auto",
+                },
+            }));
+        }
         axes.on("hold", e => {
             if (e.inputEvent) {
                 e.inputEvent.preventDefault();

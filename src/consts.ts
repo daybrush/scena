@@ -1,4 +1,6 @@
 export const PREFIX = `scenejs_editor_`;
+export const SUPPORT_POINTER_EVENTS = "PointerEvent" in window || "MSPointerEvent" in window;
+export const SUPPORT_TOUCH = "ontouchstart" in window;
 
 export const CSS2 = `
 .item_info {
