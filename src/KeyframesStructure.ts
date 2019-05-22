@@ -131,6 +131,7 @@ export function getKeyframesStructure(
     const keyframeLines: ElementStructure[] = [];
 
     const length = frames.length;
+    const hasProperties = properties.length;
 
     if (length >= 2) {
         const startFrame =
@@ -138,7 +139,7 @@ export function getKeyframesStructure(
             && frames[0][0] === 0
             && frames[0][1] === 0
             && isUndefined(frames[0][2])
-            && !properties.length
+            && !hasProperties
             ? frames[1]
             : frames[0];
         const endFrame = frames[length - 1];
@@ -170,7 +171,7 @@ export function getKeyframesStructure(
             && time === 0
             && iterationTime === 0
             && isUndefined(value)
-            && !properties.length
+            && !hasProperties
         ) {
             return;
         }
@@ -190,7 +191,9 @@ export function getKeyframesStructure(
                 !isItScene
                 && !isUndefined(value)
                 && !isUndefined(nextValue)
-                && valueText !== nextValueText) {
+                && valueText !== nextValueText
+                && hasProperties
+            ) {
                 keyframeLines.push({
                     selector: ".keyframe_line",
                     key: `line${keyframeLines.length}`,
