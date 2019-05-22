@@ -1,4 +1,4 @@
-import { toValue, applyStyle, isSceneItem, isScene } from "./utils";
+import { toValue, applyStyle, isScene, findIndex } from "./utils";
 import { ElementStructure, Ids, TimelineInfo, PropertiesInfo } from "./types";
 import { getLinesStructure } from "./KeytimesStructure";
 import { isUndefined } from "@daybrush/utils";
@@ -133,15 +133,11 @@ export function getKeyframesStructure(
     const length = frames.length;
     const hasProperties = properties.length;
 
-    if (length >= 2) {
-        const startFrame =
-            length !== 2
-            && frames[0][0] === 0
-            && frames[0][1] === 0
-            && isUndefined(frames[0][2])
-            && !hasProperties
-            ? frames[1]
-            : frames[0];
+    let startIndex = 0;
+    if (length >= 2 && !hasProperties) {
+        const index = findIndex(frames, ([, , value]) => !isUndefined(value));
+        startIndex = Math.max(frames[0][1] === 0 && frames[1][1] === 0 ? 1 : 0, index);
+        const startFrame = frames[startIndex];
         const endFrame = frames[length - 1];
         const time = startFrame[0];
         const nextTime = endFrame[0];
@@ -165,7 +161,16 @@ export function getKeyframesStructure(
     }
     frames.forEach(([time, iterationTime, value], i): ElementStructure => {
         const valueText = toValue(value);
+        if (frames[i + 1]) {
+            const [nextTime, nextIterationTime] = frames[i + 1];
 
+            if (
+                (iterationTime === 0 && nextIterationTime === 0)
+                || (iterationTime === duration && nextIterationTime === duration)
+            ) {
+                delayFrames.push(getDelayFrameStructure(time, nextTime, maxTime));
+            }
+        }
         if (
             i === 0
             && time === 0
@@ -176,17 +181,9 @@ export function getKeyframesStructure(
             return;
         }
         if (frames[i + 1]) {
-            const [nextTime, nextIterationTime, nextValue] = frames[i + 1];
+            const [nextTime, , nextValue] = frames[i + 1];
             const nextValueText = toValue(nextValue);
 
-            if (
-                (iterationTime === 0 && nextIterationTime === 0)
-                || (iterationTime === duration && nextIterationTime === duration)
-            ) {
-                delayFrames.push(
-                    getDelayFrameStructure(time, nextTime, maxTime),
-                );
-            }
             if (
                 !isItScene
                 && !isUndefined(value)
@@ -210,12 +207,11 @@ export function getKeyframesStructure(
             }
         }
 
-        if (isItScene) {
+        if (isItScene || i < startIndex) {
             return;
         }
-
         keyframes.push({
-            key: `keyframe${keyframes.length}`,
+            key: `keyframe${i}`,
             selector: ".keyframe",
             dataset: {
                 time,

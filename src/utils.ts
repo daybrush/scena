@@ -31,13 +31,28 @@ export function applyStyle(el: HTMLElement, style: IObject<any>) {
         el.style[name] = style[name];
     }
 }
+export function findIndex<T>(arr: T[], callback: (value: T, index: number, arr: T[]) => boolean) {
+    const length = arr.length;
+
+    for (let i = 0; i < length; ++i) {
+        if (callback(arr[i], i, arr)) {
+            return i;
+        }
+    }
+    return -1;
+}
+export function find<T>(arr: T[], callback: (value: T, index: number, arr: T[]) => boolean): T | undefined {
+    return arr[findIndex(arr, callback)];
+}
 export function findIndexByProperty(selectedProperty: string, structures: ElementStructure[]) {
-    return structures.findIndex(
+    return findIndex(
+        structures,
         ({ dataset: { key } }) => key === selectedProperty,
     );
 }
 export function findStructureByProperty(selectedProperty: string, structures: ElementStructure[]) {
-    return structures.find(
+    return find(
+        structures,
         ({ dataset: { key } }) => key === selectedProperty,
     );
 }
