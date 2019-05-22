@@ -1,7 +1,7 @@
 {
   "name": "@scenejs/timeline",
-  "version": "0.1.1",
-  "description": "",
+  "version": "0.1.2",
+  "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist3timeline.js",
   "module": "./dist/timeline.esm.js",
   "sideEffects": false,
@@ -14,6 +14,16 @@
     "release": "npm run build && release",
     "release:init": "npm run build && release -i"
   },
+  "keywords": [
+      "scene",
+      "scenejs",
+      "css",
+      "animate",
+      "animation",
+      "requestAnimationFrame",
+      "motion",
+      "timeline"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/daybrush/scenejs-timeline.git"
