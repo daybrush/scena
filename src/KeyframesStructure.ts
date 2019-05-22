@@ -130,6 +130,38 @@ export function getKeyframesStructure(
     const delayFrames: ElementStructure[] = [];
     const keyframeLines: ElementStructure[] = [];
 
+    const length = frames.length;
+
+    if (length >= 2) {
+        const startFrame =
+            length !== 2
+            && frames[0][0] === 0
+            && frames[0][1] === 0
+            && isUndefined(frames[0][2])
+            && !properties.length
+            ? frames[1]
+            : frames[0];
+        const endFrame = frames[length - 1];
+        const time = startFrame[0];
+        const nextTime = endFrame[0];
+
+        keyframeGroups.push({
+            selector: ".keyframe_group",
+            key: `group`,
+            datas: {
+                time: `${time},${nextTime}`,
+                from: time,
+                to: nextTime,
+            },
+            dataset: {
+                time,
+            },
+            style: {
+                left: `${time / maxTime * 100}%`,
+                width: `${(nextTime - time) / maxTime * 100}%`,
+            },
+        });
+    }
     frames.forEach(([time, iterationTime, value], i): ElementStructure => {
         const valueText = toValue(value);
 
@@ -154,41 +186,24 @@ export function getKeyframesStructure(
                     getDelayFrameStructure(time, nextTime, maxTime),
                 );
             }
-            if (isItScene || !properties.length) {
-                if (valueText !== nextValueText) {
-                    keyframeGroups.push({
-                        selector: ".keyframe_group",
-                        key: `group${keyframes.length}`,
-                        datas: {
-                            time: `${time},${nextTime}`,
-                            from: time,
-                            to: nextTime,
-                        },
-                        dataset: {
-                            time,
-                        },
-                        style: {
-                            left: `${time / maxTime * 100}%`,
-                            width: `${(nextTime - time) / maxTime * 100}%`,
-                        },
-                    });
-                }
-            } else {
-                if (!isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText) {
-                    keyframeLines.push({
-                        selector: ".keyframe_line",
-                        key: `line${keyframeLines.length}`,
-                        datas: {
-                            time: `${time},${nextTime}`,
-                            from: time,
-                            to: nextTime,
-                        },
-                        style: {
-                            left: `${time / maxTime * 100}%`,
-                            width: `${(nextTime - time) / maxTime * 100}%`,
-                        },
-                    });
-                }
+            if (
+                !isItScene
+                && !isUndefined(value)
+                && !isUndefined(nextValue)
+                && valueText !== nextValueText) {
+                keyframeLines.push({
+                    selector: ".keyframe_line",
+                    key: `line${keyframeLines.length}`,
+                    datas: {
+                        time: `${time},${nextTime}`,
+                        from: time,
+                        to: nextTime,
+                    },
+                    style: {
+                        left: `${time / maxTime * 100}%`,
+                        width: `${(nextTime - time) / maxTime * 100}%`,
+                    },
+                });
             }
         }
 

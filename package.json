@@ -1,6 +1,6 @@
 {
   "name": "@scenejs/timeline",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "",
   "main": "./dist3timeline.js",
   "module": "./dist/timeline.esm.js",
