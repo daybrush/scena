@@ -136,7 +136,7 @@ export function getKeyframesStructure(
     let startIndex = 0;
     if (length >= 2 && !hasProperties) {
         const index = findIndex(frames, ([, , value]) => !isUndefined(value));
-        startIndex = Math.max(frames[0][1] === 0 && frames[1][1] === 0 ? 1 : 0, index);
+        startIndex = Math.min(length - 2, Math.max(frames[0][1] === 0 && frames[1][1] === 0 ? 1 : 0, index));
         const startFrame = frames[startIndex];
         const endFrame = frames[length - 1];
         const time = startFrame[0];

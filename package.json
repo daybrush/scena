@@ -1,6 +1,6 @@
 {
   "name": "@scenejs/timeline",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist3timeline.js",
   "module": "./dist/timeline.esm.js",
