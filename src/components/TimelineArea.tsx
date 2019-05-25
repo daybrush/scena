@@ -126,6 +126,7 @@ export default class TimelineArea extends React.Component<{
         this.initScene();
         this.initDragKeyframes();
         this.initClickProperty();
+        this.initFold();
     }
     private getDistTime = (
         distX: number,
@@ -308,6 +309,7 @@ export default class TimelineArea extends React.Component<{
         } = this.scrollArea;
         const selectedProperty = propertiesArea.properties[index];
         const foldedId = selectedProperty.props.id;
+
         fold(propertiesArea, foldedId);
         fold(valuesArea, foldedId);
         fold(keyframesArea, foldedId);
@@ -436,6 +438,16 @@ export default class TimelineArea extends React.Component<{
                     dblCheck(isDrag, inputEvent, clientX, clientY, dblclick);
                 },
             });
+        });
+    }
+    private initFold() {
+        // fold all
+        this.scrollArea.propertiesArea.properties.forEach((property, i) => {
+            const {keys, isParent} = property.props.propertiesInfo;
+
+            if (keys.length === 1 && isParent) {
+                this.fold(i);
+            }
         });
     }
 }

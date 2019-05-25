@@ -246,10 +246,10 @@ export default class Timeline extends Component {
         }
     }
     private initStructure(scene: Scene | SceneItem, parentEl: HTMLElement) {
-        ReactDOM.render(
+        this.timelineArea = ReactDOM.render(
             <TimelineArea scene = {this.scene}/>,
             parentEl,
-        );
+        ) as any;
     }
 
     private initDragValues() {

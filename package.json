@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/daybrush/scenejs-timeline#readme",
   "dependencies": {
-    "@daybrush/builder": "0.0.6",
+    "@daybrush/builder": "0.0.7",
     "@daybrush/drag": "^0.4.2",
     "@daybrush/utils": "^0.9.0",
     "@egjs/axes": "^2.5.10",

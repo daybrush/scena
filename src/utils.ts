@@ -277,6 +277,8 @@ export function fold(
     const id = foldedProperty + "///";
     const foldedInfo = target.state.foldedInfo;
 
+    foldedInfo[id] = !foldedInfo[id];
+    // console.log(foldedInfo);
     target.setState({
         foldedInfo: {
             ...foldedInfo,
