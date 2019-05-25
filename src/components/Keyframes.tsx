@@ -1,19 +1,36 @@
-import { Component } from "react";
 import { PropertiesInfo } from "../types";
-import { isScene, findIndex, toValue } from "../utils";
+import { isScene, findIndex, toValue, prefix } from "../utils";
 import Keyframe from "./Keyframe";
 import KeyframeGroup from "./KeyframeGroup";
-import KeyframeDelay from "./KeyframeLine";
+import KeyframeDelay from "./KeyframeDelay";
 import KeyframeLine from "./KeyframeLine";
 import { isUndefined } from "@daybrush/utils";
+import * as React from "react";
+import ElementComponent from "./ElementComponent";
 
-export default class Keyframes extends Component<{
+export default class Keyframes extends ElementComponent<{
     id: string,
     propertiesInfo: PropertiesInfo,
     maxTime: number,
+    folded: number,
+    selected: boolean,
+    selectedTime: number,
 }> {
     public render() {
-        const { id, propertiesInfo, maxTime } = this.props;
+        const { id, propertiesInfo, selected, folded } = this.props;
+        return (
+            <div
+                className={prefix("keyframes" + (folded === 1 ? " fold" : "") + (selected ? " select" : ""))}
+                data-item={propertiesInfo.isItem ? "1" : "0"}
+                data-id={id}>
+                <div className={prefix("keyframes-container")}>
+                    {this.renderList()}
+                </div>
+            </div>
+        );
+    }
+    public renderList() {
+        const { propertiesInfo, maxTime, selected, selectedTime } = this.props;
         const { item, frames, properties } = propertiesInfo;
         const isItScene = isScene(item);
         const duration = item.getDuration();
@@ -39,6 +56,7 @@ export default class Keyframes extends Component<{
                 <KeyframeGroup
                     key="group"
                     id={`${time},${nextTime}`}
+                    selected={selected && time <= selectedTime && selectedTime <= nextTime}
                     time={time}
                     nextTime={nextTime}
                     maxTime={maxTime} />,
@@ -101,6 +119,7 @@ export default class Keyframes extends Component<{
                 <Keyframe
                     key={`keyframe${i}`}
                     id={`${time}`}
+                    selected={selected && time === selectedTime}
                     time={time}
                     iterationTime={iterationTime}
                     value={valueText}
@@ -109,12 +128,6 @@ export default class Keyframes extends Component<{
             );
         });
 
-        return (
-            <div className="keyframes" data-item={propertiesInfo.isItem ? "1" : "0"} data-id={id}>
-                <div className="keyframes-container">
-                    {[...keyframeGroups, ...keyframes, ...keyframeDelays, ...keyframeLines]}
-                </div>
-            </div>
-        );
+        return [...keyframeGroups, ...keyframes, ...keyframeDelays, ...keyframeLines];
     }
 }

@@ -10,6 +10,7 @@ import {
     isUndefined,
 } from "@daybrush/utils";
 import { ElementStructure, TimelineInfo } from "./types";
+import ElementComponent from "./components/ElementComponent";
 
 export function numberFormat(num: number, count: number, isRight?: boolean) {
     const length = `${num}`.length;
@@ -237,17 +238,49 @@ export function getSceneItem(scene: Scene, names: string[]): SceneItem {
 }
 
 export function findElementIndexByPosition(elements: HTMLElement[], pos: number): number {
-    const length = elements.length;
-
-    for (let index = 0; index < length; ++index) {
-        const el = elements[index];
+    return findIndex(elements, el => {
         const box = el.getBoundingClientRect();
         const top = box.top;
         const bottom = top + box.height;
 
-        if (top <= pos && pos < bottom) {
-            return index;
+        return top <= pos && pos < bottom;
+    });
+}
+
+export function prefix(className: string) {
+    return className.split(" ").map(name => `${PREFIX}${name}`).join(" ");
+}
+export function ref(target: any, name: string) {
+    return e => (target[name] = e);
+}
+export function refs(target: any, name: string, i: number) {
+    return e => (target[name][i] = e);
+}
+
+export function checkFolded(foldedInfo: IObject<any>, names: any[]) {
+    const index = findIndex(names, (name, i) => foldedInfo[names.slice(0, i + 1).join("///") + "///"]);
+
+    if (index > -1) {
+        if (index === names.length - 1) {
+            return 2;
         }
+        return 1;
+    } else {
+        return 0;
     }
-    return -1;
+}
+
+export function fold(
+    target: ElementComponent<any, { foldedInfo: IObject<boolean> }>,
+    foldedProperty: string,
+) {
+    const id = foldedProperty + "///";
+    const foldedInfo = target.state.foldedInfo;
+
+    target.setState({
+        foldedInfo: {
+            ...foldedInfo,
+            [id]: !foldedInfo[id],
+        },
+    });
 }

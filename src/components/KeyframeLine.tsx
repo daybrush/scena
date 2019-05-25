@@ -1,6 +1,7 @@
-import { Component } from "react";
+import * as React from "react";
+import { prefix } from "../utils";
 
-export default class KeyframeLine extends Component<{
+export default class KeyframeLine extends React.Component<{
     id: string,
     time: number,
     nextTime: number,
@@ -11,7 +12,7 @@ export default class KeyframeLine extends Component<{
 
         return (
             <div
-                className="keyframe-line"
+                className={prefix("keyframe-line")}
                 style={{ left: `${time / maxTime * 100}%`, width: `${(nextTime - time) / maxTime * 100}%` }} />
         );
     }

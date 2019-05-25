@@ -1,19 +1,19 @@
-export const PREFIX = `scenejs_editor_`;
+export const PREFIX = `scenejs-editor-`;
 export const SUPPORT_POINTER_EVENTS = "PointerEvent" in window || "MSPointerEvent" in window;
 export const SUPPORT_TOUCH = "ontouchstart" in window;
 
 export const CSS2 = `
-.item_info {
+.item-info {
     position: fixed;
     right: 0;
     top: 0;
     width: 200px;
     background: #000;
 }
-.options_area {
+.options-area {
 
 }
-.option_area {
+.option-area {
     position: relative;
     border-bottom: 1px solid #777;
     box-sizing: border-box;
@@ -24,17 +24,17 @@ export const CSS2 = `
     color: #eee;
     display: flex;
 }
-.option_name, .option_value {
+.option-name, .option-value {
     width: 50%;
     height: 30px;
     line-height: 20px;
     box-sizing: border-box;
     padding: 5px;
 }
-.option_name {
+.option-name {
     border-right: 1px solid #999;
 }
-.option_value input {
+.option-value input {
     appearance: none;
     -webkit-appearance: none;
     outline: none;
@@ -66,33 +66,36 @@ export const CSS = `
   display: flex;
   flex-direction: column;
 }
-.header_area, .scroll_area {
+.header-area, .scroll-area {
    width: 100%;
    position: relative;
   display: flex;
   -webkit-align-items: flex-start;
   align-items: flex-start;
 }
-.header_area {
+.header-area {
   position: relative;
   z-index: 10;
   top: 0;
   height: 30px;
   min-height: 30px;
 }
-.header_area .keyframes {
+.header-area .keyframes {
   padding: 0px;
 }
-.header_area .properties_area,
-.header_area .keyframes_area,
-.header_area .values_area,
-.header_area .keyframes_scroll_area {
+.header-area .properties-area,
+.header-area .keyframes-area,
+.header-area .values-area,
+.header-area .keyframes-scroll-area {
     height: 100%;
 }
-.header_area .property, .header_area .value, .header_area .keyframes {
+.header-area .keyframes-scroll-area {
+    overflow: hidden;
+}
+.header-area .property, .header-area .value, .header-area .keyframes {
   height: 100%;
 }
-.header_area .property {
+.header-area .property {
     line-height: 30px;
 }
 .value .add {
@@ -103,10 +106,10 @@ export const CSS = `
     font-size: 20px;
     cursor: pointer;
 }
-.header_area .keyframes_area::-webkit-scrollbar {
+.header-area .keyframes-area::-webkit-scrollbar {
     display: none; // Safari and Chrome
 }
-.header_area .keyframe_cursor {
+.header-area .keyframe-cursor {
     position: absolute;
     border-top: 10px solid #4af;
     border-left: 6px solid transparent;
@@ -118,21 +121,22 @@ export const CSS = `
     background: none;
     cursor: pointer;
 }
-.control_area .keyframes {
+.control-area .keyframes {
     padding-left: 10px;
 }
-.play_control_area {
+.play-control-area {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
-.play_control_area .control {
+.play-control-area .control {
     position: relative;
     display: inline-block;
     vertical-align: middle;
     color: white;
     margin: 0px 15px;
+    cursor: pointer;
 }
 .play {
     border-left: 14px solid white;
@@ -213,28 +217,28 @@ export const CSS = `
   left: 75%;
   height: 5px;
 }
-.scroll_area {
+.scroll-area {
   position: relative;
   width: 100%;
   height: calc(100% - 60px);
   overflow: auto;
 }
-.properties_area, .keyframes_area, .values_area {
+.properties-area, .keyframes-area, .values-area {
   display: inline-block;
   position: relative;
   font-size: 16px;
   overflow: auto;
 }
 
-.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {
+.properties-area::-webkit-scrollbar, .keyframes-area::-webkit-scrollbar {
     display: none; // Safari and Chrome
 }
-.properties_area {
+.properties-area {
   width: 30%;
   max-width: 200px;
   box-sizing: border-box;
 }
-.values_area {
+.values-area {
     width: 50px;
     min-width: 50px;
     display: inline-block;
@@ -266,14 +270,14 @@ export const CSS = `
 .value[data-object="1"] input {
     display: none;
 }
-.properties_scroll_area {
+.properties-scroll-area {
   display: inline-block;
   min-width: 100%;
 }
-.keyframes_area {
+.keyframes-area {
   flex: 1;
 }
-.keyframes_scroll_area {
+.keyframes-scroll-area {
   position: relative;
   min-width: 300px;
 }
@@ -339,7 +343,7 @@ export const CSS = `
     height: 30px;
     line-height: 30px;
 }
-.time_area {
+.time-area {
     position: absolute;
     top: 0;
     left: 10px;
@@ -353,7 +357,7 @@ export const CSS = `
     background: transparent;
     outline: 0;
 }
-.time_area:after {
+.time-area:after {
     content: "s";
 }
 .property .arrow {
@@ -396,7 +400,7 @@ export const CSS = `
 .keyframes {
 
 }
-.keyframe_delay {
+.keyframe-delay {
   position: absolute;
   top: 3px;
   bottom: 3px;
@@ -405,7 +409,7 @@ export const CSS = `
   opacity: 0.2;
   z-index: 0;
 }
-.keyframe_group {
+.keyframe-group {
     position: absolute;
     top: 3px;
     bottom: 3px;
@@ -417,7 +421,7 @@ export const CSS = `
     border-top-color: rgba(255, 255, 255, 0.2);
     z-index: 0;
 }
-.keyframe_line {
+.keyframe-line {
   position: absolute;
   height: 8px;
   top: 0;
@@ -451,18 +455,18 @@ export const CSS = `
 .keyframe.select {
     background: #4af;
 }
-.keyframes_container, .line_area {
+.keyframes-container, .line-area {
   position: relative;
   width: calc(100% - 30px);
   left: 15px;
   height: 100%;
 }
-.line_area {
+.line-area {
   position: absolute;
   top: 0;
   z-index: 0;
 }
-.keyframe_cursor {
+.keyframe-cursor {
   position: absolute;
   top: 0;
   z-index: 1;
@@ -472,10 +476,10 @@ export const CSS = `
   left: 15px;
   transform: translate(-50%);
 }
-.scroll_aare .keyframe_cursor {
+.scroll-aare .keyframe-cursor {
   pointer-events: none;
 }
-.division_line {
+.division-line {
   position: absolute;
   background: #333;
   width: 1px;
