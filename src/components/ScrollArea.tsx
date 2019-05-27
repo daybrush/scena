@@ -7,6 +7,7 @@ import * as React from "react";
 import { prefix, ref } from "../utils";
 import Axes from "@egjs/axes";
 import KeyController from "keycon";
+import Scene, { SceneItem } from "scenejs";
 
 export default class ScrollArea extends ElementComponent<{
     timelineInfo: TimelineInfo,
@@ -17,6 +18,9 @@ export default class ScrollArea extends ElementComponent<{
     keycon: KeyController,
     selectedProperty: string,
     selectedTime: number,
+    add: (item: Scene | SceneItem, properties: string[]) => any,
+    setTime: (time: number) => any,
+    editKeyframe: (index: number, value: any) => any,
 }> {
     public propertiesArea: PropertiesArea;
     public valuesArea: ValuesArea;
@@ -24,7 +28,7 @@ export default class ScrollArea extends ElementComponent<{
     public render() {
         const {
             axes, keycon, zoom, maxDuration, maxTime, timelineInfo,
-            selectedProperty, selectedTime,
+            selectedProperty, selectedTime, add, setTime, editKeyframe,
         } = this.props;
 
         return (
@@ -36,6 +40,10 @@ export default class ScrollArea extends ElementComponent<{
                 />
                 <ValuesArea
                     ref={ref(this, "valuesArea")}
+                    add={add}
+                    keycon={keycon}
+                    setTime={setTime}
+                    editKeyframe={editKeyframe}
                     timelineInfo={timelineInfo}
                     selectedProperty={selectedProperty}
                 />

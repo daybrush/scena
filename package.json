@@ -37,12 +37,11 @@
   "dependencies": {
     "@daybrush/builder": "0.0.7",
     "@daybrush/drag": "^0.4.2",
-    "@daybrush/utils": "^0.9.0",
+    "@daybrush/utils": "^0.10.0",
     "@egjs/axes": "^2.5.10",
     "@egjs/build-helper": "0.0.5",
     "@types/react": "^16.8.18",
     "@types/react-dom": "^16.8.4",
-    "data-dom": "0.0.11",
     "keycon": "^0.2.2",
     "rollup-plugin-alias": "^1.5.1",
     "rollup-plugin-node-resolve": "^5.0.0",

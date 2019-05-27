@@ -9,14 +9,15 @@ import {
     numberFormat,
     ref,
     getTarget, findElementIndexByPosition,
-    find, hasClass, flatObject, fold } from "../utils";
+    find, hasClass, flatObject, fold, isScene
+} from "../utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import KeyController from "keycon";
 import Scene, { SceneItem } from "scenejs";
 import { drag } from "@daybrush/drag";
 import { dblCheck } from "../dblcheck";
 import { getTimelineInfo } from "../TimelineInfo";
-import { IObject } from "@daybrush/utils";
+import { IObject, removeClass } from "@daybrush/utils";
 
 let isExportCSS = false;
 
@@ -55,11 +56,14 @@ export default class TimelineArea extends React.Component<{
         }
 
         const scene = this.props.scene;
+
+        scene.finish();
         const duration = Math.ceil(scene.getDuration());
 
         this.state.timelineInfo = getTimelineInfo(this.props.scene);
         this.state.maxTime = duration;
         this.state.maxDuration = duration;
+
         this.keycon = new KeyController()
             .keydown("alt", () => {
                 this.setState({ alt: true });
@@ -79,12 +83,11 @@ export default class TimelineArea extends React.Component<{
         );
     }
 
-    public renderStyle() {
-        if (!this.isExportCSS) {
-            return <style>{CSS}</style>;
-        }
-    }
+
     public render() {
+        const {
+            scene,
+        } = this.props;
         const {
             zoom,
             alt,
@@ -98,9 +101,18 @@ export default class TimelineArea extends React.Component<{
         return (
             <div className={prefix("timeline" + (alt ? " alt" : ""))} style={this.props.style}>
                 {this.renderStyle()}
-                <ControlArea ref={ref(this, "controlArea")} />
+                <ControlArea
+                    ref={ref(this, "controlArea")}
+                    scene = {scene}
+                    select = {this.select}
+                    prev = {this.prev}
+                    next = {this.next}
+                    setTime = {this.setTime}
+                    togglePlay={this.togglePlay}
+                    />
                 <HeaderArea
                     ref={ref(this, "headerArea")}
+                    add={this.add}
                     axes={this.axes}
                     move={this.move}
                     maxDuration={maxDuration}
@@ -109,6 +121,9 @@ export default class TimelineArea extends React.Component<{
                     timelineInfo={timelineInfo} />
                 <ScrollArea
                     ref={ref(this, "scrollArea")}
+                    add={this.add}
+                    setTime={this.setTime}
+                    editKeyframe={this.editKeyframe}
                     keycon={this.keycon}
                     axes={this.axes}
                     maxDuration={maxDuration}
@@ -127,6 +142,57 @@ export default class TimelineArea extends React.Component<{
         this.initDragKeyframes();
         this.initClickProperty();
         this.initFold();
+        this.initKeyController();
+    }
+    public componentDidUpdate() {
+        this.setTime();
+    }
+    public prev = () => {
+        this.setTime(this.props.scene.getTime() - 0.05);
+    }
+    public next = () => {
+        this.setTime(this.props.scene.getTime() + 0.05);
+    }
+    public finish = () => {
+        this.props.scene.finish();
+    }
+    public togglePlay = () => {
+        const scene = this.props.scene;
+        if (scene.getPlayState() === "running") {
+            scene.pause();
+        } else {
+            scene.play();
+        }
+    }
+    private renderStyle() {
+        if (!this.isExportCSS) {
+            return <style>{CSS}</style>;
+        }
+    }
+    private add = (item: Scene | SceneItem = this.props.scene, properties: string[] = []) => {
+        if (isScene(item)) {
+            this.newItem(item);
+        } else {
+            this.newProperty(item, properties);
+        }
+    }
+    private newItem(scene: Scene) {
+        const name = prompt("Add Item");
+
+        if (!name) {
+            return;
+        }
+        scene.newItem(name);
+        this.update();
+    }
+    private newProperty(item: SceneItem, properties: string[]) {
+        const property = prompt("Add Property");
+
+        if (!property) {
+            return;
+        }
+        item.set(item.getIterationTime(), ...properties, property, "");
+        this.update();
     }
     private getDistTime = (
         distX: number,
@@ -139,7 +205,7 @@ export default class TimelineArea extends React.Component<{
 
         return Math.round(time * 20) / 20;
     }
-    private setTime(time: number) {
+    private setTime = (time: number = this.props.scene.getTime()) => {
         const scene = this.props.scene;
         const direction = scene.getDirection();
 
@@ -177,7 +243,6 @@ export default class TimelineArea extends React.Component<{
         });
 
         this.axes.axm.set({ zoom: nextZoom });
-        this.setTime(scene.getTime());
     }
 
     private moveCursor(time: number) {
@@ -195,14 +260,14 @@ export default class TimelineArea extends React.Component<{
             valuesArea.querySelector<HTMLInputElement>(`[data-id="${name}"] input`).value = obj[name];
         }
     }
-    private select(property: string, time: number = -1) {
+    private select = (property: string, time: number = -1) => {
         this.props.scene.pause();
         this.setState({
             selectedProperty: property,
             selectedTime: time,
         });
     }
-    private editKeyframe(index: number, value: any) {
+    private editKeyframe = (index: number, value: any) => {
         const isObjectData
             = this.scrollArea.propertiesArea.properties[index].props.propertiesInfo.isParent;
 
@@ -215,6 +280,18 @@ export default class TimelineArea extends React.Component<{
         const properties = propertiesInfo.properties;
 
         item.set(item.getIterationTime(), ...properties, value);
+        this.update();
+    }
+    private removeKeyframe(property: string) {
+        const propertiesInfo = this.state.timelineInfo[property];
+        if (!property || !propertiesInfo || isScene(propertiesInfo.item)) {
+            return;
+        }
+
+        const properties = propertiesInfo.properties;
+        const item = propertiesInfo.item;
+
+        item.remove(item.getIterationTime(), ...properties);
         this.update();
     }
     private addKeyframe(index: number, time: number) {
@@ -266,7 +343,7 @@ export default class TimelineArea extends React.Component<{
             const second = numberFormat(Math.floor(time % 60), 2);
             const milisecond = numberFormat(Math.floor((time % 1) * 100), 3, true);
 
-            this.controlArea.timeAreaElement.value = `${minute}:${second}:${milisecond}`;
+            this.controlArea.timeArea.getElement().value = `${minute}:${second}:${milisecond}`;
         });
     }
     private initWheelZoom() {
@@ -309,6 +386,8 @@ export default class TimelineArea extends React.Component<{
         } = this.scrollArea;
         const selectedProperty = propertiesArea.properties[index];
         const foldedId = selectedProperty.props.id;
+
+        console.log(foldedId);
 
         fold(propertiesArea, foldedId);
         fold(valuesArea, foldedId);
@@ -443,11 +522,37 @@ export default class TimelineArea extends React.Component<{
     private initFold() {
         // fold all
         this.scrollArea.propertiesArea.properties.forEach((property, i) => {
-            const {keys, isParent} = property.props.propertiesInfo;
+            const { keys, isParent } = property.props.propertiesInfo;
 
             if (keys.length === 1 && isParent) {
+                console.log(property.props.id, i);
                 this.fold(i);
             }
         });
+    }
+    private initKeyController() {
+        window.addEventListener("blur", () => {
+            this.setState({ alt: false });
+        });
+
+        // if (props.keyboard) {
+        this.keycon.keydown("space", ({ inputEvent }) => {
+            inputEvent.preventDefault();
+        })
+            .keydown("left", e => {
+                this.prev();
+            })
+            .keydown("right", e => {
+                this.next();
+            })
+            .keyup("backspace", () => {
+                this.removeKeyframe(this.state.selectedProperty);
+            })
+            .keyup("esc", () => {
+                this.finish();
+            })
+            .keyup("space", () => {
+                this.togglePlay();
+            });
     }
 }

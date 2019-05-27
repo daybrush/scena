@@ -4,6 +4,7 @@ import * as React from "react";
 import { prefix, refs, findIndex, checkFolded } from "../utils";
 import ElementComponent from "./ElementComponent";
 import { IObject } from "@daybrush/utils";
+import Scene, { SceneItem } from "scenejs";
 
 export default class PropertiesArea extends ElementComponent<{
     timelineInfo: TimelineInfo,

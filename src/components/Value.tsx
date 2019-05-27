@@ -1,12 +1,15 @@
 import { PropertiesInfo } from "../types";
 import * as React from "react";
 import { prefix, ref } from "../utils";
+import Scene, { SceneItem } from "scenejs";
+import ElementComponent from "./ElementComponent";
 
-export default class Value extends React.Component<{
+export default class Value extends ElementComponent<{
     id: string,
     propertiesInfo: PropertiesInfo,
     folded: number,
     selected: boolean,
+    add: (item: Scene | SceneItem, properties: string[]) => any,
 }> {
     public inputElement: HTMLInputElement;
     public render() {
@@ -32,12 +35,22 @@ export default class Value extends React.Component<{
         const { isParent } = this.props.propertiesInfo;
         if (isParent) {
             return (
-                <div className={prefix("add")}>+</div>
+                <div className={prefix("add")} onClick={this.add}>+</div>
             );
         } else {
             return (
                 <input ref={ref(this, "inputElement")}></input>
             );
         }
+    }
+    private add = () => {
+        const {
+            add,
+            propertiesInfo: {
+                item,
+                properties,
+            },
+        } = this.props;
+        add(item, properties);
     }
 }

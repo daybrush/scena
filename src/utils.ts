@@ -160,49 +160,6 @@ export function addClass(target: Element, className: string) {
 export function removeClass(target: Element, className: string) {
     return removeClass2(target, `${PREFIX}${className}`);
 }
-export function findStructure(
-    selector: string,
-    structure: ElementStructure | ElementStructure[],
-    multi: true,
-    arr?: ElementStructure[],
-): ElementStructure[];
-export function findStructure(
-    selector: string,
-    structure: ElementStructure | ElementStructure[],
-    multi?: false,
-    arr?: ElementStructure[],
-): ElementStructure;
-export function findStructure(
-    selector: string,
-    structure: ElementStructure | ElementStructure[],
-    multi: true | false,
-    arr?: ElementStructure[],
-): ElementStructure | ElementStructure[];
-export function findStructure(
-    selector: string,
-    structure: ElementStructure | ElementStructure[],
-    multi: boolean = false,
-    arr: ElementStructure[] = [],
-): ElementStructure | ElementStructure[] {
-    if (isArray(structure)) {
-        const length = structure.length;
-
-        for (let i = 0; i < length; ++i) {
-            findStructure(selector, structure[i], multi, arr);
-        }
-    } else {
-        if (structure.selector === selector) {
-            arr.push(structure);
-        }
-        if (!multi && arr.length) {
-            return arr[0];
-        }
-        if (structure.children) {
-            findStructure(selector, structure.children, multi, arr);
-        }
-    }
-    return multi ? arr : arr[0];
-}
 export function isScene(value: any): value is Scene {
     return !!(value.constructor as typeof Scene).prototype.getItem;
 }
@@ -251,10 +208,10 @@ export function prefix(className: string) {
     return className.split(" ").map(name => `${PREFIX}${name}`).join(" ");
 }
 export function ref(target: any, name: string) {
-    return e => (target[name] = e);
+    return e => (e && (target[name] = e));
 }
 export function refs(target: any, name: string, i: number) {
-    return e => (target[name][i] = e);
+    return e => (e && (target[name][i] = e));
 }
 
 export function checkFolded(foldedInfo: IObject<any>, names: any[]) {
@@ -282,7 +239,6 @@ export function fold(
     target.setState({
         foldedInfo: {
             ...foldedInfo,
-            [id]: !foldedInfo[id],
         },
     });
 }

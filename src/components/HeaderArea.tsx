@@ -4,6 +4,7 @@ import KeytimesArea from "./KeytimesArea";
 import * as React from "react";
 import { prefix } from "../utils";
 import Axes from "@egjs/axes";
+import Scene, { SceneItem } from "scenejs";
 
 export default class HeaderArea extends ElementComponent<{
     timelineInfo: TimelineInfo,
@@ -11,6 +12,7 @@ export default class HeaderArea extends ElementComponent<{
     maxDuration: number,
     zoom: number,
     axes: Axes,
+    add: (item?: Scene | SceneItem, properties?: string[]) => any,
     move: (clientX: number) => void,
 }> {
     public keytimesArea: KeytimesArea;
@@ -22,8 +24,8 @@ export default class HeaderArea extends ElementComponent<{
                     <div className={prefix("property")}>Name</div>
                 </div>
                 <div className={prefix("values-area")}>
-                    <div className={prefix("value")}>
-                        <div className={prefix("add")}>+</div>
+                    <div className={prefix("value")} >
+                        <div className={prefix("add")} onClick={this.add}>+</div>
                     </div>
                 </div>
                 <KeytimesArea
@@ -36,5 +38,8 @@ export default class HeaderArea extends ElementComponent<{
                     zoom={zoom} />
             </div>
         );
+    }
+    private add = () => {
+        this.props.add();
     }
 }
