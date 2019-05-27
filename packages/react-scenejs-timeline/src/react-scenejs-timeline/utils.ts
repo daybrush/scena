@@ -159,15 +159,16 @@ export function checkFolded(foldedInfo: IObject<any>, names: any[]) {
 export function fold(
     target: ElementComponent<any, { foldedInfo: IObject<boolean> }>,
     foldedProperty: string,
+    isNotUpdate?: boolean,
 ) {
     const id = foldedProperty + "///";
     const foldedInfo = target.state.foldedInfo;
 
     foldedInfo[id] = !foldedInfo[id];
     // console.log(foldedInfo);
-    target.setState({
-        foldedInfo: {
-            ...foldedInfo,
-        },
-    });
+    if (!isNotUpdate) {
+        target.setState({
+            foldedInfo: { ...foldedInfo },
+        });
+    }
 }

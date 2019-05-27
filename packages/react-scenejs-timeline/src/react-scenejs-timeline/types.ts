@@ -2,8 +2,19 @@ import Scene, { SceneItem } from "scenejs";
 import { IObject } from "@daybrush/utils";
 import { HTMLAttributes } from "react";
 
-export interface TimelineProps extends HTMLAttributes<HTMLDivElement> {
+export interface SelectEvent {
+    selectedItem: Scene | SceneItem;
+    selectedProperty: string;
+    selectedTime: number;
+    prevSelectedProperty: string;
+    prevSelectedTime: number;
+}
+export type AttributeKeys = Exclude<keyof HTMLAttributes<HTMLDivElement>, "onSelect">;
+export type TimelineAttributes = {[key in AttributeKeys]?: HTMLAttributes<HTMLDivElement>[key]};
+export interface TimelineProps extends TimelineAttributes {
     scene?: Scene | SceneItem;
+    keyboard?: boolean;
+    onSelect?: (e: SelectEvent) => any;
 }
 export interface TimelineState {
     zoom: number;
@@ -13,6 +24,7 @@ export interface TimelineState {
     timelineInfo: TimelineInfo;
     selectedProperty: string;
     selectedTime: number;
+    init: boolean;
 }
 export interface PropertiesInfo {
     key: string;

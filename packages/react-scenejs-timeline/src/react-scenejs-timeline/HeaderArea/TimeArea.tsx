@@ -7,7 +7,6 @@ export default class TimeArea extends ElementComponent<{
     setTime: (time: number) => any,
 }, {}, HTMLInputElement> {
     public render() {
-        console.log("T");
         return (
             <input className={prefix("time-area")}/>
         );

@@ -1,6 +1,7 @@
 import builder from "@daybrush/builder";
 
 const defaultOptions = {
+    tsconfig: "tsconfig.build.json",
     external: {
         "@daybrush/utils": "utils",
         "@daybrush/drag": "utils",

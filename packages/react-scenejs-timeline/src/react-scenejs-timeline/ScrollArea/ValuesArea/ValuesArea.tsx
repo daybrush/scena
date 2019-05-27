@@ -1,9 +1,9 @@
 import { TimelineInfo } from "../../types";
 import Value from "./Value";
 import * as React from "react";
-import { prefix, refs, checkFolded, getTarget } from "../../utils";
+import { prefix, refs, checkFolded, getTarget, hasClass } from "../../utils";
 import ElementComponent from "../../utils/ElementComponent";
-import { IObject, hasClass, findIndex } from "@daybrush/utils";
+import { IObject, findIndex } from "@daybrush/utils";
 import Scene, { SceneItem } from "scenejs";
 import { drag } from "@daybrush/drag";
 import KeyController from "keycon";
@@ -36,6 +36,7 @@ export default class ValuesArea extends ElementComponent<{
             values.push(<Value
                 ref={refs(this, "values", values.length)}
                 add={add}
+                key={id}
                 folded={folded}
                 selected={selected}
                 id={id} propertiesInfo={propertiesInfo} />);
@@ -100,6 +101,7 @@ export default class ValuesArea extends ElementComponent<{
         if (!parentEl) {
             return;
         }
+        console.log(target, value);
         const index = findIndex(this.values, v => v.getElement() === parentEl);
 
         if (index === -1) {

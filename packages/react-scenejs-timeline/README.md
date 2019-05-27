@@ -15,6 +15,9 @@ A library that represents the timeline of [**Scene.js**](https://github.com/dayb
 
 [**Scene.js**](https://github.com/daybrush/scenejs) &nbsp;/&nbsp;  [**Scene.js Timeline**](https://github.com/daybrush/scenejs-timeline) &nbsp;/&nbsp; [**Example**](http://daybrush.com/scenejs/features.html#timeline)
 
+<br/>
+
+![](https://daybrush.com/scenejs-timeline/images/timeline.png)
 </div>
 
 ### Installation
@@ -32,6 +35,9 @@ render() {
         <Timeline
             scene={scene}
             keyboard={true}
+            onSelect={(e: SelectEvent) => {
+                console.log(e.selectedItem);
+            }}
         />
     );
 }

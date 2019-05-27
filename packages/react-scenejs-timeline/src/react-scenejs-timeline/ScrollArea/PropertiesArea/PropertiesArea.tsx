@@ -31,6 +31,7 @@ export default class PropertiesArea extends ElementComponent<{
                     ref={refs(this, "properties", properties.length)}
                     selected={selected}
                     folded={folded}
+                    key={id}
                     id={id} propertiesInfo={propertiesInfo} />,
             );
         }

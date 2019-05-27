@@ -41,8 +41,8 @@ export function getEntries(times: number[], states: AnimatorState[]) {
         for (let i = 0; i < intCount; ++i) {
             const isReverse =
                 direction === REVERSE
-                || direction === ALTERNATE && (i % 2)
-                || direction === ALTERNATE_REVERSE && !(i % 2);
+                || (direction === ALTERNATE && (i % 2))
+                || (direction === ALTERNATE_REVERSE && !(i % 2));
 
             for (let j = 0; j < length; ++j) {
                 const entry = entries[isReverse ? length - j - 1 : j];

@@ -1,4 +1,4 @@
-import { TimelineInfo, PropertiesInfo, TimelineProps, TimelineState } from "./types";
+import { TimelineProps, TimelineState } from "./types";
 import ControlArea from "./HeaderArea/ControlArea";
 import HeaderArea from "./HeaderArea/HeaderArea";
 import ScrollArea from "./ScrollArea/ScrollArea";
@@ -9,7 +9,7 @@ import {
     numberFormat,
     ref,
     getTarget, findElementIndexByPosition,
-    hasClass, flatObject, fold, isScene
+    hasClass, flatObject, isScene
 } from "./utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import KeyController from "keycon";
@@ -22,6 +22,9 @@ import { IObject, find, isUndefined } from "@daybrush/utils";
 let isExportCSS = false;
 
 export default class Timeline extends React.Component<TimelineProps, TimelineState> {
+    public static defaultProps = {
+        keyboard: true,
+    };
     public headerArea!: HeaderArea;
     public controlArea!: ControlArea;
     public scrollArea!: ScrollArea;
@@ -33,6 +36,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         timelineInfo: {},
         selectedProperty: "",
         selectedTime: -1,
+        init: false,
     };
     private isExportCSS = false;
     private axes!: Axes;
@@ -44,7 +48,8 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             this.isExportCSS = true;
         }
 
-        this.state = {...this.state, ...this.initScene(this.props.scene)};
+        this.state = { ...this.state, ...this.initScene(this.props.scene) };
+
         this.keycon = new KeyController()
             .keydown("alt", () => {
                 this.setState({ alt: true });
@@ -52,7 +57,6 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             .keyup("alt", () => {
                 this.setState({ alt: false });
             });
-
         this.axes = new Axes(
             {
                 zoom: {
@@ -67,6 +71,8 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         const {
             scene,
             className,
+            keyboard,
+            onSelect,
             ...attributes
         } = this.props;
         const {
@@ -113,9 +119,12 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
                     maxDuration={maxDuration}
                     zoom={zoom}
                     maxTime={maxTime}
+                    update={this.update}
+                    select={this.select}
                     selectedProperty={selectedProperty}
                     selectedTime={selectedTime}
-                    timelineInfo={timelineInfo} />
+                    timelineInfo={timelineInfo}
+                />
             </div>
         );
     }
@@ -123,18 +132,63 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         this.initWheelZoom();
         this.initScroll();
         this.initDragKeyframes();
-        this.initClickProperty();
-        this.initFold();
         this.initKeyController();
     }
-    public componentDidUpdate(prevProps: TimelineProps) {
+    public componentDidUpdate(prevProps: TimelineProps, prevState: TimelineState) {
+        if (this.props.onSelect && prevState.selectedProperty !== this.state.selectedProperty) {
+            const {
+                selectedProperty: prevSelectedProperty,
+                selectedTime: prevSelectedTime,
+            } = prevState;
+            const {
+                selectedProperty,
+                selectedTime,
+            } = this.state;
+            const selectedItem = this.state.timelineInfo[selectedProperty]!;
+
+            this.props.onSelect({
+                selectedItem: !selectedProperty ? this.props.scene! : selectedItem.item,
+                selectedProperty,
+                selectedTime,
+                prevSelectedProperty,
+                prevSelectedTime,
+            });
+        }
+
+        if (this.state.init) {
+            this.state.init = false;
+            this.scrollArea.foldAll();
+        }
         if (prevProps.scene !== this.props.scene) {
             this.releaseScene(prevProps.scene);
+
             this.setState(this.initScene(this.props.scene));
         } else {
             this.setTime();
         }
 
+    }
+    public update = (isInit: boolean = false) => {
+        const scene = this.props.scene;
+
+        if (!scene) {
+            return;
+        }
+        const maxDuration = Math.ceil(scene.getDuration());
+        const maxTime = Math.max(this.state.maxTime, maxDuration);
+        const currentMaxTime = this.state.maxTime;
+        const zoom = this.axes.get(["zoom"]).zoom;
+        const nextZoomScale = currentMaxTime > 1 ? maxTime / currentMaxTime : 1;
+        const nextZoom = Math.max(1, zoom * nextZoomScale);
+
+        this.setState({
+            timelineInfo: getTimelineInfo(scene),
+            maxTime,
+            maxDuration,
+            init: isInit,
+        });
+
+        this.axes.axm.set({ zoom: nextZoom });
     }
     public prev = () => {
         const scene = this.props.scene;
@@ -219,7 +273,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         if (direction === "normal" || direction === "alternate") {
             scene.setTime(time);
         } else {
-            scene.setTime(scene.getDuration() - time);
+            scene.setTime(scene.getDuration() - time!);
         }
     }
     private getTime = (clientX: number) => {
@@ -232,28 +286,6 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
     private move = (clientX: number) => {
         this.setTime(this.getTime(clientX));
     }
-    private update() {
-        const scene = this.props.scene;
-
-        if (!scene) {
-            return;
-        }
-        const maxDuration = Math.ceil(scene.getDuration());
-        const maxTime = Math.max(this.state.maxTime, maxDuration);
-        const currentMaxTime = this.state.maxTime;
-        const zoom = this.axes.get(["zoom"]).zoom;
-        const nextZoomScale = currentMaxTime > 1 ? maxTime / currentMaxTime : 1;
-        const nextZoom = Math.max(1, zoom * nextZoomScale);
-
-        this.setState({
-            timelineInfo: getTimelineInfo(scene),
-            maxTime,
-            maxDuration,
-        });
-
-        this.axes.axm.set({ zoom: nextZoom });
-    }
-
     private moveCursor(time: number) {
         const maxTime = this.state.maxTime;
         const px = 15 - 30 * time / maxTime;
@@ -269,16 +301,22 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             valuesArea.querySelector<HTMLInputElement>(`[data-id="${name}"] input`)!.value = obj[name];
         }
     }
-    private select = (property: string, time: number = -1) => {
+    private select = (property: string, time: number = -1, isNotUpdate?: boolean) => {
         const scene = this.props.scene;
         if (!scene) {
             return;
         }
         scene.pause();
-        this.setState({
-            selectedProperty: property,
-            selectedTime: time,
-        });
+
+        if (isNotUpdate) {
+            this.state.selectedProperty = property;
+            this.state.selectedTime = -1;
+        } else {
+            this.setState({
+                selectedProperty: property,
+                selectedTime: time,
+            });
+        }
     }
     private editKeyframe = (index: number, value: any) => {
         const propertiesInfo = this.scrollArea.propertiesArea.properties[index].props.propertiesInfo;
@@ -300,7 +338,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         }
 
         const properties = propertiesInfo.properties;
-        const item = propertiesInfo.item;
+        const item = propertiesInfo.item!;
 
         item.remove(item.getIterationTime(), ...properties);
         this.update();
@@ -319,32 +357,6 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             this.editKeyframe(index, inputElement.value);
         }
     }
-    private removeProperty(propertiesInfo: PropertiesInfo) {
-        const { key, isItem, parentItem, item: targetItem, properties } = propertiesInfo;
-        if (isItem) {
-            let targetName: string | null = null;
-            parentItem.forEach((item, name) => {
-                if (item === targetItem) {
-                    targetName = name;
-                    return;
-                }
-            });
-            if (targetName != null) {
-                parentItem.removeItem(targetName);
-            }
-        } else {
-            const times = (targetItem as SceneItem).times;
-
-            times.forEach(time => {
-                (targetItem as SceneItem).remove(time, ...properties);
-            });
-        }
-        if (this.state.selectedProperty === key) {
-            this.state.selectedProperty = "";
-            this.state.selectedTime = -1;
-        }
-        this.update();
-    }
     private animate = (e: any) => {
         const time = e.time;
         const minute = numberFormat(Math.floor(time / 60), 2);
@@ -362,9 +374,11 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
                 maxTime: 0,
                 maxDuration: 0,
                 zoom: 1,
+                init: false,
             };
         }
         scene.finish();
+        scene.on("animate", this.animate);
         const duration = Math.ceil(scene.getDuration());
 
         return {
@@ -372,6 +386,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             maxTime: duration,
             maxDuration: duration,
             zoom: 1,
+            init: true,
         };
     }
     private releaseScene(scene?: Scene | SceneItem) {
@@ -412,49 +427,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
 
         this.axes = axes;
     }
-    private fold(index: number) {
-        const {
-            propertiesArea,
-            valuesArea,
-            keyframesArea,
-        } = this.scrollArea!;
-        const selectedProperty = propertiesArea.properties[index];
-        const foldedId = selectedProperty.props.id;
 
-        fold(propertiesArea!, foldedId);
-        fold(valuesArea!, foldedId);
-        fold(keyframesArea!, foldedId);
-    }
-    private initClickProperty() {
-        this.scrollArea.propertiesArea.getElement().addEventListener("click", e => {
-            const isClickArrow = getTarget(e.target as HTMLElement, el => hasClass(el, "arrow"));
-            const isClickRemove = getTarget(e.target as HTMLElement, el => hasClass(el, "remove"));
-            const target = getTarget(e.target as HTMLElement, el => hasClass(el, "property"));
-
-            if (!target) {
-                return;
-            }
-            const properties = this.scrollArea.propertiesArea.properties;
-            const index = this.scrollArea.propertiesArea.properties
-                .map(property => property.getElement())
-                .indexOf(target);
-
-            if (index === -1) {
-                return;
-            }
-            const selectedProperty = properties[index];
-
-            if (isClickRemove) {
-                this.removeProperty(selectedProperty.props.propertiesInfo);
-            } else {
-                this.select(selectedProperty.props.id);
-
-                if (isClickArrow) {
-                    this.fold(index);
-                }
-            }
-        });
-    }
     private initScroll() {
         let isScrollKeyframe = false;
 
@@ -551,39 +524,31 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             });
         });
     }
-    private initFold() {
-        // fold all
-        this.scrollArea.propertiesArea.properties.forEach((property, i) => {
-            const { keys, isParent } = property.props.propertiesInfo;
-
-            if (keys.length === 1 && isParent) {
-                this.fold(i);
-            }
-        });
-    }
     private initKeyController() {
         window.addEventListener("blur", () => {
             this.setState({ alt: false });
         });
 
         // if (props.keyboard) {
-        this.keycon.keydown("space", ({ inputEvent }) => {
-            inputEvent.preventDefault();
-        })
-            .keydown("left", e => {
-                this.prev();
+        if (this.props.keyboard) {
+            this.keycon!.keydown("space", ({ inputEvent }) => {
+                inputEvent.preventDefault();
             })
-            .keydown("right", e => {
-                this.next();
-            })
-            .keyup("backspace", () => {
-                this.removeKeyframe(this.state.selectedProperty);
-            })
-            .keyup("esc", () => {
-                this.finish();
-            })
-            .keyup("space", () => {
-                this.togglePlay();
-            });
+                .keydown("left", e => {
+                    this.prev();
+                })
+                .keydown("right", e => {
+                    this.next();
+                })
+                .keyup("backspace", () => {
+                    this.removeKeyframe(this.state.selectedProperty);
+                })
+                .keyup("esc", () => {
+                    this.finish();
+                })
+                .keyup("space", () => {
+                    this.togglePlay();
+                });
+        }
     }
 }
