@@ -17,7 +17,7 @@ A library that represents the timeline of [**Scene.js**](https://github.com/dayb
 
 <br/>
 
-![](https://daybrush.com/scenejs-timeline/images/timeline.png)
+![](https://github.com/daybrush/scenejs-timeline/blob/master/demo/images/timeline.png?raw=true)
 </div>
 
 ### Installation
