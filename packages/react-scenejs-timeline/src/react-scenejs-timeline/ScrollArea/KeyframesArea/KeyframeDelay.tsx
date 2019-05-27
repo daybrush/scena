@@ -1,6 +1,7 @@
-import { Component } from "react";
+import * as React from "react";
+import { prefix } from "../../utils";
 
-export default class KeyframeDelay extends Component<{
+export default class KeyframeDelay extends React.Component<{
     id: string,
     time: number,
     nextTime: number,
@@ -10,7 +11,7 @@ export default class KeyframeDelay extends Component<{
         const { time, nextTime, maxTime } = this.props;
         return (
             <div
-                className="keyframe-delay"
+                className={prefix("keyframe-delay")}
                 style={{ left: `${time / maxTime * 100}%`, width: `${(nextTime - time) / maxTime * 100}%` }} />
         );
     }

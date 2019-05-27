@@ -6,11 +6,9 @@ import {
     removeClass as removeClass2,
     IObject,
     isObject,
-    isArray,
-    isUndefined,
+    findIndex,
 } from "@daybrush/utils";
-import { ElementStructure, TimelineInfo } from "./types";
-import ElementComponent from "./components/ElementComponent";
+import ElementComponent from "./utils/ElementComponent";
 
 export function numberFormat(num: number, count: number, isRight?: boolean) {
     const length = `${num}`.length;
@@ -29,79 +27,7 @@ export function numberFormat(num: number, count: number, isRight?: boolean) {
 }
 export function applyStyle(el: HTMLElement, style: IObject<any>) {
     for (const name in style) {
-        el.style[name] = style[name];
-    }
-}
-export function findIndex<T>(arr: T[], callback: (value: T, index: number, arr: T[]) => boolean) {
-    const length = arr.length;
-
-    for (let i = 0; i < length; ++i) {
-        if (callback(arr[i], i, arr)) {
-            return i;
-        }
-    }
-    return -1;
-}
-export function find<T>(arr: T[], callback: (value: T, index: number, arr: T[]) => boolean): T | undefined {
-    return arr[findIndex(arr, callback)];
-}
-export function findIndexByProperty(selectedProperty: string, structures: ElementStructure[]) {
-    return findIndex(
-        structures,
-        ({ dataset: { key } }) => key === selectedProperty,
-    );
-}
-export function findStructureByProperty(selectedProperty: string, structures: ElementStructure[]) {
-    return find(
-        structures,
-        ({ dataset: { key } }) => key === selectedProperty,
-    );
-}
-
-export function createElement(structure: ElementStructure) {
-    const { selector, dataset, attr, style, html } = structure;
-
-    const classNames = selector.match(/\.([^.#\s])+/g) || [];
-    const tag = (selector.match(/^[^.#\s]+/g) || [])[0] || "div";
-    const id = (selector.match(/#[^.#\s]+/g) || [])[0] || "";
-    const el = document.createElement(tag);
-
-    id && (el.id = id.replace(/^#/g, ""));
-    el.className = classNames.map(name => `${PREFIX}${name.replace(/^\./g, "")}`).join(" ");
-
-    if (dataset) {
-        for (const name in dataset) {
-            el.setAttribute(`data-${name}`, dataset[name]);
-        }
-    }
-    if (attr) {
-        for (const name in attr) {
-            el.setAttribute(name, attr[name]);
-        }
-    }
-    if (style) {
-        applyStyle(el, style);
-    }
-    if (html) {
-        el.innerHTML = html;
-    }
-    return el;
-}
-export function updateElement(prevStructure: ElementStructure, nextStructure: ElementStructure) {
-    const { dataset, attr, style, html, element } = nextStructure;
-    if (dataset) {
-        for (const name in dataset) {
-            element.setAttribute(`data-${name}`, dataset[name]);
-        }
-    }
-    if (attr) {
-        for (const name in attr) {
-            element.setAttribute(name, attr[name]);
-        }
-    }
-    style && applyStyle(element, style);
-    if (prevStructure.html !== nextStructure.html) {
-        element.innerHTML = html;
+        el.style[name as any] = style[name as any];
     }
 }
 export function keys(value: object) {
@@ -111,9 +37,8 @@ export function keys(value: object) {
     }
     return arr;
 }
-export function toValue(value: any) {
-    const type = typeof value;
-    if (type === "object") {
+export function toValue(value: any): any {
+    if (isObject(value)) {
         if (Array.isArray(value)) {
             return `[${value.join(", ")}]`;
         }
@@ -139,7 +64,7 @@ export function flatObject(obj: IObject<any>, newObj: IObject<any> = {}) {
     return newObj;
 }
 
-export function getTarget<T extends HTMLElement>(target: T, conditionCallback: (el: Element) => boolean): T {
+export function getTarget<T extends HTMLElement>(target: T, conditionCallback: (el: Element) => boolean): T | null {
     let parentTarget = target;
 
     while (parentTarget && parentTarget !== document.body) {
@@ -208,10 +133,14 @@ export function prefix(className: string) {
     return className.split(" ").map(name => `${PREFIX}${name}`).join(" ");
 }
 export function ref(target: any, name: string) {
-    return e => (e && (target[name] = e));
+    return (e: any) => {
+        e && (target[name] = e);
+    };
 }
 export function refs(target: any, name: string, i: number) {
-    return e => (e && (target[name][i] = e));
+    return (e: any) => {
+        e && (target[name][i] = e);
+    };
 }
 
 export function checkFolded(foldedInfo: IObject<any>, names: any[]) {
@@ -230,15 +159,16 @@ export function checkFolded(foldedInfo: IObject<any>, names: any[]) {
 export function fold(
     target: ElementComponent<any, { foldedInfo: IObject<boolean> }>,
     foldedProperty: string,
+    isNotUpdate?: boolean,
 ) {
     const id = foldedProperty + "///";
     const foldedInfo = target.state.foldedInfo;
 
     foldedInfo[id] = !foldedInfo[id];
     // console.log(foldedInfo);
-    target.setState({
-        foldedInfo: {
-            ...foldedInfo,
-        },
-    });
+    if (!isNotUpdate) {
+        target.setState({
+            foldedInfo: { ...foldedInfo },
+        });
+    }
 }

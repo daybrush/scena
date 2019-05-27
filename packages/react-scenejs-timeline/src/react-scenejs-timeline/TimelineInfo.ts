@@ -22,7 +22,7 @@ export function getEntries(times: number[], states: AnimatorState[]) {
         return [];
     }
     let entries = times.map(time => ([time, time]));
-    let nextEntries = [];
+    let nextEntries: number[][] = [];
     const firstEntry = entries[0];
     if (firstEntry[0] !== 0 && states[states.length - 1][DELAY]) {
         entries.unshift([0, 0]);
@@ -41,8 +41,8 @@ export function getEntries(times: number[], states: AnimatorState[]) {
         for (let i = 0; i < intCount; ++i) {
             const isReverse =
                 direction === REVERSE
-                || direction === ALTERNATE && (i % 2)
-                || direction === ALTERNATE_REVERSE && !(i % 2);
+                || (direction === ALTERNATE && (i % 2))
+                || (direction === ALTERNATE_REVERSE && !(i % 2));
 
             for (let j = 0; j < length; ++j) {
                 const entry = entries[isReverse ? length - j - 1 : j];
@@ -94,7 +94,7 @@ export function getItemInfo(
     const parentItem = items[items.length - 2] as Scene;
 
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
-        const frames = [];
+        const frames: any[] = [];
         const isParent = isObject(itemNames);
         const isItem = properties.length === 0;
         entries.forEach(([time, iterationTime]) => {
@@ -139,7 +139,7 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
 
                 const times = [0, lastItem.getDuration()];
                 const entries = getEntries(times, items.slice(1).map(animator => animator.state).reverse());
-                const frames = [];
+                const frames: any[] = [];
                 entries.forEach(([time, iterationTime]) => {
                     frames.push([time, iterationTime, iterationTime]);
                 });
