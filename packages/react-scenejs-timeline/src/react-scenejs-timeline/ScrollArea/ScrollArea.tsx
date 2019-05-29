@@ -88,7 +88,7 @@ export default class ScrollArea extends ElementComponent<{
     private removeProperty(propertiesInfo: PropertiesInfo) {
         const { key, isItem, parentItem, item: targetItem, properties } = propertiesInfo;
         if (isItem) {
-            let targetName: string | null = null;
+            let targetName: string | number | null = null;
             parentItem.forEach((item, name) => {
                 if (item === targetItem) {
                     targetName = name;

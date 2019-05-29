@@ -1,6 +1,6 @@
 {
   "name": "react-scenejs-timeline",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist/timeline.cjs.js",
   "module": "./dist/timeline.esm.js",
@@ -10,9 +10,7 @@
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "start": "react-scripts start",
     "build": "rollup -c && npm run declaration && print-sizes ./dist ",
-    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
-    "release": "npm run build && release",
-    "release:init": "npm run build && release -i"
+    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json"
   },
   "keywords": [
     "scene",
@@ -36,21 +34,22 @@
   "homepage": "https://github.com/daybrush/scenejs-timeline#readme",
   "devDependencies": {
     "@daybrush/builder": "0.0.7",
+    "@scenejs/effects": "^0.0.6",
+    "@types/react": "^16.8.18",
+    "@types/react-dom": "^16.8.4",
+    "print-sizes": "0.0.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "^3.0.1",
     "shape-svg": "^0.3.3",
     "tslint": "^5.16.0",
-    "typescript": "^3.4.5",
-    "@types/react": "^16.8.18",
-    "@types/react-dom": "^16.8.4",
-    "@scenejs/effects": "0.0.5"
+    "typescript": "^3.4.5"
   },
   "dependencies": {
-    "@daybrush/utils": "*",
-    "@egjs/axes": "*",
-    "keycon": "*",
-    "scenejs": "*"
+    "@daybrush/utils": "^0.10.0",
+    "@egjs/axes": "^2.5.13",
+    "keycon": "^0.2.2",
+    "scenejs": "^1.0.0"
   },
   "browserslist": {
     "production": [
