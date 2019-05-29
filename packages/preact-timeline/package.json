@@ -1,0 +1,49 @@
+{
+  "name": "preact-timeline",
+  "version": "0.1.1",
+  "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
+  "main": "./dist/timeline.cjs.js",
+  "module": "./dist/timeline.esm.js",
+  "sideEffects": false,
+  "types": "declaration/Timeline.d.ts",
+  "scripts": {
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "start": "react-scripts start",
+    "build": "rollup -c && npm run declaration && print-sizes ./dist ",
+    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json"
+  },
+  "keywords": [
+    "scene",
+    "scenejs",
+    "css",
+    "animate",
+    "animation",
+    "requestAnimationFrame",
+    "motion",
+    "timeline"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daybrush/scenejs-timeline.git"
+  },
+  "author": "Daybrush",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daybrush/scenejs-timeline/issues"
+  },
+  "homepage": "https://github.com/daybrush/scenejs-timeline#readme",
+  "dependencies": {
+    "react-scenejs-timeline": "^0.1.1"
+  },
+  "devDependencies": {
+    "@daybrush/builder": "0.0.7",
+    "preact": "^8.4.2",
+    "preact-compat": "^3.18.5",
+    "print-sizes": "0.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "rollup-plugin-alias": "^1.5.1",
+    "tslint": "^5.16.0",
+    "typescript": "^3.5.1"
+  }
+}
