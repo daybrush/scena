@@ -6,9 +6,11 @@ author: Daybrush
 repository: git+https://github.com/daybrush/scenejs-timeline.git
 version: 0.1.3
 */
-import PreactTimeline from 'preact-timeline';
-import EgComponent from '@egjs/component';
-import { render, h } from 'preact';
+'use strict';
+
+var PreactTimeline = require('preact-timeline');
+var EgComponent = require('@egjs/component');
+var preact = require('preact');
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -78,7 +80,7 @@ function (_super) {
     };
 
     var element = document.createElement("div");
-    render(h(PreactTimeline, __assign({
+    preact.render(preact.h(PreactTimeline, __assign({
       ref: function (e) {
         e && (_this.timelineArea = e);
       },
@@ -100,5 +102,5 @@ function (_super) {
   return Timeline;
 }(EgComponent);
 
-export default Timeline;
-//# sourceMappingURL=timeline.esm.js.map
+module.exports = Timeline;
+//# sourceMappingURL=timeline.cjs.js.map

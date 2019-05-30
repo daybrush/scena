@@ -63,18 +63,704 @@ version: 0.1.3
       return __assign.apply(this, arguments);
     };
 
-    var PREFIX = "scenejs_editor_";
-    var SUPPORT_POINTER_EVENTS = "PointerEvent" in window || "MSPointerEvent" in window;
-    var SUPPORT_TOUCH = "ontouchstart" in window;
-    var CSS2 = "\n.item_info {\n    position: fixed;\n    right: 0;\n    top: 0;\n    width: 200px;\n    background: #000;\n}\n.options_area {\n\n}\n.option_area {\n    position: relative;\n    border-bottom: 1px solid #777;\n    box-sizing: border-box;\n    white-space: nowrap;\n    background: rgba(90, 90, 90, 0.7);\n    font-size: 13px;\n    font-weight: bold;\n    color: #eee;\n    display: flex;\n}\n.option_name, .option_value {\n    width: 50%;\n    height: 30px;\n    line-height: 20px;\n    box-sizing: border-box;\n    padding: 5px;\n}\n.option_name {\n    border-right: 1px solid #999;\n}\n.option_value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
-    var CSS = "\n.timeline * {\n    box-sizing: border-box;\n}\n.timeline {\n  position: fixed;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  width: 100%;\n  font-size: 0;\n  background: #000;\n  display: flex;\n  flex-direction: column;\n}\n.header_area, .scroll_area {\n   width: 100%;\n   position: relative;\n  display: flex;\n  -webkit-align-items: flex-start;\n  align-items: flex-start;\n}\n.header_area {\n  position: relative;\n  z-index: 10;\n  top: 0;\n  height: 30px;\n  min-height: 30px;\n}\n.header_area .keyframes {\n  padding: 0px;\n}\n.header_area .properties_area,\n.header_area .keyframes_area,\n.header_area .values_area,\n.header_area .keyframes_scroll_area {\n    height: 100%;\n}\n.header_area .property, .header_area .value, .header_area .keyframes {\n  height: 100%;\n}\n.header_area .property {\n    line-height: 30px;\n}\n.value .add {\n    text-align: center;\n    color: #fff;\n    line-height: 30px;\n    font-weight: bold;\n    font-size: 20px;\n    cursor: pointer;\n}\n.header_area .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.header_area .keyframe_cursor {\n    position: absolute;\n    border-top: 10px solid #4af;\n    border-left: 6px solid transparent;\n    border-right: 6px solid transparent;\n    width: 0;\n    height: 0;\n    bottom: 0;\n    top: auto;\n    background: none;\n    cursor: pointer;\n}\n.control_area .keyframes {\n    padding-left: 10px;\n}\n.play_control_area {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n}\n.play_control_area .control {\n    position: relative;\n    display: inline-block;\n    vertical-align: middle;\n    color: white;\n    margin: 0px 15px;\n}\n.play {\n    border-left: 14px solid white;\n    border-top: 8px solid transparent;\n    border-bottom: 8px solid transparent;\n}\n.pause {\n    border-left: 4px solid #fff;\n    border-right: 4px solid #fff;\n    width: 14px;\n    height: 16px;\n}\n.prev {\n    border-right: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.prev:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    right: 100%;\n    transform: translate(0, -50%);\n    background: white;\n}\n.next {\n    border-left: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.next:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    transform: translate(0, -50%);\n    background: white;\n}\n.keytime {\n  position: relative;\n  display: inline-block;\n  height: 100%;\n  font-size: 13px;\n  font-weight: bold;\n  color: #777;\n}\n.keytime:last-child {\n  max-width: 0px;\n}\n.keytime span {\n  position: absolute;\n  line-height: 1;\n  bottom: 12px;\n  display: inline-block;\n  transform: translate(-50%);\n  color: #eee;\n}\n.keytime .graduation {\n  position: absolute;\n  bottom: 0;\n  width: 1px;\n  height: 10px;\n  background: #777;\n  transform: translate(-50%);\n}\n.keytime .graduation.half {\n  left: 50%;\n  height: 7px;\n}\n.keytime .graduation.quarter {\n  left: 25%;\n  height: 5px;\n}\n.keytime .graduation.quarter3 {\n  left: 75%;\n  height: 5px;\n}\n.scroll_area {\n  position: relative;\n  width: 100%;\n  height: calc(100% - 60px);\n  overflow: auto;\n}\n.properties_area, .keyframes_area, .values_area {\n  display: inline-block;\n  position: relative;\n  font-size: 16px;\n  overflow: auto;\n}\n\n.properties_area::-webkit-scrollbar, .keyframes_area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.properties_area {\n  width: 30%;\n  max-width: 200px;\n  box-sizing: border-box;\n}\n.values_area {\n    width: 50px;\n    min-width: 50px;\n    display: inline-block;\n    border-right: 1px solid #999;\n    box-sizing: border-box;\n}\n.value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n    text-align: center;\n}\n.value {\n\n}\n.alt .value input {\n    cursor: ew-resize;\n}\n.value[data-object=\"1\"] input {\n    display: none;\n}\n.properties_scroll_area {\n  display: inline-block;\n  min-width: 100%;\n}\n.keyframes_area {\n  flex: 1;\n}\n.keyframes_scroll_area {\n  position: relative;\n  min-width: 300px;\n}\n.keyframes, .property, .value {\n  position: relative;\n  height: 30px;\n  line-height: 30px;\n  border-bottom: 1px solid #777;\n  box-sizing: border-box;\n  white-space: nowrap;\n  background: rgba(90, 90, 90, 0.7);\n  z-index: 1;\n}\n\n.property {\n  padding-left: 10px;\n  box-sizing: border-box;\n  font-size: 13px;\n  font-weight: bold;\n  color: #eee;\n}\n.property .remove {\n    position: absolute;\n    display: inline-block;\n    cursor: pointer;\n    width: 18px;\n    height: 18px;\n    top: 0;\n    bottom: 0;\n    right: 10px;\n    margin: auto;\n    border-radius: 50%;\n    border: 2px solid #fff;\n    vertical-align: middle;\n    display: none;\n    margin-left: 10px;\n    box-sizing: border-box;\n}\n.property .remove:before, .property .remove:after {\n    position: absolute;\n    content: \"\";\n    width: 8px;\n    height: 2px;\n    border-radius: 1px;\n    background: #fff;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n}\n.property .remove:before {\n    transform: rotate(45deg);\n}\n.property .remove:after {\n    transform: rotate(-45deg);\n}\n.property:hover .remove {\n    display: inline-block;\n}\n\n[data-item=\"1\"], [data-item=\"1\"] .add {\n    height: 30px;\n    line-height: 30px;\n}\n.time_area {\n    position: absolute;\n    top: 0;\n    left: 10px;\n    font-size: 13px;\n    color: #4af;\n    line-height: 30px;\n    font-weight: bold;\n    height: 100%;\n    line-height: 30px;\n    border: 0;\n    background: transparent;\n    outline: 0;\n}\n.time_area:after {\n    content: \"s\";\n}\n.property .arrow {\n    position: relative;\n    display: inline-block;\n    width: 20px;\n    height: 25px;\n    cursor: pointer;\n    vertical-align: middle;\n}\n.property .arrow:after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    left: 0;\n    bottom: 0;\n    margin: auto;\n    width: 0;\n    height: 0;\n    border-top: 6px solid #eee;\n    border-left: 4px solid transparent;\n    border-right: 4px solid transparent;\n}\n.property[data-fold=\"1\"] .arrow:after {\n    border-top: 4px solid transparent;\n    border-bottom: 4px solid transparent;\n    border-right: 0;\n    border-left: 6px solid #eee;\n}\n.property[data-object=\"0\"] .arrow {\n    display: none;\n}\n.property.fold, .keyframes.fold, .value.fold {\n    display: none;\n}\n.property.select, .value.select, .keyframes.select {\n    background: rgba(120, 120, 120, 0.7);\n}\n.keyframes {\n\n}\n.keyframe_delay {\n  position: absolute;\n  top: 3px;\n  bottom: 3px;\n  left: 0;\n  background: #4af;\n  opacity: 0.2;\n  z-index: 0;\n}\n.keyframe_group {\n    position: absolute;\n    top: 3px;\n    bottom: 3px;\n    left: 0;\n    background: #4af;\n    opacity: 0.6;\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-left-color: rgba(255, 255, 255, 0.2);\n    border-top-color: rgba(255, 255, 255, 0.2);\n    z-index: 0;\n}\n.keyframe_line {\n  position: absolute;\n  height: 8px;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  background: #666;\n  z-index: 0;\n}\n.keyframe {\n  position: absolute;\n  font-size: 0px;\n  width: 12px;\n  height: 12px;\n  top: 0px;\n  bottom: 0px;\n  margin: auto;\n  background: #fff;\n  border: 2px solid #383838;\n  border-radius: 2px;\n  box-sizing: border-box;\n  transform: translate(-50%) rotate(45deg);\n  z-index: 1;\n  cursor: pointer;\n}\n.keyframe[data-no=\"1\"] {\n    opacity: 0.2;\n}\n.select .keyframe {\n    border-color: #555;\n}\n.keyframe.select {\n    background: #4af;\n}\n.keyframes_container, .line_area {\n  position: relative;\n  width: calc(100% - 30px);\n  left: 15px;\n  height: 100%;\n}\n.line_area {\n  position: absolute;\n  top: 0;\n  z-index: 0;\n}\n.keyframe_cursor {\n  position: absolute;\n  top: 0;\n  z-index: 1;\n  background: #4af;\n  width: 1px;\n  height: 100%;\n  left: 15px;\n  transform: translate(-50%);\n}\n.scroll_aare .keyframe_cursor {\n  pointer-events: none;\n}\n.division_line {\n  position: absolute;\n  background: #333;\n  width: 1px;\n  height: 100%;\n  transform: translate(-50%);\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
-    var DIRECTION = "direction";
-    var ITERATION_COUNT = "iterationCount";
-    var DELAY = "delay";
-    var PLAY_SPEED = "playSpeed";
-    var ALTERNATE = "alternate";
-    var REVERSE = "reverse";
-    var ALTERNATE_REVERSE = "alternate-reverse";
+    var VNode = function VNode() {};
+
+    var options = {};
+
+    var stack = [];
+
+    var EMPTY_CHILDREN = [];
+
+    function h(nodeName, attributes) {
+    	var children = EMPTY_CHILDREN,
+    	    lastSimple,
+    	    child,
+    	    simple,
+    	    i;
+    	for (i = arguments.length; i-- > 2;) {
+    		stack.push(arguments[i]);
+    	}
+    	if (attributes && attributes.children != null) {
+    		if (!stack.length) stack.push(attributes.children);
+    		delete attributes.children;
+    	}
+    	while (stack.length) {
+    		if ((child = stack.pop()) && child.pop !== undefined) {
+    			for (i = child.length; i--;) {
+    				stack.push(child[i]);
+    			}
+    		} else {
+    			if (typeof child === 'boolean') child = null;
+
+    			if (simple = typeof nodeName !== 'function') {
+    				if (child == null) child = '';else if (typeof child === 'number') child = String(child);else if (typeof child !== 'string') simple = false;
+    			}
+
+    			if (simple && lastSimple) {
+    				children[children.length - 1] += child;
+    			} else if (children === EMPTY_CHILDREN) {
+    				children = [child];
+    			} else {
+    				children.push(child);
+    			}
+
+    			lastSimple = simple;
+    		}
+    	}
+
+    	var p = new VNode();
+    	p.nodeName = nodeName;
+    	p.children = children;
+    	p.attributes = attributes == null ? undefined : attributes;
+    	p.key = attributes == null ? undefined : attributes.key;
+
+    	if (options.vnode !== undefined) options.vnode(p);
+
+    	return p;
+    }
+
+    function extend(obj, props) {
+      for (var i in props) {
+        obj[i] = props[i];
+      }return obj;
+    }
+
+    function applyRef(ref, value) {
+      if (ref != null) {
+        if (typeof ref == 'function') ref(value);else ref.current = value;
+      }
+    }
+
+    var defer = typeof Promise == 'function' ? Promise.resolve().then.bind(Promise.resolve()) : setTimeout;
+
+    var IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+
+    var items = [];
+
+    function enqueueRender(component) {
+    	if (!component._dirty && (component._dirty = true) && items.push(component) == 1) {
+    		(defer)(rerender);
+    	}
+    }
+
+    function rerender() {
+    	var p;
+    	while (p = items.pop()) {
+    		if (p._dirty) renderComponent(p);
+    	}
+    }
+
+    function isSameNodeType(node, vnode, hydrating) {
+    	if (typeof vnode === 'string' || typeof vnode === 'number') {
+    		return node.splitText !== undefined;
+    	}
+    	if (typeof vnode.nodeName === 'string') {
+    		return !node._componentConstructor && isNamedNode(node, vnode.nodeName);
+    	}
+    	return hydrating || node._componentConstructor === vnode.nodeName;
+    }
+
+    function isNamedNode(node, nodeName) {
+    	return node.normalizedNodeName === nodeName || node.nodeName.toLowerCase() === nodeName.toLowerCase();
+    }
+
+    function getNodeProps(vnode) {
+    	var props = extend({}, vnode.attributes);
+    	props.children = vnode.children;
+
+    	var defaultProps = vnode.nodeName.defaultProps;
+    	if (defaultProps !== undefined) {
+    		for (var i in defaultProps) {
+    			if (props[i] === undefined) {
+    				props[i] = defaultProps[i];
+    			}
+    		}
+    	}
+
+    	return props;
+    }
+
+    function createNode(nodeName, isSvg) {
+    	var node = isSvg ? document.createElementNS('http://www.w3.org/2000/svg', nodeName) : document.createElement(nodeName);
+    	node.normalizedNodeName = nodeName;
+    	return node;
+    }
+
+    function removeNode(node) {
+    	var parentNode = node.parentNode;
+    	if (parentNode) parentNode.removeChild(node);
+    }
+
+    function setAccessor(node, name, old, value, isSvg) {
+    	if (name === 'className') name = 'class';
+
+    	if (name === 'key') ; else if (name === 'ref') {
+    		applyRef(old, null);
+    		applyRef(value, node);
+    	} else if (name === 'class' && !isSvg) {
+    		node.className = value || '';
+    	} else if (name === 'style') {
+    		if (!value || typeof value === 'string' || typeof old === 'string') {
+    			node.style.cssText = value || '';
+    		}
+    		if (value && typeof value === 'object') {
+    			if (typeof old !== 'string') {
+    				for (var i in old) {
+    					if (!(i in value)) node.style[i] = '';
+    				}
+    			}
+    			for (var i in value) {
+    				node.style[i] = typeof value[i] === 'number' && IS_NON_DIMENSIONAL.test(i) === false ? value[i] + 'px' : value[i];
+    			}
+    		}
+    	} else if (name === 'dangerouslySetInnerHTML') {
+    		if (value) node.innerHTML = value.__html || '';
+    	} else if (name[0] == 'o' && name[1] == 'n') {
+    		var useCapture = name !== (name = name.replace(/Capture$/, ''));
+    		name = name.toLowerCase().substring(2);
+    		if (value) {
+    			if (!old) node.addEventListener(name, eventProxy, useCapture);
+    		} else {
+    			node.removeEventListener(name, eventProxy, useCapture);
+    		}
+    		(node._listeners || (node._listeners = {}))[name] = value;
+    	} else if (name !== 'list' && name !== 'type' && !isSvg && name in node) {
+    		try {
+    			node[name] = value == null ? '' : value;
+    		} catch (e) {}
+    		if ((value == null || value === false) && name != 'spellcheck') node.removeAttribute(name);
+    	} else {
+    		var ns = isSvg && name !== (name = name.replace(/^xlink:?/, ''));
+
+    		if (value == null || value === false) {
+    			if (ns) node.removeAttributeNS('http://www.w3.org/1999/xlink', name.toLowerCase());else node.removeAttribute(name);
+    		} else if (typeof value !== 'function') {
+    			if (ns) node.setAttributeNS('http://www.w3.org/1999/xlink', name.toLowerCase(), value);else node.setAttribute(name, value);
+    		}
+    	}
+    }
+
+    function eventProxy(e) {
+    	return this._listeners[e.type](options.event && options.event(e) || e);
+    }
+
+    var mounts = [];
+
+    var diffLevel = 0;
+
+    var isSvgMode = false;
+
+    var hydrating = false;
+
+    function flushMounts() {
+    	var c;
+    	while (c = mounts.shift()) {
+    		if (c.componentDidMount) c.componentDidMount();
+    	}
+    }
+
+    function diff(dom, vnode, context, mountAll, parent, componentRoot) {
+    	if (!diffLevel++) {
+    		isSvgMode = parent != null && parent.ownerSVGElement !== undefined;
+
+    		hydrating = dom != null && !('__preactattr_' in dom);
+    	}
+
+    	var ret = idiff(dom, vnode, context, mountAll, componentRoot);
+
+    	if (parent && ret.parentNode !== parent) parent.appendChild(ret);
+
+    	if (! --diffLevel) {
+    		hydrating = false;
+
+    		if (!componentRoot) flushMounts();
+    	}
+
+    	return ret;
+    }
+
+    function idiff(dom, vnode, context, mountAll, componentRoot) {
+    	var out = dom,
+    	    prevSvgMode = isSvgMode;
+
+    	if (vnode == null || typeof vnode === 'boolean') vnode = '';
+
+    	if (typeof vnode === 'string' || typeof vnode === 'number') {
+    		if (dom && dom.splitText !== undefined && dom.parentNode && (!dom._component || componentRoot)) {
+    			if (dom.nodeValue != vnode) {
+    				dom.nodeValue = vnode;
+    			}
+    		} else {
+    			out = document.createTextNode(vnode);
+    			if (dom) {
+    				if (dom.parentNode) dom.parentNode.replaceChild(out, dom);
+    				recollectNodeTree(dom, true);
+    			}
+    		}
+
+    		out['__preactattr_'] = true;
+
+    		return out;
+    	}
+
+    	var vnodeName = vnode.nodeName;
+    	if (typeof vnodeName === 'function') {
+    		return buildComponentFromVNode(dom, vnode, context, mountAll);
+    	}
+
+    	isSvgMode = vnodeName === 'svg' ? true : vnodeName === 'foreignObject' ? false : isSvgMode;
+
+    	vnodeName = String(vnodeName);
+    	if (!dom || !isNamedNode(dom, vnodeName)) {
+    		out = createNode(vnodeName, isSvgMode);
+
+    		if (dom) {
+    			while (dom.firstChild) {
+    				out.appendChild(dom.firstChild);
+    			}
+    			if (dom.parentNode) dom.parentNode.replaceChild(out, dom);
+
+    			recollectNodeTree(dom, true);
+    		}
+    	}
+
+    	var fc = out.firstChild,
+    	    props = out['__preactattr_'],
+    	    vchildren = vnode.children;
+
+    	if (props == null) {
+    		props = out['__preactattr_'] = {};
+    		for (var a = out.attributes, i = a.length; i--;) {
+    			props[a[i].name] = a[i].value;
+    		}
+    	}
+
+    	if (!hydrating && vchildren && vchildren.length === 1 && typeof vchildren[0] === 'string' && fc != null && fc.splitText !== undefined && fc.nextSibling == null) {
+    		if (fc.nodeValue != vchildren[0]) {
+    			fc.nodeValue = vchildren[0];
+    		}
+    	} else if (vchildren && vchildren.length || fc != null) {
+    			innerDiffNode(out, vchildren, context, mountAll, hydrating || props.dangerouslySetInnerHTML != null);
+    		}
+
+    	diffAttributes(out, vnode.attributes, props);
+
+    	isSvgMode = prevSvgMode;
+
+    	return out;
+    }
+
+    function innerDiffNode(dom, vchildren, context, mountAll, isHydrating) {
+    	var originalChildren = dom.childNodes,
+    	    children = [],
+    	    keyed = {},
+    	    keyedLen = 0,
+    	    min = 0,
+    	    len = originalChildren.length,
+    	    childrenLen = 0,
+    	    vlen = vchildren ? vchildren.length : 0,
+    	    j,
+    	    c,
+    	    f,
+    	    vchild,
+    	    child;
+
+    	if (len !== 0) {
+    		for (var i = 0; i < len; i++) {
+    			var _child = originalChildren[i],
+    			    props = _child['__preactattr_'],
+    			    key = vlen && props ? _child._component ? _child._component.__key : props.key : null;
+    			if (key != null) {
+    				keyedLen++;
+    				keyed[key] = _child;
+    			} else if (props || (_child.splitText !== undefined ? isHydrating ? _child.nodeValue.trim() : true : isHydrating)) {
+    				children[childrenLen++] = _child;
+    			}
+    		}
+    	}
+
+    	if (vlen !== 0) {
+    		for (var i = 0; i < vlen; i++) {
+    			vchild = vchildren[i];
+    			child = null;
+
+    			var key = vchild.key;
+    			if (key != null) {
+    				if (keyedLen && keyed[key] !== undefined) {
+    					child = keyed[key];
+    					keyed[key] = undefined;
+    					keyedLen--;
+    				}
+    			} else if (min < childrenLen) {
+    					for (j = min; j < childrenLen; j++) {
+    						if (children[j] !== undefined && isSameNodeType(c = children[j], vchild, isHydrating)) {
+    							child = c;
+    							children[j] = undefined;
+    							if (j === childrenLen - 1) childrenLen--;
+    							if (j === min) min++;
+    							break;
+    						}
+    					}
+    				}
+
+    			child = idiff(child, vchild, context, mountAll);
+
+    			f = originalChildren[i];
+    			if (child && child !== dom && child !== f) {
+    				if (f == null) {
+    					dom.appendChild(child);
+    				} else if (child === f.nextSibling) {
+    					removeNode(f);
+    				} else {
+    					dom.insertBefore(child, f);
+    				}
+    			}
+    		}
+    	}
+
+    	if (keyedLen) {
+    		for (var i in keyed) {
+    			if (keyed[i] !== undefined) recollectNodeTree(keyed[i], false);
+    		}
+    	}
+
+    	while (min <= childrenLen) {
+    		if ((child = children[childrenLen--]) !== undefined) recollectNodeTree(child, false);
+    	}
+    }
+
+    function recollectNodeTree(node, unmountOnly) {
+    	var component = node._component;
+    	if (component) {
+    		unmountComponent(component);
+    	} else {
+    		if (node['__preactattr_'] != null) applyRef(node['__preactattr_'].ref, null);
+
+    		if (unmountOnly === false || node['__preactattr_'] == null) {
+    			removeNode(node);
+    		}
+
+    		removeChildren(node);
+    	}
+    }
+
+    function removeChildren(node) {
+    	node = node.lastChild;
+    	while (node) {
+    		var next = node.previousSibling;
+    		recollectNodeTree(node, true);
+    		node = next;
+    	}
+    }
+
+    function diffAttributes(dom, attrs, old) {
+    	var name;
+
+    	for (name in old) {
+    		if (!(attrs && attrs[name] != null) && old[name] != null) {
+    			setAccessor(dom, name, old[name], old[name] = undefined, isSvgMode);
+    		}
+    	}
+
+    	for (name in attrs) {
+    		if (name !== 'children' && name !== 'innerHTML' && (!(name in old) || attrs[name] !== (name === 'value' || name === 'checked' ? dom[name] : old[name]))) {
+    			setAccessor(dom, name, old[name], old[name] = attrs[name], isSvgMode);
+    		}
+    	}
+    }
+
+    var recyclerComponents = [];
+
+    function createComponent(Ctor, props, context) {
+    	var inst,
+    	    i = recyclerComponents.length;
+
+    	if (Ctor.prototype && Ctor.prototype.render) {
+    		inst = new Ctor(props, context);
+    		Component.call(inst, props, context);
+    	} else {
+    		inst = new Component(props, context);
+    		inst.constructor = Ctor;
+    		inst.render = doRender;
+    	}
+
+    	while (i--) {
+    		if (recyclerComponents[i].constructor === Ctor) {
+    			inst.nextBase = recyclerComponents[i].nextBase;
+    			recyclerComponents.splice(i, 1);
+    			return inst;
+    		}
+    	}
+
+    	return inst;
+    }
+
+    function doRender(props, state, context) {
+    	return this.constructor(props, context);
+    }
+
+    function setComponentProps(component, props, renderMode, context, mountAll) {
+    	if (component._disable) return;
+    	component._disable = true;
+
+    	component.__ref = props.ref;
+    	component.__key = props.key;
+    	delete props.ref;
+    	delete props.key;
+
+    	if (typeof component.constructor.getDerivedStateFromProps === 'undefined') {
+    		if (!component.base || mountAll) {
+    			if (component.componentWillMount) component.componentWillMount();
+    		} else if (component.componentWillReceiveProps) {
+    			component.componentWillReceiveProps(props, context);
+    		}
+    	}
+
+    	if (context && context !== component.context) {
+    		if (!component.prevContext) component.prevContext = component.context;
+    		component.context = context;
+    	}
+
+    	if (!component.prevProps) component.prevProps = component.props;
+    	component.props = props;
+
+    	component._disable = false;
+
+    	if (renderMode !== 0) {
+    		if (renderMode === 1 || options.syncComponentUpdates !== false || !component.base) {
+    			renderComponent(component, 1, mountAll);
+    		} else {
+    			enqueueRender(component);
+    		}
+    	}
+
+    	applyRef(component.__ref, component);
+    }
+
+    function renderComponent(component, renderMode, mountAll, isChild) {
+    	if (component._disable) return;
+
+    	var props = component.props,
+    	    state = component.state,
+    	    context = component.context,
+    	    previousProps = component.prevProps || props,
+    	    previousState = component.prevState || state,
+    	    previousContext = component.prevContext || context,
+    	    isUpdate = component.base,
+    	    nextBase = component.nextBase,
+    	    initialBase = isUpdate || nextBase,
+    	    initialChildComponent = component._component,
+    	    skip = false,
+    	    snapshot = previousContext,
+    	    rendered,
+    	    inst,
+    	    cbase;
+
+    	if (component.constructor.getDerivedStateFromProps) {
+    		state = extend(extend({}, state), component.constructor.getDerivedStateFromProps(props, state));
+    		component.state = state;
+    	}
+
+    	if (isUpdate) {
+    		component.props = previousProps;
+    		component.state = previousState;
+    		component.context = previousContext;
+    		if (renderMode !== 2 && component.shouldComponentUpdate && component.shouldComponentUpdate(props, state, context) === false) {
+    			skip = true;
+    		} else if (component.componentWillUpdate) {
+    			component.componentWillUpdate(props, state, context);
+    		}
+    		component.props = props;
+    		component.state = state;
+    		component.context = context;
+    	}
+
+    	component.prevProps = component.prevState = component.prevContext = component.nextBase = null;
+    	component._dirty = false;
+
+    	if (!skip) {
+    		rendered = component.render(props, state, context);
+
+    		if (component.getChildContext) {
+    			context = extend(extend({}, context), component.getChildContext());
+    		}
+
+    		if (isUpdate && component.getSnapshotBeforeUpdate) {
+    			snapshot = component.getSnapshotBeforeUpdate(previousProps, previousState);
+    		}
+
+    		var childComponent = rendered && rendered.nodeName,
+    		    toUnmount,
+    		    base;
+
+    		if (typeof childComponent === 'function') {
+
+    			var childProps = getNodeProps(rendered);
+    			inst = initialChildComponent;
+
+    			if (inst && inst.constructor === childComponent && childProps.key == inst.__key) {
+    				setComponentProps(inst, childProps, 1, context, false);
+    			} else {
+    				toUnmount = inst;
+
+    				component._component = inst = createComponent(childComponent, childProps, context);
+    				inst.nextBase = inst.nextBase || nextBase;
+    				inst._parentComponent = component;
+    				setComponentProps(inst, childProps, 0, context, false);
+    				renderComponent(inst, 1, mountAll, true);
+    			}
+
+    			base = inst.base;
+    		} else {
+    			cbase = initialBase;
+
+    			toUnmount = initialChildComponent;
+    			if (toUnmount) {
+    				cbase = component._component = null;
+    			}
+
+    			if (initialBase || renderMode === 1) {
+    				if (cbase) cbase._component = null;
+    				base = diff(cbase, rendered, context, mountAll || !isUpdate, initialBase && initialBase.parentNode, true);
+    			}
+    		}
+
+    		if (initialBase && base !== initialBase && inst !== initialChildComponent) {
+    			var baseParent = initialBase.parentNode;
+    			if (baseParent && base !== baseParent) {
+    				baseParent.replaceChild(base, initialBase);
+
+    				if (!toUnmount) {
+    					initialBase._component = null;
+    					recollectNodeTree(initialBase, false);
+    				}
+    			}
+    		}
+
+    		if (toUnmount) {
+    			unmountComponent(toUnmount);
+    		}
+
+    		component.base = base;
+    		if (base && !isChild) {
+    			var componentRef = component,
+    			    t = component;
+    			while (t = t._parentComponent) {
+    				(componentRef = t).base = base;
+    			}
+    			base._component = componentRef;
+    			base._componentConstructor = componentRef.constructor;
+    		}
+    	}
+
+    	if (!isUpdate || mountAll) {
+    		mounts.push(component);
+    	} else if (!skip) {
+
+    		if (component.componentDidUpdate) {
+    			component.componentDidUpdate(previousProps, previousState, snapshot);
+    		}
+    	}
+
+    	while (component._renderCallbacks.length) {
+    		component._renderCallbacks.pop().call(component);
+    	}if (!diffLevel && !isChild) flushMounts();
+    }
+
+    function buildComponentFromVNode(dom, vnode, context, mountAll) {
+    	var c = dom && dom._component,
+    	    originalComponent = c,
+    	    oldDom = dom,
+    	    isDirectOwner = c && dom._componentConstructor === vnode.nodeName,
+    	    isOwner = isDirectOwner,
+    	    props = getNodeProps(vnode);
+    	while (c && !isOwner && (c = c._parentComponent)) {
+    		isOwner = c.constructor === vnode.nodeName;
+    	}
+
+    	if (c && isOwner && (!mountAll || c._component)) {
+    		setComponentProps(c, props, 3, context, mountAll);
+    		dom = c.base;
+    	} else {
+    		if (originalComponent && !isDirectOwner) {
+    			unmountComponent(originalComponent);
+    			dom = oldDom = null;
+    		}
+
+    		c = createComponent(vnode.nodeName, props, context);
+    		if (dom && !c.nextBase) {
+    			c.nextBase = dom;
+
+    			oldDom = null;
+    		}
+    		setComponentProps(c, props, 1, context, mountAll);
+    		dom = c.base;
+
+    		if (oldDom && dom !== oldDom) {
+    			oldDom._component = null;
+    			recollectNodeTree(oldDom, false);
+    		}
+    	}
+
+    	return dom;
+    }
+
+    function unmountComponent(component) {
+
+    	var base = component.base;
+
+    	component._disable = true;
+
+    	if (component.componentWillUnmount) component.componentWillUnmount();
+
+    	component.base = null;
+
+    	var inner = component._component;
+    	if (inner) {
+    		unmountComponent(inner);
+    	} else if (base) {
+    		if (base['__preactattr_'] != null) applyRef(base['__preactattr_'].ref, null);
+
+    		component.nextBase = base;
+
+    		removeNode(base);
+    		recyclerComponents.push(component);
+
+    		removeChildren(base);
+    	}
+
+    	applyRef(component.__ref, null);
+    }
+
+    function Component(props, context) {
+    	this._dirty = true;
+
+    	this.context = context;
+
+    	this.props = props;
+
+    	this.state = this.state || {};
+
+    	this._renderCallbacks = [];
+    }
+
+    extend(Component.prototype, {
+    	setState: function setState(state, callback) {
+    		if (!this.prevState) this.prevState = this.state;
+    		this.state = extend(extend({}, this.state), typeof state === 'function' ? state(this.state, this.props) : state);
+    		if (callback) this._renderCallbacks.push(callback);
+    		enqueueRender(this);
+    	},
+    	forceUpdate: function forceUpdate(callback) {
+    		if (callback) this._renderCallbacks.push(callback);
+    		renderComponent(this, 2);
+    	},
+    	render: function render() {}
+    });
+
+    function render(vnode, parent, merge) {
+      return diff(merge, vnode, {}, false, parent, false);
+    }
 
     /*
     Copyright (c) 2018 Daybrush
@@ -82,7 +768,7 @@ version: 0.1.3
     license: MIT
     author: Daybrush
     repository: https://github.com/daybrush/utils
-    @version 0.9.0
+    @version 0.10.0
     */
     /**
     * get string "object"
@@ -155,6 +841,53 @@ version: 0.1.3
       return Date.now ? Date.now() : new Date().getTime();
     }
     /**
+    * Returns the index of the first element in the array that satisfies the provided testing function.
+    * @function
+    * @memberof CrossBrowser
+    * @param - The array `findIndex` was called upon.
+    * @param - A function to execute on each value in the array until the function returns true, indicating that the satisfying element was found.
+    * @param - Returns defaultIndex if not found by the function.
+    * @example
+    import { findIndex } from "@daybrush/utils";
+
+    findIndex([{a: 1}, {a: 2}, {a: 3}, {a: 4}], ({ a }) => a === 2); // 1
+    */
+
+
+    function findIndex(arr, callback, defaultIndex) {
+      if (defaultIndex === void 0) {
+        defaultIndex = -1;
+      }
+
+      var length = arr.length;
+
+      for (var i = 0; i < length; ++i) {
+        if (callback(arr[i], i, arr)) {
+          return i;
+        }
+      }
+
+      return defaultIndex;
+    }
+    /**
+    * Returns the value of the first element in the array that satisfies the provided testing function.
+    * @function
+    * @memberof CrossBrowser
+    * @param - The array `find` was called upon.
+    * @param - A function to execute on each value in the array,
+    * @param - Returns defalutValue if not found by the function.
+    * @example
+    import { find } from "@daybrush/utils";
+
+    find([{a: 1}, {a: 2}, {a: 3}, {a: 4}], ({ a }) => a === 2); // {a: 2}
+    */
+
+
+    function find(arr, callback, defalutValue) {
+      var index = findIndex(arr, callback);
+      return index > -1 ? arr[index] : defalutValue;
+    }
+    /**
     * Checks if the specified class value exists in the element's class attribute.
     * @memberof DOM
     * @param element - target
@@ -173,45 +906,6 @@ version: 0.1.3
       }
 
       return !!element.className.match(new RegExp("(\\s|^)" + className + "(\\s|$)"));
-    }
-    /**
-    * Add the specified class value. If these classe already exist in the element's class attribute they are ignored.
-    * @memberof DOM
-    * @param element - target
-    * @param className - the class name to add
-    * @example
-    import {addClass} from "@daybrush/utils";
-
-    addClass(element, "start");
-    */
-
-
-    function addClass(element, className) {
-      if (element.classList) {
-        element.classList.add(className);
-      } else {
-        element.className += " " + className;
-      }
-    }
-    /**
-    * Removes the specified class value.
-    * @memberof DOM
-    * @param element - target
-    * @param className - the class name to remove
-    * @example
-    import {removeClass} from "@daybrush/utils";
-
-    removeClass(element, "start");
-    */
-
-
-    function removeClass(element, className) {
-      if (element.classList) {
-        element.classList.remove(className);
-      } else {
-        var reg = new RegExp("(\\s|^)" + className + "(\\s|$)");
-        element.className = element.className.replace(reg, " ");
-      }
     }
     /**
     * Sets up a function that will be called whenever the specified event is delivered to the target
@@ -233,206 +927,762 @@ version: 0.1.3
       el.addEventListener(type, listener, options);
     }
 
-    function numberFormat(num, count, isRight) {
-      var length = ("" + num).length;
-      var arr = [];
+    /*
+    Copyright (c) 2017 NAVER Corp.
+    @egjs/component project is licensed under the MIT license
 
-      if (isRight) {
-        arr.push(num);
-      }
+    @egjs/component JavaScript library
+    https://naver.github.io/egjs-component
 
-      for (var i = length; i < count; ++i) {
-        arr.push(0);
-      }
+    @version 2.1.2
+    */
 
-      if (!isRight) {
-        arr.push(num);
-      }
-
-      return arr.join("");
+    /**
+     * Copyright (c) 2015 NAVER Corp.
+     * egjs projects are licensed under the MIT license
+     */
+    function isUndefined$1(value) {
+      return typeof value === "undefined";
     }
-    function applyStyle(el, style) {
-      for (var name in style) {
-        el.style[name] = style[name];
-      }
-    }
-    function findIndex(arr, callback) {
-      var length = arr.length;
+    /**
+     * A class used to manage events in a component
+     * @ko 컴포넌트의 이벤트을 관리할 수 있게 하는 클래스
+     * @alias eg.Component
+     */
 
-      for (var i = 0; i < length; ++i) {
-        if (callback(arr[i], i, arr)) {
-          return i;
+
+    var Component$1 =
+    /*#__PURE__*/
+    function () {
+      var Component =
+      /*#__PURE__*/
+      function () {
+        /**
+        * Version info string
+        * @ko 버전정보 문자열
+        * @name VERSION
+        * @static
+        * @type {String}
+        * @example
+        * eg.Component.VERSION;  // ex) 2.0.0
+        * @memberof eg.Component
+        */
+
+        /**
+         * @support {"ie": "7+", "ch" : "latest", "ff" : "latest",  "sf" : "latest", "edge" : "latest", "ios" : "7+", "an" : "2.1+ (except 3.x)"}
+         */
+        function Component() {
+          this._eventHandler = {};
+          this.options = {};
         }
-      }
-
-      return -1;
-    }
-    function find(arr, callback) {
-      return arr[findIndex(arr, callback)];
-    }
-    function findIndexByProperty(selectedProperty, structures) {
-      return findIndex(structures, function (_a) {
-        var key = _a.dataset.key;
-        return key === selectedProperty;
-      });
-    }
-    function findStructureByProperty(selectedProperty, structures) {
-      return find(structures, function (_a) {
-        var key = _a.dataset.key;
-        return key === selectedProperty;
-      });
-    }
-    function createElement(structure) {
-      var selector = structure.selector,
-          dataset = structure.dataset,
-          attr = structure.attr,
-          style = structure.style,
-          html = structure.html;
-      var classNames = selector.match(/\.([^.#\s])+/g) || [];
-      var tag = (selector.match(/^[^.#\s]+/g) || [])[0] || "div";
-      var id = (selector.match(/#[^.#\s]+/g) || [])[0] || "";
-      var el = document.createElement(tag);
-      id && (el.id = id.replace(/^#/g, ""));
-      el.className = classNames.map(function (name) {
-        return "" + PREFIX + name.replace(/^\./g, "");
-      }).join(" ");
-
-      if (dataset) {
-        for (var name in dataset) {
-          el.setAttribute("data-" + name, dataset[name]);
+        /**
+         * Triggers a custom event.
+         * @ko 커스텀 이벤트를 발생시킨다
+         * @param {String} eventName The name of the custom event to be triggered <ko>발생할 커스텀 이벤트의 이름</ko>
+         * @param {Object} customEvent Event data to be sent when triggering a custom event <ko>커스텀 이벤트가 발생할 때 전달할 데이터</ko>
+         * @return {Boolean} Indicates whether the event has occurred. If the stop() method is called by a custom event handler, it will return false and prevent the event from occurring. <a href="https://github.com/naver/egjs-component/wiki/How-to-make-Component-event-design%3F">Ref</a> <ko>이벤트 발생 여부. 커스텀 이벤트 핸들러에서 stop() 메서드를 호출하면 'false'를 반환하고 이벤트 발생을 중단한다. <a href="https://github.com/naver/egjs-component/wiki/How-to-make-Component-event-design%3F">참고</a></ko>
+         * @example
+        class Some extends eg.Component {
+         some(){
+         	if(this.trigger("beforeHi")){ // When event call to stop return false.
+        	this.trigger("hi");// fire hi event.
+         	}
+         }
         }
-      }
-
-      if (attr) {
-        for (var name in attr) {
-          el.setAttribute(name, attr[name]);
+        const some = new Some();
+        some.on("beforeHi", (e) => {
+        if(condition){
+        	e.stop(); // When event call to stop, `hi` event not call.
         }
-      }
+        });
+        some.on("hi", (e) => {
+        // `currentTarget` is component instance.
+        console.log(some === e.currentTarget); // true
+        });
+        // If you want to more know event design. You can see article.
+        // https://github.com/naver/egjs-component/wiki/How-to-make-Component-event-design%3F
+         */
 
-      if (style) {
-        applyStyle(el, style);
-      }
 
-      if (html) {
-        el.innerHTML = html;
-      }
+        var _proto = Component.prototype;
 
-      return el;
-    }
-    function updateElement(prevStructure, nextStructure) {
-      var dataset = nextStructure.dataset,
-          attr = nextStructure.attr,
-          style = nextStructure.style,
-          html = nextStructure.html,
-          element = nextStructure.element;
-
-      if (dataset) {
-        for (var name in dataset) {
-          element.setAttribute("data-" + name, dataset[name]);
-        }
-      }
-
-      if (attr) {
-        for (var name in attr) {
-          element.setAttribute(name, attr[name]);
-        }
-      }
-
-      style && applyStyle(element, style);
-
-      if (prevStructure.html !== nextStructure.html) {
-        element.innerHTML = html;
-      }
-    }
-    function keys(value) {
-      var arr = [];
-
-      for (var name in value) {
-        arr.push(name);
-      }
-
-      return arr;
-    }
-    function toValue(value) {
-      var type = typeof value;
-
-      if (type === "object") {
-        if (Array.isArray(value)) {
-          return "[" + value.join(", ") + "]";
-        }
-
-        return "{" + keys(value).map(function (k) {
-          return k + ": " + toValue(value[k]);
-        }).join(", ") + "}";
-      }
-
-      return value;
-    }
-    function flatObject(obj, newObj) {
-      if (newObj === void 0) {
-        newObj = {};
-      }
-
-      for (var name in obj) {
-        var value = obj[name];
-
-        if (isObject(value)) {
-          var nextObj = flatObject(isFrame(value) ? value.get() : value);
-
-          for (var nextName in nextObj) {
-            newObj[name + "///" + nextName] = nextObj[nextName];
+        _proto.trigger = function trigger(eventName, customEvent) {
+          if (customEvent === void 0) {
+            customEvent = {};
           }
+
+          var handlerList = this._eventHandler[eventName] || [];
+          var hasHandlerList = handlerList.length > 0;
+
+          if (!hasHandlerList) {
+            return true;
+          } // If detach method call in handler in first time then handler list calls.
+
+
+          handlerList = handlerList.concat();
+          customEvent.eventType = eventName;
+          var isCanceled = false;
+          var arg = [customEvent];
+          var i = 0;
+
+          customEvent.stop = function () {
+            isCanceled = true;
+          };
+
+          customEvent.currentTarget = this;
+
+          for (var _len = arguments.length, restParam = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+            restParam[_key - 2] = arguments[_key];
+          }
+
+          if (restParam.length >= 1) {
+            arg = arg.concat(restParam);
+          }
+
+          for (i = 0; handlerList[i]; i++) {
+            handlerList[i].apply(this, arg);
+          }
+
+          return !isCanceled;
+        };
+        /**
+         * Executed event just one time.
+         * @ko 이벤트가 한번만 실행된다.
+         * @param {eventName} eventName The name of the event to be attached <ko>등록할 이벤트의 이름</ko>
+         * @param {Function} handlerToAttach The handler function of the event to be attached <ko>등록할 이벤트의 핸들러 함수</ko>
+         * @return {eg.Component} An instance of a component itself<ko>컴포넌트 자신의 인스턴스</ko>
+         * @example
+        class Some extends eg.Component {
+         hi() {
+           alert("hi");
+         }
+         thing() {
+           this.once("hi", this.hi);
+         }
+        }
+        var some = new Some();
+        some.thing();
+        some.trigger("hi");
+        // fire alert("hi");
+        some.trigger("hi");
+        // Nothing happens
+         */
+
+
+        _proto.once = function once(eventName, handlerToAttach) {
+          if (typeof eventName === "object" && isUndefined$1(handlerToAttach)) {
+            var eventHash = eventName;
+            var i;
+
+            for (i in eventHash) {
+              this.once(i, eventHash[i]);
+            }
+
+            return this;
+          } else if (typeof eventName === "string" && typeof handlerToAttach === "function") {
+            var self = this;
+            this.on(eventName, function listener() {
+              for (var _len2 = arguments.length, arg = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                arg[_key2] = arguments[_key2];
+              }
+
+              handlerToAttach.apply(self, arg);
+              self.off(eventName, listener);
+            });
+          }
+
+          return this;
+        };
+        /**
+         * Checks whether an event has been attached to a component.
+         * @ko 컴포넌트에 이벤트가 등록됐는지 확인한다.
+         * @param {String} eventName The name of the event to be attached <ko>등록 여부를 확인할 이벤트의 이름</ko>
+         * @return {Boolean} Indicates whether the event is attached. <ko>이벤트 등록 여부</ko>
+         * @example
+        class Some extends eg.Component {
+         some() {
+           this.hasOn("hi");// check hi event.
+         }
+        }
+         */
+
+
+        _proto.hasOn = function hasOn(eventName) {
+          return !!this._eventHandler[eventName];
+        };
+        /**
+         * Attaches an event to a component.
+         * @ko 컴포넌트에 이벤트를 등록한다.
+         * @param {eventName} eventName The name of the event to be attached <ko>등록할 이벤트의 이름</ko>
+         * @param {Function} handlerToAttach The handler function of the event to be attached <ko>등록할 이벤트의 핸들러 함수</ko>
+         * @return {eg.Component} An instance of a component itself<ko>컴포넌트 자신의 인스턴스</ko>
+         * @example
+        class Some extends eg.Component {
+         hi() {
+           console.log("hi");
+         }
+         some() {
+           this.on("hi",this.hi); //attach event
+         }
+        }
+        */
+
+
+        _proto.on = function on(eventName, handlerToAttach) {
+          if (typeof eventName === "object" && isUndefined$1(handlerToAttach)) {
+            var eventHash = eventName;
+            var name;
+
+            for (name in eventHash) {
+              this.on(name, eventHash[name]);
+            }
+
+            return this;
+          } else if (typeof eventName === "string" && typeof handlerToAttach === "function") {
+            var handlerList = this._eventHandler[eventName];
+
+            if (isUndefined$1(handlerList)) {
+              this._eventHandler[eventName] = [];
+              handlerList = this._eventHandler[eventName];
+            }
+
+            handlerList.push(handlerToAttach);
+          }
+
+          return this;
+        };
+        /**
+         * Detaches an event from the component.
+         * @ko 컴포넌트에 등록된 이벤트를 해제한다
+         * @param {eventName} eventName The name of the event to be detached <ko>해제할 이벤트의 이름</ko>
+         * @param {Function} handlerToDetach The handler function of the event to be detached <ko>해제할 이벤트의 핸들러 함수</ko>
+         * @return {eg.Component} An instance of a component itself <ko>컴포넌트 자신의 인스턴스</ko>
+         * @example
+        class Some extends eg.Component {
+         hi() {
+           console.log("hi");
+         }
+         some() {
+           this.off("hi",this.hi); //detach event
+         }
+        }
+         */
+
+
+        _proto.off = function off(eventName, handlerToDetach) {
+          // All event detach.
+          if (isUndefined$1(eventName)) {
+            this._eventHandler = {};
+            return this;
+          } // All handler of specific event detach.
+
+
+          if (isUndefined$1(handlerToDetach)) {
+            if (typeof eventName === "string") {
+              this._eventHandler[eventName] = undefined;
+              return this;
+            } else {
+              var eventHash = eventName;
+              var name;
+
+              for (name in eventHash) {
+                this.off(name, eventHash[name]);
+              }
+
+              return this;
+            }
+          } // The handler of specific event detach.
+
+
+          var handlerList = this._eventHandler[eventName];
+
+          if (handlerList) {
+            var k;
+            var handlerFunction;
+
+            for (k = 0; (handlerFunction = handlerList[k]) !== undefined; k++) {
+              if (handlerFunction === handlerToDetach) {
+                handlerList = handlerList.splice(k, 1);
+                break;
+              }
+            }
+          }
+
+          return this;
+        };
+
+        return Component;
+      }();
+
+      Component.VERSION = "2.1.2";
+      return Component;
+    }();
+
+    /*
+    Copyright (c) 2019 Daybrush
+    name: keycon
+    license: MIT
+    author: Daybrush
+    repository: git+https://github.com/daybrush/keycon.git
+    version: 0.2.2
+    */
+
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
+
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+
+    /* global Reflect, Promise */
+    var extendStatics$1 = function (d, b) {
+      extendStatics$1 = Object.setPrototypeOf || {
+        __proto__: []
+      } instanceof Array && function (d, b) {
+        d.__proto__ = b;
+      } || function (d, b) {
+        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+      };
+
+      return extendStatics$1(d, b);
+    };
+
+    function __extends$1(d, b) {
+      extendStatics$1(d, b);
+
+      function __() {
+        this.constructor = d;
+      }
+
+      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
+
+    function createCommonjsModule(fn, module) {
+      return module = {
+        exports: {}
+      }, fn(module, module.exports), module.exports;
+    }
+
+    var keycode = createCommonjsModule(function (module, exports) {
+    // Source: http://jsfiddle.net/vWx8V/
+    // http://stackoverflow.com/questions/5603195/full-list-of-javascript-keycodes
+
+    /**
+     * Conenience method returns corresponding value for given keyName or keyCode.
+     *
+     * @param {Mixed} keyCode {Number} or keyName {String}
+     * @return {Mixed}
+     * @api public
+     */
+    function keyCode(searchInput) {
+      // Keyboard Events
+      if (searchInput && 'object' === typeof searchInput) {
+        var hasKeyCode = searchInput.which || searchInput.keyCode || searchInput.charCode;
+        if (hasKeyCode) searchInput = hasKeyCode;
+      } // Numbers
+
+
+      if ('number' === typeof searchInput) return names[searchInput]; // Everything else (cast to string)
+
+      var search = String(searchInput); // check codes
+
+      var foundNamedKey = codes[search.toLowerCase()];
+      if (foundNamedKey) return foundNamedKey; // check aliases
+
+      var foundNamedKey = aliases[search.toLowerCase()];
+      if (foundNamedKey) return foundNamedKey; // weird character?
+
+      if (search.length === 1) return search.charCodeAt(0);
+      return undefined;
+    }
+    /**
+     * Compares a keyboard event with a given keyCode or keyName.
+     *
+     * @param {Event} event Keyboard event that should be tested
+     * @param {Mixed} keyCode {Number} or keyName {String}
+     * @return {Boolean}
+     * @api public
+     */
+
+
+    keyCode.isEventKey = function isEventKey(event, nameOrCode) {
+      if (event && 'object' === typeof event) {
+        var keyCode = event.which || event.keyCode || event.charCode;
+
+        if (keyCode === null || keyCode === undefined) {
+          return false;
+        }
+
+        if (typeof nameOrCode === 'string') {
+          // check codes
+          var foundNamedKey = codes[nameOrCode.toLowerCase()];
+
+          if (foundNamedKey) {
+            return foundNamedKey === keyCode;
+          } // check aliases
+
+
+          var foundNamedKey = aliases[nameOrCode.toLowerCase()];
+
+          if (foundNamedKey) {
+            return foundNamedKey === keyCode;
+          }
+        } else if (typeof nameOrCode === 'number') {
+          return nameOrCode === keyCode;
+        }
+
+        return false;
+      }
+    };
+
+    exports = module.exports = keyCode;
+    /**
+     * Get by name
+     *
+     *   exports.code['enter'] // => 13
+     */
+
+    var codes = exports.code = exports.codes = {
+      'backspace': 8,
+      'tab': 9,
+      'enter': 13,
+      'shift': 16,
+      'ctrl': 17,
+      'alt': 18,
+      'pause/break': 19,
+      'caps lock': 20,
+      'esc': 27,
+      'space': 32,
+      'page up': 33,
+      'page down': 34,
+      'end': 35,
+      'home': 36,
+      'left': 37,
+      'up': 38,
+      'right': 39,
+      'down': 40,
+      'insert': 45,
+      'delete': 46,
+      'command': 91,
+      'left command': 91,
+      'right command': 93,
+      'numpad *': 106,
+      'numpad +': 107,
+      'numpad -': 109,
+      'numpad .': 110,
+      'numpad /': 111,
+      'num lock': 144,
+      'scroll lock': 145,
+      'my computer': 182,
+      'my calculator': 183,
+      ';': 186,
+      '=': 187,
+      ',': 188,
+      '-': 189,
+      '.': 190,
+      '/': 191,
+      '`': 192,
+      '[': 219,
+      '\\': 220,
+      ']': 221,
+      "'": 222 // Helper aliases
+
+    };
+    var aliases = exports.aliases = {
+      'windows': 91,
+      '⇧': 16,
+      '⌥': 18,
+      '⌃': 17,
+      '⌘': 91,
+      'ctl': 17,
+      'control': 17,
+      'option': 18,
+      'pause': 19,
+      'break': 19,
+      'caps': 20,
+      'return': 13,
+      'escape': 27,
+      'spc': 32,
+      'spacebar': 32,
+      'pgup': 33,
+      'pgdn': 34,
+      'ins': 45,
+      'del': 46,
+      'cmd': 91
+      /*!
+       * Programatically add the following
+       */
+      // lower case chars
+
+    };
+
+    for (i = 97; i < 123; i++) codes[String.fromCharCode(i)] = i - 32; // numbers
+
+
+    for (var i = 48; i < 58; i++) codes[i - 48] = i; // function keys
+
+
+    for (i = 1; i < 13; i++) codes['f' + i] = i + 111; // numpad keys
+
+
+    for (i = 0; i < 10; i++) codes['numpad ' + i] = i + 96;
+    /**
+     * Get by code
+     *
+     *   exports.name[13] // => 'Enter'
+     */
+
+
+    var names = exports.names = exports.title = {}; // title for backward compat
+    // Create reverse mapping
+
+    for (i in codes) names[codes[i]] = i; // Add aliases
+
+
+    for (var alias in aliases) {
+      codes[alias] = aliases[alias];
+    }
+    });
+    var keycode_1 = keycode.code;
+    var keycode_2 = keycode.codes;
+    var keycode_3 = keycode.aliases;
+    var keycode_4 = keycode.names;
+    var keycode_5 = keycode.title;
+
+    /*
+    Copyright (c) 2018 Daybrush
+    @name: @daybrush/utils
+    license: MIT
+    author: Daybrush
+    repository: https://github.com/daybrush/utils
+    @version 0.7.1
+    */
+    /**
+    * get string "string"
+    * @memberof Consts
+    * @example
+    import {STRING} from "@daybrush/utils";
+
+    console.log(STRING); // "string"
+    */
+
+    var STRING = "string";
+    /**
+    * Check the type that the value is isArray.
+    * @memberof Utils
+    * @param {string} value - Value to check the type
+    * @return {} true if the type is correct, false otherwise
+    * @example
+    import {isArray} from "@daybrush/utils";
+
+    console.log(isArray([])); // true
+    console.log(isArray({})); // false
+    console.log(isArray(undefined)); // false
+    console.log(isArray(null)); // false
+    */
+
+
+    function isArray(value) {
+      return Array.isArray(value);
+    }
+    /**
+    * Check the type that the value is string.
+    * @memberof Utils
+    * @param {string} value - Value to check the type
+    * @return {} true if the type is correct, false otherwise
+    * @example
+    import {isString} from "@daybrush/utils";
+
+    console.log(isString("1234")); // true
+    console.log(isString(undefined)); // false
+    console.log(isString(1)); // false
+    console.log(isString(null)); // false
+    */
+
+
+    function isString(value) {
+      return typeof value === STRING;
+    }
+    /**
+    * Sets up a function that will be called whenever the specified event is delivered to the target
+    * @memberof DOM
+    * @param - event target
+    * @param - A case-sensitive string representing the event type to listen for.
+    * @param - The object which receives a notification (an object that implements the Event interface) when an event of the specified type occurs
+    * @param - An options object that specifies characteristics about the event listener. The available options are:
+    * @example
+    import {addEvent} from "@daybrush/utils";
+
+    addEvent(el, "click", e => {
+      console.log(e);
+    });
+    */
+
+
+    function addEvent$1(el, type, listener, options) {
+      el.addEventListener(type, listener, options);
+    }
+
+    var codeData = {
+      "+": "plus",
+      "left command": "meta",
+      "right command": "meta"
+    };
+    var keysSort = {
+      shift: 1,
+      ctrl: 2,
+      alt: 3,
+      meta: 4
+    };
+
+    function getKey(keyCode) {
+      var key = keycode_4[keyCode] || "";
+
+      for (var name in codeData) {
+        key = key.replace(name, codeData[name]);
+      }
+
+      return key.replace(/\s/g, "");
+    }
+
+    function getCombi(e, key) {
+      var keys = [e.shiftKey && "shift", e.ctrlKey && "ctrl", e.altKey && "alt", e.metaKey && "meta"];
+      keys.indexOf(key) === -1 && keys.push(key);
+      return keys.filter(Boolean);
+    }
+
+    function getArrangeCombi(keys) {
+      var arrangeKeys = keys.slice();
+      arrangeKeys.sort(function (prev, next) {
+        var prevScore = keysSort[prev] || 5;
+        var nextScore = keysSort[next] || 5;
+        return prevScore - nextScore;
+      });
+      return arrangeKeys;
+    }
+    /**
+     */
+
+
+    var KeyController =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1(KeyController, _super);
+      /**
+       *
+       */
+
+
+      function KeyController(container) {
+        if (container === void 0) {
+          container = window;
+        }
+
+        var _this = _super.call(this) || this;
+        /**
+         */
+
+
+        _this.ctrlKey = false;
+        /**
+         */
+
+        _this.altKey = false;
+        /**
+         *
+         */
+
+        _this.shiftKey = false;
+        /**
+         *
+         */
+
+        _this.metaKey = false;
+
+        _this.clear = function () {
+          _this.ctrlKey = false;
+          _this.altKey = false;
+          _this.shiftKey = false;
+          _this.metaKey = false;
+        };
+
+        _this.keydownEvent = function (e) {
+          _this.triggerEvent("keydown", e);
+        };
+
+        _this.keyupEvent = function (e) {
+          _this.triggerEvent("keyup", e);
+        };
+
+        addEvent$1(container, "blur", _this.clear);
+        addEvent$1(container, "keydown", _this.keydownEvent);
+        addEvent$1(container, "keyup", _this.keyupEvent);
+        return _this;
+      }
+      /**
+       *
+       */
+
+
+      var __proto = KeyController.prototype;
+
+      __proto.keydown = function (comb, callback) {
+        return this.addEvent("keydown", comb, callback);
+      };
+      /**
+       *
+       */
+
+
+      __proto.keyup = function (comb, callback) {
+        return this.addEvent("keyup", comb, callback);
+      };
+
+      __proto.addEvent = function (type, comb, callback) {
+        if (isArray(comb)) {
+          this.on(type + "." + getArrangeCombi(comb).join("."), callback);
+        } else if (isString(comb)) {
+          this.on(type + "." + comb, callback);
         } else {
-          newObj[name] = value;
-        }
-      }
-
-      return newObj;
-    }
-    function getTarget(target, conditionCallback) {
-      var parentTarget = target;
-
-      while (parentTarget && parentTarget !== document.body) {
-        if (conditionCallback(parentTarget)) {
-          return parentTarget;
+          this.on(type, comb);
         }
 
-        parentTarget = parentTarget.parentNode;
-      }
+        return this;
+      };
 
-      return null;
-    }
-    function hasClass$1(target, className) {
-      return hasClass(target, "" + PREFIX + className);
-    }
-    function addClass$1(target, className) {
-      return addClass(target, "" + PREFIX + className);
-    }
-    function removeClass$1(target, className) {
-      return removeClass(target, "" + PREFIX + className);
-    }
-    function isScene(value) {
-      return !!value.constructor.prototype.getItem;
-    }
-    function isFrame(value) {
-      return !!value.constructor.prototype.toCSS;
-    }
-    function findElementIndexByPosition(elements, pos) {
-      var length = elements.length;
+      __proto.triggerEvent = function (type, e) {
+        this.ctrlKey = e.ctrlKey;
+        this.shiftKey = e.shiftKey;
+        this.altKey = e.altKey;
+        this.metaKey = e.metaKey;
+        var key = getKey(e.keyCode);
+        var isToggle = key === "ctrl" || key === "shift" || key === "meta" || key === "alt";
+        var param = {
+          key: key,
+          isToggle: isToggle,
+          inputEvent: e,
+          keyCode: e.keyCode,
+          ctrlKey: e.ctrlKey,
+          altKey: e.altKey,
+          shiftKey: e.shiftKey,
+          metaKey: e.metaKey
+        };
+        this.trigger(type, param);
+        this.trigger(type + "." + key, param);
+        var combi = getCombi(e, key);
+        combi.length > 1 && this.trigger(type + "." + combi.join("."), param);
+      };
 
-      for (var index = 0; index < length; ++index) {
-        var el = elements[index];
-        var box = el.getBoundingClientRect();
-        var top = box.top;
-        var bottom = top + box.height;
-
-        if (top <= pos && pos < bottom) {
-          return index;
-        }
-      }
-
-      return -1;
-    }
+      return KeyController;
+    }(Component$1);
 
     /*
     Copyright (c) 2019 Daybrush
@@ -542,9 +1792,7 @@ version: 0.1.3
 
       if (isTouch) {
         el.addEventListener("touchstart", onDragStart);
-        container.addEventListener("touchmove", onDrag, {
-          passive: false
-        });
+        container.addEventListener("touchmove", onDrag);
         container.addEventListener("touchend", onDragEnd);
       }
     }
@@ -699,9 +1947,9 @@ version: 0.1.3
     var TOUCH_ACTION_PAN_Y = 'pan-y';
     var TOUCH_ACTION_MAP = getTouchActionProps();
     var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
-    var SUPPORT_TOUCH$1 = 'ontouchstart' in win;
-    var SUPPORT_POINTER_EVENTS$1 = prefixed(win, 'PointerEvent') !== undefined;
-    var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH$1 && MOBILE_REGEX.test(navigator.userAgent);
+    var SUPPORT_TOUCH = 'ontouchstart' in win;
+    var SUPPORT_POINTER_EVENTS = prefixed(win, 'PointerEvent') !== undefined;
+    var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(navigator.userAgent);
     var INPUT_TYPE_TOUCH = 'touch';
     var INPUT_TYPE_PEN = 'pen';
     var INPUT_TYPE_MOUSE = 'mouse';
@@ -1863,11 +3111,11 @@ version: 0.1.3
 
       if (inputClass) {
         Type = inputClass;
-      } else if (SUPPORT_POINTER_EVENTS$1) {
+      } else if (SUPPORT_POINTER_EVENTS) {
         Type = PointerEventInput;
       } else if (SUPPORT_ONLY_TOUCH) {
         Type = TouchInput;
-      } else if (!SUPPORT_TOUCH$1) {
+      } else if (!SUPPORT_TOUCH) {
         Type = MouseInput;
       } else {
         Type = TouchMouseInput;
@@ -2843,303 +4091,12 @@ version: 0.1.3
 
     /*
     Copyright (c) 2017 NAVER Corp.
-    @egjs/component project is licensed under the MIT license
-
-    @egjs/component JavaScript library
-    https://naver.github.io/egjs-component
-
-    @version 2.1.2
-    */
-
-    /**
-     * Copyright (c) 2015 NAVER Corp.
-     * egjs projects are licensed under the MIT license
-     */
-    function isUndefined$1(value) {
-      return typeof value === "undefined";
-    }
-    /**
-     * A class used to manage events in a component
-     * @ko 컴포넌트의 이벤트을 관리할 수 있게 하는 클래스
-     * @alias eg.Component
-     */
-
-
-    var Component =
-    /*#__PURE__*/
-    function () {
-      var Component =
-      /*#__PURE__*/
-      function () {
-        /**
-        * Version info string
-        * @ko 버전정보 문자열
-        * @name VERSION
-        * @static
-        * @type {String}
-        * @example
-        * eg.Component.VERSION;  // ex) 2.0.0
-        * @memberof eg.Component
-        */
-
-        /**
-         * @support {"ie": "7+", "ch" : "latest", "ff" : "latest",  "sf" : "latest", "edge" : "latest", "ios" : "7+", "an" : "2.1+ (except 3.x)"}
-         */
-        function Component() {
-          this._eventHandler = {};
-          this.options = {};
-        }
-        /**
-         * Triggers a custom event.
-         * @ko 커스텀 이벤트를 발생시킨다
-         * @param {String} eventName The name of the custom event to be triggered <ko>발생할 커스텀 이벤트의 이름</ko>
-         * @param {Object} customEvent Event data to be sent when triggering a custom event <ko>커스텀 이벤트가 발생할 때 전달할 데이터</ko>
-         * @return {Boolean} Indicates whether the event has occurred. If the stop() method is called by a custom event handler, it will return false and prevent the event from occurring. <a href="https://github.com/naver/egjs-component/wiki/How-to-make-Component-event-design%3F">Ref</a> <ko>이벤트 발생 여부. 커스텀 이벤트 핸들러에서 stop() 메서드를 호출하면 'false'를 반환하고 이벤트 발생을 중단한다. <a href="https://github.com/naver/egjs-component/wiki/How-to-make-Component-event-design%3F">참고</a></ko>
-         * @example
-        class Some extends eg.Component {
-         some(){
-         	if(this.trigger("beforeHi")){ // When event call to stop return false.
-        	this.trigger("hi");// fire hi event.
-         	}
-         }
-        }
-        const some = new Some();
-        some.on("beforeHi", (e) => {
-        if(condition){
-        	e.stop(); // When event call to stop, `hi` event not call.
-        }
-        });
-        some.on("hi", (e) => {
-        // `currentTarget` is component instance.
-        console.log(some === e.currentTarget); // true
-        });
-        // If you want to more know event design. You can see article.
-        // https://github.com/naver/egjs-component/wiki/How-to-make-Component-event-design%3F
-         */
-
-
-        var _proto = Component.prototype;
-
-        _proto.trigger = function trigger(eventName, customEvent) {
-          if (customEvent === void 0) {
-            customEvent = {};
-          }
-
-          var handlerList = this._eventHandler[eventName] || [];
-          var hasHandlerList = handlerList.length > 0;
-
-          if (!hasHandlerList) {
-            return true;
-          } // If detach method call in handler in first time then handler list calls.
-
-
-          handlerList = handlerList.concat();
-          customEvent.eventType = eventName;
-          var isCanceled = false;
-          var arg = [customEvent];
-          var i = 0;
-
-          customEvent.stop = function () {
-            isCanceled = true;
-          };
-
-          customEvent.currentTarget = this;
-
-          for (var _len = arguments.length, restParam = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-            restParam[_key - 2] = arguments[_key];
-          }
-
-          if (restParam.length >= 1) {
-            arg = arg.concat(restParam);
-          }
-
-          for (i = 0; handlerList[i]; i++) {
-            handlerList[i].apply(this, arg);
-          }
-
-          return !isCanceled;
-        };
-        /**
-         * Executed event just one time.
-         * @ko 이벤트가 한번만 실행된다.
-         * @param {eventName} eventName The name of the event to be attached <ko>등록할 이벤트의 이름</ko>
-         * @param {Function} handlerToAttach The handler function of the event to be attached <ko>등록할 이벤트의 핸들러 함수</ko>
-         * @return {eg.Component} An instance of a component itself<ko>컴포넌트 자신의 인스턴스</ko>
-         * @example
-        class Some extends eg.Component {
-         hi() {
-           alert("hi");
-         }
-         thing() {
-           this.once("hi", this.hi);
-         }
-        }
-        var some = new Some();
-        some.thing();
-        some.trigger("hi");
-        // fire alert("hi");
-        some.trigger("hi");
-        // Nothing happens
-         */
-
-
-        _proto.once = function once(eventName, handlerToAttach) {
-          if (typeof eventName === "object" && isUndefined$1(handlerToAttach)) {
-            var eventHash = eventName;
-            var i;
-
-            for (i in eventHash) {
-              this.once(i, eventHash[i]);
-            }
-
-            return this;
-          } else if (typeof eventName === "string" && typeof handlerToAttach === "function") {
-            var self = this;
-            this.on(eventName, function listener() {
-              for (var _len2 = arguments.length, arg = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                arg[_key2] = arguments[_key2];
-              }
-
-              handlerToAttach.apply(self, arg);
-              self.off(eventName, listener);
-            });
-          }
-
-          return this;
-        };
-        /**
-         * Checks whether an event has been attached to a component.
-         * @ko 컴포넌트에 이벤트가 등록됐는지 확인한다.
-         * @param {String} eventName The name of the event to be attached <ko>등록 여부를 확인할 이벤트의 이름</ko>
-         * @return {Boolean} Indicates whether the event is attached. <ko>이벤트 등록 여부</ko>
-         * @example
-        class Some extends eg.Component {
-         some() {
-           this.hasOn("hi");// check hi event.
-         }
-        }
-         */
-
-
-        _proto.hasOn = function hasOn(eventName) {
-          return !!this._eventHandler[eventName];
-        };
-        /**
-         * Attaches an event to a component.
-         * @ko 컴포넌트에 이벤트를 등록한다.
-         * @param {eventName} eventName The name of the event to be attached <ko>등록할 이벤트의 이름</ko>
-         * @param {Function} handlerToAttach The handler function of the event to be attached <ko>등록할 이벤트의 핸들러 함수</ko>
-         * @return {eg.Component} An instance of a component itself<ko>컴포넌트 자신의 인스턴스</ko>
-         * @example
-        class Some extends eg.Component {
-         hi() {
-           console.log("hi");
-         }
-         some() {
-           this.on("hi",this.hi); //attach event
-         }
-        }
-        */
-
-
-        _proto.on = function on(eventName, handlerToAttach) {
-          if (typeof eventName === "object" && isUndefined$1(handlerToAttach)) {
-            var eventHash = eventName;
-            var name;
-
-            for (name in eventHash) {
-              this.on(name, eventHash[name]);
-            }
-
-            return this;
-          } else if (typeof eventName === "string" && typeof handlerToAttach === "function") {
-            var handlerList = this._eventHandler[eventName];
-
-            if (isUndefined$1(handlerList)) {
-              this._eventHandler[eventName] = [];
-              handlerList = this._eventHandler[eventName];
-            }
-
-            handlerList.push(handlerToAttach);
-          }
-
-          return this;
-        };
-        /**
-         * Detaches an event from the component.
-         * @ko 컴포넌트에 등록된 이벤트를 해제한다
-         * @param {eventName} eventName The name of the event to be detached <ko>해제할 이벤트의 이름</ko>
-         * @param {Function} handlerToDetach The handler function of the event to be detached <ko>해제할 이벤트의 핸들러 함수</ko>
-         * @return {eg.Component} An instance of a component itself <ko>컴포넌트 자신의 인스턴스</ko>
-         * @example
-        class Some extends eg.Component {
-         hi() {
-           console.log("hi");
-         }
-         some() {
-           this.off("hi",this.hi); //detach event
-         }
-        }
-         */
-
-
-        _proto.off = function off(eventName, handlerToDetach) {
-          // All event detach.
-          if (isUndefined$1(eventName)) {
-            this._eventHandler = {};
-            return this;
-          } // All handler of specific event detach.
-
-
-          if (isUndefined$1(handlerToDetach)) {
-            if (typeof eventName === "string") {
-              this._eventHandler[eventName] = undefined;
-              return this;
-            } else {
-              var eventHash = eventName;
-              var name;
-
-              for (name in eventHash) {
-                this.off(name, eventHash[name]);
-              }
-
-              return this;
-            }
-          } // The handler of specific event detach.
-
-
-          var handlerList = this._eventHandler[eventName];
-
-          if (handlerList) {
-            var k;
-            var handlerFunction;
-
-            for (k = 0; (handlerFunction = handlerList[k]) !== undefined; k++) {
-              if (handlerFunction === handlerToDetach) {
-                handlerList = handlerList.splice(k, 1);
-                break;
-              }
-            }
-          }
-
-          return this;
-        };
-
-        return Component;
-      }();
-
-      Component.VERSION = "2.1.2";
-      return Component;
-    }();
-
-    /*
-    Copyright (c) 2017 NAVER Corp.
     @egjs/axes project is licensed under the MIT license
 
     @egjs/axes JavaScript library
     https://github.com/naver/egjs-axes
 
-    @version 2.5.10
+    @version 2.5.13
     */
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -3158,7 +4115,7 @@ version: 0.1.3
 
     /* global Reflect, Promise */
 
-    var extendStatics$1 = Object.setPrototypeOf || {
+    var extendStatics$2 = Object.setPrototypeOf || {
       __proto__: []
     } instanceof Array && function (d, b) {
       d.__proto__ = b;
@@ -3166,8 +4123,8 @@ version: 0.1.3
       for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     };
 
-    function __extends$1(d, b) {
-      extendStatics$1(d, b);
+    function __extends$2(d, b) {
+      extendStatics$2(d, b);
 
       function __() {
         this.constructor = d;
@@ -3329,6 +4286,12 @@ version: 0.1.3
       caf(key);
     }
 
+    function mapToFixed(obj) {
+      return map(obj, function (value) {
+        return toFixed(value);
+      });
+    }
+
     function map(obj, callback) {
       var tranformed = {};
 
@@ -3441,7 +4404,7 @@ version: 0.1.3
           duration = wishDuration;
         } else {
           var durations_1 = map(destPos, function (v, k) {
-            return getDuration(Math.abs(Math.abs(v) - Math.abs(depaPos[k])), _this.options.deceleration);
+            return getDuration(Math.abs(v - depaPos[k]), _this.options.deceleration);
           });
           duration = Object.keys(durations_1).reduce(function (max, v) {
             return Math.max(max, durations_1[v]);
@@ -3538,24 +4501,43 @@ version: 0.1.3
           var info_1 = this._animateParam;
           var self_1 = this;
           var prevPos_1 = info_1.depaPos;
-          info_1.startTime = new Date().getTime();
+          var prevEasingPer_1 = 0;
+          var directions_1 = map(prevPos_1, function (value, key) {
+            return value <= info_1.destPos[key] ? 1 : -1;
+          });
+          var prevTime_1 = new Date().getTime();
+          info_1.startTime = prevTime_1;
 
           (function loop() {
             self_1._raf = null;
-            var easingPer = self_1.easing((new Date().getTime() - info_1.startTime) / param.duration);
-            var toPos = map(info_1.depaPos, function (pos, key) {
-              return pos + info_1.delta[key] * easingPer;
+            var currentTime = new Date().getTime();
+            var easingPer = self_1.easing((currentTime - info_1.startTime) / param.duration);
+            var toPos = map(prevPos_1, function (pos, key) {
+              return pos + info_1.delta[key] * (easingPer - prevEasingPer_1);
             });
-            var isCanceled = !self_1.em.triggerChange(toPos, false, prevPos_1);
-            prevPos_1 = map(toPos, function (v) {
-              return toFixed(v);
+            toPos = self_1.axm.map(toPos, function (pos, options, key) {
+              // fix absolute position to relative position
+              // fix the bouncing phenomenon by changing the range.
+              var nextPos = getCirculatedPos(pos, options.range, options.circular, true);
+
+              if (pos !== nextPos) {
+                // circular
+                param.destPos[key] += -directions_1[key] * (options.range[1] - options.range[0]);
+                prevPos_1[key] += -directions_1[key] * (options.range[1] - options.range[0]);
+              }
+
+              return nextPos;
             });
+            var isCanceled = !self_1.em.triggerChange(toPos, false, mapToFixed(prevPos_1));
+            prevPos_1 = toPos;
+            prevTime_1 = currentTime;
+            prevEasingPer_1 = easingPer;
 
             if (easingPer >= 1) {
               var destPos = param.destPos;
 
               if (!equal(destPos, self_1.axm.get(Object.keys(destPos)))) {
-                self_1.em.triggerChange(destPos, true, prevPos_1);
+                self_1.em.triggerChange(destPos, true, mapToFixed(prevPos_1));
               }
 
               complete();
@@ -4240,6 +5222,7 @@ version: 0.1.3
           this.isOutside = false;
         }
 
+        depaPos = this.atOutside(depaPos);
         destPos = this.atOutside(destPos);
         var isCanceled = !this.em.triggerChange(destPos, false, depaPos, {
           input: input,
@@ -4407,11 +5390,15 @@ version: 0.1.3
     var Axes =
     /*#__PURE__*/
     function (_super) {
-      __extends$1(Axes, _super);
+      __extends$2(Axes, _super);
 
       function Axes(axis, options, startPos) {
         if (axis === void 0) {
           axis = {};
+        }
+
+        if (options === void 0) {
+          options = {};
         }
 
         var _this = _super.call(this) || this;
@@ -4700,7 +5687,7 @@ version: 0.1.3
        */
 
 
-      Axes.VERSION = "2.5.10";
+      Axes.VERSION = "2.5.13";
       /**
        * @name eg.Axes.TRANSFORM
        * @desc Returns the transform attribute with CSS vendor prefixes.
@@ -4770,10 +5757,10 @@ version: 0.1.3
 
       Axes.DIRECTION_ALL = DIRECTION_ALL;
       return Axes;
-    }(Component);
+    }(Component$1);
 
-    var SUPPORT_POINTER_EVENTS$2 = "PointerEvent" in win$1 || "MSPointerEvent" in win$1;
-    var SUPPORT_TOUCH$2 = "ontouchstart" in win$1;
+    var SUPPORT_POINTER_EVENTS$1 = "PointerEvent" in win$1 || "MSPointerEvent" in win$1;
+    var SUPPORT_TOUCH$1 = "ontouchstart" in win$1;
     var UNIQUEKEY = "_EGJS_AXES_INPUTTYPE_";
 
     function toAxis(source, offset) {
@@ -4810,11 +5797,11 @@ version: 0.1.3
             break;
 
           case "touch":
-            hasTouch = SUPPORT_TOUCH$2;
+            hasTouch = SUPPORT_TOUCH$1;
             break;
 
           case "pointer":
-            hasPointer = SUPPORT_POINTER_EVENTS$2;
+            hasPointer = SUPPORT_POINTER_EVENTS$1;
           // no default
         }
       });
@@ -5057,30 +6044,555 @@ version: 0.1.3
       return PinchInput;
     }();
 
-    var prevTime = 0;
-    var prevX = -1;
-    var prevY = -1;
-    function dblCheck(isDrag, e, clientX, clientY, callback) {
-      var currentTime = now();
+    /*
+    Copyright (c) 2019 Daybrush
+    name: preact-timeline
+    license: MIT
+    author: Daybrush
+    repository: git+https://github.com/daybrush/scenejs-timeline.git
+    version: 0.0.4
+    */
 
-      if (!isDrag) {
-        if (prevX === clientX && prevY === clientY && currentTime - prevTime <= 500) {
-          callback(e, clientX, clientY);
-        }
+    /*! *****************************************************************************
+    Copyright (c) Microsoft Corporation. All rights reserved.
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+    this file except in compliance with the License. You may obtain a copy of the
+    License at http://www.apache.org/licenses/LICENSE-2.0
 
-        prevX = clientX;
-        prevY = clientY;
-        prevTime = currentTime;
-      }
+    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+    MERCHANTABLITY OR NON-INFRINGEMENT.
+
+    See the Apache Version 2.0 License for specific language governing permissions
+    and limitations under the License.
+    ***************************************************************************** */
+    /* global Reflect, Promise */
+
+    var extendStatics$3 = function(d, b) {
+        extendStatics$3 = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics$3(d, b);
+    };
+
+    function __extends$3(d, b) {
+        extendStatics$3(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
+
+    var __assign$2 = function() {
+        __assign$2 = Object.assign || function __assign(t) {
+            for (var s, i = 1, n = arguments.length; i < n; i++) {
+                s = arguments[i];
+                for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+            }
+            return t;
+        };
+        return __assign$2.apply(this, arguments);
+    };
+
+    var ELEMENTS = 'a abbr address area article aside audio b base bdi bdo big blockquote body br button canvas caption cite code col colgroup data datalist dd del details dfn dialog div dl dt em embed fieldset figcaption figure footer form h1 h2 h3 h4 h5 h6 head header hgroup hr html i iframe img input ins kbd keygen label legend li link main map mark menu menuitem meta meter nav noscript object ol optgroup option output p param picture pre progress q rp rt ruby s samp script section select small source span strong style sub summary sup table tbody td textarea tfoot th thead time title tr track u ul var video wbr circle clipPath defs ellipse g image line linearGradient mask path pattern polygon polyline radialGradient rect stop svg text tspan'.split(' ');
+
+    var REACT_ELEMENT_TYPE = (typeof Symbol!=='undefined' && Symbol.for && Symbol.for('react.element')) || 0xeac7;
+
+    var COMPONENT_WRAPPER_KEY = (typeof Symbol!=='undefined' && Symbol.for) ? Symbol.for('__preactCompatWrapper') : '__preactCompatWrapper';
+
+    // don't autobind these methods since they already have guaranteed context.
+    var AUTOBIND_BLACKLIST = {
+    	constructor: 1,
+    	render: 1,
+    	shouldComponentUpdate: 1,
+    	componentWillReceiveProps: 1,
+    	componentWillUpdate: 1,
+    	componentDidUpdate: 1,
+    	componentWillMount: 1,
+    	componentDidMount: 1,
+    	componentWillUnmount: 1,
+    	componentDidUnmount: 1
+    };
+
+
+    var CAMEL_PROPS = /^(?:accent|alignment|arabic|baseline|cap|clip|color|fill|flood|font|glyph|horiz|marker|overline|paint|stop|strikethrough|stroke|text|underline|unicode|units|v|vector|vert|word|writing|x)[A-Z]/;
+
+
+    var BYPASS_HOOK = {};
+
+    /*global process*/
+    var DEV = false;
+    try {
+    	DEV = process.env.NODE_ENV!=='production';
+    }
+    catch (e) {}
+
+
+
+    // make react think we're react.
+    var VNode$1 = h('a', null).constructor;
+    VNode$1.prototype.$$typeof = REACT_ELEMENT_TYPE;
+    VNode$1.prototype.preactCompatUpgraded = false;
+    VNode$1.prototype.preactCompatNormalized = false;
+
+    Object.defineProperty(VNode$1.prototype, 'type', {
+    	get: function() { return this.nodeName; },
+    	set: function(v) { this.nodeName = v; },
+    	configurable:true
+    });
+
+    Object.defineProperty(VNode$1.prototype, 'props', {
+    	get: function() { return this.attributes; },
+    	set: function(v) { this.attributes = v; },
+    	configurable:true
+    });
+
+
+
+    var oldEventHook = options.event;
+    options.event = function (e) {
+    	if (oldEventHook) { e = oldEventHook(e); }
+    	e.persist = Object;
+    	e.nativeEvent = e;
+    	return e;
+    };
+
+
+    var oldVnodeHook = options.vnode;
+    options.vnode = function (vnode) {
+    	if (!vnode.preactCompatUpgraded) {
+    		vnode.preactCompatUpgraded = true;
+
+    		var tag = vnode.nodeName,
+    			attrs = vnode.attributes = vnode.attributes==null ? {} : extend$1({}, vnode.attributes);
+
+    		if (typeof tag==='function') {
+    			if (tag[COMPONENT_WRAPPER_KEY]===true || (tag.prototype && 'isReactComponent' in tag.prototype)) {
+    				if (vnode.children && String(vnode.children)==='') { vnode.children = undefined; }
+    				if (vnode.children) { attrs.children = vnode.children; }
+
+    				if (!vnode.preactCompatNormalized) {
+    					normalizeVNode(vnode);
+    				}
+    				handleComponentVNode(vnode);
+    			}
+    		}
+    		else {
+    			if (vnode.children && String(vnode.children)==='') { vnode.children = undefined; }
+    			if (vnode.children) { attrs.children = vnode.children; }
+
+    			if (attrs.defaultValue) {
+    				if (!attrs.value && attrs.value!==0) {
+    					attrs.value = attrs.defaultValue;
+    				}
+    				delete attrs.defaultValue;
+    			}
+
+    			handleElementVNode(vnode, attrs);
+    		}
+    	}
+
+    	if (oldVnodeHook) { oldVnodeHook(vnode); }
+    };
+
+    function handleComponentVNode(vnode) {
+    	var tag = vnode.nodeName,
+    		a = vnode.attributes;
+
+    	vnode.attributes = {};
+    	if (tag.defaultProps) { extend$1(vnode.attributes, tag.defaultProps); }
+    	if (a) { extend$1(vnode.attributes, a); }
+    }
+
+    function handleElementVNode(vnode, a) {
+    	var shouldSanitize, attrs, i;
+    	if (a) {
+    		for (i in a) { if ((shouldSanitize = CAMEL_PROPS.test(i))) { break; } }
+    		if (shouldSanitize) {
+    			attrs = vnode.attributes = {};
+    			for (i in a) {
+    				if (a.hasOwnProperty(i)) {
+    					attrs[ CAMEL_PROPS.test(i) ? i.replace(/([A-Z0-9])/, '-$1').toLowerCase() : i ] = a[i];
+    				}
+    			}
+    		}
+    	}
+    }
+
+
+
+    var ARR = [];
+
+
+    /** Track current render() component for ref assignment */
+    var currentComponent;
+
+
+    function createFactory(type) {
+    	return createElement.bind(null, type);
+    }
+
+
+    var DOM = {};
+    for (var i=ELEMENTS.length; i--; ) {
+    	DOM[ELEMENTS[i]] = createFactory(ELEMENTS[i]);
+    }
+
+    function upgradeToVNodes(arr, offset) {
+    	for (var i=offset || 0; i<arr.length; i++) {
+    		var obj = arr[i];
+    		if (Array.isArray(obj)) {
+    			upgradeToVNodes(obj);
+    		}
+    		else if (obj && typeof obj==='object' && !isValidElement(obj) && ((obj.props && obj.type) || (obj.attributes && obj.nodeName) || obj.children)) {
+    			arr[i] = createElement(obj.type || obj.nodeName, obj.props || obj.attributes, obj.children);
+    		}
+    	}
+    }
+
+    function isStatelessComponent(c) {
+    	return typeof c==='function' && !(c.prototype && c.prototype.render);
+    }
+
+
+    // wraps stateless functional components in a PropTypes validator
+    function wrapStatelessComponent(WrappedComponent) {
+    	return createClass({
+    		displayName: WrappedComponent.displayName || WrappedComponent.name,
+    		render: function() {
+    			return WrappedComponent(this.props, this.context);
+    		}
+    	});
+    }
+
+
+    function statelessComponentHook(Ctor) {
+    	var Wrapped = Ctor[COMPONENT_WRAPPER_KEY];
+    	if (Wrapped) { return Wrapped===true ? Ctor : Wrapped; }
+
+    	Wrapped = wrapStatelessComponent(Ctor);
+
+    	Object.defineProperty(Wrapped, COMPONENT_WRAPPER_KEY, { configurable:true, value:true });
+    	Wrapped.displayName = Ctor.displayName;
+    	Wrapped.propTypes = Ctor.propTypes;
+    	Wrapped.defaultProps = Ctor.defaultProps;
+
+    	Object.defineProperty(Ctor, COMPONENT_WRAPPER_KEY, { configurable:true, value:Wrapped });
+
+    	return Wrapped;
+    }
+
+
+    function createElement() {
+    	var args = [], len = arguments.length;
+    	while ( len-- ) args[ len ] = arguments[ len ];
+
+    	upgradeToVNodes(args, 2);
+    	return normalizeVNode(h.apply(void 0, args));
+    }
+
+
+    function normalizeVNode(vnode) {
+    	vnode.preactCompatNormalized = true;
+
+    	applyClassName(vnode);
+
+    	if (isStatelessComponent(vnode.nodeName)) {
+    		vnode.nodeName = statelessComponentHook(vnode.nodeName);
+    	}
+
+    	var ref = vnode.attributes.ref,
+    		type = ref && typeof ref;
+    	if (currentComponent && (type==='string' || type==='number')) {
+    		vnode.attributes.ref = createStringRefProxy(ref, currentComponent);
+    	}
+
+    	applyEventNormalization(vnode);
+
+    	return vnode;
+    }
+
+
+    function isValidElement(element) {
+    	return element && ((element instanceof VNode$1) || element.$$typeof===REACT_ELEMENT_TYPE);
+    }
+
+
+    function createStringRefProxy(name, component) {
+    	return component._refProxies[name] || (component._refProxies[name] = function (resolved) {
+    		if (component && component.refs) {
+    			component.refs[name] = resolved;
+    			if (resolved===null) {
+    				delete component._refProxies[name];
+    				component = null;
+    			}
+    		}
+    	});
+    }
+
+
+    function applyEventNormalization(ref) {
+    	var nodeName = ref.nodeName;
+    	var attributes = ref.attributes;
+
+    	if (!attributes || typeof nodeName!=='string') { return; }
+    	var props = {};
+    	for (var i in attributes) {
+    		props[i.toLowerCase()] = i;
+    	}
+    	if (props.ondoubleclick) {
+    		attributes.ondblclick = attributes[props.ondoubleclick];
+    		delete attributes[props.ondoubleclick];
+    	}
+    	// for *textual inputs* (incl textarea), normalize `onChange` -> `onInput`:
+    	if (props.onchange && (nodeName==='textarea' || (nodeName.toLowerCase()==='input' && !/^fil|che|rad/i.test(attributes.type)))) {
+    		var normalized = props.oninput || 'oninput';
+    		if (!attributes[normalized]) {
+    			attributes[normalized] = multihook([attributes[normalized], attributes[props.onchange]]);
+    			delete attributes[props.onchange];
+    		}
+    	}
+    }
+
+
+    function applyClassName(vnode) {
+    	var a = vnode.attributes || (vnode.attributes = {});
+    	classNameDescriptor.enumerable = 'className' in a;
+    	if (a.className) { a.class = a.className; }
+    	Object.defineProperty(a, 'className', classNameDescriptor);
+    }
+
+
+    var classNameDescriptor = {
+    	configurable: true,
+    	get: function() { return this.class; },
+    	set: function(v) { this.class = v; }
+    };
+
+    function extend$1(base, props) {
+    	var arguments$1 = arguments;
+
+    	for (var i=1, obj = (void 0); i<arguments.length; i++) {
+    		if ((obj = arguments$1[i])) {
+    			for (var key in obj) {
+    				if (obj.hasOwnProperty(key)) {
+    					base[key] = obj[key];
+    				}
+    			}
+    		}
+    	}
+    	return base;
+    }
+
+
+    function shallowDiffers(a, b) {
+    	for (var i in a) { if (!(i in b)) { return true; } }
+    	for (var i$1 in b) { if (a[i$1]!==b[i$1]) { return true; } }
+    	return false;
+    }
+
+
+    function findDOMNode(component) {
+    	return component && (component.base || component.nodeType === 1 && component) || null;
+    }
+
+
+    function F(){}
+
+    function createClass(obj) {
+    	function cl(props, context) {
+    		bindAll(this);
+    		Component$1$1.call(this, props, context, BYPASS_HOOK);
+    		newComponentHook.call(this, props, context);
+    	}
+
+    	obj = extend$1({ constructor: cl }, obj);
+
+    	// We need to apply mixins here so that getDefaultProps is correctly mixed
+    	if (obj.mixins) {
+    		applyMixins(obj, collateMixins(obj.mixins));
+    	}
+    	if (obj.statics) {
+    		extend$1(cl, obj.statics);
+    	}
+    	if (obj.propTypes) {
+    		cl.propTypes = obj.propTypes;
+    	}
+    	if (obj.defaultProps) {
+    		cl.defaultProps = obj.defaultProps;
+    	}
+    	if (obj.getDefaultProps) {
+    		cl.defaultProps = obj.getDefaultProps.call(cl);
+    	}
+
+    	F.prototype = Component$1$1.prototype;
+    	cl.prototype = extend$1(new F(), obj);
+
+    	cl.displayName = obj.displayName || 'Component';
+
+    	return cl;
+    }
+
+
+    // Flatten an Array of mixins to a map of method name to mixin implementations
+    function collateMixins(mixins) {
+    	var keyed = {};
+    	for (var i=0; i<mixins.length; i++) {
+    		var mixin = mixins[i];
+    		for (var key in mixin) {
+    			if (mixin.hasOwnProperty(key) && typeof mixin[key]==='function') {
+    				(keyed[key] || (keyed[key]=[])).push(mixin[key]);
+    			}
+    		}
+    	}
+    	return keyed;
+    }
+
+
+    // apply a mapping of Arrays of mixin methods to a component prototype
+    function applyMixins(proto, mixins) {
+    	for (var key in mixins) { if (mixins.hasOwnProperty(key)) {
+    		proto[key] = multihook(
+    			mixins[key].concat(proto[key] || ARR),
+    			key==='getDefaultProps' || key==='getInitialState' || key==='getChildContext'
+    		);
+    	} }
+    }
+
+
+    function bindAll(ctx) {
+    	for (var i in ctx) {
+    		var v = ctx[i];
+    		if (typeof v==='function' && !v.__bound && !AUTOBIND_BLACKLIST.hasOwnProperty(i)) {
+    			(ctx[i] = v.bind(ctx)).__bound = true;
+    		}
+    	}
+    }
+
+
+    function callMethod(ctx, m, args) {
+    	if (typeof m==='string') {
+    		m = ctx.constructor.prototype[m];
+    	}
+    	if (typeof m==='function') {
+    		return m.apply(ctx, args);
+    	}
+    }
+
+    function multihook(hooks, skipDuplicates) {
+    	return function() {
+    		var arguments$1 = arguments;
+
+    		var ret;
+    		for (var i=0; i<hooks.length; i++) {
+    			var r = callMethod(this, hooks[i], arguments$1);
+
+    			if (skipDuplicates && r!=null) {
+    				if (!ret) { ret = {}; }
+    				for (var key in r) { if (r.hasOwnProperty(key)) {
+    					ret[key] = r[key];
+    				} }
+    			}
+    			else if (typeof r!=='undefined') { ret = r; }
+    		}
+    		return ret;
+    	};
+    }
+
+
+    function newComponentHook(props, context) {
+    	propsHook.call(this, props, context);
+    	this.componentWillReceiveProps = multihook([propsHook, this.componentWillReceiveProps || 'componentWillReceiveProps']);
+    	this.render = multihook([propsHook, beforeRender, this.render || 'render', afterRender]);
+    }
+
+
+    function propsHook(props, context) {
+    	if (!props) { return; }
+
+    	// React annoyingly special-cases single children, and some react components are ridiculously strict about this.
+    	var c = props.children;
+    	if (c && Array.isArray(c) && c.length===1 && (typeof c[0]==='string' || typeof c[0]==='function' || c[0] instanceof VNode$1)) {
+    		props.children = c[0];
+
+    		// but its totally still going to be an Array.
+    		if (props.children && typeof props.children==='object') {
+    			props.children.length = 1;
+    			props.children[0] = props.children;
+    		}
+    	}
+
+    	// add proptype checking
+    	if (DEV) {
+    		var ctor = typeof this==='function' ? this : this.constructor,
+    			propTypes = this.propTypes || ctor.propTypes;
+    		var displayName = this.displayName || ctor.name;
+    	}
+    }
+
+
+    function beforeRender(props) {
+    	currentComponent = this;
+    }
+
+    function afterRender() {
+    	if (currentComponent===this) {
+    		currentComponent = null;
+    	}
+    }
+
+
+
+    function Component$1$1(props, context, opts) {
+    	Component.call(this, props, context);
+    	this.state = this.getInitialState ? this.getInitialState() : {};
+    	this.refs = {};
+    	this._refProxies = {};
+    	if (opts!==BYPASS_HOOK) {
+    		newComponentHook.call(this, props, context);
+    	}
+    }
+    extend$1(Component$1$1.prototype = new Component(), {
+    	constructor: Component$1$1,
+
+    	isReactComponent: {},
+
+    	replaceState: function(state, callback) {
+    		this.setState(state, callback);
+    		for (var i in this.state) {
+    			if (!(i in state)) {
+    				delete this.state[i];
+    			}
+    		}
+    	},
+
+    	getDOMNode: function() {
+    		return this.base;
+    	},
+
+    	isMounted: function() {
+    		return !!this.base;
+    	}
+    });
+
+
+
+    function PureComponent(props, context) {
+    	Component$1$1.call(this, props, context);
+    }
+    F.prototype = Component$1$1.prototype;
+    PureComponent.prototype = new F();
+    PureComponent.prototype.isPureReactComponent = true;
+    PureComponent.prototype.shouldComponentUpdate = function(props, state) {
+    	return shallowDiffers(this.props, props) || shallowDiffers(this.state, state);
+    };
 
     /*
     Copyright (c) 2019 Daybrush
-    name: keycon
+    name: react-scenejs-timeline
     license: MIT
     author: Daybrush
-    repository: git+https://github.com/daybrush/keycon.git
-    version: 0.2.2
+    repository: git+https://github.com/daybrush/scenejs-timeline.git
+    version: 0.1.4
     */
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -5099,8 +6611,8 @@ version: 0.1.3
 
     /* global Reflect, Promise */
 
-    var extendStatics$2 = function (d, b) {
-      extendStatics$2 = Object.setPrototypeOf || {
+    var extendStatics$1$1 = function (d, b) {
+      extendStatics$1$1 = Object.setPrototypeOf || {
         __proto__: []
       } instanceof Array && function (d, b) {
         d.__proto__ = b;
@@ -5108,11 +6620,11 @@ version: 0.1.3
         for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
       };
 
-      return extendStatics$2(d, b);
+      return extendStatics$1$1(d, b);
     };
 
-    function __extends$2(d, b) {
-      extendStatics$2(d, b);
+    function __extends$1$1(d, b) {
+      extendStatics$1$1(d, b);
 
       function __() {
         this.constructor = d;
@@ -5121,1102 +6633,1322 @@ version: 0.1.3
       d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     }
 
-    function createCommonjsModule(fn, module) {
-      return module = {
-        exports: {}
-      }, fn(module, module.exports), module.exports;
-    }
+    var __assign$1$1 = function () {
+      __assign$1$1 = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
 
-    var keycode = createCommonjsModule(function (module, exports) {
-      // Source: http://jsfiddle.net/vWx8V/
-      // http://stackoverflow.com/questions/5603195/full-list-of-javascript-keycodes
-
-      /**
-       * Conenience method returns corresponding value for given keyName or keyCode.
-       *
-       * @param {Mixed} keyCode {Number} or keyName {String}
-       * @return {Mixed}
-       * @api public
-       */
-      function keyCode(searchInput) {
-        // Keyboard Events
-        if (searchInput && 'object' === typeof searchInput) {
-          var hasKeyCode = searchInput.which || searchInput.keyCode || searchInput.charCode;
-          if (hasKeyCode) searchInput = hasKeyCode;
-        } // Numbers
-
-
-        if ('number' === typeof searchInput) return names[searchInput]; // Everything else (cast to string)
-
-        var search = String(searchInput); // check codes
-
-        var foundNamedKey = codes[search.toLowerCase()];
-        if (foundNamedKey) return foundNamedKey; // check aliases
-
-        var foundNamedKey = aliases[search.toLowerCase()];
-        if (foundNamedKey) return foundNamedKey; // weird character?
-
-        if (search.length === 1) return search.charCodeAt(0);
-        return undefined;
-      }
-      /**
-       * Compares a keyboard event with a given keyCode or keyName.
-       *
-       * @param {Event} event Keyboard event that should be tested
-       * @param {Mixed} keyCode {Number} or keyName {String}
-       * @return {Boolean}
-       * @api public
-       */
-
-
-      keyCode.isEventKey = function isEventKey(event, nameOrCode) {
-        if (event && 'object' === typeof event) {
-          var keyCode = event.which || event.keyCode || event.charCode;
-
-          if (keyCode === null || keyCode === undefined) {
-            return false;
-          }
-
-          if (typeof nameOrCode === 'string') {
-            // check codes
-            var foundNamedKey = codes[nameOrCode.toLowerCase()];
-
-            if (foundNamedKey) {
-              return foundNamedKey === keyCode;
-            } // check aliases
-
-
-            var foundNamedKey = aliases[nameOrCode.toLowerCase()];
-
-            if (foundNamedKey) {
-              return foundNamedKey === keyCode;
-            }
-          } else if (typeof nameOrCode === 'number') {
-            return nameOrCode === keyCode;
-          }
-
-          return false;
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
         }
+
+        return t;
       };
 
-      exports = module.exports = keyCode;
-      /**
-       * Get by name
-       *
-       *   exports.code['enter'] // => 13
-       */
-
-      var codes = exports.code = exports.codes = {
-        'backspace': 8,
-        'tab': 9,
-        'enter': 13,
-        'shift': 16,
-        'ctrl': 17,
-        'alt': 18,
-        'pause/break': 19,
-        'caps lock': 20,
-        'esc': 27,
-        'space': 32,
-        'page up': 33,
-        'page down': 34,
-        'end': 35,
-        'home': 36,
-        'left': 37,
-        'up': 38,
-        'right': 39,
-        'down': 40,
-        'insert': 45,
-        'delete': 46,
-        'command': 91,
-        'left command': 91,
-        'right command': 93,
-        'numpad *': 106,
-        'numpad +': 107,
-        'numpad -': 109,
-        'numpad .': 110,
-        'numpad /': 111,
-        'num lock': 144,
-        'scroll lock': 145,
-        'my computer': 182,
-        'my calculator': 183,
-        ';': 186,
-        '=': 187,
-        ',': 188,
-        '-': 189,
-        '.': 190,
-        '/': 191,
-        '`': 192,
-        '[': 219,
-        '\\': 220,
-        ']': 221,
-        "'": 222 // Helper aliases
-
-      };
-      var aliases = exports.aliases = {
-        'windows': 91,
-        '⇧': 16,
-        '⌥': 18,
-        '⌃': 17,
-        '⌘': 91,
-        'ctl': 17,
-        'control': 17,
-        'option': 18,
-        'pause': 19,
-        'break': 19,
-        'caps': 20,
-        'return': 13,
-        'escape': 27,
-        'spc': 32,
-        'spacebar': 32,
-        'pgup': 33,
-        'pgdn': 34,
-        'ins': 45,
-        'del': 46,
-        'cmd': 91
-        /*!
-         * Programatically add the following
-         */
-        // lower case chars
-
-      };
-
-      for (i = 97; i < 123; i++) codes[String.fromCharCode(i)] = i - 32; // numbers
-
-
-      for (var i = 48; i < 58; i++) codes[i - 48] = i; // function keys
-
-
-      for (i = 1; i < 13; i++) codes['f' + i] = i + 111; // numpad keys
-
-
-      for (i = 0; i < 10; i++) codes['numpad ' + i] = i + 96;
-      /**
-       * Get by code
-       *
-       *   exports.name[13] // => 'Enter'
-       */
-
-
-      var names = exports.names = exports.title = {}; // title for backward compat
-      // Create reverse mapping
-
-      for (i in codes) names[codes[i]] = i; // Add aliases
-
-
-      for (var alias in aliases) {
-        codes[alias] = aliases[alias];
-      }
-    });
-    var keycode_1 = keycode.code;
-    var keycode_2 = keycode.codes;
-    var keycode_3 = keycode.aliases;
-    var keycode_4 = keycode.names;
-    var keycode_5 = keycode.title;
-    /*
-    Copyright (c) 2018 Daybrush
-    @name: @daybrush/utils
-    license: MIT
-    author: Daybrush
-    repository: https://github.com/daybrush/utils
-    @version 0.7.1
-    */
-
-    /**
-    * get string "string"
-    * @memberof Consts
-    * @example
-    import {STRING} from "@daybrush/utils";
-
-    console.log(STRING); // "string"
-    */
-
-    var STRING = "string";
-    /**
-    * Check the type that the value is isArray.
-    * @memberof Utils
-    * @param {string} value - Value to check the type
-    * @return {} true if the type is correct, false otherwise
-    * @example
-    import {isArray} from "@daybrush/utils";
-
-    console.log(isArray([])); // true
-    console.log(isArray({})); // false
-    console.log(isArray(undefined)); // false
-    console.log(isArray(null)); // false
-    */
-
-    function isArray(value) {
-      return Array.isArray(value);
-    }
-    /**
-    * Check the type that the value is string.
-    * @memberof Utils
-    * @param {string} value - Value to check the type
-    * @return {} true if the type is correct, false otherwise
-    * @example
-    import {isString} from "@daybrush/utils";
-
-    console.log(isString("1234")); // true
-    console.log(isString(undefined)); // false
-    console.log(isString(1)); // false
-    console.log(isString(null)); // false
-    */
-
-
-    function isString(value) {
-      return typeof value === STRING;
-    }
-    /**
-    * Sets up a function that will be called whenever the specified event is delivered to the target
-    * @memberof DOM
-    * @param - event target
-    * @param - A case-sensitive string representing the event type to listen for.
-    * @param - The object which receives a notification (an object that implements the Event interface) when an event of the specified type occurs
-    * @param - An options object that specifies characteristics about the event listener. The available options are:
-    * @example
-    import {addEvent} from "@daybrush/utils";
-
-    addEvent(el, "click", e => {
-      console.log(e);
-    });
-    */
-
-
-    function addEvent$1(el, type, listener, options) {
-      el.addEventListener(type, listener, options);
-    }
-
-    var codeData = {
-      "+": "plus",
-      "left command": "meta",
-      "right command": "meta"
-    };
-    var keysSort = {
-      shift: 1,
-      ctrl: 2,
-      alt: 3,
-      meta: 4
+      return __assign$1$1.apply(this, arguments);
     };
 
-    function getKey(keyCode) {
-      var key = keycode_4[keyCode] || "";
+    function __rest(s, e) {
+      var t = {};
 
-      for (var name in codeData) {
-        key = key.replace(name, codeData[name]);
+      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+
+      if (s != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0) t[p[i]] = s[p[i]];
+      return t;
+    }
+
+    var PREFIX = "scenejs-editor-";
+    var SUPPORT_POINTER_EVENTS$2 = "PointerEvent" in window || "MSPointerEvent" in window;
+    var SUPPORT_TOUCH$2 = "ontouchstart" in window;
+    var CSS2 = "\n.item-info {\n    position: fixed;\n    right: 0;\n    top: 0;\n    width: 200px;\n    background: #000;\n}\n.options-area {\n\n}\n.option-area {\n    position: relative;\n    border-bottom: 1px solid #777;\n    box-sizing: border-box;\n    white-space: nowrap;\n    background: rgba(90, 90, 90, 0.7);\n    font-size: 13px;\n    font-weight: bold;\n    color: #eee;\n    display: flex;\n}\n.option-name, .option-value {\n    width: 50%;\n    height: 30px;\n    line-height: 20px;\n    box-sizing: border-box;\n    padding: 5px;\n}\n.option-name {\n    border-right: 1px solid #999;\n}\n.option-value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
+    var CSS = "\n.timeline * {\n    box-sizing: border-box;\n}\n.timeline {\n  position: fixed;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  width: 100%;\n  font-size: 0;\n  background: #000;\n  display: flex;\n  flex-direction: column;\n}\n.header-area, .scroll-area {\n   width: 100%;\n   position: relative;\n  display: flex;\n  -webkit-align-items: flex-start;\n  align-items: flex-start;\n}\n.header-area {\n  position: relative;\n  z-index: 10;\n  top: 0;\n  height: 30px;\n  min-height: 30px;\n}\n.header-area .keyframes {\n  padding: 0px;\n}\n.header-area .properties-area,\n.header-area .keyframes-area,\n.header-area .values-area,\n.header-area .keyframes-scroll-area {\n    height: 100%;\n}\n.header-area .keyframes-scroll-area {\n    overflow: hidden;\n}\n.header-area .property, .header-area .value, .header-area .keyframes {\n  height: 100%;\n}\n.header-area .property {\n    line-height: 30px;\n}\n.value .add {\n    text-align: center;\n    color: #fff;\n    line-height: 30px;\n    font-weight: bold;\n    font-size: 20px;\n    cursor: pointer;\n}\n.header-area .keyframes-area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.header-area .keyframe-cursor {\n    position: absolute;\n    border-top: 10px solid #4af;\n    border-left: 6px solid transparent;\n    border-right: 6px solid transparent;\n    width: 0;\n    height: 0;\n    bottom: 0;\n    top: auto;\n    background: none;\n    cursor: pointer;\n}\n.control-area .keyframes {\n    padding-left: 10px;\n}\n.play-control-area {\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    transform: translate(-50%, -50%);\n}\n.play-control-area .control {\n    position: relative;\n    display: inline-block;\n    vertical-align: middle;\n    color: white;\n    margin: 0px 15px;\n    cursor: pointer;\n}\n.play {\n    border-left: 14px solid white;\n    border-top: 8px solid transparent;\n    border-bottom: 8px solid transparent;\n}\n.pause {\n    border-left: 4px solid #fff;\n    border-right: 4px solid #fff;\n    width: 14px;\n    height: 16px;\n}\n.prev {\n    border-right: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.prev:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    right: 100%;\n    transform: translate(0, -50%);\n    background: white;\n}\n.next {\n    border-left: 10px solid white;\n    border-top: 6px solid transparent;\n    border-bottom: 6px solid transparent;\n}\n.next:before {\n    position: absolute;\n    content: \"\";\n    width: 3px;\n    height: 10px;\n    top: 0;\n    transform: translate(0, -50%);\n    background: white;\n}\n.keytime {\n  position: relative;\n  display: inline-block;\n  height: 100%;\n  font-size: 13px;\n  font-weight: bold;\n  color: #777;\n}\n.keytime:last-child {\n  max-width: 0px;\n}\n.keytime span {\n  position: absolute;\n  line-height: 1;\n  bottom: 12px;\n  display: inline-block;\n  transform: translate(-50%);\n  color: #eee;\n}\n.keytime .graduation {\n  position: absolute;\n  bottom: 0;\n  width: 1px;\n  height: 10px;\n  background: #777;\n  transform: translate(-50%);\n}\n.keytime .graduation.half {\n  left: 50%;\n  height: 7px;\n}\n.keytime .graduation.quarter {\n  left: 25%;\n  height: 5px;\n}\n.keytime .graduation.quarter3 {\n  left: 75%;\n  height: 5px;\n}\n.scroll-area {\n  position: relative;\n  width: 100%;\n  height: calc(100% - 60px);\n  overflow: auto;\n}\n.properties-area, .keyframes-area, .values-area {\n  display: inline-block;\n  position: relative;\n  font-size: 16px;\n  overflow: auto;\n}\n\n.properties-area::-webkit-scrollbar, .keyframes-area::-webkit-scrollbar {\n    display: none; // Safari and Chrome\n}\n.properties-area {\n  width: 30%;\n  max-width: 200px;\n  box-sizing: border-box;\n}\n.values-area {\n    width: 50px;\n    min-width: 50px;\n    display: inline-block;\n    border-right: 1px solid #999;\n    box-sizing: border-box;\n}\n.value input {\n    appearance: none;\n    -webkit-appearance: none;\n    outline: none;\n    position: relative;\n    display: block;\n    width: 100%;\n    height: 100%;\n    background: transparent;\n    color: #4af;\n    font-weight: bold;\n    background: none;\n    border: 0;\n    box-sizing: border-box;\n    text-align: center;\n}\n.value {\n\n}\n.alt .value input {\n    cursor: ew-resize;\n}\n.value[data-object=\"1\"] input {\n    display: none;\n}\n.properties-scroll-area {\n  display: inline-block;\n  min-width: 100%;\n}\n.keyframes-area {\n  flex: 1;\n}\n.keyframes-scroll-area {\n  position: relative;\n  min-width: 300px;\n}\n.keyframes, .property, .value {\n  position: relative;\n  height: 30px;\n  line-height: 30px;\n  border-bottom: 1px solid #777;\n  box-sizing: border-box;\n  white-space: nowrap;\n  background: rgba(90, 90, 90, 0.7);\n  z-index: 1;\n}\n\n.property {\n  padding-left: 10px;\n  box-sizing: border-box;\n  font-size: 13px;\n  font-weight: bold;\n  color: #eee;\n}\n.property .remove {\n    position: absolute;\n    display: inline-block;\n    cursor: pointer;\n    width: 18px;\n    height: 18px;\n    top: 0;\n    bottom: 0;\n    right: 10px;\n    margin: auto;\n    border-radius: 50%;\n    border: 2px solid #fff;\n    vertical-align: middle;\n    display: none;\n    margin-left: 10px;\n    box-sizing: border-box;\n}\n.property .remove:before, .property .remove:after {\n    position: absolute;\n    content: \"\";\n    width: 8px;\n    height: 2px;\n    border-radius: 1px;\n    background: #fff;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    margin: auto;\n}\n.property .remove:before {\n    transform: rotate(45deg);\n}\n.property .remove:after {\n    transform: rotate(-45deg);\n}\n.property:hover .remove {\n    display: inline-block;\n}\n\n[data-item=\"1\"], [data-item=\"1\"] .add {\n    height: 30px;\n    line-height: 30px;\n}\n.time-area {\n    position: absolute;\n    top: 0;\n    left: 10px;\n    font-size: 13px;\n    color: #4af;\n    line-height: 30px;\n    font-weight: bold;\n    height: 100%;\n    line-height: 30px;\n    border: 0;\n    background: transparent;\n    outline: 0;\n}\n.time-area:after {\n    content: \"s\";\n}\n.property .arrow {\n    position: relative;\n    display: inline-block;\n    width: 20px;\n    height: 25px;\n    cursor: pointer;\n    vertical-align: middle;\n}\n.property .arrow:after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    left: 0;\n    bottom: 0;\n    margin: auto;\n    width: 0;\n    height: 0;\n    border-top: 6px solid #eee;\n    border-left: 4px solid transparent;\n    border-right: 4px solid transparent;\n}\n.property[data-fold=\"1\"] .arrow:after {\n    border-top: 4px solid transparent;\n    border-bottom: 4px solid transparent;\n    border-right: 0;\n    border-left: 6px solid #eee;\n}\n.property[data-object=\"0\"] .arrow {\n    display: none;\n}\n.property.fold, .keyframes.fold, .value.fold {\n    display: none;\n}\n.property.select, .value.select, .keyframes.select {\n    background: rgba(120, 120, 120, 0.7);\n}\n.keyframes {\n\n}\n.keyframe-delay {\n  position: absolute;\n  top: 3px;\n  bottom: 3px;\n  left: 0;\n  background: #4af;\n  opacity: 0.2;\n  z-index: 0;\n}\n.keyframe-group {\n    position: absolute;\n    top: 3px;\n    bottom: 3px;\n    left: 0;\n    background: #4af;\n    opacity: 0.6;\n    border: 1px solid rgba(0, 0, 0, 0.2);\n    border-left-color: rgba(255, 255, 255, 0.2);\n    border-top-color: rgba(255, 255, 255, 0.2);\n    z-index: 0;\n}\n.keyframe-line {\n  position: absolute;\n  height: 8px;\n  top: 0;\n  bottom: 0;\n  margin: auto;\n  background: #666;\n  z-index: 0;\n}\n.keyframe {\n  position: absolute;\n  font-size: 0px;\n  width: 12px;\n  height: 12px;\n  top: 0px;\n  bottom: 0px;\n  margin: auto;\n  background: #fff;\n  border: 2px solid #383838;\n  border-radius: 2px;\n  box-sizing: border-box;\n  transform: translate(-50%) rotate(45deg);\n  z-index: 1;\n  cursor: pointer;\n}\n.keyframe[data-no=\"1\"] {\n    opacity: 0.2;\n}\n.select .keyframe {\n    border-color: #555;\n}\n.keyframe.select {\n    background: #4af;\n}\n.keyframes-container, .line-area {\n  position: relative;\n  width: calc(100% - 30px);\n  left: 15px;\n  height: 100%;\n}\n.line-area {\n  position: absolute;\n  top: 0;\n  z-index: 0;\n}\n.keyframe-cursor {\n  position: absolute;\n  top: 0;\n  z-index: 1;\n  background: #4af;\n  width: 1px;\n  height: 100%;\n  left: 15px;\n  transform: translate(-50%);\n}\n.scroll-aare .keyframe-cursor {\n  pointer-events: none;\n}\n.division-line {\n  position: absolute;\n  background: #333;\n  width: 1px;\n  height: 100%;\n  transform: translate(-50%);\n}\n".replace(/\.([^{,\s\d.]+)/g, "." + PREFIX + "$1");
+    var DIRECTION = "direction";
+    var ITERATION_COUNT = "iterationCount";
+    var DELAY = "delay";
+    var PLAY_SPEED = "playSpeed";
+    var ALTERNATE = "alternate";
+    var REVERSE = "reverse";
+    var ALTERNATE_REVERSE = "alternate-reverse";
+
+    function numberFormat(num, count, isRight) {
+      var length = ("" + num).length;
+      var arr = [];
+
+      if (isRight) {
+        arr.push(num);
       }
 
-      return key.replace(/\s/g, "");
+      for (var i = length; i < count; ++i) {
+        arr.push(0);
+      }
+
+      if (!isRight) {
+        arr.push(num);
+      }
+
+      return arr.join("");
     }
 
-    function getCombi(e, key) {
-      var keys = [e.shiftKey && "shift", e.ctrlKey && "ctrl", e.altKey && "alt", e.metaKey && "meta"];
-      keys.indexOf(key) === -1 && keys.push(key);
-      return keys.filter(Boolean);
+    function keys(value) {
+      var arr = [];
+
+      for (var name in value) {
+        arr.push(name);
+      }
+
+      return arr;
     }
 
-    function getArrangeCombi(keys) {
-      var arrangeKeys = keys.slice();
-      arrangeKeys.sort(function (prev, next) {
-        var prevScore = keysSort[prev] || 5;
-        var nextScore = keysSort[next] || 5;
-        return prevScore - nextScore;
+    function toValue(value) {
+      if (isObject(value)) {
+        if (Array.isArray(value)) {
+          return "[" + value.join(", ") + "]";
+        }
+
+        return "{" + keys(value).map(function (k) {
+          return k + ": " + toValue(value[k]);
+        }).join(", ") + "}";
+      }
+
+      return value;
+    }
+
+    function flatObject(obj, newObj) {
+      if (newObj === void 0) {
+        newObj = {};
+      }
+
+      for (var name in obj) {
+        var value = obj[name];
+
+        if (isObject(value)) {
+          var nextObj = flatObject(isFrame(value) ? value.get() : value);
+
+          for (var nextName in nextObj) {
+            newObj[name + "///" + nextName] = nextObj[nextName];
+          }
+        } else {
+          newObj[name] = value;
+        }
+      }
+
+      return newObj;
+    }
+
+    function getTarget(target, conditionCallback) {
+      var parentTarget = target;
+
+      while (parentTarget && parentTarget !== document.body) {
+        if (conditionCallback(parentTarget)) {
+          return parentTarget;
+        }
+
+        parentTarget = parentTarget.parentNode;
+      }
+
+      return null;
+    }
+
+    function hasClass$1(target, className) {
+      return hasClass(target, "" + PREFIX + className);
+    }
+
+    function isScene(value) {
+      return !!value.constructor.prototype.getItem;
+    }
+
+    function isFrame(value) {
+      return !!value.constructor.prototype.toCSS;
+    }
+
+    function findElementIndexByPosition(elements, pos) {
+      return findIndex(elements, function (el) {
+        var box = el.getBoundingClientRect();
+        var top = box.top;
+        var bottom = top + box.height;
+        return top <= pos && pos < bottom;
       });
-      return arrangeKeys;
     }
-    /**
-     */
 
+    function prefix(className) {
+      return className.split(" ").map(function (name) {
+        return "" + PREFIX + name;
+      }).join(" ");
+    }
 
-    var KeyController =
+    function ref(target, name) {
+      return function (e) {
+        e && (target[name] = e);
+      };
+    }
+
+    function refs(target, name, i) {
+      return function (e) {
+        e && (target[name][i] = e);
+      };
+    }
+
+    function checkFolded(foldedInfo, names) {
+      var index = findIndex(names, function (name, i) {
+        return foldedInfo[names.slice(0, i + 1).join("///") + "///"];
+      });
+
+      if (index > -1) {
+        if (index === names.length - 1) {
+          return 2;
+        }
+
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    function fold(target, foldedProperty, isNotUpdate) {
+      var id = foldedProperty + "///";
+      var foldedInfo = target.state.foldedInfo;
+      foldedInfo[id] = !foldedInfo[id]; // console.log(foldedInfo);
+
+      if (!isNotUpdate) {
+        target.setState({
+          foldedInfo: __assign$1$1({}, foldedInfo)
+        });
+      }
+    }
+
+    var ElementComponent =
     /*#__PURE__*/
     function (_super) {
-      __extends$2(KeyController, _super);
-      /**
-       *
-       */
+      __extends$1$1(ElementComponent, _super);
 
+      function ElementComponent() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
 
-      function KeyController(container) {
-        if (container === void 0) {
-          container = window;
-        }
+      var __proto = ElementComponent.prototype;
 
-        var _this = _super.call(this) || this;
-        /**
-         */
+      __proto.getElement = function () {
+        return this.element || (this.element = findDOMNode(this));
+      };
 
+      return ElementComponent;
+    }(PureComponent);
 
-        _this.ctrlKey = false;
-        /**
-         */
+    var TimeArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(TimeArea, _super);
 
-        _this.altKey = false;
-        /**
-         *
-         */
+      function TimeArea() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
 
-        _this.shiftKey = false;
-        /**
-         *
-         */
+      var __proto = TimeArea.prototype;
 
-        _this.metaKey = false;
+      __proto.render = function () {
+        return createElement("input", {
+          className: prefix("time-area")
+        });
+      };
 
-        _this.clear = function () {
-          _this.ctrlKey = false;
-          _this.altKey = false;
-          _this.shiftKey = false;
-          _this.metaKey = false;
+      __proto.componentDidMount = function () {
+        var _this = this;
+
+        new KeyController(this.getElement()).keydown(function (e) {
+          !e.isToggle && e.inputEvent.stopPropagation();
+        }).keyup(function (e) {
+          !e.isToggle && e.inputEvent.stopPropagation();
+        }).keyup("enter", function (e) {
+          // go to time
+          var value = _this.getElement().value;
+
+          var result = /(\d+):(\d+):(\d+)/g.exec(value);
+
+          if (!result) {
+            return;
+          }
+
+          var minute = parseFloat(result[1]);
+          var second = parseFloat(result[2]);
+          var milisecond = parseFloat("0." + result[3]);
+          var time = minute * 60 + second + milisecond;
+
+          _this.props.setTime(time);
+        });
+      };
+
+      return TimeArea;
+    }(ElementComponent);
+
+    var ControlArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(ControlArea, _super);
+
+      function ControlArea() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+
+        _this.state = {
+          isPlay: false
         };
 
-        _this.keydownEvent = function (e) {
-          _this.triggerEvent("keydown", e);
+        _this.play = function () {
+          _this.setState({
+            isPlay: true
+          });
         };
 
-        _this.keyupEvent = function (e) {
-          _this.triggerEvent("keyup", e);
+        _this.pause = function () {
+          _this.setState({
+            isPlay: false
+          });
         };
 
-        addEvent$1(container, "blur", _this.clear);
-        addEvent$1(container, "keydown", _this.keydownEvent);
-        addEvent$1(container, "keyup", _this.keyupEvent);
+        _this.unselect = function () {
+          _this.props.select("", -1);
+        };
+
         return _this;
       }
-      /**
-       *
-       */
 
+      var __proto = ControlArea.prototype;
 
-      var __proto = KeyController.prototype;
-
-      __proto.keydown = function (comb, callback) {
-        return this.addEvent("keydown", comb, callback);
+      __proto.render = function () {
+        return createElement("div", {
+          className: prefix("control-area header-area")
+        }, createElement("div", {
+          className: prefix("properties-area"),
+          onClick: this.unselect
+        }, createElement("div", {
+          className: prefix("property")
+        })), createElement("div", {
+          className: prefix("values-area")
+        }, createElement("div", {
+          className: prefix("value")
+        })), createElement("div", {
+          className: prefix("keyframes-area")
+        }, createElement("div", {
+          className: prefix("keyframes")
+        }, createElement(TimeArea, {
+          ref: ref(this, "timeArea"),
+          setTime: this.props.setTime
+        }), createElement("div", {
+          className: prefix("play-control-area")
+        }, createElement("div", {
+          className: prefix("control prev"),
+          onClick: this.props.prev
+        }), createElement("div", {
+          className: prefix("control " + (this.state.isPlay ? "pause" : "play")),
+          onClick: this.props.togglePlay
+        }), createElement("div", {
+          className: prefix("control next"),
+          onClick: this.props.next
+        })))));
       };
-      /**
-       *
-       */
 
-
-      __proto.keyup = function (comb, callback) {
-        return this.addEvent("keyup", comb, callback);
+      __proto.componentDidMount = function () {
+        this.initScene(this.props.scene);
       };
 
-      __proto.addEvent = function (type, comb, callback) {
-        if (isArray(comb)) {
-          this.on(type + "." + getArrangeCombi(comb).join("."), callback);
-        } else if (isString(comb)) {
-          this.on(type + "." + comb, callback);
-        } else {
-          this.on(type, comb);
+      __proto.componentDidUpdate = function (prevProps) {
+        if (prevProps.scene !== this.props.scene) {
+          this.initScene(this.props.scene);
+          this.releaseScene(prevProps.scene);
+        }
+      };
+
+      __proto.componentWillUnmount = function () {
+        this.releaseScene(this.props.scene);
+      };
+
+      __proto.initScene = function (scene) {
+        if (!scene) {
+          return;
         }
 
-        return this;
-      };
-
-      __proto.triggerEvent = function (type, e) {
-        this.ctrlKey = e.ctrlKey;
-        this.shiftKey = e.shiftKey;
-        this.altKey = e.altKey;
-        this.metaKey = e.metaKey;
-        var key = getKey(e.keyCode);
-        var isToggle = key === "ctrl" || key === "shift" || key === "meta" || key === "alt";
-        var param = {
-          key: key,
-          isToggle: isToggle,
-          inputEvent: e,
-          keyCode: e.keyCode,
-          ctrlKey: e.ctrlKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey,
-          metaKey: e.metaKey
-        };
-        this.trigger(type, param);
-        this.trigger(type + "." + key, param);
-        var combi = getCombi(e, key);
-        combi.length > 1 && this.trigger(type + "." + combi.join("."), param);
-      };
-
-      return KeyController;
-    }(Component);
-
-    /*
-    Copyright (c) 2018 Daybrush
-    @name: @daybrush/utils
-    license: MIT
-    author: Daybrush
-    repository: https://github.com/daybrush/utils
-    @version 0.7.1
-    */
-    /**
-    * get string "undefined"
-    * @memberof Consts
-    * @example
-    import {UNDEFINED} from "@daybrush/utils";
-
-    console.log(UNDEFINED); // "undefined"
-    */
-
-    var UNDEFINED$1 = "undefined";
-    /**
-    * @namespace
-    * @name Utils
-    */
-
-    /**
-    * Check the type that the value is undefined.
-    * @memberof Utils
-    * @param {string} value - Value to check the type
-    * @return {boolean} true if the type is correct, false otherwise
-    * @example
-    import {isUndefined} from "@daybrush/utils";
-
-    console.log(isUndefined(undefined)); // true
-    console.log(isUndefined("")); // false
-    console.log(isUndefined(1)); // false
-    console.log(isUndefined(null)); // false
-    */
-
-    function isUndefined$2(value) {
-      return typeof value === UNDEFINED$1;
-    }
-
-    /*
-    Copyright (c) 2019 Daybrush
-    name: data-dom
-    license: MIT
-    author: Daybrush
-    repository: git+https://github.com/daybrush/data-dom.git
-    version: 0.0.11
-    */
-
-    function concat(arr) {
-      return [].concat(arr);
-    }
-
-    function render(createElement, structure, parentStructureIndex, parentEl) {
-      if (parentStructureIndex === void 0) {
-        parentStructureIndex = 0;
-      }
-
-      var children = structure.children;
-      var el = createElement(structure);
-      structure.element = el;
-
-      if (structure.ref) {
-        structure.ref(structure, parentStructureIndex);
-      }
-
-      if (children) {
-        concat(children).filter(function (child) {
-          return child;
-        }).forEach(function (child, i) {
-          render(createElement, child, i, el);
+        scene.on({
+          play: this.play,
+          paused: this.pause
         });
-      }
-
-      parentEl && parentEl.appendChild(el);
-      return structure;
-    }
-
-    function compare(prevArr, nextArr, syncCallback) {
-      var prevKeys = prevArr.map(function (_a, i) {
-        var key = _a.key;
-        return isUndefined$2(key) ? i : key;
-      });
-      var nextKeys = nextArr.map(function (_a, i) {
-        var key = _a.key;
-        return isUndefined$2(key) ? i : key;
-      });
-      var prevKeysObject = {};
-      var nextKeysObject = {};
-      var added = [];
-      var removed = [];
-      var changed = [];
-      prevKeys.forEach(function (key, i) {
-        prevKeysObject[key] = i;
-      });
-      nextKeys.forEach(function (key, i) {
-        if (!(key in prevKeysObject)) {
-          added.push(i);
-        } else {
-          syncCallback(prevArr[prevKeysObject[key]], nextArr[i], i);
-        }
-
-        nextKeysObject[key] = i;
-      });
-      prevKeys.forEach(function (key, i) {
-        var index = nextKeysObject[key];
-
-        if (isUndefined$2(index)) {
-          removed.push(i);
-        } else if (i !== index) {
-          changed.push([i, index]);
-        }
-      });
-      changed.sort(function (a, b) {
-        return a[1] > b[1] ? 1 : -1;
-      });
-      var newChanged = changed.filter(function (changeInfo) {
-        return changeInfo[1] < changeInfo[0];
-      });
-      return {
-        added: added,
-        removed: removed,
-        changed: newChanged
       };
-    }
 
-    function update(createElement, updateElement, prevStructure, nextStructure, parentStructure, startIndex) {
-      if (startIndex === void 0) {
-        startIndex = 0;
-      }
-
-      var prevStructures = concat(prevStructure || []);
-      var nextStructures = concat(nextStructure || []);
-
-      var _a = compare(prevStructures, nextStructures || [], function (prev, next, index) {
-        next.element = prev.element;
-
-        if (next.ref) {
-          next.ref(next, startIndex + index);
+      __proto.releaseScene = function (scene) {
+        if (!scene) {
+          return;
         }
 
-        updateElement(prev, next);
-        update(createElement, updateElement, prev.children, next.children, next);
-      }),
-          added = _a.added,
-          changed = _a.changed,
-          removed = _a.removed;
+        scene.off("play", this.play);
+        scene.off("paused", this.pause);
+      };
 
-      if (parentStructure) {
-        var parentElement_1 = parentStructure.element;
-        removed.reverse().forEach(function (index) {
-          parentElement_1.removeChild(prevStructures[index].element);
-        });
+      return ControlArea;
+    }(ElementComponent);
 
-        if (changed.length) {
-          var min_1 = Infinity;
-          var max_1 = -1;
-          changed.forEach(function (_a) {
-            var from = _a[0],
-                to = _a[1];
-            min_1 = Math.min(min_1, to);
-            max_1 = Math.max(max_1, to);
-          });
-          added.forEach(function (index) {
-            render(createElement, nextStructures[index], index);
-            min_1 = Math.min(min_1, index);
-            max_1 = Math.max(max_1, index);
-          });
-
-          for (var i = max_1; i >= min_1; --i) {
-            parentElement_1.insertBefore(nextStructure[i].element, nextStructure[i + 1] && nextStructure[i + 1].element);
-          }
-        } else {
-          added.forEach(function (index) {
-            var element = render(createElement, nextStructures[index], index).element;
-            parentElement_1.insertBefore(element, nextStructures[index + 1] && nextStructures[index + 1].element);
-          });
-        }
-
-        if (nextStructure) {
-          parentStructure.children = nextStructure;
-        }
-      }
-    }
-
-    var DataDOM =
+    var KeyframeCursor =
     /*#__PURE__*/
-    function () {
-      function DataDOM(createElement, updateElement) {
-        this.createElement = createElement;
-        this.updateElement = updateElement;
+    function (_super) {
+      __extends$1$1(KeyframeCursor, _super);
+
+      function KeyframeCursor() {
+        return _super !== null && _super.apply(this, arguments) || this;
       }
 
-      var __proto = DataDOM.prototype;
+      var __proto = KeyframeCursor.prototype;
 
-      __proto.render = function (structure, parentEl) {
-        return render(this.createElement, structure, 0, parentEl);
+      __proto.render = function () {
+        return createElement("div", {
+          className: prefix("keyframe-cursor"),
+          ref: ref(this, "cursor")
+        });
       };
 
-      __proto.update = function (prevStructure, nextStructure, parentStructure) {
-        update(this.createElement, this.updateElement, prevStructure, nextStructure, parentStructure);
-        return this;
-      };
+      return KeyframeCursor;
+    }(ElementComponent);
 
-      return DataDOM;
-    }();
+    var KeytimesArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(KeytimesArea, _super);
 
-    function getKeytimesStructure(maxTime) {
-      var keytimes = [];
-
-      for (var time = 0; time <= maxTime; ++time) {
-        keytimes.push({
-          key: time,
-          dataset: {
-            time: time
-          },
-          selector: ".keytime",
-          style: {
-            width: 100 / maxTime + "%"
-          },
-          children: [{
-            selector: "span",
-            html: "" + time
-          }, {
-            selector: ".graduation.start"
-          }, {
-            selector: ".graduation.quarter"
-          }, {
-            selector: ".graduation.half"
-          }, {
-            selector: ".graduation.quarter3"
-          }]
-        });
+      function KeytimesArea() {
+        return _super !== null && _super.apply(this, arguments) || this;
       }
 
-      return keytimes;
-    }
-    function getLinesStructure(maxTime) {
-      var lines = [];
+      var __proto = KeytimesArea.prototype;
 
-      for (var time = 0; time <= maxTime; ++time) {
-        lines.push({
-          key: time,
-          selector: ".division_line",
-          style: {
-            left: 100 / maxTime * time + "%"
-          }
-        });
-      }
+      __proto.renderKeytimes = function () {
+        var maxTime = this.props.maxTime;
+        var keytimes = [];
 
-      return lines;
-    }
-
-    function getHeaderAreaStructure(ids, zoom, maxDuration, maxTime) {
-      return {
-        selector: ".header_area",
-        ref: function (e) {
-          ids.keyframesScrollAreas = [];
-          ids.keyframesAreas = [];
-          ids.propertiesAreas = [];
-        },
-        children: [{
-          ref: function (e) {
-            ids.propertiesAreas[0] = e;
-          },
-          selector: ".properties_area",
-          children: [{
-            selector: ".property",
-            html: "Name"
-          }]
-        }, {
-          selector: ".values_area",
-          children: {
-            selector: ".value",
-            children: {
-              key: "add",
-              selector: ".add",
-              html: "+",
-              ref: function (e) {
-                ids.addItem = e;
-              }
+        for (var time = 0; time <= maxTime; ++time) {
+          keytimes.push(createElement("div", {
+            key: time,
+            "data-time": time,
+            className: prefix("keytime"),
+            style: {
+              width: 100 / maxTime + "%"
             }
-          }
-        }, getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime)]
+          }, createElement("span", null, time), createElement("div", {
+            className: prefix("graduation start")
+          }), createElement("div", {
+            className: prefix("graduation quarter")
+          }), createElement("div", {
+            className: prefix("graduation half")
+          }), createElement("div", {
+            className: prefix("graduation quarter3")
+          })));
+        }
+
+        return keytimes;
       };
-    }
-    function getKeytimesAreaStructure(ids, zoom, maxDuration, maxTime) {
-      return {
-        ref: function (e) {
-          ids.keyframesAreas[0] = e;
-        },
-        selector: ".keyframes_area",
-        children: {
+
+      __proto.render = function () {
+        var _a = this.props,
+            maxTime = _a.maxTime,
+            maxDuration = _a.maxDuration,
+            zoom = _a.zoom;
+        return createElement("div", {
+          className: prefix("keytimes-area keyframes-area")
+        }, createElement("div", {
+          className: prefix("keyframes-scroll-area"),
+          ref: ref(this, "scrollAreaElement"),
           style: {
             minWidth: 50 * maxTime + "px",
             width: Math.min(maxDuration ? maxTime / maxDuration : 1, 2) * zoom * 100 + "%"
-          },
-          dataset: {
-            width: Math.min(maxDuration ? maxTime / maxDuration : 1, 2)
-          },
-          ref: function (e) {
-            ids.keyframesScrollAreas[0] = e;
-          },
-          selector: ".keyframes_scroll_area",
-          children: {
-            ref: function (e) {
-              ids.cursors = [];
-            },
-            selector: ".keyframes",
-            children: [{
-              ref: function (e) {
-                ids.keytimesContainer = e;
-              },
-              selector: ".keyframes_container",
-              children: getKeytimesStructure(maxTime)
-            }, {
-              selector: ".keyframe_cursor",
-              ref: function (e) {
-                ids.cursors[0] = e;
-              }
-            }]
           }
-        }
+        }, createElement("div", {
+          className: prefix("keytimes keyframes")
+        }, createElement("div", {
+          className: prefix("keyframes-container")
+        }, this.renderKeytimes()), createElement(KeyframeCursor, {
+          ref: ref(this, "cursor")
+        }))));
       };
-    }
 
-    function getKeyframesAreaStructure(ids, keyframesList, zoom, maxDuration, maxTime) {
-      var width = Math.min(maxDuration ? maxTime / maxDuration : 1, 2);
-      return {
-        ref: function (e) {
-          ids.keyframesAreas[1] = e;
-        },
-        selector: ".keyframes_area",
-        children: {
-          style: {
-            minWidth: 50 * maxTime + "px",
-            width: width * zoom * 100 + "%"
-          },
-          dataset: {
-            width: width
-          },
-          ref: function (e) {
-            ids.keyframesScrollAreas[1] = e;
-          },
-          selector: ".keyframes_scroll_area",
-          children: getKeyframesScrollAreaChildrenStructure(ids, keyframesList, maxTime)
-        }
-      };
-    }
-    function getKeyframesScrollAreaChildrenStructure(ids, keyframesList, maxTime) {
-      return keyframesList.concat([{
-        key: "cursor",
-        selector: ".keyframe_cursor",
-        ref: function (e) {
-          ids.cursors[1] = e;
-        }
-      }, {
-        key: "lineArea",
-        ref: function (e) {
-          ids.lineArea = e;
-        },
-        selector: ".line_area",
-        children: getLinesStructure(maxTime)
-      }]);
-    }
-    function getKeyframesListStructure(ids, timelineInfo, maxTime) {
-      var keyframesList = [];
+      __proto.componentDidMount = function () {
+        var _this = this;
 
-      for (var key in timelineInfo) {
-        var propertiesInfo = timelineInfo[key];
-        var keyframes = getKeyframesStructure(propertiesInfo, maxTime);
-        keyframesList.push({
-          ref: function (e, i) {
-            ids.keyframesList[i] = e;
-            ids.keyframesContainers[i] = e.children;
-          },
-          selector: ".keyframes",
-          key: key,
-          dataset: {
-            item: propertiesInfo.isItem ? "1" : "0",
-            key: key
-          },
-          datas: propertiesInfo,
-          children: {
-            selector: ".keyframes_container",
-            children: keyframes
-          }
+        addEvent(this.getElement(), "wheel", function (e) {
+          var delta = e.deltaY;
+
+          _this.props.axes.setBy({
+            zoom: delta / 5000
+          });
+
+          !e.deltaX && e.preventDefault();
         });
+        setDrag(this.cursor.getElement(), {
+          dragstart: function (_a) {
+            var inputEvent = _a.inputEvent;
+            inputEvent.stopPropagation();
+          },
+          drag: function (_a) {
+            var clientX = _a.clientX;
+
+            _this.props.move(clientX);
+          },
+          container: window
+        });
+      };
+
+      return KeytimesArea;
+    }(ElementComponent);
+
+    var HeaderArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(HeaderArea, _super);
+
+      function HeaderArea() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+
+        _this.add = function () {
+          if (_this.props.scene) {
+            return;
+          }
+
+          _this.props.add();
+        };
+
+        return _this;
       }
 
-      return keyframesList;
-    }
-    function getDelayFrameStructure(time, nextTime, maxTime) {
-      return {
-        selector: ".keyframe_delay",
-        key: "delay" + time + "," + nextTime,
-        datas: {
-          time: -1
-        },
-        style: {
-          left: time / maxTime * 100 + "%",
-          width: (nextTime - time) / maxTime * 100 + "%"
-        }
-      };
-    }
-    function getKeyframesStructure(propertiesInfo, maxTime) {
-      var item = propertiesInfo.item,
-          frames = propertiesInfo.frames,
-          properties = propertiesInfo.properties;
-      var isItScene = isScene(item);
-      var duration = item.getDuration();
-      var keyframes = [];
-      var keyframeGroups = [];
-      var delayFrames = [];
-      var keyframeLines = [];
-      var length = frames.length;
-      var hasProperties = properties.length;
-      var startIndex = 0;
+      var __proto = HeaderArea.prototype;
 
-      if (length >= 2 && !hasProperties) {
-        var index = findIndex(frames, function (_a) {
-          var value = _a[2];
-          return !isUndefined(value);
-        });
-        startIndex = Math.min(length - 2, Math.max(frames[0][1] === 0 && frames[1][1] === 0 ? 1 : 0, index));
-        var startFrame = frames[startIndex];
-        var endFrame = frames[length - 1];
-        var time = startFrame[0];
-        var nextTime = endFrame[0];
-        keyframeGroups.push({
-          selector: ".keyframe_group",
-          key: "group",
-          datas: {
-            time: time + "," + nextTime,
-            from: time,
-            to: nextTime
-          },
-          dataset: {
-            time: time
-          },
+      __proto.render = function () {
+        var _a = this.props,
+            axes = _a.axes,
+            timelineInfo = _a.timelineInfo,
+            maxTime = _a.maxTime,
+            maxDuration = _a.maxDuration,
+            zoom = _a.zoom,
+            move = _a.move;
+        return createElement("div", {
+          className: prefix("header-area")
+        }, createElement("div", {
+          className: prefix("properties-area")
+        }, createElement("div", {
+          className: prefix("property")
+        }, "Name")), createElement("div", {
+          className: prefix("values-area")
+        }, createElement("div", {
+          className: prefix("value")
+        }, createElement("div", {
+          className: prefix("add"),
+          onClick: this.add
+        }, "+"))), createElement(KeytimesArea, {
+          ref: ref(this, "keytimesArea"),
+          move: move,
+          axes: axes,
+          timelineInfo: timelineInfo,
+          maxDuration: maxDuration,
+          maxTime: maxTime,
+          zoom: zoom
+        }));
+      };
+
+      return HeaderArea;
+    }(ElementComponent);
+
+    var Keyframe =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(Keyframe, _super);
+
+      function Keyframe() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = Keyframe.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            time = _a.time,
+            value = _a.value,
+            maxTime = _a.maxTime,
+            selected = _a.selected;
+        return createElement("div", {
+          className: prefix("keyframe" + (selected ? " select" : "")),
+          "data-time": time,
+          style: {
+            left: time / maxTime * 100 + "%"
+          }
+        }, time, " ", value);
+      };
+
+      return Keyframe;
+    }(ElementComponent);
+
+    var KeyframeGroup =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(KeyframeGroup, _super);
+
+      function KeyframeGroup() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = KeyframeGroup.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            time = _a.time,
+            nextTime = _a.nextTime,
+            maxTime = _a.maxTime,
+            selected = _a.selected;
+        return createElement("div", {
+          className: prefix("keyframe-group" + (selected ? " select" : "")),
+          "data-time": time,
           style: {
             left: time / maxTime * 100 + "%",
             width: (nextTime - time) / maxTime * 100 + "%"
           }
         });
+      };
+
+      return KeyframeGroup;
+    }(Component$1$1);
+
+    var KeyframeDelay =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(KeyframeDelay, _super);
+
+      function KeyframeDelay() {
+        return _super !== null && _super.apply(this, arguments) || this;
       }
 
-      frames.forEach(function (_a, i) {
-        var time = _a[0],
-            iterationTime = _a[1],
-            value = _a[2];
-        var valueText = toValue(value);
+      var __proto = KeyframeDelay.prototype;
 
-        if (frames[i + 1]) {
-          var _b = frames[i + 1],
-              nextTime = _b[0],
-              nextIterationTime = _b[1];
-
-          if (iterationTime === 0 && nextIterationTime === 0 || iterationTime === duration && nextIterationTime === duration) {
-            delayFrames.push(getDelayFrameStructure(time, nextTime, maxTime));
+      __proto.render = function () {
+        var _a = this.props,
+            time = _a.time,
+            nextTime = _a.nextTime,
+            maxTime = _a.maxTime;
+        return createElement("div", {
+          className: prefix("keyframe-delay"),
+          style: {
+            left: time / maxTime * 100 + "%",
+            width: (nextTime - time) / maxTime * 100 + "%"
           }
-        }
+        });
+      };
 
-        if (i === 0 && time === 0 && iterationTime === 0 && isUndefined(value) && !hasProperties) {
-          return;
-        }
+      return KeyframeDelay;
+    }(Component$1$1);
 
-        if (frames[i + 1]) {
-          var _c = frames[i + 1],
-              nextTime = _c[0],
-              nextValue = _c[2];
-          var nextValueText = toValue(nextValue);
+    var KeyframeLine =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(KeyframeLine, _super);
 
-          if (!isItScene && !isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText && hasProperties) {
-            keyframeLines.push({
-              selector: ".keyframe_line",
-              key: "line" + keyframeLines.length,
-              datas: {
-                time: time + "," + nextTime,
-                from: time,
-                to: nextTime
-              },
-              style: {
-                left: time / maxTime * 100 + "%",
-                width: (nextTime - time) / maxTime * 100 + "%"
-              }
-            });
+      function KeyframeLine() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = KeyframeLine.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            time = _a.time,
+            nextTime = _a.nextTime,
+            maxTime = _a.maxTime;
+        return createElement("div", {
+          className: prefix("keyframe-line"),
+          style: {
+            left: time / maxTime * 100 + "%",
+            width: (nextTime - time) / maxTime * 100 + "%"
           }
+        });
+      };
+
+      return KeyframeLine;
+    }(Component$1$1);
+
+    var Keyframes =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(Keyframes, _super);
+
+      function Keyframes() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = Keyframes.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            id = _a.id,
+            propertiesInfo = _a.propertiesInfo,
+            selected = _a.selected,
+            folded = _a.folded;
+        return createElement("div", {
+          className: prefix("keyframes" + (folded === 1 ? " fold" : "") + (selected ? " select" : "")),
+          "data-item": propertiesInfo.isItem ? "1" : "0",
+          "data-id": id
+        }, createElement("div", {
+          className: prefix("keyframes-container")
+        }, this.renderList()));
+      };
+
+      __proto.renderList = function () {
+        var _a = this.props,
+            propertiesInfo = _a.propertiesInfo,
+            maxTime = _a.maxTime,
+            selected = _a.selected,
+            selectedTime = _a.selectedTime;
+        var item = propertiesInfo.item,
+            frames = propertiesInfo.frames,
+            properties = propertiesInfo.properties;
+        var isItScene = isScene(item);
+        var duration = item.getDuration();
+        var keyframes = [];
+        var keyframeGroups = [];
+        var keyframeDelays = [];
+        var keyframeLines = [];
+        var length = frames.length;
+        var hasProperties = properties.length;
+        var startIndex = 0;
+
+        if (length >= 2 && !hasProperties) {
+          var index = findIndex(frames, function (_a) {
+            var value = _a[2];
+            return !isUndefined(value);
+          });
+          startIndex = Math.min(length - 2, Math.max(frames[0][1] === 0 && frames[1][1] === 0 ? 1 : 0, index));
+          var startFrame = frames[startIndex];
+          var endFrame = frames[length - 1];
+          var time = startFrame[0];
+          var nextTime = endFrame[0];
+          keyframeGroups.push(createElement(KeyframeGroup, {
+            key: "group",
+            id: time + "," + nextTime,
+            selected: selected && time <= selectedTime && selectedTime <= nextTime,
+            time: time,
+            nextTime: nextTime,
+            maxTime: maxTime
+          }));
         }
 
-        if (isItScene || i < startIndex) {
-          return;
-        }
+        frames.forEach(function (_a, i) {
+          var time = _a[0],
+              iterationTime = _a[1],
+              value = _a[2];
+          var valueText = toValue(value);
 
-        keyframes.push({
-          key: "keyframe" + i,
-          selector: ".keyframe",
-          dataset: {
-            time: time
-          },
-          datas: {
+          if (frames[i + 1]) {
+            var _b = frames[i + 1],
+                nextTime = _b[0],
+                nextIterationTime = _b[1];
+
+            if (iterationTime === 0 && nextIterationTime === 0 || iterationTime === duration && nextIterationTime === duration) {
+              keyframeDelays.push(createElement(KeyframeDelay, {
+                key: "delay" + time + "," + nextTime,
+                id: "-1",
+                time: time,
+                nextTime: nextTime,
+                maxTime: maxTime
+              }));
+            }
+          }
+
+          if (i === 0 && time === 0 && iterationTime === 0 && isUndefined(value) && !hasProperties) {
+            return;
+          }
+
+          if (frames[i + 1]) {
+            var _c = frames[i + 1],
+                nextTime = _c[0],
+                nextValue = _c[2];
+            var nextValueText = toValue(nextValue);
+
+            if (!isItScene && !isUndefined(value) && !isUndefined(nextValue) && valueText !== nextValueText && hasProperties) {
+              keyframeLines.push(createElement(KeyframeLine, {
+                key: "line" + keyframeLines.length,
+                time: time,
+                id: time + "," + nextTime,
+                nextTime: nextTime,
+                maxTime: maxTime
+              }));
+            }
+          }
+
+          if (isItScene || i < startIndex) {
+            return;
+          }
+
+          keyframes.push(createElement(Keyframe, {
+            key: "keyframe" + i,
+            id: "" + time,
+            selected: selected && time === selectedTime,
             time: time,
             iterationTime: iterationTime,
-            value: valueText
-          },
-          style: {
-            left: time / maxTime * 100 + "%"
-          },
-          html: time + " " + valueText
+            value: valueText,
+            maxTime: maxTime
+          }));
         });
-      });
-      return keyframeGroups.concat(keyframes, delayFrames, keyframeLines);
-    }
+        return keyframeGroups.concat(keyframes, keyframeDelays, keyframeLines);
+      };
 
-    function getPropertiesStructure(ids, timelineInfo) {
-      var properties = [];
+      return Keyframes;
+    }(ElementComponent);
 
-      for (var key in timelineInfo) {
-        var propertiesInfo = timelineInfo[key];
-        var propertyNames = propertiesInfo.keys;
-        var length = propertyNames.length;
-        var id = propertyNames[length - 1];
-        properties.push({
-          ref: function (e, i) {
-            ids.properties[i] = e;
-          },
-          key: key,
-          selector: ".property",
-          dataset: {
-            key: key,
-            object: propertiesInfo.isParent ? "1" : "0",
-            item: propertiesInfo.isItem ? "1" : "0"
-          },
-          datas: propertiesInfo,
+    var LineArea = function (_a) {
+      var maxTime = _a.maxTime;
+      var lines = [];
+
+      for (var time = 0; time <= maxTime; ++time) {
+        lines.push(createElement("div", {
+          className: prefix("division-line"),
+          key: time,
           style: {
-            paddingLeft: 10 + (length - 1) * 20 + "px"
-          },
-          children: [{
-            selector: ".arrow"
-          }, {
-            selector: "span",
-            html: id
-          }, {
-            selector: ".remove"
-          }]
-        });
+            left: 100 / maxTime * time + "%"
+          }
+        }));
       }
 
-      return properties;
-    }
+      return createElement("div", {
+        className: prefix("line-area")
+      }, lines);
+    };
 
-    function getValuesStructure(ids, timelineInfo) {
-      var values = [];
+    var KeyframesArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(KeyframesArea, _super);
 
-      for (var key in timelineInfo) {
-        var propertiesInfo = timelineInfo[key];
-        var frames = propertiesInfo.frames;
-        values.push({
-          ref: function (e, i) {
-            ids.values[i] = e;
-          },
-          key: key,
-          selector: ".value",
-          dataset: {
+      function KeyframesArea() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+
+        _this.keyframesList = [];
+        _this.state = {
+          foldedInfo: {}
+        };
+        return _this;
+      }
+
+      var __proto = KeyframesArea.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            timelineInfo = _a.timelineInfo,
+            maxTime = _a.maxTime,
+            maxDuration = _a.maxDuration,
+            zoom = _a.zoom,
+            selectedProperty = _a.selectedProperty,
+            selectedTime = _a.selectedTime;
+        var foldedInfo = this.state.foldedInfo;
+        var width = Math.min(maxDuration ? maxTime / maxDuration : 1, 2);
+        var keyframesList = [];
+        this.keyframesList = [];
+
+        for (var key in timelineInfo) {
+          var propertiesInfo = timelineInfo[key];
+          var selected = key === selectedProperty;
+          var folded = checkFolded(foldedInfo, propertiesInfo.keys);
+          keyframesList.push(createElement(Keyframes, {
+            ref: refs(this, "keyframesList", keyframesList.length),
+            selected: selected,
+            folded: folded,
+            selectedTime: selectedTime,
             key: key,
-            item: propertiesInfo.isItem ? "1" : "0",
-            object: propertiesInfo.isParent ? "1" : "0"
+            id: key,
+            propertiesInfo: propertiesInfo,
+            maxTime: maxTime
+          }));
+        }
+
+        return createElement("div", {
+          className: prefix("keyframes-area")
+        }, createElement("div", {
+          className: prefix("keyframes-scroll-area"),
+          ref: ref(this, "scrollAreaElement"),
+          style: {
+            minWidth: 50 * maxTime + "px",
+            width: width * zoom * 100 + "%"
+          }
+        }, keyframesList.concat([createElement(KeyframeCursor, {
+          key: "cursor",
+          ref: ref(this, "cursor")
+        }), createElement(LineArea, {
+          maxTime: maxTime,
+          key: "lines"
+        })])));
+      };
+
+      __proto.componentDidMount = function () {
+        var _this = this;
+
+        addEvent(this.getElement(), "wheel", function (e) {
+          if (!_this.props.keycon.altKey) {
+            return;
+          }
+
+          e.preventDefault();
+          var delta = e.deltaY;
+
+          _this.props.axes.setBy({
+            zoom: delta / 5000
+          });
+        });
+      };
+
+      return KeyframesArea;
+    }(ElementComponent);
+
+    var Property =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(Property, _super);
+
+      function Property() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = Property.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            id = _a.id,
+            selected = _a.selected,
+            folded = _a.folded,
+            _b = _a.propertiesInfo,
+            propertyNames = _b.keys,
+            isItem = _b.isItem,
+            isParent = _b.isParent;
+        var length = propertyNames.length;
+        var name = propertyNames[length - 1];
+        return createElement("div", {
+          className: prefix("property" + (folded === 1 ? " fold" : "") + (selected ? " select" : "")),
+          "data-id": id,
+          "data-name": name,
+          "data-object": isParent ? 1 : 0,
+          "data-item": isItem ? 1 : 0,
+          "data-fold": folded === 2 ? 1 : 0,
+          style: {
+            paddingLeft: 10 + (length - 1) * 20 + "px"
+          }
+        }, createElement("div", {
+          className: prefix("arrow")
+        }), createElement("span", null, name), createElement("div", {
+          className: prefix("remove")
+        }));
+      };
+
+      return Property;
+    }(ElementComponent);
+
+    var PropertiesArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(PropertiesArea, _super);
+
+      function PropertiesArea() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+
+        _this.properties = [];
+        _this.state = {
+          foldedInfo: {}
+        };
+        return _this;
+      }
+
+      var __proto = PropertiesArea.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            timelineInfo = _a.timelineInfo,
+            selectedProperty = _a.selectedProperty;
+        var foldedInfo = this.state.foldedInfo;
+        var properties = [];
+        this.properties = [];
+
+        for (var id in timelineInfo) {
+          var propertiesInfo = timelineInfo[id];
+          var selected = selectedProperty === id;
+          var folded = checkFolded(foldedInfo, propertiesInfo.keys);
+          properties.push(createElement(Property, {
+            ref: refs(this, "properties", properties.length),
+            selected: selected,
+            folded: folded,
+            key: id,
+            id: id,
+            propertiesInfo: propertiesInfo
+          }));
+        }
+
+        return createElement("div", {
+          className: prefix("properties-area")
+        }, createElement("div", {
+          className: prefix("properties-scroll-area")
+        }, properties));
+      };
+
+      return PropertiesArea;
+    }(ElementComponent);
+
+    var Value =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(Value, _super);
+
+      function Value() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+
+        _this.add = function () {
+          var _a = _this.props,
+              add = _a.add,
+              _b = _a.propertiesInfo,
+              item = _b.item,
+              properties = _b.properties;
+          add(item, properties);
+        };
+
+        return _this;
+      }
+
+      var __proto = Value.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            id = _a.id,
+            selected = _a.selected,
+            folded = _a.folded,
+            _b = _a.propertiesInfo,
+            isItem = _b.isItem,
+            isParent = _b.isParent;
+        return createElement("div", {
+          className: prefix("value" + (folded === 1 ? " fold" : "") + (selected ? " select" : "")),
+          "data-id": id,
+          "data-object": isParent ? 1 : 0,
+          "data-item": isItem ? 1 : 0
+        }, this.renderValue());
+      };
+
+      __proto.renderValue = function () {
+        var isParent = this.props.propertiesInfo.isParent;
+
+        if (isParent) {
+          return createElement("div", {
+            className: prefix("add"),
+            onClick: this.add
+          }, "+");
+        } else {
+          return createElement("input", {
+            ref: ref(this, "inputElement")
+          });
+        }
+      };
+
+      return Value;
+    }(ElementComponent);
+
+    var ValuesArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(ValuesArea, _super);
+
+      function ValuesArea() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+
+        _this.values = [];
+        _this.state = {
+          foldedInfo: {}
+        };
+        return _this;
+      }
+
+      var __proto = ValuesArea.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            timelineInfo = _a.timelineInfo,
+            selectedProperty = _a.selectedProperty,
+            add = _a.add;
+        var foldedInfo = this.state.foldedInfo;
+        var values = [];
+        this.values = [];
+
+        for (var id in timelineInfo) {
+          var propertiesInfo = timelineInfo[id];
+          var selected = selectedProperty === id;
+          var folded = checkFolded(foldedInfo, propertiesInfo.keys);
+          values.push(createElement(Value, {
+            ref: refs(this, "values", values.length),
+            add: add,
+            key: id,
+            folded: folded,
+            selected: selected,
+            id: id,
+            propertiesInfo: propertiesInfo
+          }));
+        }
+
+        return createElement("div", {
+          className: prefix("values-area")
+        }, values);
+      };
+
+      __proto.componentDidMount = function () {
+        var _this = this;
+
+        var element = this.getElement();
+        var dragTarget;
+        var dragTargetValue;
+        element.addEventListener("focusout", function (e) {
+          _this.props.setTime();
+        });
+        setDrag(element, {
+          container: window,
+          dragstart: function (e) {
+            dragTarget = e.inputEvent.target;
+            dragTargetValue = dragTarget.value;
+
+            if (!_this.props.keycon.altKey || !getTarget(dragTarget, function (el) {
+              return el.nodeName === "INPUT";
+            })) {
+              return false;
+            }
           },
-          datas: propertiesInfo,
-          children: propertiesInfo.isParent ? {
-            key: "add",
-            selector: ".add",
-            html: "+"
-          } : {
-            key: "input",
-            selector: "input",
-            attr: {
-              value: frames[0] ? frames[0][1] : ""
+          drag: function (e) {
+            var nextValue = dragTargetValue.replace(/-?\d+/g, function (num) {
+              return "" + (parseFloat(num) + Math.round(e.distX / 2));
+            });
+            dragTarget.value = nextValue;
+          },
+          dragend: function (e) {
+            _this.edit(dragTarget, dragTarget.value);
+          }
+        });
+        new KeyController(element).keydown(function (e) {
+          !e.isToggle && e.inputEvent.stopPropagation();
+        }).keyup(function (e) {
+          !e.isToggle && e.inputEvent.stopPropagation();
+        }).keyup("enter", function (e) {
+          var target = e.inputEvent.target;
+
+          _this.edit(target, target.value);
+        }).keyup("esc", function (e) {
+          var target = e.inputEvent.target;
+          target.blur();
+        });
+      };
+
+      __proto.edit = function (target, value) {
+        var parentEl = getTarget(target, function (el) {
+          return hasClass$1(el, "value");
+        });
+
+        if (!parentEl) {
+          return;
+        }
+
+        console.log(target, value);
+        var index = findIndex(this.values, function (v) {
+          return v.getElement() === parentEl;
+        });
+
+        if (index === -1) {
+          return;
+        }
+
+        this.props.editKeyframe(index, value);
+      };
+
+      return ValuesArea;
+    }(ElementComponent);
+
+    var ScrollArea =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$1$1(ScrollArea, _super);
+
+      function ScrollArea() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = ScrollArea.prototype;
+
+      __proto.render = function () {
+        var _a = this.props,
+            axes = _a.axes,
+            keycon = _a.keycon,
+            zoom = _a.zoom,
+            maxDuration = _a.maxDuration,
+            maxTime = _a.maxTime,
+            timelineInfo = _a.timelineInfo,
+            selectedProperty = _a.selectedProperty,
+            selectedTime = _a.selectedTime,
+            add = _a.add,
+            setTime = _a.setTime,
+            editKeyframe = _a.editKeyframe;
+        return createElement("div", {
+          className: prefix("scroll-area")
+        }, createElement(PropertiesArea, {
+          ref: ref(this, "propertiesArea"),
+          timelineInfo: timelineInfo,
+          selectedProperty: selectedProperty
+        }), createElement(ValuesArea, {
+          ref: ref(this, "valuesArea"),
+          add: add,
+          keycon: keycon,
+          setTime: setTime,
+          editKeyframe: editKeyframe,
+          timelineInfo: timelineInfo,
+          selectedProperty: selectedProperty
+        }), createElement(KeyframesArea, {
+          ref: ref(this, "keyframesArea"),
+          axes: axes,
+          keycon: keycon,
+          zoom: zoom,
+          maxDuration: maxDuration,
+          timelineInfo: timelineInfo,
+          maxTime: maxTime,
+          selectedProperty: selectedProperty,
+          selectedTime: selectedTime
+        }));
+      };
+
+      __proto.componentDidMount = function () {
+        this.initClickProperty();
+        this.foldAll();
+      };
+
+      __proto.foldAll = function () {
+        var _this = this; // fold all
+
+
+        this.propertiesArea.properties.forEach(function (property, i) {
+          var _a = property.props.propertiesInfo,
+              keys = _a.keys,
+              isParent = _a.isParent;
+
+          if (keys.length === 1 && isParent) {
+            _this.fold(i);
+          }
+        });
+      };
+
+      __proto.fold = function (index, isNotUpdate) {
+        var selectedProperty = this.propertiesArea.properties[index];
+        var foldedId = selectedProperty.props.id;
+        fold(this.propertiesArea, foldedId, isNotUpdate);
+        fold(this.valuesArea, foldedId, isNotUpdate);
+        fold(this.keyframesArea, foldedId, isNotUpdate);
+      };
+
+      __proto.removeProperty = function (propertiesInfo) {
+        var key = propertiesInfo.key,
+            isItem = propertiesInfo.isItem,
+            parentItem = propertiesInfo.parentItem,
+            targetItem = propertiesInfo.item,
+            properties = propertiesInfo.properties;
+
+        if (isItem) {
+          var targetName_1 = null;
+          parentItem.forEach(function (item, name) {
+            if (item === targetItem) {
+              targetName_1 = name;
+              return;
+            }
+          });
+
+          if (targetName_1 != null) {
+            parentItem.removeItem(targetName_1);
+          }
+        } else {
+          var times = targetItem.times;
+          times.forEach(function (time) {
+            var _a;
+
+            (_a = targetItem).remove.apply(_a, [time].concat(properties));
+          });
+        }
+
+        if (this.props.selectedProperty === key) {
+          this.props.select("", -1, true);
+        }
+
+        this.props.update();
+      };
+
+      __proto.initClickProperty = function () {
+        var _this = this;
+
+        this.propertiesArea.getElement().addEventListener("click", function (e) {
+          var isClickArrow = getTarget(e.target, function (el) {
+            return hasClass$1(el, "arrow");
+          });
+          var isClickRemove = getTarget(e.target, function (el) {
+            return hasClass$1(el, "remove");
+          });
+          var target = getTarget(e.target, function (el) {
+            return hasClass$1(el, "property");
+          });
+
+          if (!target) {
+            return;
+          }
+
+          var properties = _this.propertiesArea.properties;
+
+          var index = _this.propertiesArea.properties.map(function (property) {
+            return property.getElement();
+          }).indexOf(target);
+
+          if (index === -1) {
+            return;
+          }
+
+          var selectedProperty = properties[index];
+
+          if (isClickRemove) {
+            _this.removeProperty(selectedProperty.props.propertiesInfo);
+          } else {
+            _this.props.select(selectedProperty.props.id);
+
+            if (isClickArrow) {
+              _this.fold(index);
             }
           }
         });
+      };
+
+      return ScrollArea;
+    }(ElementComponent);
+
+    var prevTime = 0;
+    var prevX = -1;
+    var prevY = -1;
+
+    function dblCheck(isDrag, e, clientX, clientY, callback) {
+      var currentTime = now();
+
+      if (!isDrag) {
+        if (prevX === clientX && prevY === clientY && currentTime - prevTime <= 500) {
+          callback(e, clientX, clientY);
+        }
+
+        prevX = clientX;
+        prevY = clientY;
+        prevTime = currentTime;
       }
-
-      return values;
-    }
-
-    function getScrollAreaStructure(ids, timelineInfo, zoom, maxDuration, maxTime) {
-      var keyframesList = getKeyframesListStructure(ids, timelineInfo, maxTime);
-      return {
-        ref: function (e) {
-          ids.scrollArea = e;
-          ids.keyframesList = [];
-          ids.keyframesContainers = [];
-        },
-        selector: ".scroll_area",
-        children: [{
-          ref: function (e) {
-            ids.propertiesAreas[1] = e;
-            ids.properties = [];
-          },
-          selector: ".properties_area",
-          children: [{
-            selector: ".properties_scroll_area",
-            children: getPropertiesStructure(ids, timelineInfo)
-          }]
-        }, {
-          ref: function (e) {
-            ids.valuesArea = e;
-            ids.values = [];
-          },
-          selector: ".values_area",
-          children: getValuesStructure(ids, timelineInfo)
-        }, getKeyframesAreaStructure(ids, keyframesList, zoom, maxDuration, maxTime)]
-      };
-    }
-
-    function getControlAreaStructure(ids) {
-      return {
-        selector: ".header_area.control_area",
-        children: [{
-          selector: ".properties_area",
-          ref: function (e) {
-            ids.unselectedArea = e;
-          },
-          children: {
-            selector: ".property"
-          }
-        }, {
-          selector: ".values_area",
-          children: {
-            selector: ".value"
-          }
-        }, {
-          selector: ".keyframes_area",
-          children: {
-            selector: ".keyframes",
-            children: [{
-              selector: "input.time_area",
-              ref: function (e) {
-                ids.timeArea = e;
-              },
-              html: "???"
-            }, {
-              selector: ".play_control_area",
-              children: [{
-                ref: function (e) {
-                  ids.prevBtn = e;
-                },
-                selector: ".control.prev"
-              }, {
-                ref: function (e) {
-                  ids.playBtn = e;
-                },
-                selector: ".control.play"
-              }, {
-                ref: function (e) {
-                  ids.nextBtn = e;
-                },
-                selector: ".control.next"
-              }]
-            }]
-          }
-        }]
-      };
     }
 
     var MAXIMUM = 1000000;
+
     function toFixed$1(num) {
       return Math.round(num * MAXIMUM) / MAXIMUM;
     }
+
     function addEntry(entries, time, keytime) {
       var prevEntry = entries[entries.length - 1];
       (!prevEntry || prevEntry[0] !== time || prevEntry[1] !== keytime) && entries.push([toFixed$1(time), toFixed$1(keytime)]);
     }
+
     function dotNumber(a1, a2, b1, b2) {
       return (a1 * b2 + a2 * b1) / (b1 + b2);
     }
+
     function getEntries(times, states) {
       if (!times.length) {
         return [];
@@ -6274,6 +8006,7 @@ version: 0.1.3
       });
       return entries;
     }
+
     function getItemInfo(timelineInfo, items, names, item) {
       item.update();
       var times = item.times.slice();
@@ -6331,6 +8064,7 @@ version: 0.1.3
         }
       })(item.names);
     }
+
     function getTimelineInfo(scene) {
       var timelineInfo = {};
 
@@ -6389,109 +8123,318 @@ version: 0.1.3
     var Timeline =
     /*#__PURE__*/
     function (_super) {
-      __extends(Timeline, _super);
+      __extends$1$1(Timeline, _super);
 
-      function Timeline(scene, parentEl, options) {
-        if (options === void 0) {
-          options = {};
+      function Timeline(props) {
+        var _this = _super.call(this, props) || this;
+
+        _this.state = {
+          alt: false,
+          zoom: 1,
+          maxDuration: 0,
+          maxTime: 0,
+          timelineInfo: {},
+          selectedProperty: "",
+          selectedTime: -1,
+          init: false
+        };
+        _this.isExportCSS = false;
+
+        _this.update = function (isInit) {
+          if (isInit === void 0) {
+            isInit = false;
+          }
+
+          var scene = _this.props.scene;
+
+          if (!scene) {
+            return;
+          }
+
+          var maxDuration = Math.ceil(scene.getDuration());
+          var maxTime = Math.max(_this.state.maxTime, maxDuration);
+          var currentMaxTime = _this.state.maxTime;
+
+          var zoom = _this.axes.get(["zoom"]).zoom;
+
+          var nextZoomScale = currentMaxTime > 1 ? maxTime / currentMaxTime : 1;
+          var nextZoom = Math.max(1, zoom * nextZoomScale);
+
+          _this.setState({
+            timelineInfo: getTimelineInfo(scene),
+            maxTime: maxTime,
+            maxDuration: maxDuration,
+            init: isInit
+          });
+
+          _this.axes.axm.set({
+            zoom: nextZoom
+          });
+        };
+
+        _this.prev = function () {
+          var scene = _this.props.scene;
+          scene && _this.setTime(scene.getTime() - 0.05);
+        };
+
+        _this.next = function () {
+          var scene = _this.props.scene;
+          scene && _this.setTime(scene.getTime() + 0.05);
+        };
+
+        _this.finish = function () {
+          var scene = _this.props.scene;
+          scene && scene.finish();
+        };
+
+        _this.togglePlay = function () {
+          var scene = _this.props.scene;
+
+          if (!scene) {
+            return;
+          }
+
+          if (scene.getPlayState() === "running") {
+            scene.pause();
+          } else {
+            scene.play();
+          }
+        };
+
+        _this.add = function (item, properties) {
+          if (item === void 0) {
+            item = _this.props.scene;
+          }
+
+          if (properties === void 0) {
+            properties = [];
+          }
+
+          if (isScene(item)) {
+            _this.newItem(item);
+          } else {
+            _this.newProperty(item, properties);
+          }
+        };
+
+        _this.getDistTime = function (distX, rect) {
+          if (rect === void 0) {
+            rect = _this.scrollArea.keyframesArea.scrollAreaElement.getBoundingClientRect();
+          }
+
+          var scrollAreaWidth = rect.width - 30;
+          var percentage = Math.min(scrollAreaWidth, distX) / scrollAreaWidth;
+          var time = _this.state.maxTime * percentage;
+          return Math.round(time * 20) / 20;
+        };
+
+        _this.setTime = function (time) {
+          var scene = _this.props.scene;
+
+          if (!scene) {
+            return;
+          }
+
+          var direction = scene.getDirection();
+          scene.pause();
+
+          if (isUndefined(time)) {
+            time = scene.getTime();
+          }
+
+          if (direction === "normal" || direction === "alternate") {
+            scene.setTime(time);
+          } else {
+            scene.setTime(scene.getDuration() - time);
+          }
+        };
+
+        _this.getTime = function (clientX) {
+          var rect = _this.scrollArea.keyframesArea.scrollAreaElement.getBoundingClientRect();
+
+          var scrollAreaX = rect.left + 15;
+          var x = Math.max(clientX - scrollAreaX, 0);
+          return _this.getDistTime(x, rect);
+        };
+
+        _this.move = function (clientX) {
+          _this.setTime(_this.getTime(clientX));
+        };
+
+        _this.select = function (property, time, isNotUpdate) {
+          if (time === void 0) {
+            time = -1;
+          }
+
+          var scene = _this.props.scene;
+
+          if (!scene) {
+            return;
+          }
+
+          scene.pause();
+
+          if (isNotUpdate) {
+            _this.state.selectedProperty = property;
+            _this.state.selectedTime = -1;
+          } else {
+            _this.setState({
+              selectedProperty: property,
+              selectedTime: time
+            });
+          }
+        };
+
+        _this.editKeyframe = function (index, value) {
+          var propertiesInfo = _this.scrollArea.propertiesArea.properties[index].props.propertiesInfo;
+          var isObjectData = propertiesInfo.isParent;
+
+          if (isObjectData) {
+            return;
+          }
+
+          var item = propertiesInfo.item;
+          var properties = propertiesInfo.properties;
+          item.set.apply(item, [item.getIterationTime()].concat(properties, [value]));
+
+          _this.update();
+        };
+
+        _this.animate = function (e) {
+          var time = e.time;
+          var minute = numberFormat(Math.floor(time / 60), 2);
+          var second = numberFormat(Math.floor(time % 60), 2);
+          var milisecond = numberFormat(Math.floor(time % 1 * 100), 3, true);
+
+          _this.moveCursor(time);
+
+          _this.setInputs(flatObject(e.frames || e.frame.get()));
+
+          _this.controlArea.timeArea.getElement().value = minute + ":" + second + ":" + milisecond;
+        };
+
+        if (isExportCSS) {
+          isExportCSS = true;
+          _this.isExportCSS = true;
         }
 
-        var _this = _super.call(this) || this;
-
-        _this.maxTime = 0;
-        _this.selectedProperty = "";
-        _this.selectedTime = -1;
-        _this.ids = {};
-        _this.options = __assign({
-          keyboard: true
-        }, options);
-        scene.finish();
-        _this.scene = scene;
-
-        _this.initStructure(scene, parentEl);
-
-        _this.initEditor();
-
-        _this.initScroll();
-
-        _this.initWheelZoom();
-
-        _this.initDragKeyframes();
-
-        _this.initClickProperty();
-
-        _this.initController();
-
-        _this.initDragValues();
-
-        _this.initKeyController();
-
-        _this.setTime(0);
-
-        return _this; // new Info(this, parentEl);
+        _this.state = __assign$1$1({}, _this.state, _this.initScene(_this.props.scene));
+        _this.keycon = new KeyController().keydown("alt", function () {
+          _this.setState({
+            alt: true
+          });
+        }).keyup("alt", function () {
+          _this.setState({
+            alt: false
+          });
+        });
+        _this.axes = new Axes({
+          zoom: {
+            range: [1, Infinity]
+          }
+        }, {}, {
+          zoom: 1
+        });
+        return _this;
       }
 
       var __proto = Timeline.prototype;
 
-      __proto.getElement = function () {
-        return this.structure.element;
-      }; // scene control
+      __proto.render = function () {
+        var _a = this.props,
+            scene = _a.scene,
+            className = _a.className,
+            keyboard = _a.keyboard,
+            onSelect = _a.onSelect,
+            attributes = __rest(_a, ["scene", "className", "keyboard", "onSelect"]);
 
-
-      __proto.prev = function () {
-        this.setTime(this.scene.getTime() - 0.05);
+        var _b = this.state,
+            zoom = _b.zoom,
+            alt = _b.alt,
+            maxDuration = _b.maxDuration,
+            maxTime = _b.maxTime,
+            timelineInfo = _b.timelineInfo,
+            selectedProperty = _b.selectedProperty,
+            selectedTime = _b.selectedTime;
+        return createElement("div", __assign$1$1({
+          className: prefix("timeline" + (alt ? " alt" : "")) + (className ? " " + className : "")
+        }, attributes), this.renderStyle(), createElement(ControlArea, {
+          ref: ref(this, "controlArea"),
+          scene: scene,
+          select: this.select,
+          prev: this.prev,
+          next: this.next,
+          setTime: this.setTime,
+          togglePlay: this.togglePlay
+        }), createElement(HeaderArea, {
+          ref: ref(this, "headerArea"),
+          scene: scene,
+          add: this.add,
+          axes: this.axes,
+          move: this.move,
+          maxDuration: maxDuration,
+          zoom: zoom,
+          maxTime: maxTime,
+          timelineInfo: timelineInfo
+        }), createElement(ScrollArea, {
+          ref: ref(this, "scrollArea"),
+          add: this.add,
+          setTime: this.setTime,
+          editKeyframe: this.editKeyframe,
+          keycon: this.keycon,
+          axes: this.axes,
+          maxDuration: maxDuration,
+          zoom: zoom,
+          maxTime: maxTime,
+          update: this.update,
+          select: this.select,
+          selectedProperty: selectedProperty,
+          selectedTime: selectedTime,
+          timelineInfo: timelineInfo
+        }));
       };
 
-      __proto.next = function () {
-        this.setTime(this.scene.getTime() + 0.05);
+      __proto.componentDidMount = function () {
+        this.initWheelZoom();
+        this.initScroll();
+        this.initDragKeyframes();
+        this.initKeyController();
       };
 
-      __proto.finish = function () {
-        this.scene.finish();
-      };
+      __proto.componentDidUpdate = function (prevProps, prevState) {
+        if (this.props.onSelect && prevState.selectedProperty !== this.state.selectedProperty) {
+          var prevSelectedProperty = prevState.selectedProperty,
+              prevSelectedTime = prevState.selectedTime;
+          var _a = this.state,
+              selectedProperty = _a.selectedProperty,
+              selectedTime = _a.selectedTime;
+          var selectedItem = this.state.timelineInfo[selectedProperty];
+          this.props.onSelect({
+            selectedItem: !selectedProperty ? this.props.scene : selectedItem.item,
+            selectedProperty: selectedProperty,
+            selectedTime: selectedTime,
+            prevSelectedProperty: prevSelectedProperty,
+            prevSelectedTime: prevSelectedTime
+          });
+        }
 
-      __proto.togglePlay = function () {
-        var scene = this.scene;
+        if (this.state.init) {
+          this.state.init = false;
+          this.scrollArea.foldAll();
+        }
 
-        if (scene.getPlayState() === "running") {
-          scene.pause();
+        if (prevProps.scene !== this.props.scene) {
+          this.releaseScene(prevProps.scene);
+          this.setState(this.initScene(this.props.scene));
         } else {
-          scene.play();
+          this.setTime();
         }
       };
 
-      __proto.setTime = function (time) {
-        var scene = this.scene;
-        var direction = scene.getDirection();
-        scene.pause();
-
-        if (direction === "normal" || direction === "alternate") {
-          scene.setTime(time);
-        } else {
-          scene.setTime(scene.getDuration() - time);
+      __proto.renderStyle = function () {
+        if (!this.isExportCSS) {
+          return createElement("style", null, CSS);
         }
-      };
-
-      __proto.update = function () {
-        var scene = this.scene;
-        this.timelineInfo = getTimelineInfo(scene);
-        var maxDuration = Math.ceil(scene.getDuration());
-        var maxTime = Math.max(this.maxTime, maxDuration);
-        var zoom = this.axes.get(["zoom"]).zoom;
-        var currentMaxTime = this.maxTime;
-        this.maxTime = maxTime;
-        var ids = this.ids;
-        var prevKeytimesArea = ids.keyframesAreas[0];
-        var nextZoom = currentMaxTime > 1 ? maxTime / currentMaxTime : 1;
-        zoom = Math.max(1, zoom * nextZoom);
-        this.axes.axm.set({
-          zoom: zoom
-        }); // update keytimes
-
-        this.datadom.update(prevKeytimesArea, getKeytimesAreaStructure(ids, zoom, maxTime, maxTime));
-        var nextScrollAreaStructure = getScrollAreaStructure(ids, this.timelineInfo, this.axes.get(["zoom"]).zoom, maxTime, maxTime);
-        this.datadom.update(ids.scrollArea, nextScrollAreaStructure);
-        this.setTime(scene.getTime());
       };
 
       __proto.newItem = function (scene) {
@@ -6501,163 +8444,133 @@ version: 0.1.3
           return;
         }
 
-        this.scene.newItem(name);
+        scene.newItem(name);
         this.update();
       };
 
       __proto.newProperty = function (item, properties) {
-        var property = prompt("new property");
+        var property = prompt("Add Property");
 
         if (!property) {
           return;
         }
 
-        item.set.apply(item, [item.getIterationTime()].concat(properties, [property, 0]));
+        item.set.apply(item, [item.getIterationTime()].concat(properties, [property, ""]));
         this.update();
-      }; // init
+      };
 
+      __proto.moveCursor = function (time) {
+        var maxTime = this.state.maxTime;
+        var px = 15 - 30 * time / maxTime;
+        var percent = 100 * time / maxTime;
+        var left = "calc(" + percent + "% + " + px + "px)";
+        this.scrollArea.keyframesArea.cursor.getElement().style.left = left;
+        this.headerArea.keytimesArea.cursor.getElement().style.left = left;
+      };
 
-      __proto.initController = function () {
-        var _this = this;
+      __proto.setInputs = function (obj) {
+        var valuesArea = this.scrollArea.valuesArea.getElement();
 
-        var ids = this.ids;
-        var playBtn = this.ids.playBtn.element;
-        var scene = this.scene;
-        this.ids.addItem.element.addEventListener("click", function (e) {
-          if (isScene(_this.scene)) {
-            _this.newItem(_this.scene);
-          } else {
-            _this.newProperty(_this.scene, []);
-          }
-        });
-        playBtn.addEventListener("click", function (e) {
-          _this.togglePlay();
-
-          e.preventDefault();
-        });
-        ids.unselectedArea.element.addEventListener("click", function (e) {
-          _this.select("", -1);
-        });
-        ids.prevBtn.element.addEventListener("click", function (e) {
-          _this.prev();
-
-          e.preventDefault();
-        });
-        ids.nextBtn.element.addEventListener("click", function (e) {
-          _this.next();
-
-          e.preventDefault();
-        });
-        scene.on("play", function () {
-          addClass$1(playBtn, "pause");
-          removeClass$1(playBtn, "play"); // playBtn.innerHTML = "pause";
-        });
-        scene.on("paused", function () {
-          addClass$1(playBtn, "play");
-          removeClass$1(playBtn, "pause"); // playBtn.innerHTML = "play";
-        });
-
-        if (this.options.keyboard) {
-          new KeyController(ids.timeArea.element).keydown(function (e) {
-            !e.isToggle && e.inputEvent.stopPropagation();
-          }).keyup(function (e) {
-            !e.isToggle && e.inputEvent.stopPropagation();
-          }).keyup("enter", function (e) {
-            // go to time
-            var element = ids.timeArea.element;
-            var value = element.value;
-            var result = /(\d+):(\d+):(\d+)/g.exec(value);
-
-            if (!result) {
-              return;
-            }
-
-            var minute = parseFloat(result[1]);
-            var second = parseFloat(result[2]);
-            var milisecond = parseFloat("0." + result[3]);
-            var time = minute * 60 + second + milisecond;
-
-            _this.setTime(time);
-          });
+        for (var name in obj) {
+          valuesArea.querySelector("[data-id=\"" + name + "\"] input").value = obj[name];
         }
       };
 
-      __proto.initKeyController = function () {
-        var _this = this;
+      __proto.removeKeyframe = function (property) {
+        var propertiesInfo = this.state.timelineInfo[property];
 
-        var ids = this.ids;
-        window.addEventListener("blur", function () {
-          removeClass$1(ids.timeline.element, "alt");
-        });
-        this.keycon = new KeyController().keydown("alt", function () {
-          addClass$1(ids.timeline.element, "alt");
-        }).keyup("alt", function () {
-          removeClass$1(ids.timeline.element, "alt");
-        });
+        if (!property || !propertiesInfo || isScene(propertiesInfo.item)) {
+          return;
+        }
 
-        if (this.options.keyboard) {
-          this.keycon.keydown("space", function (_a) {
-            var inputEvent = _a.inputEvent;
-            inputEvent.preventDefault();
-          }).keydown("left", function (e) {
-            _this.prev();
-          }).keydown("right", function (e) {
-            _this.next();
-          }).keyup("backspace", function () {
-            _this.removeKeyframe(_this.selectedProperty);
-          }).keyup("esc", function () {
-            _this.finish();
-          }).keyup("space", function () {
-            _this.togglePlay();
-          });
+        var properties = propertiesInfo.properties;
+        var item = propertiesInfo.item;
+        item.remove.apply(item, [item.getIterationTime()].concat(properties));
+        this.update();
+      };
+
+      __proto.addKeyframe = function (index, time) {
+        var keyframesList = this.scrollArea.keyframesArea.keyframesList;
+        var id = keyframesList[index].props.id;
+        this.select(id, time);
+        var inputElement = this.scrollArea.valuesArea.values[index].inputElement;
+
+        if (inputElement) {
+          this.editKeyframe(index, inputElement.value);
         }
       };
 
-      __proto.initStructure = function (scene, parentEl) {
-        var _this = this;
-
-        this.timelineInfo = getTimelineInfo(scene);
-        var duration = Math.ceil(scene.getDuration());
-        var maxDuration = Math.ceil(duration);
-        var maxTime = maxDuration;
-        var ids = this.ids;
-        var timelineCSS;
-        this.maxTime = maxTime;
-
-        if (!isExportCSS) {
-          timelineCSS = {
-            selector: "style.style",
-            html: CSS
+      __proto.initScene = function (scene) {
+        if (!scene) {
+          return {
+            timelineInfo: {},
+            maxTime: 0,
+            maxDuration: 0,
+            zoom: 1,
+            init: false
           };
-          isExportCSS = true;
         }
 
-        var structure = {
-          selector: ".timeline",
-          ref: function (e) {
-            ids.timeline = e;
-          },
-          children: [timelineCSS, getControlAreaStructure(ids), getHeaderAreaStructure(ids, 1, maxDuration, maxTime), getScrollAreaStructure(ids, this.timelineInfo, 1, maxDuration, maxTime)]
+        scene.finish();
+        scene.on("animate", this.animate);
+        var duration = Math.ceil(scene.getDuration());
+        return {
+          timelineInfo: getTimelineInfo(scene),
+          maxTime: duration,
+          maxDuration: duration,
+          zoom: 1,
+          init: true
         };
-        this.datadom = new DataDOM(createElement, updateElement);
-        this.structure = this.datadom.render(structure, parentEl); // fold all
+      };
 
-        this.ids.properties.forEach(function (property, i) {
-          var propertiesInfo = property.datas;
-          var keys = propertiesInfo.keys,
-              isParent = propertiesInfo.isParent;
+      __proto.releaseScene = function (scene) {
+        if (!scene) {
+          return;
+        }
 
-          if (keys.length === 1 && isParent) {
-            _this.fold(i);
+        scene.off("animate", this.animate);
+      };
+
+      __proto.initWheelZoom = function () {
+        var _this = this;
+
+        var scrollArea = this.scrollArea.getElement();
+        var axes = this.axes;
+
+        if (SUPPORT_TOUCH$2 || SUPPORT_POINTER_EVENTS$2) {
+          axes.connect("zoom", new PinchInput(scrollArea, {
+            scale: 0.1,
+            hammerManagerOptions: {
+              touchAction: "auto"
+            }
+          }));
+        }
+
+        axes.on("hold", function (e) {
+          if (e.inputEvent) {
+            e.inputEvent.preventDefault();
           }
         });
+        axes.on("change", function (e) {
+          if (e.pos.zoom === _this.state.zoom) {
+            return;
+          }
+
+          _this.setState({
+            zoom: e.pos.zoom
+          });
+
+          if (e.inputEvent) {
+            e.inputEvent.preventDefault();
+          }
+        });
+        this.axes = axes;
       };
 
       __proto.initScroll = function () {
-        var keyframesAreas = this.ids.keyframesAreas;
         var isScrollKeyframe = false;
-        var headerKeyframesArea = keyframesAreas[0].element;
-        var scrollKeyframesArea = keyframesAreas[1].element;
+        var headerKeyframesArea = this.headerArea.keytimesArea.getElement();
+        var scrollKeyframesArea = this.scrollArea.keyframesArea.getElement();
         headerKeyframesArea.addEventListener("scroll", function () {
           if (isScrollKeyframe) {
             isScrollKeyframe = false;
@@ -6676,304 +8589,66 @@ version: 0.1.3
         });
       };
 
-      __proto.initWheelZoom = function () {
-        var _this = this;
-
-        var ids = this.ids;
-        var keyframesScrollAreas = ids.keyframesScrollAreas;
-        var headerArea = keyframesScrollAreas[0].element;
-        var scrollArea = keyframesScrollAreas[1].element;
-        var axes = new Axes({
-          zoom: {
-            range: [1, Infinity]
-          }
-        }, {}, {
-          zoom: 1
-        });
-
-        if (SUPPORT_TOUCH || SUPPORT_POINTER_EVENTS) {
-          axes.connect("zoom", new PinchInput(scrollArea, {
-            scale: 0.1,
-            hammerManagerOptions: {
-              touchAction: "auto"
-            }
-          }));
-        }
-
-        axes.on("hold", function (e) {
-          if (e.inputEvent) {
-            e.inputEvent.preventDefault();
-          }
-        });
-        axes.on("change", function (e) {
-          var scale = ids.keyframesScrollAreas[0].dataset.width;
-          var width = e.pos.zoom * scale * 100;
-          ids.keyframesScrollAreas.forEach(function (_a) {
-            var element = _a.element;
-            element.style.width = width + "%";
-          });
-
-          if (e.inputEvent) {
-            e.inputEvent.preventDefault();
-          }
-        });
-        this.axes = axes;
-        headerArea.addEventListener("wheel", function (e) {
-          var delta = e.deltaY;
-          axes.setBy({
-            zoom: delta / 5000
-          });
-          !e.deltaX && e.preventDefault();
-        });
-        addEvent(scrollArea, "wheel", function (e) {
-          if (!_this.keycon.altKey) {
-            return;
-          }
-
-          e.preventDefault();
-          var delta = e.deltaY;
-          axes.setBy({
-            zoom: delta / 5000
-          });
-        });
-      };
-
-      __proto.select = function (selectedProperty, keyframeTime) {
-        var prevSelectedProperty = this.selectedProperty;
-        var prevSelectedTime = this.selectedTime;
-        var ids = this.ids;
-        var values = ids.values;
-        var properties = ids.properties;
-        var keyframesList = ids.keyframesList;
-        this.selectedProperty = selectedProperty;
-        this.scene.pause();
-
-        if (prevSelectedProperty) {
-          var prevSelectedIndex = findIndexByProperty(prevSelectedProperty, properties);
-          removeClass$1(properties[prevSelectedIndex].element, "select");
-          removeClass$1(values[prevSelectedIndex].element, "select");
-          removeClass$1(keyframesList[prevSelectedIndex].element, "select");
-
-          if (prevSelectedTime >= 0) {
-            var keyframes = ids.keyframesContainers[prevSelectedIndex].children;
-            keyframes.forEach(function (keyframe) {
-              if (keyframe.datas.time === prevSelectedTime) {
-                removeClass$1(keyframe.element, "select");
-              }
-            });
-            this.selectedTime = -1;
-          }
-        }
-
-        var selectedItem = this.scene;
-
-        if (selectedProperty) {
-          if (document.activeElement) {
-            document.activeElement.blur();
-          }
-
-          var selectedIndex = findIndexByProperty(selectedProperty, properties);
-          addClass$1(properties[selectedIndex].element, "select");
-          addClass$1(values[selectedIndex].element, "select");
-          addClass$1(keyframesList[selectedIndex].element, "select");
-          selectedItem = ids.keyframesList[selectedIndex].datas.item;
-
-          if (keyframeTime >= 0) {
-            var selectedPropertyStructure = ids.keyframesContainers[selectedIndex];
-            var keyframes = selectedPropertyStructure.children;
-            keyframes.forEach(function (keyframe) {
-              if (keyframe.datas.time === keyframeTime) {
-                addClass$1(keyframe.element, "select");
-              }
-            });
-            this.selectedTime = keyframeTime;
-          }
-        }
-
-        this.trigger("select", {
-          selectedItem: selectedItem,
-          selectedProperty: this.selectedProperty,
-          selectedTime: this.selectedTime,
-          prevSelectedProperty: prevSelectedProperty,
-          prevSelectedTime: prevSelectedTime
-        });
-      };
-
-      __proto.initClickProperty = function () {
-        var _this = this;
-
-        var ids = this.ids;
-        var propertiesAreas = ids.propertiesAreas;
-        propertiesAreas[1].element.addEventListener("click", function (e) {
-          var properties = ids.properties.map(function (property) {
-            return property.element;
-          });
-          var length = properties.length;
-          var arrow = getTarget(e.target, function (el) {
-            return hasClass$1(el, "arrow");
-          });
-          var remove = getTarget(e.target, function (el) {
-            return hasClass$1(el, "remove");
-          });
-          var target = getTarget(e.target, function (el) {
-            return hasClass$1(el, "property");
-          });
-
-          if (!target) {
-            return;
-          }
-
-          var index = properties.indexOf(target);
-
-          if (index === -1) {
-            return;
-          }
-
-          var selectedProperty = ids.properties[index];
-
-          if (remove) {
-            _this.remove(selectedProperty.datas);
-          } else {
-            _this.select(selectedProperty.dataset.key);
-
-            if (arrow) {
-              _this.fold(index);
-            }
-          }
-        });
-      };
-
-      __proto.setInputs = function (obj) {
-        var valuesArea = this.ids.valuesArea.element;
-
-        for (var name in obj) {
-          valuesArea.querySelector("[data-key=\"" + name + "\"] input").value = obj[name];
-        }
-      };
-
-      __proto.moveCursor = function (time) {
-        var cursors = this.ids.cursors;
-        var maxTime = this.maxTime;
-        var px = 15 - 30 * time / maxTime;
-        var percent = 100 * time / maxTime;
-        var left = "calc(" + percent + "% + " + px + "px)";
-        cursors.forEach(function (cursor) {
-          cursor.element.style.left = left;
-        });
-      };
-
       __proto.initDragKeyframes = function () {
         var _this = this;
-
-        var ids = this.ids;
-        var scrollArea = ids.scrollArea,
-            timeArea = ids.timeArea,
-            cursors = ids.cursors,
-            keyframesAreas = ids.keyframesAreas,
-            keyframesScrollAreas = ids.keyframesScrollAreas;
-        var scene = this.scene;
-        scene.on("animate", function (e) {
-          var time = e.time;
-
-          _this.moveCursor(time);
-
-          _this.setInputs(flatObject(e.frames || e.frame.get()));
-
-          var minute = numberFormat(Math.floor(time / 60), 2);
-          var second = numberFormat(Math.floor(time % 60), 2);
-          var milisecond = numberFormat(Math.floor(time % 1 * 100), 3, true);
-          timeArea.element.value = minute + ":" + second + ":" + milisecond;
-        });
-
-        var getDistTime = function (distX, rect) {
-          if (rect === void 0) {
-            rect = keyframesScrollAreas[1].element.getBoundingClientRect();
-          }
-
-          var scrollAreaWidth = rect.width - 30;
-          var percentage = Math.min(scrollAreaWidth, distX) / scrollAreaWidth;
-          var time = _this.maxTime * percentage;
-          return Math.round(time * 20) / 20;
-        };
-
-        var getTime = function (clientX) {
-          var rect = keyframesScrollAreas[1].element.getBoundingClientRect();
-          var scrollAreaX = rect.left + 15;
-          var x = Math.max(clientX - scrollAreaX, 0);
-          return getDistTime(x, rect);
-        };
-
-        var move = function (clientX) {
-          _this.setTime(getTime(clientX));
-        };
 
         var click = function (e, clientX, clientY) {
           var target = getTarget(e.target, function (el) {
             return hasClass$1(el, "keyframe");
           });
-          var time = target ? parseFloat(target.getAttribute("data-time")) : getTime(clientX);
+          var time = target ? parseFloat(target.getAttribute("data-time") || "") : _this.getTime(clientX);
 
           _this.setTime(time);
 
-          var list = ids.keyframesList;
-          var index = findElementIndexByPosition(list.map(function (_a) {
-            var element = _a.element;
-            return element;
+          var list = _this.scrollArea.keyframesArea.keyframesList;
+          var index = findElementIndexByPosition(list.map(function (keyframes) {
+            return keyframes.getElement();
           }), clientY);
 
           if (index > -1) {
-            _this.select(list[index].dataset.key, time);
+            _this.select(list[index].props.id, time);
           }
 
           e.preventDefault();
         };
 
         var dblclick = function (e, clientX, clientY) {
-          var list = ids.keyframesList;
-          var index = findElementIndexByPosition(list.map(function (_a) {
-            var element = _a.element;
-            return element;
+          var list = _this.scrollArea.keyframesArea.keyframesList;
+          var index = findElementIndexByPosition(list.map(function (keyframes) {
+            return keyframes.getElement();
           }), clientY);
 
           if (index === -1) {
             return;
           }
 
-          _this.addKeyframe(index, getTime(clientX));
+          _this.addKeyframe(index, _this.getTime(clientX));
         };
 
-        setDrag(cursors[0].element, {
-          dragstart: function (_a) {
-            var inputEvent = _a.inputEvent;
-            inputEvent.stopPropagation();
-          },
-          drag: function (_a) {
-            var clientX = _a.clientX;
-            move(clientX);
-          },
-          container: window
-        });
-        var dragItem = null;
+        var keytimesScrollArea = this.headerArea.keytimesArea.scrollAreaElement;
+        var keyframesScrollArea = this.scrollArea.keyframesArea.scrollAreaElement;
+        var dragItem;
         var dragDelay = 0;
-        var dragTarget = null;
-        keyframesScrollAreas.forEach(function (_a) {
-          var element = _a.element;
+        var dragTarget;
+        [keytimesScrollArea, keyframesScrollArea].forEach(function (element) {
           setDrag(element, {
             container: window,
             dragstart: function (_a) {
               var inputEvent = _a.inputEvent;
               dragTarget = getTarget(inputEvent.target, function (el) {
-                return hasClass$1(el, "keyframe_group");
+                return hasClass$1(el, "keyframe-group");
               });
 
               if (dragTarget) {
-                var properties = _this.ids.properties;
-                var keyframesTarget = getTarget(dragTarget, function (el) {
+                var properties = _this.scrollArea.propertiesArea.properties;
+                var keyframesElement = getTarget(dragTarget, function (el) {
                   return hasClass$1(el, "keyframes");
                 });
-                var key = keyframesTarget.getAttribute("data-key");
-                var property = findStructureByProperty(key, properties);
-                var propertiesInfo = property.datas;
+                var id_1 = keyframesElement.getAttribute("data-id");
+                var property = find(properties, function (p) {
+                  return p.props.id === id_1;
+                });
+                var propertiesInfo = property.props.propertiesInfo;
                 dragItem = propertiesInfo.item;
                 dragDelay = dragItem.getDelay();
               }
@@ -6985,12 +8660,12 @@ version: 0.1.3
                   inputEvent = _a.inputEvent;
 
               if (dragTarget) {
-                dragItem.setDelay(Math.max(dragDelay + getDistTime(distX), 0));
+                dragItem.setDelay(Math.max(dragDelay + _this.getDistTime(distX), 0));
 
                 _this.update();
               } else {
-                keyframesAreas[1].element.scrollLeft -= deltaX;
-                scrollArea.element.scrollTop -= deltaY;
+                _this.scrollArea.keyframesArea.getElement().scrollLeft -= deltaX;
+                _this.scrollArea.getElement().scrollTop -= deltaY;
                 inputEvent.preventDefault();
               }
             },
@@ -7001,7 +8676,7 @@ version: 0.1.3
                   inputEvent = _a.inputEvent;
               dragTarget = null;
               dragItem = null;
-              dragDelay = null;
+              dragDelay = 0;
               !isDrag && click(inputEvent, clientX, clientY);
               dblCheck(isDrag, inputEvent, clientX, clientY, dblclick);
             }
@@ -7009,239 +8684,123 @@ version: 0.1.3
         });
       };
 
-      __proto.initDragValues = function () {
+      __proto.initKeyController = function () {
         var _this = this;
 
-        var ids = this.ids;
-        var element = ids.valuesArea.element;
-        var dragTarget = null;
-        var dragTargetValue;
-        addEvent(element, "click", function (e) {
-          var addedElement = getTarget(dragTarget, function (el) {
-            return hasClass$1(el, "add");
+        window.addEventListener("blur", function () {
+          _this.setState({
+            alt: false
           });
+        }); // if (props.keyboard) {
 
-          if (!addedElement) {
-            return;
+        if (this.props.keyboard) {
+          this.keycon.keydown("space", function (_a) {
+            var inputEvent = _a.inputEvent;
+            inputEvent.preventDefault();
+          }).keydown("left", function (e) {
+            _this.prev();
+          }).keydown("right", function (e) {
+            _this.next();
+          }).keyup("backspace", function () {
+            _this.removeKeyframe(_this.state.selectedProperty);
+          }).keyup("esc", function () {
+            _this.finish();
+          }).keyup("space", function () {
+            _this.togglePlay();
+          });
+        }
+      };
+
+      Timeline.defaultProps = {
+        keyboard: true
+      };
+      return Timeline;
+    }(Component$1$1);
+
+    var Timeline$1 =
+    /*#__PURE__*/
+    function (_super) {
+      __extends$3(Timeline$1, _super);
+
+      function Timeline$1() {
+        return _super !== null && _super.apply(this, arguments) || this;
+      }
+
+      var __proto = Timeline$1.prototype;
+
+      __proto.render = function () {
+        var _this = this;
+
+        return h(Timeline, __assign$2({}, this.props, {
+          ref: function (e) {
+            _this.timeline = e;
           }
+        }));
+      };
 
-          var valueElement = addedElement.parentElement;
-          var index = findIndexByProperty(valueElement.getAttribute("data-key"), ids.values);
+      __proto.update = function (isInit) {
+        this.timeline.update(isInit);
+      };
 
-          if (index < 0) {
-            return;
-          }
+      __proto.prev = function () {
+        this.timeline.prev();
+      };
 
-          var propertiesInfo = ids.properties[index].datas;
-          var properties = propertiesInfo.properties.slice();
-          var item = propertiesInfo.item;
+      __proto.next = function () {
+        this.timeline.next();
+      };
 
-          if (isScene(item)) {
-            _this.newItem(item);
-          } else {
-            _this.newProperty(item, properties);
-          }
-        });
-        setDrag(element, {
-          container: window,
-          dragstart: function (e) {
-            dragTarget = e.inputEvent.target;
-            dragTargetValue = dragTarget.value;
+      __proto.finish = function () {
+        this.timeline.finish();
+      };
 
-            if (!_this.keycon.altKey || !getTarget(dragTarget, function (el) {
-              return el.nodeName === "INPUT";
-            })) {
-              return false;
-            }
+      __proto.togglePlay = function () {
+        this.timeline.togglePlay();
+      };
+
+      return Timeline$1;
+    }(Component);
+
+    var Timeline$2 =
+    /*#__PURE__*/
+    function (_super) {
+      __extends(Timeline, _super);
+
+      function Timeline(scene, parentElement, options) {
+        if (options === void 0) {
+          options = {};
+        }
+
+        var _this = _super.call(this) || this;
+
+        _this.onSelect = function (e) {
+          _this.trigger("select", e);
+        };
+
+        var element = document.createElement("div");
+        render(h(Timeline$1, __assign({
+          ref: function (e) {
+            e && (_this.timelineArea = e);
           },
-          drag: function (e) {
-            var nextValue = dragTargetValue.replace(/-?\d+/g, function (num) {
-              return "" + (parseFloat(num) + Math.round(e.distX / 2));
-            });
-            dragTarget.value = nextValue;
-          },
-          dragend: function (e) {
-            _this.edit(dragTarget, dragTarget.value);
-          }
-        });
-      };
+          keyboard: true
+        }, options, {
+          scene: scene,
+          onSelect: _this.onSelect
+        })), element);
+        parentElement.appendChild(element.children[0]);
+        return _this;
+      }
 
-      __proto.addKeyframe = function (index, time) {
-        var list = this.ids.keyframesList;
-        var property = list[index].dataset.key;
-        var _a = list[index].datas,
-            item = _a.item,
-            properties = _a.properties;
-        this.select(property, time);
-        var value = this.ids.values[index].children.element.value;
-        this.editKeyframe(index, value);
-      };
+      var __proto = Timeline.prototype;
 
-      __proto.fold = function (index, forceFold) {
-        var _this = this;
-
-        var ids = this.ids;
-        var properties = ids.properties,
-            values = ids.values,
-            keyframesList = ids.keyframesList;
-        var selectedProperty = properties[index];
-        var length = properties.length;
-        var max;
-
-        for (max = index + 1; max < length; ++max) {
-          if (properties[max].datas.key.indexOf(selectedProperty.datas.key + "///") !== 0) {
-            break;
-          }
-        }
-
-        var foldProperties = properties.slice(index + 1, max);
-        var foldValues = values.slice(index + 1, max);
-        var foldKeyframesList = keyframesList.slice(index + 1, max);
-        var selectedElement = selectedProperty.element; // true : unfold, false: fold
-
-        var isFold = isUndefined(forceFold) ? selectedElement.getAttribute("data-fold") === "1" : forceFold;
-        selectedElement.setAttribute("data-fold", isFold ? "0" : "1");
-        var foldFunction = isFold ? removeClass$1 : addClass$1;
-        var depth = selectedProperty.datas.keys.length;
-        foldProperties.forEach(function (property, i) {
-          var datas = property.datas;
-
-          if (depth + 1 < datas.keys.length) {
-            return;
-          }
-
-          foldFunction(property.element, "fold");
-          foldFunction(foldValues[i].element, "fold");
-          foldFunction(foldKeyframesList[i].element, "fold");
-
-          if (datas.isParent) {
-            if (!isFold) {
-              _this.fold(index + 1 + i, false);
-            } else {
-              // always fold
-              property.element.setAttribute("data-fold", "1");
-            }
-          } else {
-            property.element.setAttribute("data-fold", isFold ? "0" : "1");
-          }
-        });
-      };
-
-      __proto.remove = function (propertiesInfo) {
-        var key = propertiesInfo.key,
-            isItem = propertiesInfo.isItem,
-            parentItem = propertiesInfo.parentItem,
-            targetItem = propertiesInfo.item,
-            properties = propertiesInfo.properties;
-
-        if (isItem) {
-          var targetName_1 = null;
-          parentItem.forEach(function (item, name) {
-            if (item === targetItem) {
-              targetName_1 = name;
-              return;
-            }
-          });
-
-          if (targetName_1 != null) {
-            parentItem.removeItem(targetName_1);
-          }
-        } else {
-          var times = targetItem.times;
-          times.forEach(function (time) {
-            var _a;
-
-            (_a = targetItem).remove.apply(_a, [time].concat(properties));
-          });
-        }
-
-        if (this.selectedProperty === key) {
-          this.selectedProperty = "";
-          this.selectedTime = -1;
-        }
-
-        this.update();
-      };
-
-      __proto.removeKeyframe = function (property) {
-        var propertiesInfo = this.timelineInfo[property];
-
-        if (!property || !propertiesInfo || isScene(propertiesInfo.item)) {
-          return;
-        }
-
-        var properties = propertiesInfo.properties;
-        var item = propertiesInfo.item;
-        item.remove.apply(item, [item.getIterationTime()].concat(properties));
-        this.update();
-      };
-
-      __proto.editKeyframe = function (index, value) {
-        var ids = this.ids;
-        var isObjectData = ids.properties[index].dataset.object === "1";
-
-        if (isObjectData) {
-          return;
-        }
-
-        var propertiesInfo = ids.keyframesList[index].datas;
-        var item = propertiesInfo.item;
-        var properties = propertiesInfo.properties;
-        item.set.apply(item, [item.getIterationTime()].concat(properties, [value]));
-        this.update();
-      };
-
-      __proto.restoreKeyframes = function () {
-        this.setTime(this.scene.getTime());
-      };
-
-      __proto.edit = function (target, value) {
-        var parentEl = getTarget(target, function (el) {
-          return hasClass$1(el, "value");
-        });
-
-        if (!parentEl) {
-          return;
-        }
-
-        var values = this.ids.values.map(function (_a) {
-          var element = _a.element;
-          return element;
-        });
-        var index = values.indexOf(parentEl);
-
-        if (index === -1) {
-          return;
-        }
-
-        this.editKeyframe(index, value);
-      };
-
-      __proto.initEditor = function () {
-        var _this = this;
-
-        var valuesArea = this.ids.valuesArea.element;
-        new KeyController(valuesArea).keydown(function (e) {
-          !e.isToggle && e.inputEvent.stopPropagation();
-        }).keyup(function (e) {
-          !e.isToggle && e.inputEvent.stopPropagation();
-        }).keyup("enter", function (e) {
-          var target = e.inputEvent.target;
-
-          _this.edit(target, target.value);
-        }).keyup("esc", function (e) {
-          var target = e.inputEvent.target;
-          target.blur();
-        });
-        valuesArea.addEventListener("focusout", function (e) {
-          _this.restoreKeyframes();
-        });
+      __proto.update = function (isInit) {
+        this.timelineArea.update(isInit);
       };
 
       return Timeline;
-    }(Component);
+    }(Component$1);
 
-    return Timeline;
+    return Timeline$2;
 
 }));
 //# sourceMappingURL=timeline.pkgd.js.map
