@@ -5,7 +5,7 @@
   "main": "./dist/timeline.js",
   "module": "./dist/timeline.esm.js",
   "sideEffects": false,
-  "types": "declaration/Timeline.d.ts",
+  "types": "declaration/index.d.ts",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "start": "rollup -c -w",
