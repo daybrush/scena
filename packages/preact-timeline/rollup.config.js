@@ -10,18 +10,12 @@ const cjsPlugin = cjs({
     }
 });
 
-const aliasPlugin = alias({
-    "react": "preact",
-    "react-dom": "preact",
-});
-
 const resolvePlugin = resolve();
 const customResolvePlugin =  {
     ...resolvePlugin,
     resolveId(importee, importer) {
-        console.log(importee);
         if (importee === "react" || importee === "react-dom") {
-            return resolvePlugin.resolveId("node_modules/preact-compat/dist/preact-compat.min.js", importer);
+            return resolvePlugin.resolveId("preact-compat", importer);
         }
         return resolvePlugin.resolveId(importee, importer);
     },
@@ -34,10 +28,11 @@ const defaultOptions = {
         "@daybrush/drag": "utils",
         "@egjs/axes": "eg.Axes",
         "keycon": "KeyController",
+        "prop-types": "PropTypes",
+        "preact": "Preact",
     },
     plugins: [
         customResolvePlugin,
-        aliasPlugin,
         cjsPlugin,
     ],
 };
