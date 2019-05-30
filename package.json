@@ -41,7 +41,7 @@
     "@egjs/component": "^2.1.2",
     "keycon": "^0.2.2",
     "preact": "^8.4.2",
-    "preact-timeline": "0.0.4",
+    "preact-timeline": "^0.1.0",
     "scenejs": "^1.0.0"
   },
   "devDependencies": {
