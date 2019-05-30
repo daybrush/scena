@@ -1,24 +1,16 @@
 
+<p align="middle"><img src="https://daybrush.com/scenejs/images/clapperboard.png" width="250"/></p>
+<h2 align="middle">Scene.js React Timeline</h2>
+<p align="middle"><a href="https://badge.fury.io/js/react-scenejs-timeline" target="_blank"><img src="https://badge.fury.io/js/react-scenejs-timeline.svg" alt="npm version" height="18"/></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg"/> <a href="https://github.com/daybrush/scenejs-timeline/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scenejs-timeline.svg"/></a></p>
 
 
-<div align="center">
-<img src="https://daybrush.com/scenejs/images/clapperboard.png" width="250"/></p>
+<p align="middle">A library that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
 
-## Scene.js React Timeline
-
-[![npm version](https://badge.fury.io/js/react-scenejs-timeline.svg)](https://badge.fury.io/js/react-scenejs-timeline)
-[![TypeScript](https://badges.frapsoft.com/typescript/version/typescript-next.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+<p align="middle"><a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a> &nbsp;/&nbsp; <a href="https://github.com/daybrush/scenejs-timeline"><strong>Scene.js Timeline</strong></a> &nbsp;/&nbsp; <a href="https://daybrush.com/scenejs/features.html#timeline"><strong>Examples</strong></a></p>
 
 
-A library that represents the timeline of [**Scene.js**](https://github.com/daybrush/scenejs). <br/>You can control time, properties, and items.
+<p align="middle"><img src="https://raw.githubusercontent.com/daybrush/scenejs-timeline/master/demo/images/timeline.png"/></p>
 
-[**Scene.js**](https://github.com/daybrush/scenejs) &nbsp;/&nbsp;  [**Scene.js Timeline**](https://github.com/daybrush/scenejs-timeline) &nbsp;/&nbsp; [**Example**](http://daybrush.com/scenejs/features.html#timeline)
-
-<br/>
-
-![](https://github.com/daybrush/scenejs-timeline/blob/master/demo/images/timeline.png?raw=true)
-</div>
 
 ### Installation
 ```sh
