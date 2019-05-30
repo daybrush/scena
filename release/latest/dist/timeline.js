@@ -6039,7 +6039,7 @@ version: 0.1.3
     license: MIT
     author: Daybrush
     repository: git+https://github.com/daybrush/scenejs-timeline.git
-    version: 0.0.4
+    version: 0.1.0
     */
 
     /*! *****************************************************************************
