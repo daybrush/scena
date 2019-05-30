@@ -13,8 +13,11 @@ const resolvePlugin = resolve();
 const customResolvePlugin =  {
     ...resolvePlugin,
     resolveId(importee, importer) {
+        console.log(importee, importer);
         if (importee === "react" || importee === "react-dom") {
             return resolvePlugin.resolveId("preact-compat", importer);
+        } else if (importee === "prop-types") {
+            return resolvePlugin.resolveId(process.cwd() + "/src/preact-timeline/no-prop-types.ts", importer);
         }
         return resolvePlugin.resolveId(importee, importer);
     },
@@ -27,7 +30,6 @@ const defaultOptions = {
         "@daybrush/drag": "utils",
         "@egjs/axes": "eg.Axes",
         "keycon": "KeyController",
-        "prop-types": "PropTypes",
         "preact": "Preact",
     },
     plugins: [

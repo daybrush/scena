@@ -1,6 +1,6 @@
 {
   "name": "preact-timeline",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist/timeline.cjs.js",
   "module": "./dist/timeline.esm.js",
@@ -33,6 +33,10 @@
   },
   "homepage": "https://github.com/daybrush/scenejs-timeline#readme",
   "dependencies": {
+    "@daybrush/drag": "^0.4.2",
+    "@daybrush/utils": "^0.10.0",
+    "@egjs/axes": "^2.5.13",
+    "keycon": "^0.2.2",
     "scenejs": "^1.0.0"
   },
   "devDependencies": {
