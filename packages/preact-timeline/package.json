@@ -1,6 +1,6 @@
 {
   "name": "preact-timeline",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist/timeline.cjs.js",
   "module": "./dist/timeline.esm.js",

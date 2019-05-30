@@ -2,7 +2,7 @@
   "name": "@scenejs/timeline",
   "version": "0.1.3",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
-  "main": "./dist/timeline.js",
+  "main": "./dist/timeline.cjs.js",
   "module": "./dist/timeline.esm.js",
   "sideEffects": false,
   "types": "declaration/index.d.ts",
@@ -40,9 +40,9 @@
     "@egjs/axes": "^2.5.13",
     "@egjs/component": "^2.1.2",
     "keycon": "^0.2.2",
-    "scenejs": "^1.0.0",
     "preact": "^8.4.2",
-    "preact-timeline": "0.0.4"
+    "preact-timeline": "0.0.4",
+    "scenejs": "^1.0.0"
   },
   "devDependencies": {
     "@daybrush/builder": "^0.1.0",
