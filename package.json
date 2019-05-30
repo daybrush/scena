@@ -35,32 +35,20 @@
   },
   "homepage": "https://github.com/daybrush/scenejs-timeline#readme",
   "dependencies": {
-    "@daybrush/builder": "0.0.7",
     "@daybrush/drag": "^0.4.2",
     "@daybrush/utils": "^0.10.0",
-    "@egjs/axes": "^2.5.10",
-    "@egjs/build-helper": "0.0.5",
-    "@types/react": "^16.8.18",
-    "@types/react-dom": "^16.8.4",
+    "@egjs/axes": "^2.5.13",
+    "@egjs/component": "^2.1.2",
     "keycon": "^0.2.2",
-    "rollup-plugin-alias": "^1.5.1",
-    "rollup-plugin-node-resolve": "^5.0.0",
-    "scenejs": "^1.0.0-rc10"
+    "scenejs": "^1.0.0",
+    "preact": "^8.4.2",
+    "preact-timeline": "0.0.4"
   },
   "devDependencies": {
+    "@daybrush/builder": "^0.1.0",
     "@daybrush/release": "^0.2.4",
-    "preact": "^8.4.2",
-    "preact-compat": "^3.18.5",
     "print-sizes": "0.0.4",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "rollup-plugin-commonjs": "^10.0.0",
-    "rollup-plugin-peer-deps-external": "^2.2.0",
     "tslint": "^5.15.0",
     "typescript": "^3.4.2"
-  },
-  "alias": {
-    "react": "preact-compat",
-    "react-dom": "preact-compat"
   }
 }
