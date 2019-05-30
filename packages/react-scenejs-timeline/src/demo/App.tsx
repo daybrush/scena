@@ -44,7 +44,7 @@ export default class App extends Component<{}> {
                 <Timeline
                     ref={ref(this, "timeline")}
                     scene={this.scene}
-                    style={{ maxHeight: "350px" }}
+                    style={{ maxHeight: "350px", position: "fixed", bottom: 0, left: 0, right: 0}}
                 />
             </div>);
     }
