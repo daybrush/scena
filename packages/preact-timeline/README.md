@@ -1,12 +1,10 @@
 
-
-
 <div align="center">
 <img src="https://daybrush.com/scenejs/images/clapperboard.png" width="250"/></p>
 
-## Scene.js React Timeline
+## Scene.js Preact Timeline
 
-[![npm version](https://badge.fury.io/js/react-scenejs-timeline.svg)](https://badge.fury.io/js/react-scenejs-timeline)
+[![npm version](https://badge.fury.io/js/preact-timeline.svg)](https://badge.fury.io/js/preact-timeline)
 [![TypeScript](https://badges.frapsoft.com/typescript/version/typescript-next.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
@@ -22,13 +20,13 @@ A library that represents the timeline of [**Scene.js**](https://github.com/dayb
 
 ### Installation
 ```sh
-$ npm i react-scenejs-timeline
+$ npm i preact-timeline
 ```
 
 
 ### How to use
 ```tsx
-import Timeline from "react-scenejs-timeline";
+import Timeline from "preact-timeline";
 
 render() {
     return (

@@ -1,6 +1,5 @@
 import builder from "@daybrush/builder";
 import cjs from "rollup-plugin-commonjs";
-import alias from "rollup-plugin-alias";
 import resolve from "rollup-plugin-node-resolve";
 
 
