@@ -48,7 +48,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             this.isExportCSS = true;
         }
 
-        this.state = { ...this.state, ...this.initScene(this.props.scene) };
+        this.state = { ...this.state, ...this.initScene(this.props.scene, false) };
 
         this.keycon = new KeyController()
             .keydown("alt", () => {
@@ -162,7 +162,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         if (prevProps.scene !== this.props.scene) {
             this.releaseScene(prevProps.scene);
 
-            this.setState(this.initScene(this.props.scene));
+            this.setState(this.initScene(this.props.scene, true));
         } else {
             this.setTime();
         }
@@ -367,7 +367,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         this.setInputs(flatObject(e.frames || e.frame.get()));
         this.controlArea.timeArea.getElement().value = `${minute}:${second}:${milisecond}`;
     }
-    private initScene(scene?: Scene | SceneItem) {
+    private initScene(scene?: Scene | SceneItem, isInit?: boolean) {
         if (!scene) {
             return {
                 timelineInfo: {},
@@ -386,7 +386,7 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             maxTime: duration,
             maxDuration: duration,
             zoom: 1,
-            init: true,
+            init: isInit || false,
         };
     }
     private releaseScene(scene?: Scene | SceneItem) {
