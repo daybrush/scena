@@ -1,8 +1,8 @@
-import PreactTimeline, { SelectEvent } from "preact-timeline";
+import PreactTimeline from "preact-timeline";
 import EgComponent from "@egjs/component";
 import { VNode, h, render, Component } from "preact";
 import Scene, { SceneItem } from "scenejs";
-import { TimelineProps } from "./types";
+import { TimelineProps, SelectEvent } from "./types";
 
 export default class Timeline extends EgComponent {
     private timelineArea!: PreactTimeline;

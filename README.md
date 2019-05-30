@@ -12,6 +12,12 @@
 <p align="middle"><img src="https://raw.githubusercontent.com/daybrush/scenejs-timeline/master/demo/images/timeline.png"/></p>
 
 
+
+
+### Related Projects
+* [**react-scenejs-timeline**](https://github.com/daybrush/scenejs-timeline/tree/master/packages/react-scenejs-timeline): A React Component that control scene.js timeline.
+* [**preact-timeline**](https://github.com/daybrush/scenejs-timeline/tree/master/packages/preact-timeline): A Preact Component that control scene.js timeline.
+
 ### Installation
 ```sh
 $ npm i @scenejs/timeline
@@ -25,7 +31,7 @@ $ npm i @scenejs/timeline
 ### How to use
 ```ts
 import Scene from "scenejs";
-import Timeline from "@scenejs/timeline";
+import Timeline, { SelectEvent } from "@scenejs/timeline";
 
 const scene = new Scene({
     ...
