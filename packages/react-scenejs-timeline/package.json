@@ -1,11 +1,11 @@
 {
   "name": "react-scenejs-timeline",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist/timeline.cjs.js",
   "module": "./dist/timeline.esm.js",
   "sideEffects": false,
-  "types": "declaration/Timeline.d.ts",
+  "types": "declaration/index.d.ts",
   "scripts": {
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "start": "react-scripts start",

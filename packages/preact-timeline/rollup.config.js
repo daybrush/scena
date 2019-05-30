@@ -13,7 +13,6 @@ const resolvePlugin = resolve();
 const customResolvePlugin =  {
     ...resolvePlugin,
     resolveId(importee, importer) {
-        console.log(importee, importer);
         if (importee === "react" || importee === "react-dom") {
             return resolvePlugin.resolveId("preact-compat", importer);
         } else if (importee === "prop-types") {
