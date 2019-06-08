@@ -2,55 +2,6 @@ export const PREFIX = `scenejs-editor-`;
 export const SUPPORT_POINTER_EVENTS = "PointerEvent" in window || "MSPointerEvent" in window;
 export const SUPPORT_TOUCH = "ontouchstart" in window;
 
-export const CSS2 = `
-.item-info {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 200px;
-    background: #000;
-}
-.options-area {
-
-}
-.option-area {
-    position: relative;
-    border-bottom: 1px solid #777;
-    box-sizing: border-box;
-    white-space: nowrap;
-    background: rgba(90, 90, 90, 0.7);
-    font-size: 13px;
-    font-weight: bold;
-    color: #eee;
-    display: flex;
-}
-.option-name, .option-value {
-    width: 50%;
-    height: 30px;
-    line-height: 20px;
-    box-sizing: border-box;
-    padding: 5px;
-}
-.option-name {
-    border-right: 1px solid #999;
-}
-.option-value input {
-    appearance: none;
-    -webkit-appearance: none;
-    outline: none;
-    position: relative;
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    color: #4af;
-    font-weight: bold;
-    background: none;
-    border: 0;
-    box-sizing: border-box;
-}
-`.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
-
 export const CSS = `
 .timeline * {
     box-sizing: border-box;
@@ -199,7 +150,7 @@ export const CSS = `
   bottom: 0;
   width: 1px;
   height: 10px;
-  background: #777;
+  background: #666;
   transform: translate(-50%);
 }
 .keytime .graduation.half {
@@ -239,7 +190,7 @@ export const CSS = `
     width: 50px;
     min-width: 50px;
     display: inline-block;
-    border-right: 1px solid #999;
+    border-right: 1px solid #666;
     box-sizing: border-box;
 }
 .value input {
@@ -282,7 +233,7 @@ export const CSS = `
   position: relative;
   height: 30px;
   line-height: 30px;
-  border-bottom: 1px solid #777;
+  border-bottom: 1px solid #555;
   box-sizing: border-box;
   white-space: nowrap;
   background: rgba(90, 90, 90, 0.7);
