@@ -18,10 +18,11 @@ import { drag } from "@daybrush/drag";
 import { dblCheck } from "./dblcheck";
 import { getTimelineInfo } from "./TimelineInfo";
 import { IObject, find, isUndefined } from "@daybrush/utils";
+import PureProps from "react-pure-props";
 
 let isExportCSS = false;
 
-export default class Timeline extends React.Component<TimelineProps, TimelineState> {
+export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     public static defaultProps = {
         keyboard: true,
     };
@@ -135,26 +136,6 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         this.initKeyController();
     }
     public componentDidUpdate(prevProps: TimelineProps, prevState: TimelineState) {
-        if (this.props.onSelect && prevState.selectedProperty !== this.state.selectedProperty) {
-            const {
-                selectedProperty: prevSelectedProperty,
-                selectedTime: prevSelectedTime,
-            } = prevState;
-            const {
-                selectedProperty,
-                selectedTime,
-            } = this.state;
-            const selectedItem = this.state.timelineInfo[selectedProperty]!;
-
-            this.props.onSelect({
-                selectedItem: !selectedProperty ? this.props.scene! : selectedItem.item,
-                selectedProperty,
-                selectedTime,
-                prevSelectedProperty,
-                prevSelectedTime,
-            });
-        }
-
         if (this.state.init) {
             this.state.init = false;
             this.scrollArea.foldAll();
@@ -166,7 +147,11 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
         } else {
             this.setTime();
         }
-
+    }
+    public componentWillUnmount() {
+        if (this.isExportCSS) {
+            isExportCSS = false;
+        }
     }
     public update = (isInit: boolean = false) => {
         const scene = this.props.scene;
@@ -307,10 +292,27 @@ export default class Timeline extends React.Component<TimelineProps, TimelineSta
             return;
         }
         scene.pause();
+        const state = this.state;
 
+        if (this.props.onSelect) {
+            const {
+                selectedProperty: prevSelectedProperty,
+                selectedTime: prevSelectedTime,
+                timelineInfo,
+            } = state;
+            const selectedItem = timelineInfo[property]!;
+
+            this.props.onSelect({
+                selectedItem: !property ? this.props.scene! : selectedItem.item,
+                selectedProperty: property,
+                selectedTime: time,
+                prevSelectedProperty,
+                prevSelectedTime,
+            });
+        }
         if (isNotUpdate) {
-            this.state.selectedProperty = property;
-            this.state.selectedTime = -1;
+            state.selectedProperty = property;
+            state.selectedTime = time;
         } else {
             this.setState({
                 selectedProperty: property,
