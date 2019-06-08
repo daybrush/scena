@@ -6,7 +6,7 @@
 
 <p align="middle">A library that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
 
-<p align="middle"><a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a> &nbsp;/&nbsp; <a href="https://github.com/daybrush/scenejs-timeline"><strong>Scene.js Timeline</strong></a> &nbsp;/&nbsp; <a href="https://daybrush.com/scenejs/features.html#timeline"><strong>Examples</strong></a></p>
+<p align="middle"><a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a> &nbsp;/&nbsp; <a href="https://github.com/daybrush/scenejs-timeline"><strong>Scene.js Timeline</strong></a> &nbsp;/&nbsp; <a href="https://codesandbox.io/s/preacttimeline-example-rx0k6"><strong>Example</strong></a></p>
 
 
 <p align="middle"><img src="https://raw.githubusercontent.com/daybrush/scenejs-timeline/master/demo/images/timeline.png"/></p>
