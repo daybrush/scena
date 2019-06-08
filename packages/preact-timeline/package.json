@@ -1,6 +1,6 @@
 {
   "name": "preact-timeline",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist/timeline.cjs.js",
   "module": "./dist/timeline.esm.js",
@@ -45,7 +45,7 @@
     "preact": "^8.4.2",
     "preact-compat": "^3.18.5",
     "print-sizes": "0.0.4",
-    "react-scenejs-timeline": "^0.1.7",
+    "react-scenejs-timeline": "^0.1.8",
     "rollup-plugin-css-bundle": "^1.0.4",
     "shape-svg": "^0.3.3",
     "tslint": "^5.16.0",
