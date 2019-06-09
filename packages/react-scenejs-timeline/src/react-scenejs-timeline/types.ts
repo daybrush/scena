@@ -25,6 +25,7 @@ export interface TimelineState {
     timelineInfo: TimelineInfo;
     selectedProperty: string;
     selectedTime: number;
+    updateTime: boolean;
     init: boolean;
 }
 export interface PropertiesInfo {

@@ -39,6 +39,7 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         selectedProperty: "",
         selectedTime: -1,
         init: false,
+        updateTime: false,
     };
     private isExportCSS = false;
     private axes!: Axes;
@@ -137,15 +138,19 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         this.initKeyController();
     }
     public componentDidUpdate(prevProps: TimelineProps, prevState: TimelineState) {
-        if (this.state.init) {
-            this.state.init = false;
+        const state = this.state;
+
+        if (state.init) {
+            state.init = false;
             this.scrollArea.foldAll();
         }
         if (prevProps.scene !== this.props.scene) {
             this.releaseScene(prevProps.scene);
 
             this.setState(this.initScene(this.props.scene, true));
-        } else {
+        }
+        if (state.updateTime) {
+            state.updateTime = false;
             this.setTime();
         }
     }
@@ -171,6 +176,7 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
             timelineInfo: getTimelineInfo(scene),
             maxTime,
             maxDuration,
+            updateTime: true,
             init: isInit,
         });
 
@@ -536,10 +542,11 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     }
     private initKeyController() {
         window.addEventListener("blur", () => {
-            this.setState({ alt: false });
+            if (this.state.alt === true) {
+                this.setState({ alt: false });
+            }
         });
 
-        // if (props.keyboard) {
         if (this.props.keyboard) {
             this.keycon!.keydown("space", ({ inputEvent }) => {
                 inputEvent.preventDefault();
