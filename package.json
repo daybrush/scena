@@ -1,0 +1,65 @@
+{
+  "name": "react-scenejs-editor",
+  "version": "0.1.0",
+  "description": "new project",
+  "main": "./dist/editor.cjs.js",
+  "module": "./dist/editor.esm.js",
+  "sideEffects": false,
+  "types": "declaration/index.d.ts",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "rollup -c && npm run declaration && print-sizes ./dist",
+    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
+    "doc": "rm -rf ./doc && jsdoc -c jsdoc.json",
+    "prerelease": "npm run build && prerelease --dirs=dist,doc",
+    "release": "npm run build && npm run doc && release --dirs=dist,doc",
+    "release:init": "npm run build && release -i --dirs=dist,doc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daybrush/scenejs-editor.git"
+  },
+  "author": "Daybrush",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daybrush/scenejs-editor/issues"
+  },
+  "homepage": "https://github.com/daybrush/scenejs-editor#readme",
+  "dependencies": {
+    "@daybrush/utils": "^0.10.0",
+    "@scenejs/effects": "^0.1.0",
+    "@scenejs/timeline": "^0.1.7",
+    "@types/node": "12.0.7",
+    "@types/react": "16.8.19",
+    "@types/react-dom": "16.8.4",
+    "keycon": "^0.3.0",
+    "react-pure-props": "^0.1.1",
+    "react-scenejs-timeline": "^0.1.9",
+    "scenejs": "^1.0.3",
+    "shape-svg": "^0.3.3"
+  },
+  "devDependencies": {
+    "@daybrush/builder": "^0.1.1",
+    "@daybrush/jsdoc": "^0.3.7",
+    "@daybrush/release": "^0.2.4",
+    "daybrush-jsdoc-template": "^1.6.0",
+    "print-sizes": "0.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1",
+    "tslint": "^5.17.0",
+    "typescript": "^3.2.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
