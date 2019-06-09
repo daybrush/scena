@@ -5,6 +5,7 @@ import { HTMLAttributes } from "react";
 export interface SelectEvent {
     selectedItem: Scene | SceneItem;
     selectedProperty: string;
+    selectedName: string;
     selectedTime: number;
     prevSelectedProperty: string;
     prevSelectedTime: number;

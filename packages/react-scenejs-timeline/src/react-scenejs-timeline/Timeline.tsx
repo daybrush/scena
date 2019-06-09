@@ -29,6 +29,7 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     public headerArea!: HeaderArea;
     public controlArea!: ControlArea;
     public scrollArea!: ScrollArea;
+    public values: IObject<any> = {};
     public state: TimelineState = {
         alt: false,
         zoom: 1,
@@ -201,6 +202,9 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
             scene.play();
         }
     }
+    public getValues() {
+        return this.values;
+    }
     private renderStyle() {
         if (!this.isExportCSS) {
             return <style>{CSS}</style>;
@@ -281,6 +285,7 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         this.headerArea.keytimesArea.cursor.getElement().style.left = left;
     }
     private setInputs(obj: IObject<any>) {
+        this.values = obj;
         const valuesArea = this.scrollArea.valuesArea.getElement();
         for (const name in obj) {
             valuesArea.querySelector<HTMLInputElement>(`[data-id="${name}"] input`)!.value = obj[name];
@@ -300,10 +305,13 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
                 selectedTime: prevSelectedTime,
                 timelineInfo,
             } = state;
-            const selectedItem = timelineInfo[property]!;
+            const propertiesInfo = timelineInfo[property]!;
+            const selectedItem = property ? propertiesInfo.item : this.props.scene!;
+            const selectedName = property ? propertiesInfo.names.join("///") : "";
 
             this.props.onSelect({
-                selectedItem: !property ? this.props.scene! : selectedItem.item,
+                selectedItem,
+                selectedName,
                 selectedProperty: property,
                 selectedTime: time,
                 prevSelectedProperty,
