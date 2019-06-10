@@ -53,6 +53,7 @@ export const CSS = `
     flex: 1;
     background: transparent;
     border-bottom: 0;
+    z-index: auto;
 }
 .info .option .value input {
     position: relative;
@@ -141,6 +142,15 @@ export const CSS = `
 .info .group .group {
     padding-left: 10px;
 }
+.info .color {
+    z-index: 10;
+}
+.info .picker {
+    position: absolute;
+    right: 5px;
+    top: 100%;
+    z-index: 10;
+}
 `.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
 
 export const DIRECTIONS: DirectionType[] = ["normal", "reverse", "alternate", "alternate-reverse"];
@@ -158,6 +168,12 @@ export const PROPERTY_TYPES: IObject<any> = {
     "filter": "group",
     "width": SIZE_TYPE,
     "height": SIZE_TYPE,
+    "color": "color",
+    "background-color": "color",
+    "border-left-color": "color",
+    "border-right-color": "color",
+    "border-top-color": "color",
+    "border-bottom-color": "color",
     "opacity": "number",
     "transform///rotate": ANGLE_TYPE,
     "transform///rotateX": ANGLE_TYPE,

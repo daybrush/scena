@@ -21,11 +21,11 @@ export default class UnitBox extends Input<{
             </div>
         );
     }
+    public setValue() {
+        return;
+    }
     protected setCallback = () => {
         this.props.setCallback(this.numberBox.getValue() + this.selectBox.getValue());
-    }
-    protected setValue() {
-        return;
     }
     private splitUnit() {
         const { value, unit } = splitUnit(this.props.value);

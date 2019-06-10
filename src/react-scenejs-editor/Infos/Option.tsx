@@ -5,6 +5,7 @@ import TextBox from "../Inputs/TextBox";
 import NumberBox from "../Inputs/NumberBox";
 import LabelBox from "../Inputs/LabelBox";
 import UnitBox from "../Inputs/UnitBox";
+import ColorBox from "../Inputs/ColorBox";
 
 export default class Option extends React.Component<{
     type?: string,
@@ -32,6 +33,8 @@ export default class Option extends React.Component<{
         switch (type) {
             case "unit":
                 return (<UnitBox options={param} value={value} setCallback={setCallback} />);
+            case "color":
+                return (<ColorBox options={param} value={value} setCallback={setCallback} />);
             case "select":
                 return (<SelectBox options={param} value={value} setCallback={setCallback} />);
             case "number":

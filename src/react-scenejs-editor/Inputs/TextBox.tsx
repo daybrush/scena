@@ -3,9 +3,20 @@ import { getKey } from "keycon";
 import Input from "./Input";
 import { ref } from "../utils";
 
-export default class TextBox extends Input {
+export default class TextBox extends Input<{
+    onFocus?: () => void,
+    onBlur?: () => void,
+}> {
     public render() {
-        return (<input ref={ref(this, "input")} onKeyDown={this.onKeyDown} onKeyUp={this.onKeyUp}/>);
+        const {
+            onFocus,
+            onBlur,
+        } = this.props;
+
+        return (
+            <input ref={ref(this, "input")}
+                onKeyDown={this.onKeyDown} onKeyUp={this.onKeyUp} onFocus={onFocus} onBlur={onBlur} />
+        );
     }
     protected onKeyDown = (e: any) => {
         e.stopPropagation();
