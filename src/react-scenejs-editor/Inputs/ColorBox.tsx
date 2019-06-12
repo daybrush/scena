@@ -3,6 +3,7 @@ import { ChromePicker, ColorResult } from "react-color";
 import Input from "./Input";
 import { ref, prefix } from "../utils";
 import TextBox from "./TextBox";
+import { splitBracket } from "@daybrush/utils";
 
 export default class ColorBox extends Input<{
     options: string[],
@@ -38,9 +39,21 @@ export default class ColorBox extends Input<{
     }
     public renderPicker() {
         if (this.state.isFocus) {
+            let value: any = this.props.value;
+            const result = splitBracket(this.props.value);
+
+            if (result.prefix === "rgba") {
+                const rgba = result.value.split(",");
+                value = {
+                    r: parseInt(rgba[0], 10),
+                    g: parseInt(rgba[1], 10),
+                    b: parseInt(rgba[2], 10),
+                    a: parseFloat(rgba[3]),
+                };
+            }
             return (
                 <div className={prefix("picker")}>
-                    <ChromePicker color="" onChangeComplete={this.onChangeComplete} />
+                    <ChromePicker color={value} onChangeComplete={this.onChangeComplete} />
                 </div>
             );
         } else {
