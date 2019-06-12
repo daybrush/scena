@@ -1,8 +1,18 @@
 import Scene, { AnimatorState, SceneItem } from "scenejs";
-import { ITERATION_COUNT, DELAY, PLAY_SPEED, DIRECTION, REVERSE, ALTERNATE, ALTERNATE_REVERSE } from "./consts";
+import {
+    ITERATION_COUNT,
+    DELAY,
+    PLAY_SPEED,
+    DIRECTION,
+    REVERSE,
+    ALTERNATE,
+    ALTERNATE_REVERSE,
+    DURATION,
+    INFINITE,
+} from "./consts";
 import { TimelineInfo } from "./types";
 import { isScene } from "./utils";
-import { isUndefined, isObject } from "@daybrush/utils";
+import { isUndefined, isObject, dot, findIndex } from "@daybrush/utils";
 
 export const MAXIMUM = 1000000;
 export function toFixed(num: number) {
@@ -14,9 +24,6 @@ export function addEntry(entries: number[][], time: number, keytime: number) {
     (!prevEntry || prevEntry[0] !== time || prevEntry[1] !== keytime) &&
         entries.push([toFixed(time), toFixed(keytime)]);
 }
-export function dotNumber(a1: number, a2: number, b1: number, b2: number) {
-    return (a1 * b2 + a2 * b1) / (b1 + b2);
-  }
 export function getEntries(times: number[], states: AnimatorState[]) {
     if (!times.length) {
         return [];
@@ -54,7 +61,7 @@ export function getEntries(times: number[], states: AnimatorState[]) {
                     if (j !== 0) {
                         const prevTime = currentDuration * i +
                             (isReverse ? currentDuration - prevEntry[0] : prevEntry[0]);
-                        const divideTime = dotNumber(prevEntry[1], time, lastTime - prevTime, currentTime - lastTime);
+                        const divideTime = dot(prevEntry[1], time, lastTime - prevTime, currentTime - lastTime);
 
                         addEntry(nextEntries, (delay + currentDuration * iterationCount) / playSpeed, divideTime);
                     }
@@ -78,6 +85,12 @@ export function getEntries(times: number[], states: AnimatorState[]) {
 
     return entries;
 }
+export function getFiniteEntries(times: number[], states: AnimatorState[]) {
+    const infiniteIndex = findIndex(states, state => {
+        return state[ITERATION_COUNT] === INFINITE || !isFinite(state[DURATION]);
+    }, states.length - 1);
+    return getEntries(times, states.slice(0, infiniteIndex));
+}
 export function getItemInfo(
     timelineInfo: TimelineInfo,
     items: Array<Scene | SceneItem>,
@@ -90,7 +103,7 @@ export function getItemInfo(
     (!item.getFrame(0)) && times.unshift(0);
     (!item.getFrame(originalDuration)) && times.push(originalDuration);
     const states = items.slice(1).map(animator => animator.state).reverse();
-    const entries = getEntries(times, states);
+    const entries = getFiniteEntries(times, states);
     const parentItem = items[items.length - 2] as Scene;
 
     (function getPropertyInfo(itemNames: any, ...properties: any[]) {
@@ -138,7 +151,7 @@ export function getTimelineInfo(scene: Scene | SceneItem): TimelineInfo {
                 const key = names.join("///");
 
                 const times = [0, lastItem.getDuration()];
-                const entries = getEntries(times, items.slice(1).map(animator => animator.state).reverse());
+                const entries = getFiniteEntries(times, items.slice(1).map(animator => animator.state).reverse());
                 const frames: any[] = [];
                 entries.forEach(([time, iterationTime]) => {
                     frames.push([time, iterationTime, iterationTime]);
