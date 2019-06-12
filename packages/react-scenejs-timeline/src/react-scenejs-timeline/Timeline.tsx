@@ -298,6 +298,11 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         }
     }
     private select = (property: string, time: number = -1, isNotUpdate?: boolean) => {
+        const activeElement = document.activeElement;
+
+        if (activeElement && (activeElement as any).blur) {
+            (activeElement as any).blur();
+        }
         const scene = this.props.scene;
         if (!scene) {
             return;
