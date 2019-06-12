@@ -4,6 +4,7 @@ import Scene, { SceneItem } from "scenejs";
 import { ref } from "./utils";
 import { CSS } from "./consts";
 import Infos from "./Infos/Infos";
+import Menus from "./Menus/Menus";
 
 let isExportCSS = false;
 
@@ -23,6 +24,7 @@ export default class Editor extends React.Component<{
         return (
             <div className="scenejs-editor">
                 {this.renderStyle()}
+                <Menus />
                 <Infos
                     ref={ref(this, "infos")}
                     onUpdate={this.onUpdate}
