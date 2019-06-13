@@ -5,6 +5,7 @@ import { ref } from "./utils";
 import { CSS } from "./consts";
 import Infos from "./Infos/Infos";
 import Menus from "./Menus/Menus";
+import MenuControl from "./Menus/MenuControl";
 
 let isExportCSS = false;
 
@@ -25,6 +26,7 @@ export default class Editor extends React.Component<{
             <div className="scenejs-editor">
                 {this.renderStyle()}
                 <Menus />
+                <MenuControl/>
                 <Infos
                     ref={ref(this, "infos")}
                     onUpdate={this.onUpdate}
