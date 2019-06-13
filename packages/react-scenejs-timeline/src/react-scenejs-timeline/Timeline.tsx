@@ -3,24 +3,25 @@ import ControlArea from "./HeaderArea/ControlArea";
 import HeaderArea from "./HeaderArea/HeaderArea";
 import ScrollArea from "./ScrollArea/ScrollArea";
 import * as React from "react";
-import { CSS, SUPPORT_TOUCH, SUPPORT_POINTER_EVENTS } from "./consts";
+import { SUPPORT_TOUCH, SUPPORT_POINTER_EVENTS, CSS } from "./consts";
 import {
     prefix,
     numberFormat,
     ref,
     getTarget, findElementIndexByPosition,
-    hasClass, flatObject, isScene
+    hasClass, flatObject, isScene,
 } from "./utils";
 import Axes, { PinchInput } from "@egjs/axes";
 import KeyController from "keycon";
-import Scene, { SceneItem } from "scenejs";
+import Scene, { SceneItem, ROLES } from "scenejs";
 import { drag } from "@daybrush/drag";
 import { dblCheck } from "./dblcheck";
 import { getTimelineInfo } from "./TimelineInfo";
-import { IObject, find, isUndefined } from "@daybrush/utils";
+import { IObject, find, isUndefined, isObject } from "@daybrush/utils";
 import PureProps from "react-pure-props";
+import styled from "styled-components";
 
-let isExportCSS = false;
+const TimelineElement = styled.div`${CSS}`;
 
 export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     public static defaultProps = {
@@ -46,10 +47,6 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     private keycon!: KeyController;
     constructor(props: any) {
         super(props);
-        if (isExportCSS) {
-            isExportCSS = true;
-            this.isExportCSS = true;
-        }
 
         this.state = { ...this.state, ...this.initScene(this.props.scene, false) };
 
@@ -89,10 +86,9 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         } = this.state;
 
         return (
-            <div
+            <TimelineElement
                 className={prefix("timeline" + (alt ? " alt" : "")) + (className ? ` ${className}` : "")}
                 {...attributes}>
-                {this.renderStyle()}
                 <ControlArea
                     ref={ref(this, "controlArea")}
                     scene={scene}
@@ -128,7 +124,7 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
                     selectedTime={selectedTime}
                     timelineInfo={timelineInfo}
                 />
-            </div>
+            </TimelineElement>
         );
     }
     public componentDidMount() {
@@ -152,11 +148,6 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         if (state.updateTime) {
             state.updateTime = false;
             this.setTime();
-        }
-    }
-    public componentWillUnmount() {
-        if (this.isExportCSS) {
-            isExportCSS = false;
         }
     }
     public update = (isInit: boolean = false) => {
@@ -211,11 +202,6 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     public getValues() {
         return this.values;
     }
-    private renderStyle() {
-        if (!this.isExportCSS) {
-            return <style>{CSS}</style>;
-        }
-    }
     private add = (item: Scene | SceneItem = this.props.scene!, properties: string[] = []) => {
         if (isScene(item)) {
             this.newItem(item);
@@ -238,7 +224,18 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
         if (!property) {
             return;
         }
-        item.set(item.getIterationTime(), ...properties, property, "");
+        let roles: any = ROLES;
+
+        const nextProperties = [...properties, property];
+        const isRole = nextProperties.every(name => {
+            if (isObject(roles[name])) {
+                roles = roles[name];
+                return true;
+            }
+            return false;
+        });
+
+        item.set(item.getIterationTime(), ...nextProperties, isRole ? {} : "");
         this.update();
     }
     private getDistTime = (

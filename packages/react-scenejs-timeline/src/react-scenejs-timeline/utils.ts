@@ -165,7 +165,6 @@ export function fold(
     const foldedInfo = target.state.foldedInfo;
 
     foldedInfo[id] = !foldedInfo[id];
-    // console.log(foldedInfo);
     if (!isNotUpdate) {
         target.setState({
             foldedInfo: { ...foldedInfo },

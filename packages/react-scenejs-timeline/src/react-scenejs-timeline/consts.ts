@@ -3,16 +3,17 @@ export const SUPPORT_POINTER_EVENTS = "PointerEvent" in window || "MSPointerEven
 export const SUPPORT_TOUCH = "ontouchstart" in window;
 
 export const CSS = `
+
+position: relative;
+width: 100%;
+font-size: 0;
+background: #000;
+display: flex;
+flex-direction: column;
+
 .timeline * {
     box-sizing: border-box;
-}
-.timeline {
-  position: relative;
-  width: 100%;
-  font-size: 0;
-  background: #000;
-  display: flex;
-  flex-direction: column;
+    color: #fff;
 }
 .header-area, .scroll-area {
    width: 100%;
@@ -55,7 +56,7 @@ export const CSS = `
     cursor: pointer;
 }
 .header-area .keyframes-area::-webkit-scrollbar {
-    display: none; // Safari and Chrome
+    display: none;
 }
 .header-area .keyframe-cursor {
     position: absolute;
@@ -179,7 +180,7 @@ export const CSS = `
 }
 
 .properties-area::-webkit-scrollbar, .keyframes-area::-webkit-scrollbar {
-    display: none; // Safari and Chrome
+    display: none;
 }
 .properties-area {
   width: 30%;
