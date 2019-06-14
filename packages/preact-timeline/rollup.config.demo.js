@@ -2,7 +2,6 @@ import resolve from "rollup-plugin-node-resolve";
 import builder from "@daybrush/builder";
 import css from "rollup-plugin-css-bundle";
 import commonjs from "rollup-plugin-commonjs";
-import env from "rollup-plugin-env";
 
 const resolvePlugin = resolve();
 const customResolvePlugin = {
@@ -21,25 +20,34 @@ const customResolvePlugin = {
         return resolvePlugin.resolveId(importee, importer);
     },
 }
-const external = {
-    "prop-types": "prop-types",
-};
 
+
+const noenv = {
+    intro: function intro() {
+        return `
+    var rollupEnv = {};
+    if (typeof window !== "undefined") {
+        var process = {};
+    }
+  process.env = process.env || {};
+  Object.keys(rollupEnv).forEach(function (prop) {
+      process.env[prop] = rollupEnv[prop];
+  });`;
+    },
+};
 
 export default builder({
     input: "./src/demo/index.tsx",
     tsconfig: "./tsconfig.build.json",
-    sourcemap: true,
+    sourcemap: false,
     format: "umd",
     output: "./demo/dist/index.js",
     name: "app",
     exports: "named",
-    external,
-
     plugins: [
         customResolvePlugin,
         css({ output: "./demo/dist/index.css" }),
-        env({}),
+        noenv,
         commonjs({
             namedExports: {
                 "node_modules/react-is/umd/react-is.producution.min.js": ["isElement", "isValidElementType", "ForwardRef"],
