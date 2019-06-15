@@ -1,6 +1,8 @@
 import ReactTimeline from "react-scenejs-timeline";
 import { h, Component } from "preact";
 import { TimelineProps } from "./types";
+import "../compat/styled-components";
+
 
 export default class Timeline extends Component<TimelineProps> {
     private timeline: any;
