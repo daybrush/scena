@@ -4,10 +4,8 @@ import * as React from "react";
 import Timeline from "../react-scenejs-timeline";
 import Scene from "scenejs";
 import { ref } from "../react-scenejs-timeline/utils";
-import { zoomIn } from "@scenejs/effects";
 import { poly } from "shape-svg";
 import "./App.css";
-import { EASE_IN_OUT } from "scenejs";
 
 export default class App extends Component<{}> {
     private scene: Scene = new Scene();
