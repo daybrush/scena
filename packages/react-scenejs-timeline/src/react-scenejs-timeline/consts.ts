@@ -3,15 +3,15 @@ export const SUPPORT_POINTER_EVENTS = "PointerEvent" in window || "MSPointerEven
 export const SUPPORT_TOUCH = "ontouchstart" in window;
 
 export const CSS = `
-
-position: relative;
-width: 100%;
-font-size: 0;
-background: #000;
-display: flex;
-flex-direction: column;
-
-.timeline * {
+{
+    position: relative;
+    width: 100%;
+    font-size: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+}
+* {
     box-sizing: border-box;
     color: #fff;
 }

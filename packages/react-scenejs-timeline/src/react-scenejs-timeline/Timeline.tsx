@@ -19,9 +19,9 @@ import { dblCheck } from "./dblcheck";
 import { getTimelineInfo } from "./TimelineInfo";
 import { IObject, find, isUndefined, isObject } from "@daybrush/utils";
 import PureProps from "react-pure-props";
-import styled from "styled-components";
+import styled from "react-css-styler";
 
-const TimelineElement = styled.div`${CSS}`;
+const TimelineElement = styled("div", CSS);
 
 export default class Timeline extends PureProps<TimelineProps, TimelineState> {
     public static defaultProps = {
