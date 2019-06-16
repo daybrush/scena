@@ -18,7 +18,6 @@ export default builder({
     plugins: [
         resolve,
         css({ output: "./demo/dist/index.css" }),
-        noenv,
         commonjs,
     ],
 });
