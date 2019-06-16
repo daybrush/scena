@@ -523,9 +523,13 @@ export default class Timeline extends PureProps<TimelineProps, TimelineState> {
                     }
                 },
                 drag: ({ distX, deltaX, deltaY, inputEvent }) => {
-                    if (dragTarget) {
-                        dragItem!.setDelay(Math.max(dragDelay + this.getDistTime(distX), 0));
-                        this.update();
+                    if (dragTarget && dragItem) {
+                        const nextDelay = Math.max(dragDelay + this.getDistTime(distX), 0);
+
+                        if (dragItem.getDelay() !== nextDelay) {
+                            dragItem.setDelay(nextDelay);
+                            this.update();
+                        }
                     } else {
                         this.scrollArea.keyframesArea.getElement().scrollLeft -= deltaX;
                         this.scrollArea.getElement().scrollTop -= deltaY;

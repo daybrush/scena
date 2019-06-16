@@ -72,7 +72,7 @@ export default class ScrollArea extends ElementComponent<{
         this.propertiesArea.properties.forEach((property, i) => {
             const { keys, isParent } = property.props.propertiesInfo;
 
-            if (keys.length === 1 && isParent) {
+            if (isParent) {
                 this.fold(i);
             }
         });

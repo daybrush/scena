@@ -45,8 +45,22 @@ export default class Keyframes extends ElementComponent<{
         let startIndex = 0;
 
         if (length >= 2 && !hasProperties) {
+            let delayedIndex = 0;
+
+            for (let i = 1; i < length; ++i) {
+                const iterationTime = frames[i][1];
+
+                if (
+                    frames[i - 1][1] === iterationTime
+                    && (iterationTime === 0 || iterationTime === duration)
+                ) {
+                    delayedIndex = i;
+                } else {
+                    break;
+                }
+            }
             const index = findIndex(frames, ([, , value]) => !isUndefined(value));
-            startIndex = Math.min(length - 2, Math.max(frames[0][1] === 0 && frames[1][1] === 0 ? 1 : 0, index));
+            startIndex = Math.min(length - 2, Math.max(delayedIndex, index));
             const startFrame = frames[startIndex];
             const endFrame = frames[length - 1];
             const time = startFrame[0];
