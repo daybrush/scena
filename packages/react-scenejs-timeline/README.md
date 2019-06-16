@@ -1,5 +1,5 @@
 
-<p align="middle"><img src="https://daybrush.com/scenejs/images/clapperboard.png" width="250"/></p>
+<p align="middle"><img src="https://raw.githubusercontent.com/daybrush/scenejs-timeline/master/demo/images/logo.png" width="320"/></p>
 <h2 align="middle">Scene.js React Timeline</h2>
 <p align="middle"><a href="https://badge.fury.io/js/react-scenejs-timeline" target="_blank"><img src="https://badge.fury.io/js/react-scenejs-timeline.svg" alt="npm version" height="18"/></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg"/> <a href="https://github.com/daybrush/scenejs-timeline/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scenejs-timeline.svg"/></a></p>
 
