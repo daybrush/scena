@@ -87,8 +87,9 @@ export function getEntries(times: number[], states: AnimatorState[]) {
 }
 export function getFiniteEntries(times: number[], states: AnimatorState[]) {
     const infiniteIndex = findIndex(states, state => {
-        return state[ITERATION_COUNT] === INFINITE || !isFinite(state[DURATION]);
-    }, states.length - 1);
+        return state[ITERATION_COUNT] === INFINITE;
+    }, states.length - 1) + 1;
+
     return getEntries(times, states.slice(0, infiniteIndex));
 }
 export function getItemInfo(
