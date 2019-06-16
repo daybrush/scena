@@ -7,6 +7,7 @@ import { ref } from "../react-scenejs-timeline/utils";
 import { zoomIn } from "@scenejs/effects";
 import { poly } from "shape-svg";
 import "./App.css";
+import { EASE_IN_OUT } from "scenejs";
 
 export default class App extends Component<{}> {
     private scene: Scene = new Scene();
@@ -14,94 +15,105 @@ export default class App extends Component<{}> {
     public render() {
         return (
             <div>
-                <div className="clapper">
-                    <div className="clapper-container">
-                        <div className="clapper-body">
-                            <div className="top">
-                                <div className="stick stick1">
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
+                <div id="main" className="page page1">
+                    <div className="container">
+                        <div className="logo">
+                            <div className="dash-line"></div>
+                            <div className="dash-line"></div>
+                            <div className="dash-line"></div>
+                            <div className="dash-line"></div>
+                            <div className="clapper">
+                                <div className="background">
+                                    <div className="stick stick1">
+                                        <div className="rect rect1"></div>
+                                        <div className="rect rect2"></div>
+                                        <div className="rect rect3"></div>
+                                        <div className="rect rect4"></div>
+                                        <div className="rect rect5"></div>
+                                        <div className="rect rect6"></div>
+                                    </div>
+                                    <div className="stick stick1 shadow"></div>
+                                    <div className="stick stick2">
+                                        <div className="rect rect1"></div>
+                                        <div className="rect rect2"></div>
+                                        <div className="rect rect3"></div>
+                                        <div className="rect rect4"></div>
+                                        <div className="rect rect5"></div>
+                                        <div className="rect rect6"></div>
+                                    </div>
+                                    <div className="stick stick2 shadow"></div>
+                                    <div className="bottom"></div>
+                                    <div className="bottom shadow"></div>
                                 </div>
-                                <div className="stick stick2">
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                    <div className="rect"></div>
-                                </div>
+                                <div className="play-circle"></div>
+                                <div className="play-btn"></div>
                             </div>
-                            <div className="bottom"></div>
                         </div>
-                        <div className="circle"></div>
-                        <div className="play"></div>
                     </div>
                 </div>
                 <Timeline
                     ref={ref(this, "timeline")}
                     scene={this.scene}
-                    style={{ maxHeight: "350px", position: "fixed", bottom: 0, left: 0, right: 0}}
+                    style={{ maxHeight: "350px", position: "fixed", bottom: 0, left: 0, right: 0 }}
                 />
             </div>);
     }
     public componentDidMount() {
         (window as any).app = this;
 
-        document.querySelector(".play")!.appendChild(poly({
-            strokeWidth: 10,
-            left: 5,
-            top: 5,
-            right: 5, bottom: 5, width: 50, rotate: 90, fill: "#333", stroke: "#333",
-        }));
+        const playBtn = poly({
+            width: 60,
+            strokeWidth: 8,
+            strokeLinejoin: "round",
+            rotate: 90,
+            origin: "50% 50%",
+            left: 10,
+            top: 15,
+            fill: "#333", stroke: "#333",
+        });
+
+        // shadow
+        poly({
+            width: 60,
+            strokeWidth: 8,
+            strokeLinejoin: "round",
+            rotate: 90,
+            origin: "50% 50%",
+            left: 20,
+            top: 30,
+            opacity: 0.2,
+            fill: "#333", stroke: "#333",
+        }, playBtn);
+        document.querySelector(".play-btn")!.appendChild(playBtn);
         this.scene.load({
-            ".clapper": {
-                2: "transform: translate(-50%, -50%) rotate(0deg)",
-                2.5: {
-                    transform: "rotate(-15deg)",
-                },
-                3: {
-                    transform: "rotate(0deg)",
-                },
-                3.5: {
-                    transform: "rotate(-10deg)",
-                },
-            },
-            ".clapper-container": {
-                0: zoomIn({ duration: 1 }),
-            },
-            ".circle": {
-                0.3: zoomIn({ duration: 1 }),
-            },
-            ".play": {
+            ".play-btn": {
                 0: {
-                    transform: "translate(-50%, -50%)",
+                    transform: "translate(-50%, -50%) scale(0)",
                 },
-                0.6: zoomIn({ duration: 1 }),
+                1: {
+                    transform: "scale(1)",
+                },
+                options: {
+                    delay: 0.6,
+                },
             },
-            ".top .stick1": {
-                2: {
-                    transform: {
-                        rotate: "0deg",
-                    },
+            ".play-circle": {
+                0: {
+                    transform: "translate(-50%, -50%) scale(0)",
                 },
-                2.5: {
-                    transform: {
-                        rotate: "-20deg",
-                    },
+                1: {
+                    transform: "scale(1)",
                 },
-                3: {
-                    transform: {
-                        rotate: "0deg",
-                    },
+                options: {
+                    delay: 0.3,
                 },
-                3.5: {
-                    transform: {
-                        rotate: "-10deg",
-                    },
+            },
+            ".background": {
+                0: {
+                    transform: "translate(-50%, -50%) scale(0)",
+                },
+                1: {
+                    transform: "scale(1)",
                 },
             },
             ".stick1 .rect": i => ({
@@ -117,7 +129,7 @@ export default class App extends Component<{}> {
                     },
                 },
                 options: {
-                    delay: 0.6 + i * 0.1,
+                    delay: 1 + i % 6 * 0.1,
                 },
             }),
             ".stick2 .rect": i => ({
@@ -133,12 +145,76 @@ export default class App extends Component<{}> {
                     },
                 },
                 options: {
-                    delay: 0.8 + i * 0.1,
+                    delay: 1.2 + i % 6 * 0.1,
+                },
+            }),
+            ".stick1": {
+                0: {
+                    transform: {
+                        rotate: "0deg",
+                    },
+                },
+                0.5: {
+                    transform: {
+                        rotate: "-20deg",
+                    },
+                },
+                1: {
+                    transform: {
+                        rotate: "0deg",
+                    },
+                },
+                1.5: {
+                    transform: {
+                        rotate: "-10deg",
+                    },
+                },
+                options: {
+                    delay: 2.2,
+                },
+            },
+            ".logo": {
+                0: {
+                    transform: "translate(-50%, -50%) rotate(0deg)",
+                },
+                0.5: {
+                    transform: "rotate(-15deg)",
+                },
+                1: {
+                    transform: "rotate(0deg)",
+                },
+                1.5: {
+                    transform: "rotate(-10deg)",
+                },
+                options: {
+                    delay: 2.2,
+                },
+            },
+            ".clapper": {
+                1.5: {
+                    transform: "translate(-50%, -50%) translateY(30px) scale(1)",
+                },
+                2.5: {
+                    transform: "scale(0.7)",
+                },
+                options: {
+                    delay: 2.2,
+                },
+            },
+            ".dash-line": i => ({
+                0: {
+                    transform: `rotate(${i * 90}deg) translate2(0px, -100%)`,
+                },
+                1: {
+                    transform: "translate2(0px, 0%)",
+                },
+                options: {
+                    delay: 3.6 + (i % 2 + i * 0.5) * 0.1,
                 },
             }),
         }, {
                 easing: "ease-in-out",
-                iterationCount: "infinite",
+                iterationCount: 1,
                 selector: true,
             });
         this.timeline.update(true);
