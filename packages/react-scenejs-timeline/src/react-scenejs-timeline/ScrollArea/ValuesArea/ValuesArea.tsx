@@ -101,7 +101,6 @@ export default class ValuesArea extends ElementComponent<{
         if (!parentEl) {
             return;
         }
-        console.log(target, value);
         const index = findIndex(this.values, v => v.getElement() === parentEl);
 
         if (index === -1) {
