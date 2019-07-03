@@ -1,14 +1,16 @@
 import * as React from "react";
 import { prefix } from "../react-scenejs-editor/utils";
-import styled from "styled-components";
+import styler from "react-css-styler";
 
-const ControlBox = styled.div`
+const ControlBoxElement = styler("div", `
+{
     position: fixed;
     width: 0;
     height: 0;
     left: 0;
     top: 0;
-`;
+}
+`);
 
 export default class Moveable extends React.PureComponent<{
     target?: HTMLElement,
@@ -22,7 +24,7 @@ export default class Moveable extends React.PureComponent<{
         const left = 100;
         const top = 100;
         return (
-            <ControlBox
+            <ControlBoxElement
                 className={prefix("control-box")} style={{ position: "fixed", left: `${left}px`, top: `${top}px` }}>
                 <div className={prefix("control", "nw")}></div>
                 <div className={prefix("control", "n")}></div>
@@ -34,7 +36,7 @@ export default class Moveable extends React.PureComponent<{
                 <div className={prefix("control", "sw")}></div>
                 <div className={prefix("control", "s")}></div>
                 <div className={prefix("control", "se")}></div>
-            </ControlBox>
+            </ControlBoxElement>
         );
     }
 }

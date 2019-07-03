@@ -3,8 +3,8 @@ import { IObject } from "@daybrush/utils";
 
 export const PREFIX = `scenejs-editor-`;
 
-export const CSS = `
-.infos {
+export const INFOS_CSS = `
+{
     position: fixed;
     right: 0;
     top: 0;

@@ -2,12 +2,9 @@ import * as React from "react";
 import Timeline, { SelectEvent } from "react-scenejs-timeline";
 import Scene, { SceneItem } from "scenejs";
 import { ref } from "./utils";
-import { CSS } from "./consts";
 import Infos from "./Infos/Infos";
 import Menus from "./Menus/Menus";
 import MenuControl from "./Menus/MenuControl";
-
-let isExportCSS = false;
 
 export default class Editor extends React.Component<{
     scene: Scene | SceneItem,
@@ -17,16 +14,12 @@ export default class Editor extends React.Component<{
     private isExportCSS = false;
     constructor(props: any) {
         super(props);
-        if (isExportCSS) {
-            this.isExportCSS = true;
-        }
     }
     public render() {
         return (
             <div className="scenejs-editor">
-                {this.renderStyle()}
                 <Menus />
-                <MenuControl/>
+                <MenuControl />
                 <Infos
                     ref={ref(this, "infos")}
                     onUpdate={this.onUpdate}
@@ -55,11 +48,6 @@ export default class Editor extends React.Component<{
     public componentDidUpdate(prevProps: any) {
         this.checkScene(prevProps.scene, this.props.scene);
     }
-    public componentWillUnmount() {
-        if (this.isExportCSS) {
-            isExportCSS = false;
-        }
-    }
     public update(isInit?: boolean) {
         this.timeline.update(isInit);
     }
@@ -71,22 +59,15 @@ export default class Editor extends React.Component<{
     }
     private initScene(scene?: Scene | SceneItem) {
         if (!scene) {
-          return;
+            return;
         }
         scene.on("animate", this.onAnimate);
-      }
+    }
     private releaseScene(scene?: Scene | SceneItem) {
         if (!scene) {
             return;
         }
         scene.off("animate", this.onAnimate);
-      }
-    private renderStyle() {
-        if (!this.isExportCSS) {
-            return <style>{CSS}</style>;
-        } else {
-            return null;
-        }
     }
     private onAnimate = () => {
         this.infos.update(this.timeline.getValues());

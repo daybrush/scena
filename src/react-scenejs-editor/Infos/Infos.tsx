@@ -6,6 +6,10 @@ import Scene, { SceneItem } from "scenejs";
 import PureProps from "react-pure-props";
 import { IObject } from "@daybrush/utils";
 import { SelectEvent } from "react-scenejs-timeline";
+import styler from "react-css-styler";
+import { INFOS_CSS } from "../consts";
+
+const InfosElement = styler("div", INFOS_CSS);
 
 export default class Infos extends PureProps<{
     onUpdate: () => void,
@@ -24,7 +28,7 @@ export default class Infos extends PureProps<{
         const { scene, properties } = this.state;
 
         return (
-            <div className={prefix("infos")}>
+            <InfosElement className={prefix("infos")}>
                 <Options
                     ref={ref(this, "options")}
                     scene={scene}
@@ -34,7 +38,7 @@ export default class Infos extends PureProps<{
                     properties={properties}
                     scene={scene}
                     onUpdate={onUpdate} />
-            </div>
+            </InfosElement>
         );
     }
     public select(e: Partial<SelectEvent>, values: IObject<any> = {}) {
