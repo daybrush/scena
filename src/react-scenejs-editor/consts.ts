@@ -153,6 +153,14 @@ export const INFOS_CSS = `
 }
 `.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
 
+export const MENUS_CSS = `
+{
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+`.replace(/\.([^{,\s\d.]+)/g, `.${PREFIX}$1`);
+
 export const DIRECTIONS: DirectionType[] = ["normal", "reverse", "alternate", "alternate-reverse"];
 export const FILL_MODES: FillModeType[] = ["forwards", "backwards", "both"];
 

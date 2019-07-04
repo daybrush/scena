@@ -2,8 +2,7 @@ import * as React from "react";
 import Scene, { SceneItem, DirectionType, FillModeType } from "scenejs";
 import { prefix, isSceneItem } from "../utils";
 import Option from "./Option";
-import { CSS, DIRECTIONS, FILL_MODES } from "../consts";
-import { InfoState } from "../../types";
+import { DIRECTIONS, FILL_MODES } from "../consts";
 
 export default class Options extends React.Component<{
     scene: Scene | SceneItem,
