@@ -1,0 +1,163 @@
+html,body {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+html,
+body,
+#root {
+  position: relative;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.page1 {
+  position: relative;
+  min-height: 300px;
+  height: 100%;
+  text-align: center;
+}
+.page1 .startAnimation {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
+}
+.page {
+  font-size: 0;
+}
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 300px;
+  min-height: 600px;
+}
+.page1 .logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  overflow: hidden;
+}
+
+.logo .clapper {
+  position: absolute;
+  width: 200px;
+  height: 110px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(30px);
+}
+
+.logo .svg_circle {
+  position: absolute;
+}
+
+.logo svg circle {
+  stroke-dasharray: 0 1000;
+  stroke-dashoffset: 0;
+}
+
+.logo .play-btn {
+  width: 40px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translate(5px);
+  transition: width ease 0.2s;
+  z-index: 2;
+}
+
+.logo .background {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 110px;
+  border-radius: 5px;
+  transform: translate(-50%, -50%);
+}
+
+.play-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.clapper .stick {
+  position: absolute;
+  box-sizing: border-box;
+  width: 200px;
+  height: 32px;
+  font-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 5px 8px;
+  text-align: center;
+  background: #333;
+}
+
+.clapper .stick1 {
+  transform-origin: 0% 100%;
+  border-radius: 5px 5px 0px 0px;
+  top: -60px;
+}
+.clapper .stick2 {
+  top: -30px;
+}
+
+.clapper .rect {
+  position: relative;
+  display: inline-block;
+  height: 100%;
+  width: 20px;
+  background: white;
+  vertical-align: top;
+  margin: 0px 5px 0px;
+  border-radius: 5px;
+}
+
+.clapper .stick1 .rect {
+  transform: skew(15deg);
+}
+
+.clapper .stick2 .rect {
+  transform: skew(-15deg);
+}
+.logo .bottom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #333;
+  box-sizing: border-box;
+  border-radius: 0px 0px 5px 5px;
+}
+.logo .shadow {
+  position: absolute;
+  box-sizing: border-box;
+  background: #D6D6D6;
+  margin-top: 10px;
+  margin-left: 10px;
+  z-index: -1;
+}
+
+.dash-line {
+  position: absolute;
+  width: 0px;
+  height: 100%;
+  top: 0;
+  left: 40px;
+  border-left: 3px dashed #4af;
+  transform-origin: 110px 50%;
+}

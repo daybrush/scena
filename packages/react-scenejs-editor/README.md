@@ -16,17 +16,24 @@
 
 ## ⚙️ Installation
 ```sh
-$ npm i @scenejs/editor
+$ npm i react-scenejs-editor
 ```
 
-```html
-<script src="https://daybrush.com/scenejs-editor/release/latest/dist/editor.pkgd.min.js"></script>
-```
 
+## 📦 Packages
+|Package|Version|Description|
+|---|---|---|
+|[**scenejs**](https://github.com/daybrush/scenejs)|[![](https://img.shields.io/npm/v/scenejs.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/scenejs)|🎬 Scene.js is JavaScript & CSS timeline-based animation library.|
+|[**@scenejs/timeline**](https://github.com/daybrush/scenejs-timeline)|[![](https://img.shields.io/npm/v/@scenejs/timeline.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@scenejs/timeline)|A library that represents the timeline of Scene.js. You can control time, properties, and items.|
+|[**moveable**](https://github.com/daybrush/moveable)|[![](https://img.shields.io/npm/v/moveable.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/moveable)|Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable! Groupable!|
+|[**keycon**](https://github.com/daybrush/keycon)|[![](https://img.shields.io/npm/v/keycon.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/keycon)|Keyboard Controller|
+|[**@daybrush/drag**](https://github.com/daybrush/drag)|[![](https://img.shields.io/npm/v/@daybrush/drag.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@daybrush/drag)|You can set up drag events in any browser.|
 
 ## 🚀 How to use
 
 * Soon
+
+
 
 ## ⭐️ Show Your Support
 Please give a ⭐️ if this project helped you!

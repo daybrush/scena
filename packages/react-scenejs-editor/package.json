@@ -1,0 +1,74 @@
+{
+  "name": "react-scenejs-editor",
+  "version": "0.2.5",
+  "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
+  "main": "./dist/editor.cjs.js",
+  "module": "./dist/editor.esm.js",
+  "sideEffects": false,
+  "types": "declaration/index.d.ts",
+  "scripts": {
+    "lint": "tslint -c tslint.json 'src/**/*.ts'",
+    "start": "react-scripts start",
+    "build": "rollup -c && npm run declaration && print-sizes ./dist ",
+    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json"
+  },
+  "keywords": [
+    "scene",
+    "scenejs",
+    "scene.js",
+    "css",
+    "animate",
+    "animation",
+    "requestAnimationFrame",
+    "motion",
+    "timeline",
+    "editor"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daybrush/scenejs-editor.git"
+  },
+  "author": "Daybrush",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daybrush/scenejs-editor/issues"
+  },
+  "homepage": "https://github.com/daybrush/scenejs-editor#readme",
+  "devDependencies": {
+    "@daybrush/builder": "^0.1.0",
+    "@scenejs/effects": "^1.0.1",
+    "@types/react": "^16.8.18",
+    "@types/react-dom": "^16.8.4",
+    "print-sizes": "0.0.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "^3.0.1",
+    "shape-svg": "^0.3.3",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "@daybrush/drag": "^0.9.1",
+    "@daybrush/utils": "^0.10.1",
+    "framework-utils": "^0.2.1",
+    "keycon": "^0.5.0",
+    "react-color": "^2.17.3",
+    "react-css-styler": "^0.3.4",
+    "react-moveable": "^0.10.9",
+    "react-pure-props": "^0.1.5",
+    "react-scenejs-timeline": "^0.3.0",
+    "scenejs": "^1.1.4"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
