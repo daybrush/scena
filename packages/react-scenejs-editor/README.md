@@ -6,7 +6,7 @@
  <a href="https://github.com/daybrush/scenejs-editor/tree/master/packages/preact-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=Preact&style=flat-square&color=673ab8"></a>
 </p>
 
-<p align="middle"><strong>@scenejs/editor</strong> is a component that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
+<p align="middle"><strong>react-scenejs-editor</strong> is a React Component that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
 
 <p align="middle"><a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a> &nbsp;/&nbsp; <a href="https://daybrush.com/scenejs/features.html#timeline"><strong>Example</strong></a></p>
 

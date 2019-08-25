@@ -13,6 +13,8 @@
 
 
 
+## 📦 Packages
+* [**react-scenejs-editor**](https://github.com/daybrush/scenejs-editor/tree/master/packages/react-scenejs-editor): **`react-scenejs-editor`** is a React Component that represents the timeline of [**Scene.js**](https://github.com/daybrush/scenejs). You can control time, properties, and items.
 
 ## ⚙️ Installation
 ```sh
