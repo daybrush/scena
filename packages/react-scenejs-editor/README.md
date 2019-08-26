@@ -1,7 +1,7 @@
 <p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/scenejs-editor/master/demo/images/editor.png" width="100%" style="max-width: 800px"/></p>
 
 <h2 align="middle">Scene.js Timeline Editor</h2>
-<p align="middle"><a href="https://www.npmjs.com/package/@scenejs/editor" target="_blank"><img src="https://img.shields.io/npm/v/@scenejs/editor.svg?style=flat-square&color=007acc&label=version" alt="npm version" /></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square"/> <a href="https://github.com/daybrush/scenejs-editor/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scenejs-editor.svg?style=flat-square&label=license&color=08CE5D"/></a>
+<p align="middle"><a href="https://www.npmjs.com/package/react-scenejs-editor" target="_blank"><img src="https://img.shields.io/npm/v/react-scenejs-editor.svg?style=flat-square&color=007acc&label=version" alt="npm version" /></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square"/> <a href="https://github.com/daybrush/scenejs-editor/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scenejs-editor.svg?style=flat-square&label=license&color=08CE5D"/></a>
  <a href="https://github.com/daybrush/scenejs-editor/tree/master/packages/react-scenejs-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=React&style=flat-square&color=61dafb"></a>
  <a href="https://github.com/daybrush/scenejs-editor/tree/master/packages/preact-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=Preact&style=flat-square&color=673ab8"></a>
 </p>
@@ -29,7 +29,7 @@ $ npm i react-scenejs-editor
 |[**keycon**](https://github.com/daybrush/keycon)|[![](https://img.shields.io/npm/v/keycon.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/keycon)|Keyboard Controller|
 |[**@daybrush/drag**](https://github.com/daybrush/drag)|[![](https://img.shields.io/npm/v/@daybrush/drag.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@daybrush/drag)|You can set up drag events in any browser.|
 
-## 🚀 How to useN
+## 🚀 How to use
 
 * Soon
 
