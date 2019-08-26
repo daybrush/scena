@@ -1,5 +1,5 @@
 import React from "react";
-import ElementComponent from "../../utils/ElementComponent";
+import ElementComponent from "../utils/ElementComponent";
 import { poly } from "shape-svg";
 import ShapeIcon from "./ShapeIcon";
 

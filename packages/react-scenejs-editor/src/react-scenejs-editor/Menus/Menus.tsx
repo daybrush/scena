@@ -1,8 +1,8 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils";
 import Menu from "./Menu";
 import styler from "react-css-styler";
-import { MENUS_CSS } from "../../consts";
+import { MENUS_CSS } from "../consts";
 import CursorIcon from "./CursorIcon";
 import AutoCursorIcon from "./AutoCursorIcon";
 import TextIcon from "./TextIcon";
@@ -10,7 +10,6 @@ import PolyIcon from "./PolyIcon";
 import OvalIcon from "./OvalIcon";
 import RectIcon from "./RectIcon";
 import StarIcon from "./StarIcon";
-import Moveable from "../../../react-moveable/Moveable";
 
 const MenusElement = styler("div", MENUS_CSS);
 

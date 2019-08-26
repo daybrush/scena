@@ -1,9 +1,9 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils";
 import Option from "./Option";
 import { IObject, isObject } from "@daybrush/utils";
 import PureProps from "react-pure-props";
-import { PROPERTY_TYPES } from "../../consts";
+import { PROPERTY_TYPES } from "../consts";
 
 function getFullname(scope: string, name: string) {
     return `${scope ? scope + "///" : scope}${name}`;

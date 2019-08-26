@@ -1,6 +1,6 @@
 import * as React from "react";
 import Input from "./Input";
-import { prefix } from "../../utils";
+import { prefix } from "../utils";
 import NumberBox from "./NumberBox";
 import SelectBox from "./SelectBox";
 import { splitUnit } from "@daybrush/utils";

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils";
 import SelectBox from "../Inputs/SelectBox";
 import TextBox from "../Inputs/TextBox";
 import NumberBox from "../Inputs/NumberBox";

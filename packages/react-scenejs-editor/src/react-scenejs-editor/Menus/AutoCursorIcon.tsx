@@ -1,5 +1,5 @@
 import React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils";
 
 export default class AutoCursorIcon extends React.PureComponent {
     public render() {

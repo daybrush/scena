@@ -1,6 +1,6 @@
 {
   "name": "react-scenejs-editor",
-  "version": "0.2.5",
+  "version": "0.1.0",
   "description": "A library that represents the timeline of Scene.js. You can control time, properties, and items.",
   "main": "./dist/editor.cjs.js",
   "module": "./dist/editor.esm.js",
@@ -56,7 +56,7 @@
     "react-css-styler": "^0.3.4",
     "react-moveable": "^0.10.9",
     "react-pure-props": "^0.1.5",
-    "react-scenejs-timeline": "^0.3.0",
+    "react-scenejs-timeline": "^0.3.1",
     "scenejs": "^1.1.4"
   },
   "browserslist": {

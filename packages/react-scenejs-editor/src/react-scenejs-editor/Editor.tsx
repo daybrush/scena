@@ -1,14 +1,14 @@
 import * as React from "react";
-import Timeline from "../Timeline";
+import Timeline, { SelectEvent } from "react-scenejs-timeline";
 import Scene, { SceneItem } from "scenejs";
 import Infos from "./Infos/Infos";
 import Menus from "./Menus/Menus";
-import { SelectEvent, EditorState } from "../types";
+import { EditorState } from "./types";
 import { ref } from "framework-utils";
 import Moveable, { OnDrag, OnResize, OnRotate, OnRotateEnd, OnRotateGroup } from "react-moveable";
-import { findSceneItemByElementStack, prefix, isSceneItem, isScene } from "../utils";
-import styled, { StylerElement } from "react-css-styler";
-import { EDITOR_CSS } from "../consts";
+import { findSceneItemByElementStack, prefix, isSceneItem, isScene } from "./utils";
+import styled from "react-css-styler";
+import { EDITOR_CSS } from "./consts";
 
 const EditorElement = styled("div", EDITOR_CSS);
 

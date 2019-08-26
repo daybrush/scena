@@ -1,16 +1,14 @@
 
 import { Component } from "react";
 import * as React from "react";
-import Timeline from "../react-scenejs-timeline";
 import Scene from "scenejs";
 import { poly } from "shape-svg";
 import "./App.css";
-import Editor from "../react-scenejs-timeline/Editor/Editor";
+import Editor from "../react-scenejs-editor/";
 import { ref } from "framework-utils";
 
 export default class App extends Component<{}> {
     private scene: Scene = new Scene();
-    private timeline!: Timeline;
     private editor!: Editor;
     public render() {
         return (

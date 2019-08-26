@@ -1,6 +1,6 @@
 import * as React from "react";
 import Input from "./Input";
-import { prefix } from "../../utils";
+import { prefix } from "../utils";
 import { ref } from "framework-utils";
 
 export default class SelectBox extends Input<{

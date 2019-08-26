@@ -1,6 +1,6 @@
 import * as React from "react";
-import { prefix } from "../../utils";
-import Moveable from "../../../react-moveable/Moveable";
+import { prefix } from "../utils";
+import Moveable from "react-moveable";
 
 export default class MenuControl extends React.Component<{
     selected?: boolean,
