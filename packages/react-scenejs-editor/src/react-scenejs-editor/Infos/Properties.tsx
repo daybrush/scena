@@ -1,6 +1,6 @@
 import * as React from "react";
 import Scene, { SceneItem } from "scenejs";
-import { prefix, isSceneItem } from "../utils";
+import { isSceneItem } from "../utils";
 import { IObject } from "@daybrush/utils";
 import PureProps from "react-pure-props";
 import Group from "./Group";

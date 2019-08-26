@@ -5,7 +5,7 @@ import Infos from "./Infos/Infos";
 import Menus from "./Menus/Menus";
 import { EditorState } from "./types";
 import { ref } from "framework-utils";
-import Moveable, { OnDrag, OnResize, OnRotate, OnRotateEnd, OnRotateGroup } from "react-moveable";
+import Moveable, { OnDrag, OnResize, OnRotate, OnRotateEnd, OnRotateGroup, OnRotateStart } from "react-moveable";
 import { findSceneItemByElementStack, prefix, isSceneItem, isScene } from "./utils";
 import styled from "react-css-styler";
 import { EDITOR_CSS } from "./consts";
@@ -39,16 +39,21 @@ export default class Editor extends React.PureComponent<{
                     resizable={true}
                     rotatable={true}
                     throttleDrag={1}
+                    throttleResize={1}
+                    throttleRotate={1}
                     container={document.body}
-                    // onDragStart={this.onDragStart}
+
                     onRotate={this.onRotate}
                     onRotateEnd={this.onRotateEnd}
-                    onRotateGroup={this.onRotateGroup}
-                    onRotateGroupEnd={this.onRotateGroupEnd}
+
+                    onRotateGroup={this.onRotate}
+                    onRotateGroupEnd={this.onRotateEnd}
+
                     onDrag={this.onDrag}
                     onDragEnd={this.onDragEnd}
-                    // onResizeStart={this.onResizeStart}
+
                     onResize={this.onReisze}
+                    onResizeEnd={this.onResizeEnd}
                     ref={ref(this, "moveable")} />
                 <Infos
                     ref={ref(this, "infos")}
@@ -157,7 +162,7 @@ export default class Editor extends React.PureComponent<{
                 selectedTarget: null,
             });
         } else if (e.selectedItem) {
-            let targets = [];
+            let targets: any[] = [];
 
             if (isItem) {
                 targets = (e.selectedItem as SceneItem).getElements();
@@ -190,12 +195,29 @@ export default class Editor extends React.PureComponent<{
         if (!selectedItem) {
             return;
         }
-        selectedItem.set("width", `${width}px`);
-        selectedItem.set("height", `${height}px`);
+        const time = selectedItem.getIterationTime();
+
+        selectedItem.set(time, "width", `${width}px`);
+        selectedItem.set(time, "height", `${height}px`);
         selectedItem.setTime(selectedItem.getTime());
         this.setLabel(clientX, clientY, `W: ${width}px<br/>H: ${height}px`);
     }
-    private onRotateGroup = ({ target, beforeDelta, clientX, clientY }: OnRotateGroup) => {
+    private onRotateStart = ({ target, clientX, clientY }: OnRotateStart) => {
+        const selectedItem = this.state.selectedItem;
+
+        if (!selectedItem) {
+            return false;
+        }
+        const time = selectedItem.getIterationTime();
+        const rotate =
+            selectedItem.get(time, "transform", "rotate")
+            || this.state.selectedFrame!.get("transform", "rotate");
+
+        const rotation = parseFloat(rotate) || 0;
+
+        // set(rotation)
+    }
+    private onRotate = ({ target, beforeDelta, clientX, clientY }: OnRotate | OnRotateGroup) => {
         const selectedItem = this.state.selectedItem;
 
         if (!selectedItem) {
@@ -207,15 +229,11 @@ export default class Editor extends React.PureComponent<{
             || this.state.selectedFrame!.get("transform", "rotate");
 
         const rotation = parseFloat(rotate) || 0;
+        // beforeRotation
 
         selectedItem.set(time, "transform", "rotate", `${rotation + beforeDelta}deg`);
         selectedItem.setTime(selectedItem.getTime());
         this.setLabel(clientX, clientY, `R: ${rotation + beforeDelta}deg`);
-    }
-    private onRotate = ({ target, beforeDelta, clientX, clientY }: OnRotate) => {
-        // target.style.width = `${width}px`;
-        // target.style.height = `${height}px`;
-        // this.setLabel(clientX, clientY, `W: ${width}px<br/>H: ${height}px`);
     }
     private onDrag = ({ clientX, clientY, target, left, top }: OnDrag) => {
         target.style.left = `${left}px`;
@@ -225,19 +243,17 @@ export default class Editor extends React.PureComponent<{
     private onDragEnd = () => {
         // history save
         this.hideLabel();
+        this.timeline.update();
     }
     private onResizeEnd = () => {
         // history save
         this.hideLabel();
+        this.timeline.update();
     }
-    private onRotateGroupEnd = () => {
+    private onRotateEnd = () => {
         // history save
         this.hideLabel();
         this.timeline.update();
-    }
-    private onRotateEnd = ({ target, clientX, clientY }: OnRotateEnd) => {
-        // history save
-        this.hideLabel();
     }
     private onUpdate = () => {
         this.update();

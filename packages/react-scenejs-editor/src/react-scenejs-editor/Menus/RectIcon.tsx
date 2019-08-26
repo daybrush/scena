@@ -1,4 +1,3 @@
-import React from "react";
 import { rect } from "shape-svg";
 import ShapeIcon from "./ShapeIcon";
 

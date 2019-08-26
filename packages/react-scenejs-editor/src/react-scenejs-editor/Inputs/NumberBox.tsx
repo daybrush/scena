@@ -1,6 +1,4 @@
 import * as React from "react";
-import Input from "./Input";
-import { prefix } from "../utils";
 import TextBox from "./TextBox";
 import { isUndefined } from "@daybrush/utils";
 import { ref } from "framework-utils";

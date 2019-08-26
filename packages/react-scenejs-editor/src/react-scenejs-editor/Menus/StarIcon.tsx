@@ -1,4 +1,3 @@
-import React from "react";
 import { star } from "shape-svg";
 import ShapeIcon from "./ShapeIcon";
 

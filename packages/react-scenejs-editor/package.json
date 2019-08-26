@@ -38,6 +38,7 @@
     "@daybrush/builder": "^0.1.0",
     "@scenejs/effects": "^1.0.1",
     "@types/react": "^16.8.18",
+    "@types/react-color": "^3.0.1",
     "@types/react-dom": "^16.8.4",
     "print-sizes": "0.0.4",
     "react": "^16.8.6",

@@ -1,5 +1,5 @@
 
-import Scene, { SceneItem } from "scenejs";
+import Scene, { SceneItem, Frame } from "scenejs";
 import {
     hasClass as hasClass2,
     addClass as addClass2,
