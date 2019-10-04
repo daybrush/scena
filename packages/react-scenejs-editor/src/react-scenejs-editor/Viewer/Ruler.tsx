@@ -11,9 +11,6 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     background: #444;
     overflow: hidden;
 }
-:host::-webkit-scrollbar {
-    display: none;
-}
 :host.horizontal {
     width: calc(100% - 30px);
     height: 30px;
@@ -31,6 +28,7 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     position:relative;
     font-size: 0;
     pointer-events: none;
+    will-change: transform;
 }
 :host.vertical .ruler-divisions {
     right: 0;

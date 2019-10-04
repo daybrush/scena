@@ -9,6 +9,7 @@ const GuidelinesElement = styled("div", prefixCSS("scenejs-editor-", `
     position: absolute;
     top: 0;
     left: 0;
+    will-change: transform;
 }
 :host.horizontal {
     width: 100%;
