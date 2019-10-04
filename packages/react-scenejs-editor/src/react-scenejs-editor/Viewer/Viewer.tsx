@@ -8,7 +8,13 @@ export default class Viewer extends React.PureComponent<{
     verticalMin: number,
     verticalMax: number,
     onScroll: (e: any) => void,
+    width?: number,
+    height?: number,
 }> {
+    public static defaultProps = {
+        width: "100%",
+        height: "100%",
+    };
     public viewerElement!: HTMLElement;
     public width: number = 0;
     public height: number = 0;
@@ -19,6 +25,8 @@ export default class Viewer extends React.PureComponent<{
             verticalMin,
             verticalMax,
             onScroll,
+            width,
+            height,
         } = this.props;
         const scrollWidth = `${(horizontalMax - horizontalMin) * 50}px`;
         const scrollHeight = `${(verticalMax - verticalMin) * 50}px`;
@@ -30,7 +38,11 @@ export default class Viewer extends React.PureComponent<{
                     width: scrollWidth,
                     height: scrollHeight,
                 }}></div>
-                <div className={prefix("container")} ref={ref(this, "containerElement")} style={{ transform }}>
+                <div className={prefix("container")} ref={ref(this, "containerElement")} style={{
+                        width,
+                        height,
+                        transform,
+                }}>
                     {this.props.children}
                 </div>
             </div>

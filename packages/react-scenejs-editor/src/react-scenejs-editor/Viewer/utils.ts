@@ -5,3 +5,9 @@ export function findDOMRef(component: any, name: string) {
         e && (component[name] = ReactDOM.findDOMNode(e));
     };
 }
+
+export function getTranslateName(type: "vertical" | "horizontal", isReverse?: boolean) {
+    const isHorizontal = type === "horizontal";
+
+    return `translate${(!isReverse && isHorizontal) || (isReverse && !isHorizontal) ? "Y" : "X"}`;
+}

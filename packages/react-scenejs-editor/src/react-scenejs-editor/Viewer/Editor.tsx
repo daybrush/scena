@@ -5,6 +5,7 @@ import { prefix } from "../utils";
 import Ruler from "./Ruler";
 import { ref } from "framework-utils";
 import Viewer from "./Viewer";
+import Guidelines from "./Guidelines";
 
 const EditorElement = styled("div", EDITOR_CSS);
 
@@ -16,6 +17,8 @@ export default class Editor extends React.PureComponent {
     private viewer!: Viewer;
     private horizontalRuler!: Ruler;
     private verticalRuler!: Ruler;
+    private horizontalGuidelines!: Guidelines;
+    private verticalGuidelines!: Guidelines;
     private width: number = 0;
     private height: number = 0;
     public render() {
@@ -30,7 +33,10 @@ export default class Editor extends React.PureComponent {
                     type="horizontal" min={horizontalMin} max={horizontalMax} />
                 <Ruler ref={ref(this, "verticalRuler")}
                     type="vertical" min={verticalMin} max={verticalMax} />
-                <div className={prefix("guidelines")}></div>
+                <Guidelines ref={ref(this, "horizontalGuidelines")}
+                    type="horizontal" offset={horizontalMin} />
+                <Guidelines ref={ref(this, "verticalGuidelines")}
+                    type="vertical" offset={verticalMin} />
                 <Viewer ref={ref(this, "viewer")}
                     horizontalMin={horizontalMin} horizontalMax={horizontalMax}
                     verticalMin={verticalMin} verticalMax={verticalMax}
@@ -63,7 +69,7 @@ export default class Editor extends React.PureComponent {
         this.width = rect.width;
         this.height = rect.height;
 
-        this.scroll(0, 0);
+        this.onScroll();
     }
     private scroll(scrollLeft: number, scrollTop: number) {
         const {
@@ -79,11 +85,11 @@ export default class Editor extends React.PureComponent {
         const relativeBottom = relativeTop + height + 200;
 
         const horizontalRange = [
-            Math.min(Math.floor(relativeLeft / 50), -4),
+            Math.min(Math.floor(relativeLeft / 50), -4, stateHorizontalRange[0]),
             Math.max(Math.ceil(relativeRight / 50), Math.ceil(width / 50) + 4),
         ];
         const verticalRange = [
-            Math.min(Math.floor(relativeTop / 50), -4),
+            Math.min(Math.floor(relativeTop / 50), -4, stateVerticalRange[0]),
             Math.max(Math.ceil(relativeBottom / 50), Math.ceil(height / 50) + 4),
         ];
 
@@ -92,8 +98,10 @@ export default class Editor extends React.PureComponent {
         const nextScrollLeft = scrollLeft + offsetLeft;
         const nextScrollTop = scrollTop + offsetTop;
 
-        this.horizontalRuler.scroll(nextScrollLeft);
-        this.verticalRuler.scroll(nextScrollTop);
+        this.horizontalRuler.scroll(scrollLeft + stateHorizontalRange[0] * 50);
+        this.verticalRuler.scroll(scrollTop + stateVerticalRange[0] * 50);
+        this.horizontalGuidelines.scroll(scrollTop + stateVerticalRange[0] * 50);
+        this.verticalGuidelines.scroll(scrollLeft + stateHorizontalRange[0] * 50);
 
         if (
             horizontalRange[0] === stateHorizontalRange[0]
