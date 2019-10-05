@@ -8,9 +8,10 @@ export default class Viewer extends React.PureComponent<{
     horizontalMax: number,
     verticalMin: number,
     verticalMax: number,
-    onScroll: () => void,
+    zoom: number,
     width?: string,
     height?: string,
+    onScroll: () => void,
 }> {
     public static defaultProps = {
         width: "100%",
@@ -29,10 +30,12 @@ export default class Viewer extends React.PureComponent<{
             onScroll,
             width,
             height,
+            zoom,
         } = this.props;
-        const scrollWidth = `${(horizontalMax - horizontalMin) * 50}px`;
-        const scrollHeight = `${(verticalMax - verticalMin) * 50}px`;
-        const transform = `translate(${-horizontalMin * 50}px, ${-verticalMin * 50}px)`;
+        const scale = 50 * zoom;
+        const scrollWidth = `${(horizontalMax - horizontalMin) * scale}px`;
+        const scrollHeight = `${(verticalMax - verticalMin) * scale}px`;
+        const transform = `translate(${-horizontalMin * scale}px, ${-verticalMin * scale}px) scale(${zoom})`;
 
         return (
             <div className={prefix("viewer")} ref={ref(this, "viewerElement")} onScroll={onScroll}>
@@ -90,8 +93,8 @@ export default class Viewer extends React.PureComponent<{
         viewerElement.scrollTop = scrollTop;
     }
     public restoreScroll() {
-        const { horizontalMin, verticalMin } = this.props;
-        this.scroll(-horizontalMin * 50, -verticalMin * 50);
+        const { horizontalMin, verticalMin, zoom } = this.props;
+        this.scroll(-horizontalMin * 50 * zoom, -verticalMin * 50 * zoom);
     }
     public onResize = () => {
         const rect = this.viewerElement.getBoundingClientRect();

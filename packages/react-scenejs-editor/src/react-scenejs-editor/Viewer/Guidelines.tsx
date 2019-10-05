@@ -69,6 +69,7 @@ const GuidelinesElement = styled("div", prefixCSS("scenejs-editor-", `
 
 export default class Guidelines extends React.PureComponent<{
     type: "vertical" | "horizontal",
+    zoom: number,
     setGuidelines: () => void,
 }> {
     public state = {
@@ -88,7 +89,7 @@ export default class Guidelines extends React.PureComponent<{
         </GuidelinesElement>);
     }
     public renderGuidelines() {
-        const { type } = this.props;
+        const { type, zoom } = this.props;
         const translateName = getTranslateName(type);
         const guidelines = this.state.guidelines;
 
@@ -99,7 +100,7 @@ export default class Guidelines extends React.PureComponent<{
                 key={i}
                 data-index={i}
                 style={{
-                    transform: `${translateName}(${pos}px)`,
+                    transform: `${translateName}(${pos * zoom}px)`,
                 }}></div>);
         });
     }
@@ -115,11 +116,11 @@ export default class Guidelines extends React.PureComponent<{
         this.dragger.unset();
     }
     public scroll(pos: number) {
-        const { type } = this.props;
+        const { type, zoom } = this.props;
         const guidelinesElement = this.guidelinesElement;
 
         this.scrollPos = pos;
-        guidelinesElement.style.transform = `${getTranslateName(type)}(${-pos}px)`;
+        guidelinesElement.style.transform = `${getTranslateName(type)}(${-pos * zoom}px)`;
 
         const guidelines = this.state.guidelines;
         this.guidelineElements.forEach((el, i) => {
@@ -168,23 +169,23 @@ export default class Guidelines extends React.PureComponent<{
         const pos = this.drag({ datas, clientX, clientY });
         const guidelines = this.state.guidelines;
         const setGuidelines = this.props.setGuidelines;
+        const guidelinePos = pos / this.props.zoom;
+
         removeClass(datas.target, "dragging");
 
-        console.log(pos, this.scrollPos);
-
         if (datas.fromRuler) {
-            if (pos >= this.scrollPos && guidelines.indexOf(pos) < 0) {
+            if (pos >= this.scrollPos && guidelines.indexOf(guidelinePos) < 0) {
                 this.setState({
-                    guidelines: [...guidelines, pos],
+                    guidelines: [...guidelines, guidelinePos],
                 }, setGuidelines);
             }
         } else {
             const index = datas.target.getAttribute("data-index");
 
-            if (pos < this.scrollPos || guidelines.indexOf(pos) > -1) {
+            if (pos < this.scrollPos || guidelines.indexOf(guidelinePos) > -1) {
                 guidelines.splice(index, 1);
             } else {
-                guidelines[index] = pos;
+                guidelines[index] = guidelinePos;
             }
             this.setState({
                 guidelines: [...guidelines],

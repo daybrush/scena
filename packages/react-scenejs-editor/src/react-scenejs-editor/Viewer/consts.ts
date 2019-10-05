@@ -54,6 +54,7 @@ export const EDITOR_CSS = prefixCSS("scenejs-editor-", `
     top: 100%;
 }
 .container {
+    transform-origin: 0% 0%;
     background: rgba(200, 200, 200, 0.2);
 }
 

@@ -5,6 +5,7 @@ import styled from "react-css-styler";
 import { prefixCSS, ref } from "framework-utils";
 import { getTranslateName, findDOMRef } from "./utils";
 import Dragger, { OnDragStart, OnDrag, OnDragEnd } from "@daybrush/drag";
+import { IObject } from "@daybrush/utils";
 
 const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
 {
@@ -53,11 +54,11 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     top: 1px;
 }
 `));
-function renderUnit([min, max]: number[]) {
+function renderUnit([min, max]: number[], style: IObject<any>) {
     const units: JSX.Element[] = [];
 
     for (let i = min; i <= max; ++i) {
-        units.push(<RulerUnit key={i * 50} px={i * 50} />);
+        units.push(<RulerUnit key={i * 50} px={i * 50} style={style} />);
     }
     return units;
 }
@@ -65,6 +66,7 @@ export default class Ruler extends React.PureComponent<{
     type: "horizontal" | "vertical",
     min: number,
     max: number,
+    zoom: number,
     dragStart: (e: OnDragStart) => any,
     drag: (e: OnDrag) => any,
     dragEnd: (e: OnDragEnd) => any,
@@ -73,15 +75,18 @@ export default class Ruler extends React.PureComponent<{
     public divisionsElement!: HTMLElement;
     private dragger!: Dragger;
     public render() {
-        const { type, min, max } = this.props;
+        const { type, min, max, zoom } = this.props;
         const isHorizontal = type === "horizontal";
         const plusRange = isHorizontal ? [0, max - 1] : [1, max];
         const minusRange = isHorizontal ? [min, -1] : [min + 1, 0];
+        const style = {
+            [isHorizontal ? "width" : "height"]: `${zoom * 50}px`,
+        };
         return (
             <RulerElement className={prefix("ruler", type)} ref={findDOMRef(this, "rulerElement")}>
                 <div className={prefix("ruler-divisions")} ref={ref(this, "divisionsElement")}>
-                    <div className={prefix("ruler-minus-divisions")}>{renderUnit(minusRange)}</div>
-                    <div className={prefix("ruler-plus-divisions")}>{renderUnit(plusRange)}</div>
+                    <div className={prefix("ruler-minus-divisions")}>{renderUnit(minusRange, style)}</div>
+                    <div className={prefix("ruler-plus-divisions")}>{renderUnit(plusRange, style)}</div>
                 </div>
             </RulerElement>
         );
@@ -109,7 +114,8 @@ export default class Ruler extends React.PureComponent<{
         this.dragger.unset();
     }
     public scroll(pos: number) {
-        this.divisionsElement.style.transform = `${getTranslateName(this.props.type, true)}(${-pos}px)`;
+        const { type, zoom } = this.props;
+        this.divisionsElement.style.transform = `${getTranslateName(type, true)}(${-pos * zoom}px)`;
     }
 
 }

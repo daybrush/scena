@@ -13,6 +13,7 @@ export default class Editor extends React.PureComponent {
     public state = {
         horizontalRange: [0, 5],
         verticalRange: [0, 5],
+        zoom: 1,
     };
     private viewer!: Viewer;
     private horizontalRuler!: Ruler;
@@ -23,6 +24,7 @@ export default class Editor extends React.PureComponent {
         const {
             verticalRange: [verticalMin, verticalMax],
             horizontalRange: [horizontalMin, horizontalMax],
+            zoom,
         } = this.state;
         return (
             <EditorElement className="scenejs-editor">
@@ -32,24 +34,32 @@ export default class Editor extends React.PureComponent {
                     dragStart={this.dragStartHorizontal}
                     drag={this.dragHorizontal}
                     dragEnd={this.dragEndHorizontal}
+                    zoom={zoom}
                 />
                 <Ruler ref={ref(this, "verticalRuler")}
                     type="vertical" min={verticalMin} max={verticalMax}
                     dragStart={this.dragStartVertical}
                     drag={this.dragVertical}
-                    dragEnd={this.dragEndVertical} />
+                    dragEnd={this.dragEndVertical}
+                    zoom={zoom}
+                />
                 <Guidelines ref={ref(this, "horizontalGuidelines")}
                     setGuidelines={this.setGuidelines}
-                    type="horizontal" />
+                    type="horizontal"
+                    zoom={zoom}
+                />
                 <Guidelines ref={ref(this, "verticalGuidelines")}
                     setGuidelines={this.setGuidelines}
-                    type="vertical" />
+                    type="vertical"
+                    zoom={zoom}
+                />
                 <Viewer ref={ref(this, "viewer")}
                     horizontalMin={horizontalMin} horizontalMax={horizontalMax}
                     verticalMin={verticalMin} verticalMax={verticalMax}
                     onScroll={this.onScroll}
                     width={"500px"}
                     height={"500px"}
+                    zoom={zoom}
                 >{this.props.children}</Viewer>
             </EditorElement>
         );
@@ -94,6 +104,7 @@ export default class Editor extends React.PureComponent {
         const {
             horizontalRange: stateHorizontalRange,
             verticalRange: stateVerticalRange,
+            zoom,
         } = this.state;
         const width = this.viewer.width;
         const height = this.viewer.height;
@@ -101,13 +112,13 @@ export default class Editor extends React.PureComponent {
         const stateLeft = stateHorizontalRange[0] * 50;
         const stateTop = stateVerticalRange[0] * 50;
 
-        const relativeLeft = scrollLeft + stateLeft;
-        const relativeTop = scrollTop + stateTop;
+        const relativeLeft = scrollLeft / zoom + stateLeft;
+        const relativeTop = scrollTop / zoom + stateTop;
 
         const boundLeft = relativeLeft - 100;
         const boundTop = relativeTop - 100;
-        const boundRight = relativeLeft + width + 100;
-        const boundBottom = relativeTop + height + 100;
+        const boundRight = relativeLeft + width / zoom + 100;
+        const boundBottom = relativeTop + height / zoom + 100;
 
         const horizontalRange = [
             Math.min(Math.floor(boundLeft / 200) * 4, -4, stateHorizontalRange[0]),
@@ -140,8 +151,8 @@ export default class Editor extends React.PureComponent {
             verticalRange,
         }, () => {
             if (offsetLeft || offsetTop) {
-                const nextScrollLeft = scrollLeft + offsetLeft;
-                const nextScrollTop = scrollTop + offsetTop;
+                const nextScrollLeft = scrollLeft + offsetLeft * zoom;
+                const nextScrollTop = scrollTop + offsetTop * zoom;
 
                 this.viewer.scroll(nextScrollLeft, nextScrollTop);
             }
