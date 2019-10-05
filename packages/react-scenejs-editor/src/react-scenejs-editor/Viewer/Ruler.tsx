@@ -5,7 +5,6 @@ import styled from "react-css-styler";
 import { prefixCSS, ref } from "framework-utils";
 import { getTranslateName, findDOMRef } from "./utils";
 import Dragger, { OnDragStart, OnDrag, OnDragEnd } from "@daybrush/drag";
-import { IObject } from "@daybrush/utils";
 
 const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
 {
@@ -35,30 +34,22 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
 :host.vertical .ruler-divisions {
     right: 0;
 }
-.ruler-minus-divisions, .ruler-plus-divisions {
-    position: absolute;
-}
 :host.horizontal .ruler-divisions {
     white-space: nowrap;
 }
-:host.horizontal .ruler-minus-divisions {
-    right: 100%;
-}
-:host.horizontal .ruler-plus-divisions {
-    left: 0;
-}
-:host.vertical .ruler-minus-divisions {
-    bottom: calc(100% - 1px);
-}
-:host.vertical .ruler-plus-divisions {
-    top: 1px;
-}
 `));
-function renderUnit([min, max]: number[], style: IObject<any>) {
+function renderUnit(
+    unit: number,
+    size: number,
+    type: "horizontal" | "vertical",
+    [min, max]: number[],
+) {
     const units: JSX.Element[] = [];
 
+    const translateName = getTranslateName(type, true);
+
     for (let i = min; i <= max; ++i) {
-        units.push(<RulerUnit key={i * 50} px={i * 50} style={style} />);
+        units.push(<RulerUnit key={i} px={i * unit} pos={i * size} translateName={translateName} />);
     }
     return units;
 }
@@ -77,16 +68,21 @@ export default class Ruler extends React.PureComponent<{
     public render() {
         const { type, min, max, zoom } = this.props;
         const isHorizontal = type === "horizontal";
-        const plusRange = isHorizontal ? [0, max - 1] : [1, max];
-        const minusRange = isHorizontal ? [min, -1] : [min + 1, 0];
-        const style = {
-            [isHorizontal ? "width" : "height"]: `${zoom * 50}px`,
-        };
+        const scale = zoom < 1
+            ? Math.pow(2, Math.round((1 - zoom) * 3))
+            : Math.round(1 / Math.round(zoom) * 5) / 5;
+        const unit = 50 * scale;
+        const range = [
+            Math.floor(min / scale),
+            Math.ceil(max / scale),
+        ];
+        const size = zoom * unit;
         return (
             <RulerElement className={prefix("ruler", type)} ref={findDOMRef(this, "rulerElement")}>
-                <div className={prefix("ruler-divisions")} ref={ref(this, "divisionsElement")}>
-                    <div className={prefix("ruler-minus-divisions")}>{renderUnit(minusRange, style)}</div>
-                    <div className={prefix("ruler-plus-divisions")}>{renderUnit(plusRange, style)}</div>
+                <div className={prefix("ruler-divisions")} ref={ref(this, "divisionsElement")} style={{
+                    [isHorizontal ? "width" : "height"]: `${size}px`,
+                }}>
+                    {renderUnit(unit, size, type, range)}
                 </div>
             </RulerElement>
         );

@@ -169,7 +169,7 @@ export default class Guidelines extends React.PureComponent<{
         const pos = this.drag({ datas, clientX, clientY });
         const guidelines = this.state.guidelines;
         const setGuidelines = this.props.setGuidelines;
-        const guidelinePos = pos / this.props.zoom;
+        const guidelinePos = Math.round(pos / this.props.zoom);
 
         removeClass(datas.target, "dragging");
 

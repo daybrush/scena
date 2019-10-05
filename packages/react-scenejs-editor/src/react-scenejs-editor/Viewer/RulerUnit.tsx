@@ -2,7 +2,6 @@ import * as React from "react";
 import { prefix } from "../utils";
 import styled from "react-css-styler";
 import { prefixCSS } from "framework-utils";
-import { IObject } from "@daybrush/utils";
 
 const divisions: JSX.Element[] = [];
 
@@ -11,16 +10,17 @@ for (let i = 0; i < 10; ++i) {
 }
 const RulerUnitElement = styled("div", prefixCSS("scenejs-editor-", `
 {
-    position:relative;
+    position: absolute;
+    left: 0;
 }
 .horizontal :host {
-    display: inline-block;
-    width: 50px;
+    width: inherit;
     height: 30px;
 }
 .vertical :host {
     width: 30px;
-    height: 50px;
+    bottom: calc(100% - 1px);
+    height: inherit;
 }
 :host:before {
     position: absolute;
@@ -83,8 +83,10 @@ const RulerUnitElement = styled("div", prefixCSS("scenejs-editor-", `
     width: 100%;
 }
 `));
-const RulerUnit = (props: { px: number, style: IObject<any> }) => (
-    <RulerUnitElement className={prefix("ruler-unit")} data-px={props.px} style={props.style}>
+const RulerUnit = (props: { translateName: string, px: number, pos: number }) => (
+    <RulerUnitElement className={prefix("ruler-unit")} data-px={props.px} style={{
+        transform: `${props.translateName}(${props.pos}px)`,
+    }}>
         {divisions}
     </RulerUnitElement>
 );

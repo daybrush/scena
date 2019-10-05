@@ -60,13 +60,13 @@ export default class Editor extends React.PureComponent {
                     width={"500px"}
                     height={"500px"}
                     zoom={zoom}
+                    setZoom={this.setZoom}
                 >{this.props.children}</Viewer>
             </EditorElement>
         );
     }
     public componentDidMount() {
         this.viewer.onResize();
-        this.onScroll();
     }
     private restoreScroll = () => {
         this.viewer.restoreScroll();
@@ -100,6 +100,15 @@ export default class Editor extends React.PureComponent {
 
         console.log(verticalGuidelines, horizontalGuidelines);
     }
+    private setZoom = (zoom: number) => {
+        this.setState({
+            zoom,
+        }, () => {
+            const scrollPos = this.viewer.getScrollPos();
+
+            this.scroll(scrollPos[0], scrollPos[1]);
+        });
+    }
     private scroll(scrollLeft: number, scrollTop: number) {
         const {
             horizontalRange: stateHorizontalRange,
@@ -122,11 +131,11 @@ export default class Editor extends React.PureComponent {
 
         const horizontalRange = [
             Math.min(Math.floor(boundLeft / 200) * 4, -4, stateHorizontalRange[0]),
-            Math.max(Math.ceil(boundRight / 200) * 4, Math.ceil(width / 50) + 4),
+            Math.max(Math.ceil(boundRight / 200) * 4, 4, Math.ceil(width / 100) * 2 + 4),
         ];
         const verticalRange = [
             Math.min(Math.floor(boundTop / 200) * 4, -4, stateVerticalRange[0]),
-            Math.max(Math.ceil(boundBottom / 200) * 4, Math.ceil(height / 50) + 4),
+            Math.max(Math.ceil(boundBottom / 200) * 4, 4, Math.ceil(height / 100) * 2 + 4),
         ];
 
         const offsetLeft = (stateHorizontalRange[0] - horizontalRange[0]) * 50;
@@ -139,8 +148,7 @@ export default class Editor extends React.PureComponent {
         this.verticalGuidelines.scroll(relativeLeft);
 
         if (
-            !offsetLeft
-            && !offsetTop
+            !offsetLeft && !offsetTop
             && horizontalRange[1] === stateHorizontalRange[1]
             && verticalRange[1] === stateVerticalRange[1]
         ) {

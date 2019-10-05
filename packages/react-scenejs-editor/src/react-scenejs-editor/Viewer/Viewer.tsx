@@ -2,6 +2,9 @@ import * as React from "react";
 import { prefix } from "../utils";
 import { ref } from "framework-utils";
 import Dragger from "@daybrush/drag";
+import KeyController from "keycon";
+
+KeyController.setGlobal();
 
 export default class Viewer extends React.PureComponent<{
     horizontalMin: number,
@@ -11,6 +14,7 @@ export default class Viewer extends React.PureComponent<{
     zoom: number,
     width?: string,
     height?: string,
+    setZoom: (zoom: number) => void,
     onScroll: () => void,
 }> {
     public static defaultProps = {
@@ -38,7 +42,9 @@ export default class Viewer extends React.PureComponent<{
         const transform = `translate(${-horizontalMin * scale}px, ${-verticalMin * scale}px) scale(${zoom})`;
 
         return (
-            <div className={prefix("viewer")} ref={ref(this, "viewerElement")} onScroll={onScroll}>
+            <div className={prefix("viewer")}
+                ref={ref(this, "viewerElement")}
+                onScroll={onScroll}>
                 <div className={prefix("scroller")} ref={ref(this, "scrollerElement")} style={{
                     width: scrollWidth,
                     height: scrollHeight,
@@ -66,10 +72,12 @@ export default class Viewer extends React.PureComponent<{
                 this.scrollBy(-e.deltaX, -e.deltaY);
             },
         });
+        this.viewerElement.addEventListener("wheel", this.onWheel);
         window.addEventListener("resize", this.onResize);
     }
     public componentWillUnmount() {
         this.dragger.unset();
+        this.viewerElement.removeEventListener("wheel", this.onWheel);
         window.removeEventListener("resize", this.onResize);
     }
     public getScrollPos() {
@@ -101,5 +109,19 @@ export default class Viewer extends React.PureComponent<{
 
         this.width = rect.width;
         this.height = rect.height;
+
+        this.props.onScroll();
+    }
+    private onWheel = (e: WheelEvent) => {
+        const { deltaY } = e;
+
+        if (!KeyController.global.metaKey || !deltaY) {
+            return;
+        }
+        e.preventDefault();
+
+        const sign = deltaY >= 0 ? 1 : -1;
+        const delta = Math.min(Math.abs(deltaY) / 1000, 0.01);
+        this.props.setZoom(Math.max(this.props.zoom * (1 + sign * delta), 0.2));
     }
 }

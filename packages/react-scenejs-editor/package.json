@@ -52,7 +52,7 @@
     "@daybrush/drag": "^0.9.1",
     "@daybrush/utils": "^0.10.1",
     "framework-utils": "^0.2.1",
-    "keycon": "^0.5.0",
+    "keycon": "^0.6.0",
     "react-color": "^2.17.3",
     "react-css-styler": "^0.3.4",
     "react-moveable": "^0.10.9",
