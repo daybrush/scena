@@ -16,10 +16,12 @@ const GuidelinesElement = styled("div", prefixCSS("scenejs-editor-", `
 :host.horizontal {
     width: 100%;
     height: 0;
+    top: 30px;
 }
 :host.vertical {
     height: 100%;
     width: 0;
+    left: 30px;
 }
 .guideline {
     position: absolute;
@@ -67,6 +69,7 @@ const GuidelinesElement = styled("div", prefixCSS("scenejs-editor-", `
 
 export default class Guidelines extends React.PureComponent<{
     type: "vertical" | "horizontal",
+    setGuidelines: () => void,
 }> {
     public state = {
         guidelines: [],
@@ -123,8 +126,11 @@ export default class Guidelines extends React.PureComponent<{
             if (!el) {
                 return;
             }
-            el.style.display = -pos + guidelines[i] < 30 ? "none" : "block";
+            el.style.display = -pos + guidelines[i] < 0 ? "none" : "block";
         });
+    }
+    public getGuidelines() {
+        return this.state.guidelines;
     }
     public dragStartToChange = ({ datas, clientX, clientY, inputEvent }) => {
         const target = inputEvent.target;
@@ -152,7 +158,7 @@ export default class Guidelines extends React.PureComponent<{
     public drag = ({ datas, clientX, clientY }) => {
         const type = this.props.type;
         const isHorizontal = type === "horizontal";
-        const nextPos = (isHorizontal ? clientY : clientX) - datas.offset;
+        const nextPos = Math.round((isHorizontal ? clientY : clientX) - datas.offset);
 
         datas.target.style.transform = `${getTranslateName(type)}(${nextPos}px)`;
 
@@ -161,25 +167,28 @@ export default class Guidelines extends React.PureComponent<{
     public dragEnd = ({ datas, clientX, clientY }) => {
         const pos = this.drag({ datas, clientX, clientY });
         const guidelines = this.state.guidelines;
+        const setGuidelines = this.props.setGuidelines;
         removeClass(datas.target, "dragging");
 
+        console.log(pos, this.scrollPos);
+
         if (datas.fromRuler) {
-            if (pos >= this.scrollPos + 30) {
+            if (pos >= this.scrollPos && guidelines.indexOf(pos) < 0) {
                 this.setState({
                     guidelines: [...guidelines, pos],
-                });
+                }, setGuidelines);
             }
         } else {
             const index = datas.target.getAttribute("data-index");
 
-            if (pos < this.scrollPos + 30) {
+            if (pos < this.scrollPos || guidelines.indexOf(pos) > -1) {
                 guidelines.splice(index, 1);
             } else {
                 guidelines[index] = pos;
             }
             this.setState({
                 guidelines: [...guidelines],
-            });
+            }, setGuidelines);
         }
     }
 }

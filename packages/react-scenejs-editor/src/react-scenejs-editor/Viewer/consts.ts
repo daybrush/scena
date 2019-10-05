@@ -32,16 +32,27 @@ export const EDITOR_CSS = prefixCSS("scenejs-editor-", `
 }
 .box {
     position: relative;
-    width: 31px;
-    height: 31px;
+    width: 30px;
+    height: 30px;
     background: #444;
     box-sizing: border-box;
     z-index: 10;
-    border: 1px solid #777;
-    border-top: 0;
-    border-left: 0;
 }
-
+.box:before, .box:after {
+    position: absolute;
+    content: "";
+    background: #777;
+}
+.box:before {
+    width: 1px;
+    height: 100%;
+    left: 100%;
+}
+.box:after {
+    height: 1px;
+    width: 100%;
+    top: 100%;
+}
 .container {
     background: rgba(200, 200, 200, 0.2);
 }

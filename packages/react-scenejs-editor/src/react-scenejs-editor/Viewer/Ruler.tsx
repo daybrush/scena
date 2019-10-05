@@ -47,10 +47,10 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     left: 0;
 }
 :host.vertical .ruler-minus-divisions {
-    bottom: 100%;
+    bottom: calc(100% - 1px);
 }
 :host.vertical .ruler-plus-divisions {
-    top: 0;
+    top: 1px;
 }
 `));
 function renderUnit([min, max]: number[]) {

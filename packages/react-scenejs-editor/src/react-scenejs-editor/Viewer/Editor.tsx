@@ -39,8 +39,10 @@ export default class Editor extends React.PureComponent {
                     drag={this.dragVertical}
                     dragEnd={this.dragEndVertical} />
                 <Guidelines ref={ref(this, "horizontalGuidelines")}
+                    setGuidelines={this.setGuidelines}
                     type="horizontal" />
                 <Guidelines ref={ref(this, "verticalGuidelines")}
+                    setGuidelines={this.setGuidelines}
                     type="vertical" />
                 <Viewer ref={ref(this, "viewer")}
                     horizontalMin={horizontalMin} horizontalMax={horizontalMax}
@@ -81,6 +83,12 @@ export default class Editor extends React.PureComponent {
     }
     private dragEndVertical = e => {
         this.verticalGuidelines.dragEnd(e);
+    }
+    private setGuidelines = () => {
+        const verticalGuidelines = this.verticalGuidelines.getGuidelines();
+        const horizontalGuidelines = this.horizontalGuidelines.getGuidelines();
+
+        console.log(verticalGuidelines, horizontalGuidelines);
     }
     private scroll(scrollLeft: number, scrollTop: number) {
         const {
