@@ -19,8 +19,6 @@ export default class Editor extends React.PureComponent {
     private verticalRuler!: Ruler;
     private horizontalGuidelines!: Guidelines;
     private verticalGuidelines!: Guidelines;
-    private width: number = 0;
-    private height: number = 0;
     public render() {
         const {
             verticalRange: [verticalMin, verticalMax],
@@ -30,83 +28,101 @@ export default class Editor extends React.PureComponent {
             <EditorElement className="scenejs-editor">
                 <div className={prefix("box")} onClick={this.restoreScroll}></div>
                 <Ruler ref={ref(this, "horizontalRuler")}
-                    type="horizontal" min={horizontalMin} max={horizontalMax} />
+                    type="horizontal" min={horizontalMin} max={horizontalMax}
+                    dragStart={this.dragStartHorizontal}
+                    drag={this.dragHorizontal}
+                    dragEnd={this.dragEndHorizontal}
+                />
                 <Ruler ref={ref(this, "verticalRuler")}
-                    type="vertical" min={verticalMin} max={verticalMax} />
+                    type="vertical" min={verticalMin} max={verticalMax}
+                    dragStart={this.dragStartVertical}
+                    drag={this.dragVertical}
+                    dragEnd={this.dragEndVertical} />
                 <Guidelines ref={ref(this, "horizontalGuidelines")}
-                    type="horizontal" offset={horizontalMin} />
+                    type="horizontal" />
                 <Guidelines ref={ref(this, "verticalGuidelines")}
-                    type="vertical" offset={verticalMin} />
+                    type="vertical" />
                 <Viewer ref={ref(this, "viewer")}
                     horizontalMin={horizontalMin} horizontalMax={horizontalMax}
                     verticalMin={verticalMin} verticalMax={verticalMax}
                     onScroll={this.onScroll}
+                    width={"500px"}
+                    height={"500px"}
                 >{this.props.children}</Viewer>
             </EditorElement>
         );
     }
     public componentDidMount() {
-        window.addEventListener("resize", this.onResize);
-
-        this.onResize();
-    }
-    public componentWillUnmount() {
-        window.removeEventListener("resize", this.onResize);
+        this.viewer.onResize();
+        this.onScroll();
     }
     private restoreScroll = () => {
         this.viewer.restoreScroll();
     }
     private onScroll = () => {
-        const viewerElement = this.viewer.viewerElement;
-        const scrollLeft = viewerElement.scrollLeft;
-        const scrollTop = viewerElement.scrollTop;
+        const [scrollLeft, scrollTop] = this.viewer.getScrollPos();
 
         this.scroll(scrollLeft, scrollTop);
     }
-    private onResize = () => {
-        const rect = this.viewer.viewerElement.getBoundingClientRect();
-
-        this.width = rect.width;
-        this.height = rect.height;
-
-        this.onScroll();
+    private dragStartHorizontal = e => {
+        this.horizontalGuidelines.dragStartToAdd(e);
+    }
+    private dragHorizontal = e => {
+        this.horizontalGuidelines.drag(e);
+    }
+    private dragEndHorizontal = e => {
+        this.horizontalGuidelines.dragEnd(e);
+    }
+    private dragStartVertical = e => {
+        this.verticalGuidelines.dragStartToAdd(e);
+    }
+    private dragVertical = e => {
+        this.verticalGuidelines.drag(e);
+    }
+    private dragEndVertical = e => {
+        this.verticalGuidelines.dragEnd(e);
     }
     private scroll(scrollLeft: number, scrollTop: number) {
         const {
             horizontalRange: stateHorizontalRange,
             verticalRange: stateVerticalRange,
         } = this.state;
-        const width = this.width;
-        const height = this.height;
+        const width = this.viewer.width;
+        const height = this.viewer.height;
 
-        const relativeLeft = scrollLeft + stateHorizontalRange[0] * 50 - 100;
-        const relativeTop = scrollTop + stateVerticalRange[0] * 50 - 100;
-        const relativeRight = relativeLeft + width + 200;
-        const relativeBottom = relativeTop + height + 200;
+        const stateLeft = stateHorizontalRange[0] * 50;
+        const stateTop = stateVerticalRange[0] * 50;
+
+        const relativeLeft = scrollLeft + stateLeft;
+        const relativeTop = scrollTop + stateTop;
+
+        const boundLeft = relativeLeft - 100;
+        const boundTop = relativeTop - 100;
+        const boundRight = relativeLeft + width + 100;
+        const boundBottom = relativeTop + height + 100;
 
         const horizontalRange = [
-            Math.min(Math.floor(relativeLeft / 50), -4, stateHorizontalRange[0]),
-            Math.max(Math.ceil(relativeRight / 50), Math.ceil(width / 50) + 4),
+            Math.min(Math.floor(boundLeft / 200) * 4, -4, stateHorizontalRange[0]),
+            Math.max(Math.ceil(boundRight / 200) * 4, Math.ceil(width / 50) + 4),
         ];
         const verticalRange = [
-            Math.min(Math.floor(relativeTop / 50), -4, stateVerticalRange[0]),
-            Math.max(Math.ceil(relativeBottom / 50), Math.ceil(height / 50) + 4),
+            Math.min(Math.floor(boundTop / 200) * 4, -4, stateVerticalRange[0]),
+            Math.max(Math.ceil(boundBottom / 200) * 4, Math.ceil(height / 50) + 4),
         ];
 
         const offsetLeft = (stateHorizontalRange[0] - horizontalRange[0]) * 50;
         const offsetTop = (stateVerticalRange[0] - verticalRange[0]) * 50;
-        const nextScrollLeft = scrollLeft + offsetLeft;
-        const nextScrollTop = scrollTop + offsetTop;
 
-        this.horizontalRuler.scroll(scrollLeft + stateHorizontalRange[0] * 50);
-        this.verticalRuler.scroll(scrollTop + stateVerticalRange[0] * 50);
-        this.horizontalGuidelines.scroll(scrollTop + stateVerticalRange[0] * 50);
-        this.verticalGuidelines.scroll(scrollLeft + stateHorizontalRange[0] * 50);
+        this.horizontalRuler.scroll(relativeLeft);
+        this.verticalRuler.scroll(relativeTop);
+
+        this.horizontalGuidelines.scroll(relativeTop);
+        this.verticalGuidelines.scroll(relativeLeft);
 
         if (
-            horizontalRange[0] === stateHorizontalRange[0]
+            !offsetLeft
+            && !offsetTop
             && horizontalRange[1] === stateHorizontalRange[1]
-            && verticalRange[0] === stateVerticalRange[0]
             && verticalRange[1] === stateVerticalRange[1]
         ) {
             return false;
@@ -116,6 +132,9 @@ export default class Editor extends React.PureComponent {
             verticalRange,
         }, () => {
             if (offsetLeft || offsetTop) {
+                const nextScrollLeft = scrollLeft + offsetLeft;
+                const nextScrollTop = scrollTop + offsetTop;
+
                 this.viewer.scroll(nextScrollLeft, nextScrollTop);
             }
         });

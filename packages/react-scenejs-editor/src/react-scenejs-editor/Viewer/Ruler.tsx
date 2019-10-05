@@ -3,7 +3,8 @@ import { prefix } from "../utils";
 import RulerUnit from "./RulerUnit";
 import styled from "react-css-styler";
 import { prefixCSS, ref } from "framework-utils";
-import { getTranslateName } from "./utils";
+import { getTranslateName, findDOMRef } from "./utils";
+import Dragger, { OnDragStart, OnDrag, OnDragEnd } from "@daybrush/drag";
 
 const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
 {
@@ -64,15 +65,20 @@ export default class Ruler extends React.PureComponent<{
     type: "horizontal" | "vertical",
     min: number,
     max: number,
+    dragStart: (e: OnDragStart) => any,
+    drag: (e: OnDrag) => any,
+    dragEnd: (e: OnDragEnd) => any,
 }> {
+    public rulerElement!: HTMLElement;
     public divisionsElement!: HTMLElement;
+    private dragger!: Dragger;
     public render() {
         const { type, min, max } = this.props;
         const isHorizontal = type === "horizontal";
         const plusRange = isHorizontal ? [0, max - 1] : [1, max];
         const minusRange = isHorizontal ? [min, -1] : [min + 1, 0];
         return (
-            <RulerElement className={prefix("ruler", type)}>
+            <RulerElement className={prefix("ruler", type)} ref={findDOMRef(this, "rulerElement")}>
                 <div className={prefix("ruler-divisions")} ref={ref(this, "divisionsElement")}>
                     <div className={prefix("ruler-minus-divisions")}>{renderUnit(minusRange)}</div>
                     <div className={prefix("ruler-plus-divisions")}>{renderUnit(plusRange)}</div>
@@ -80,7 +86,30 @@ export default class Ruler extends React.PureComponent<{
             </RulerElement>
         );
     }
+    public componentDidMount() {
+        const {
+            dragStart,
+            drag,
+            dragEnd,
+        } = this.props;
+
+        this.dragger = new Dragger(
+            this.rulerElement, {
+            container: document.body,
+            dragstart: e => {
+                e.datas.fromRuler = true;
+                dragStart(e);
+            },
+            drag,
+            dragend: dragEnd,
+        },
+        );
+    }
+    public componentWillUnmount() {
+        this.dragger.unset();
+    }
     public scroll(pos: number) {
         this.divisionsElement.style.transform = `${getTranslateName(this.props.type, true)}(${-pos}px)`;
     }
+
 }
