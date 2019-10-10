@@ -3,7 +3,7 @@ import styled from "react-css-styler";
 import { prefixCSS, ref } from "framework-utils";
 import { prefix } from "../utils";
 import { PREFIX } from "../consts";
-import { findDOMRef } from "./utils";
+import { findDOMRef, measureSpeed, getDuration, getDestPos } from "./utils";
 import Dragger from "@daybrush/drag";
 
 const ScrollerElement = styled("div", prefixCSS(PREFIX, `
@@ -52,6 +52,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
     public viewerElement!: HTMLElement;
     public containerElement!: HTMLElement;
     private dragger!: Dragger;
+    private timer: number = 0;
 
     public render() {
         const {
@@ -98,12 +99,14 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
             events: ["touch"],
             dragstart: ({ inputEvent }) => {
                 inputEvent.preventDefault();
+                this.pauseAnimation();
             },
             drag: e => {
+                measureSpeed(e);
                 this.scrollBy(-e.deltaX, -e.deltaY);
             },
             dragend: e => {
-                // animation
+                this.startAnimation(e.datas.speed);
             },
         });
         const range = this.props.range;
@@ -195,5 +198,43 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
 
         viewerElement.scrollLeft = scrollLeft;
         viewerElement.scrollTop = scrollTop;
+    }
+    private startAnimation(speed: number[]) {
+        if (!speed || (!speed[0] && !speed[1])) {
+            return;
+        }
+        const a = -0.0006;
+        const easing = x => 1 - Math.pow(1 - x, 3);
+        const duration = getDuration(speed, a);
+        const destPos = getDestPos(speed, a);
+        const startTime = Date.now();
+        let prevTime = startTime;
+
+        const next = () => {
+            const now = Date.now();
+            let t = now - startTime;
+
+            if (duration < t) {
+                t = duration;
+            }
+            const ratio = easing(t / duration);
+            const prevRatio = easing((prevTime - startTime) / duration);
+
+            prevTime = now;
+
+            this.scrollBy(
+                -destPos[0] * (ratio - prevRatio),
+                -destPos[1] * (ratio - prevRatio),
+            );
+
+            if (t >= duration) {
+                return;
+            }
+            this.timer = requestAnimationFrame(next);
+        };
+        this.timer = requestAnimationFrame(next);
+    }
+    pauseAnimation() {
+        cancelAnimationFrame(this.timer);
     }
 }
