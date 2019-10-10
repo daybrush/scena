@@ -54,25 +54,37 @@ export default class Editor extends React.PureComponent {
                     zoom={zoom}
                 />
                 <Viewer ref={ref(this, "viewer")}
-                    horizontalMin={horizontalMin} horizontalMax={horizontalMax}
-                    verticalMin={verticalMin} verticalMax={verticalMax}
-                    onScroll={this.onScroll}
                     width={"500px"}
                     height={"500px"}
                     zoom={zoom}
+                    onScroll={this.onScroll}
                     setZoom={this.setZoom}
                 >{this.props.children}</Viewer>
             </EditorElement>
         );
     }
     public componentDidMount() {
-        this.viewer.onResize();
+        this.viewer.scrollViewer.onResize();
+        this.restoreScroll();
     }
     private restoreScroll = () => {
-        this.viewer.restoreScroll();
+        const viewer = this.viewer;
+        const zoom = this.state.zoom;
+        const {
+            offsetWidth: viewerOffsetWidth,
+            offsetHeight: viewerOffsetHeight,
+        } = viewer.getViewerElement();
+        const {
+            offsetWidth: containerOffsetWidth,
+            offsetHeight: containerOffsetHeight,
+        } = viewer.getContainerElement();
+        const left = -(viewerOffsetWidth - containerOffsetWidth * zoom) / 2;
+        const top = -(viewerOffsetHeight - containerOffsetHeight * zoom) / 2;
+
+        viewer.scrollTo(left, top);
     }
     private onScroll = () => {
-        const [scrollLeft, scrollTop] = this.viewer.getScrollPos();
+        const [scrollLeft, scrollTop] = this.viewer.getScrollPoses();
 
         this.scroll(scrollLeft, scrollTop);
     }
@@ -101,12 +113,20 @@ export default class Editor extends React.PureComponent {
         console.log(verticalGuidelines, horizontalGuidelines);
     }
     private setZoom = (zoom: number) => {
+        const prevZoom = this.state.zoom;
+
         this.setState({
             zoom,
         }, () => {
-            const scrollPos = this.viewer.getScrollPos();
+            const scrollPos = this.viewer.getScrollPoses();
 
-            this.scroll(scrollPos[0], scrollPos[1]);
+            const halfWidth = -this.viewer.scrollViewer.offsetWidth / 2;
+            const halfHeight = -this.viewer.scrollViewer.offsetHeight / 2;
+            const scale = zoom / prevZoom - 1;
+            this.viewer.scrollTo(
+                scrollPos[0] + (scrollPos[0] - halfWidth) * scale,
+                scrollPos[1] + (scrollPos[1] - halfHeight) * scale,
+            );
         });
     }
     private scroll(scrollLeft: number, scrollTop: number) {
@@ -115,14 +135,11 @@ export default class Editor extends React.PureComponent {
             verticalRange: stateVerticalRange,
             zoom,
         } = this.state;
-        const width = this.viewer.width;
-        const height = this.viewer.height;
+        const width = this.viewer.scrollViewer.offsetWidth;
+        const height = this.viewer.scrollViewer.offsetHeight;
 
-        const stateLeft = stateHorizontalRange[0] * 50;
-        const stateTop = stateVerticalRange[0] * 50;
-
-        const relativeLeft = scrollLeft / zoom + stateLeft;
-        const relativeTop = scrollTop / zoom + stateTop;
+        const relativeLeft = scrollLeft / zoom;
+        const relativeTop = scrollTop / zoom;
 
         const boundLeft = relativeLeft - 100;
         const boundTop = relativeTop - 100;
@@ -157,13 +174,6 @@ export default class Editor extends React.PureComponent {
         this.setState({
             horizontalRange,
             verticalRange,
-        }, () => {
-            if (offsetLeft || offsetTop) {
-                const nextScrollLeft = scrollLeft + offsetLeft * zoom;
-                const nextScrollTop = scrollTop + offsetTop * zoom;
-
-                this.viewer.scroll(nextScrollLeft, nextScrollTop);
-            }
         });
 
         return true;

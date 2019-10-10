@@ -84,3 +84,5 @@ export const EDITOR_CSS = prefixCSS("scenejs-editor-", `
     top: calc(50% - 250px); */
 }
 `);
+
+export const RANGE = 500;

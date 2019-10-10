@@ -6,13 +6,14 @@ import { poly } from "shape-svg";
 import "./App.css";
 // import Editor from "../react-scenejs-editor/";
 import Editor from "../react-scenejs-editor/Viewer/Editor";
+import { ref } from "framework-utils";
 
 export default class App extends Component<{}> {
     private scene: Scene = new Scene();
     // private editor!: Editor;
     public render() {
         return (
-            <Editor>
+            <Editor ref={ref(window, "a")}>
                 <div id="main" className="page page1">
                     <div className="container">
                         <div className="logo">

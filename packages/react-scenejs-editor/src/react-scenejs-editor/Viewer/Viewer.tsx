@@ -1,116 +1,58 @@
 import * as React from "react";
-import { prefix } from "../utils";
 import { ref } from "framework-utils";
-import Dragger from "@daybrush/drag";
 import KeyController from "keycon";
+import InfiniteScrollViewer from "./InfiniteScrollViewer";
+import { RANGE } from "./consts";
+import { prefix } from "../utils";
 
 KeyController.setGlobal();
 
 export default class Viewer extends React.PureComponent<{
-    horizontalMin: number,
-    horizontalMax: number,
-    verticalMin: number,
-    verticalMax: number,
     zoom: number,
     width?: string,
     height?: string,
     setZoom: (zoom: number) => void,
     onScroll: () => void,
 }> {
-    public static defaultProps = {
-        width: "100%",
-        height: "100%",
-    };
-    public viewerElement!: HTMLElement;
-    public width: number = 0;
-    public height: number = 0;
-    public dragger!: Dragger;
+    public scrollViewer!: InfiniteScrollViewer;
+
     public render() {
         const {
-            horizontalMin,
-            horizontalMax,
-            verticalMin,
-            verticalMax,
-            onScroll,
             width,
             height,
             zoom,
+            onScroll,
+            children,
         } = this.props;
-        const scale = 50 * zoom;
-        const scrollWidth = `${(horizontalMax - horizontalMin) * scale}px`;
-        const scrollHeight = `${(verticalMax - verticalMin) * scale}px`;
-        const transform = `translate(${-horizontalMin * scale}px, ${-verticalMin * scale}px) scale(${zoom})`;
 
-        return (
-            <div className={prefix("viewer")}
-                ref={ref(this, "viewerElement")}
-                onScroll={onScroll}>
-                <div className={prefix("scroller")} ref={ref(this, "scrollerElement")} style={{
-                    width: scrollWidth,
-                    height: scrollHeight,
-                }}></div>
-                <div className={prefix("container")} ref={ref(this, "containerElement")} style={{
-                    width,
-                    height,
-                    transform,
-                }}>
-                    {this.props.children}
-                </div>
-            </div>
-        );
+        return (<div className={prefix("viewer")}>
+            <InfiniteScrollViewer
+                ref={ref(this, "scrollViewer")}
+                width={width}
+                height={height}
+                zoom={zoom}
+                onScroll={onScroll} range={RANGE} threshold={100}>
+                {children}
+            </InfiniteScrollViewer>
+        </div>);
     }
     public componentDidMount() {
-        // for touch device
-        // scrollTop, scrollLeft are not directly reflected.
-        this.dragger = new Dragger(this.viewerElement, {
-            container: document.body,
-            events: ["touch"],
-            dragstart: ({ inputEvent }) => {
-                inputEvent.preventDefault();
-            },
-            drag: e => {
-                this.scrollBy(-e.deltaX, -e.deltaY);
-            },
-        });
-        this.viewerElement.addEventListener("wheel", this.onWheel);
-        window.addEventListener("resize", this.onResize);
+        this.scrollViewer.viewerElement.addEventListener("wheel", this.onWheel);
     }
     public componentWillUnmount() {
-        this.dragger.unset();
-        this.viewerElement.removeEventListener("wheel", this.onWheel);
-        window.removeEventListener("resize", this.onResize);
+        this.scrollViewer.viewerElement.addEventListener("wheel", this.onWheel);
     }
-    public getScrollPos() {
-        const viewerElement = this.viewerElement;
-
-        return [
-            viewerElement.scrollLeft,
-            viewerElement.scrollTop,
-        ];
+    public scrollTo(scrollLeft: number, scrollTop: number) {
+        this.scrollViewer.scrollTo(scrollLeft, scrollTop);
     }
-    public scrollBy(scrollLeft: number, scrollTop: number) {
-        const viewerElement = this.viewerElement;
-
-        viewerElement.scrollLeft += scrollLeft;
-        viewerElement.scrollTop += scrollTop;
+    public getScrollPoses() {
+        return this.scrollViewer.getScrollPoses();
     }
-    public scroll(scrollLeft: number, scrollTop: number) {
-        const viewerElement = this.viewerElement;
-
-        viewerElement.scrollLeft = scrollLeft;
-        viewerElement.scrollTop = scrollTop;
+    public getViewerElement() {
+        return this.scrollViewer.viewerElement;
     }
-    public restoreScroll() {
-        const { horizontalMin, verticalMin, zoom } = this.props;
-        this.scroll(-horizontalMin * 50 * zoom, -verticalMin * 50 * zoom);
-    }
-    public onResize = () => {
-        const rect = this.viewerElement.getBoundingClientRect();
-
-        this.width = rect.width;
-        this.height = rect.height;
-
-        this.props.onScroll();
+    public getContainerElement() {
+        return this.scrollViewer.containerElement;
     }
     private onWheel = (e: WheelEvent) => {
         const { deltaY } = e;
@@ -121,7 +63,7 @@ export default class Viewer extends React.PureComponent<{
         e.preventDefault();
 
         const sign = deltaY >= 0 ? 1 : -1;
-        const delta = Math.min(Math.abs(deltaY) / 1000, 0.01);
+        const delta = Math.min(Math.abs(deltaY) / 500, 0.03);
         this.props.setZoom(Math.max(this.props.zoom * (1 + sign * delta), 0.2));
     }
 }
