@@ -58,13 +58,14 @@ export default class Editor extends React.PureComponent {
                     height={"500px"}
                     zoom={zoom}
                     onScroll={this.onScroll}
+                    onResize={this.onScroll}
                     setZoom={this.setZoom}
                 >{this.props.children}</Viewer>
             </EditorElement>
         );
     }
     public componentDidMount() {
-        this.viewer.scrollViewer.onResize();
+        this.viewer.onResize();
         this.restoreScroll();
     }
     private restoreScroll = () => {
@@ -120,8 +121,8 @@ export default class Editor extends React.PureComponent {
         }, () => {
             const scrollPos = this.viewer.getScrollPoses();
 
-            const halfWidth = -this.viewer.scrollViewer.offsetWidth / 2;
-            const halfHeight = -this.viewer.scrollViewer.offsetHeight / 2;
+            const halfWidth = -this.viewer.offsetWidth / 2;
+            const halfHeight = -this.viewer.offsetHeight / 2;
             const scale = zoom / prevZoom - 1;
             this.viewer.scrollTo(
                 scrollPos[0] + (scrollPos[0] - halfWidth) * scale,
@@ -135,8 +136,8 @@ export default class Editor extends React.PureComponent {
             verticalRange: stateVerticalRange,
             zoom,
         } = this.state;
-        const width = this.viewer.scrollViewer.offsetWidth;
-        const height = this.viewer.scrollViewer.offsetHeight;
+        const width = this.viewer.offsetWidth;
+        const height = this.viewer.offsetHeight;
 
         const relativeLeft = scrollLeft / zoom;
         const relativeTop = scrollTop / zoom;

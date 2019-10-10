@@ -13,9 +13,11 @@ export default class Viewer extends React.PureComponent<{
     height?: string,
     setZoom: (zoom: number) => void,
     onScroll: () => void,
+    onResize: () => void,
 }> {
     public scrollViewer!: InfiniteScrollViewer;
-
+    public offsetWidth: number = 0;
+    public offsetHeight: number = 0;
     public render() {
         const {
             width,
@@ -38,9 +40,11 @@ export default class Viewer extends React.PureComponent<{
     }
     public componentDidMount() {
         this.scrollViewer.viewerElement.addEventListener("wheel", this.onWheel);
+        window.addEventListener("resize", this.onResize);
     }
     public componentWillUnmount() {
         this.scrollViewer.viewerElement.addEventListener("wheel", this.onWheel);
+        window.removeEventListener("resize", this.onResize);
     }
     public scrollTo(scrollLeft: number, scrollTop: number) {
         this.scrollViewer.scrollTo(scrollLeft, scrollTop);
@@ -65,5 +69,13 @@ export default class Viewer extends React.PureComponent<{
         const sign = deltaY >= 0 ? 1 : -1;
         const delta = Math.min(Math.abs(deltaY) / 500, 0.03);
         this.props.setZoom(Math.max(this.props.zoom * (1 + sign * delta), 0.2));
+    }
+    public onResize = () => {
+        const viewerElement = this.scrollViewer.viewerElement;
+
+        this.offsetWidth = viewerElement.offsetWidth;
+        this.offsetHeight = viewerElement.offsetHeight;
+
+        this.props.onResize();
     }
 }

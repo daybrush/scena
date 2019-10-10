@@ -49,8 +49,6 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
     };
     public scrollTop: number = 500;
     public scrollLeft: number = 500;
-    public offsetWidth: number = 0;
-    public offsetHeight: number = 0;
     public viewerElement!: HTMLElement;
     public containerElement!: HTMLElement;
     private dragger!: Dragger;
@@ -110,13 +108,9 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         });
         const range = this.props.range;
         this.move(range, range);
-
-        this.onResize();
-        window.addEventListener("resize", this.onResize);
     }
     public componentWillUnmount() {
         this.dragger.unset();
-        window.removeEventListener("resize", this.onResize);
     }
     public getScrollPoses() {
         const {
@@ -153,12 +147,6 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         }, () => {
             this.props.onScroll();
         });
-    }
-    public onResize = () => {
-        const viewerElement = this.viewerElement;
-
-        this.offsetWidth = viewerElement.offsetWidth;
-        this.offsetHeight = viewerElement.offsetHeight;
     }
     private onScroll = () => {
         const viewerElement = this.viewerElement;
