@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ref } from "framework-utils";
 import KeyController from "keycon";
-import InfiniteScrollViewer from "./InfiniteScrollViewer";
+import InfiniteScrollViewer from "../InfiniteScrollViewer/InfiniteScrollViewer";
 import { RANGE } from "./consts";
 import { prefix } from "../utils";
 
@@ -39,11 +39,11 @@ export default class Viewer extends React.PureComponent<{
         </div>);
     }
     public componentDidMount() {
-        this.scrollViewer.viewerElement.addEventListener("wheel", this.onWheel);
+        this.getViewerElement().addEventListener("wheel", this.onWheel);
         window.addEventListener("resize", this.onResize);
     }
     public componentWillUnmount() {
-        this.scrollViewer.viewerElement.addEventListener("wheel", this.onWheel);
+        this.getViewerElement().addEventListener("wheel", this.onWheel);
         window.removeEventListener("resize", this.onResize);
     }
     public scrollTo(scrollLeft: number, scrollTop: number) {
@@ -53,7 +53,7 @@ export default class Viewer extends React.PureComponent<{
         return this.scrollViewer.getScrollPoses();
     }
     public getViewerElement() {
-        return this.scrollViewer.viewerElement;
+        return this.scrollViewer.getViewerElement();
     }
     public getContainerElement() {
         return this.scrollViewer.containerElement;
@@ -71,7 +71,7 @@ export default class Viewer extends React.PureComponent<{
         this.props.setZoom(Math.max(this.props.zoom * (1 + sign * delta), 0.2));
     }
     public onResize = () => {
-        const viewerElement = this.scrollViewer.viewerElement;
+        const viewerElement = this.getViewerElement();
 
         this.offsetWidth = viewerElement.offsetWidth;
         this.offsetHeight = viewerElement.offsetHeight;

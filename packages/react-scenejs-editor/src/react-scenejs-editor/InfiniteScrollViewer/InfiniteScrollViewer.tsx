@@ -1,9 +1,9 @@
 import * as React from "react";
-import styled from "react-css-styler";
+import styled, { StylerInterface } from "react-css-styler";
 import { prefixCSS, ref } from "framework-utils";
 import { prefix } from "../utils";
 import { PREFIX } from "../consts";
-import { findDOMRef, measureSpeed, getDuration, getDestPos } from "./utils";
+import { measureSpeed, getDuration, getDestPos } from "./utils";
 import Dragger from "@daybrush/drag";
 
 const ScrollerElement = styled("div", prefixCSS(PREFIX, `
@@ -49,7 +49,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
     };
     public scrollTop: number = 500;
     public scrollLeft: number = 500;
-    public viewerElement!: HTMLElement;
+    public scroller!: StylerInterface<HTMLElement>;
     public containerElement!: HTMLElement;
     private dragger!: Dragger;
     private timer: number = 0;
@@ -74,7 +74,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         const size = `calc(100% + ${this.props.range * 2}px)`;
 
         return (
-            <ScrollerElement ref={findDOMRef(this, "viewerElement")}
+            <ScrollerElement ref={ref(this, "scroller")}
                 className={prefix("scroll-viewer")}
                 onScroll={this.onScroll}>
                 <div className={prefix("scroll-area")} style={{
@@ -94,7 +94,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
     public componentDidMount() {
         // for touch device
         // scrollTop, scrollLeft are not directly reflected.
-        this.dragger = new Dragger(this.viewerElement, {
+        this.dragger = new Dragger(this.getViewerElement(), {
             container: document.body,
             events: ["touch"],
             dragstart: ({ inputEvent }) => {
@@ -131,6 +131,9 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
             nextScrollTop,
         ];
     }
+    public getViewerElement() {
+        return this.scroller.getElement();
+    }
     public scrollBy(deltaX: number, deltaY: number) {
         const scrollPoses = this.getScrollPoses();
 
@@ -152,7 +155,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         });
     }
     private onScroll = () => {
-        const viewerElement = this.viewerElement;
+        const viewerElement = this.getViewerElement();
         const { scrollLeft, scrollTop } = viewerElement;
         const { range, threshold } = this.props;
         const endThreshold = range * 2 - threshold;
@@ -194,7 +197,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         }
     }
     private move(scrollLeft: number, scrollTop: number) {
-        const viewerElement = this.viewerElement;
+        const viewerElement = this.getViewerElement();
 
         viewerElement.scrollLeft = scrollLeft;
         viewerElement.scrollTop = scrollTop;
