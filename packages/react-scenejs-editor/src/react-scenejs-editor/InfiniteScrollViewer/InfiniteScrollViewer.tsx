@@ -5,6 +5,7 @@ import { prefix } from "../utils";
 import { PREFIX } from "../consts";
 import { measureSpeed, getDuration, getDestPos } from "./utils";
 import Dragger from "@daybrush/drag";
+import { IObject } from "@daybrush/utils";
 
 const ScrollerElement = styled("div", prefixCSS(PREFIX, `
 {
@@ -159,10 +160,11 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         const { scrollLeft, scrollTop } = viewerElement;
         const { range, threshold } = this.props;
         const endThreshold = range * 2 - threshold;
+        const state = this.state;
         const {
             loopX,
             loopY,
-        } = this.state;
+        } = state;
         let nextLoopX = loopX;
         let nextLoopY = loopY;
 
@@ -186,15 +188,16 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         this.scrollLeft = nextScrollLeft;
         this.scrollTop = nextScrollTop;
 
-        this.setState({
+        this.updateState({
             loopX: nextLoopX,
             loopY: nextLoopY,
-        });
-        this.props.onScroll();
+        }, () => {
+            this.props.onScroll();
 
-        if (scrollLeft !== nextScrollLeft || scrollTop !== nextScrollTop) {
-            this.move(nextScrollLeft, nextScrollTop);
-        }
+            if (scrollLeft !== nextScrollLeft || scrollTop !== nextScrollTop) {
+                this.move(nextScrollLeft, nextScrollTop);
+            }
+        });
     }
     private move(scrollLeft: number, scrollTop: number) {
         const viewerElement = this.getViewerElement();
@@ -237,7 +240,22 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
         };
         this.timer = requestAnimationFrame(next);
     }
-    pauseAnimation() {
+    private pauseAnimation() {
         cancelAnimationFrame(this.timer);
+    }
+    private updateState(nextState: IObject<any>, callback: any) {
+        const state = this.state;
+        let isUpdate = false;
+        for (const name in nextState) {
+            if (state[name] !== nextState[name]) {
+                isUpdate = true;
+                break;
+            }
+        }
+        if (isUpdate) {
+            this.setState(nextState, callback);
+        } else {
+            callback();
+        }
     }
 }

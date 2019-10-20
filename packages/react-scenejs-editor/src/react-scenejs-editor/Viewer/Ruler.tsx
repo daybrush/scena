@@ -1,9 +1,7 @@
 import * as React from "react";
 import { prefix } from "../utils";
-import RulerUnit from "./RulerUnit";
-import styled from "react-css-styler";
+import styled, { StylerInterface } from "react-css-styler";
 import { prefixCSS, ref } from "framework-utils";
-import { getTranslateName, findDOMRef } from "./utils";
 import Dragger, { OnDragStart, OnDrag, OnDragEnd } from "@daybrush/drag";
 
 const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
@@ -11,13 +9,13 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     position: absolute;
     background: #444;
     overflow: hidden;
+    z-index: 10;
 }
 :host.horizontal {
     width: calc(100% - 30px);
     height: 30px;
     left: 30px;
     top: 0px;
-    white-space:nowrap;
 }
 :host.vertical {
     top: 30px;
@@ -25,93 +23,150 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     width: 30px;
     height: calc(100% - 30px);
 }
-.ruler-divisions {
-    position:relative;
-    font-size: 0;
-    pointer-events: none;
-    will-change: transform;
-}
-:host.vertical .ruler-divisions {
-    right: 0;
-}
-:host.horizontal .ruler-divisions {
-    white-space: nowrap;
+canvas {
+    width: 100%;
+    height: 100%;
 }
 `));
-function renderUnit(
-    unit: number,
-    size: number,
-    type: "horizontal" | "vertical",
-    [min, max]: number[],
-) {
-    const units: JSX.Element[] = [];
 
-    const translateName = getTranslateName(type, true);
-
-    for (let i = min; i <= max; ++i) {
-        units.push(<RulerUnit key={i} px={i * unit} pos={i * size} translateName={translateName} />);
-    }
-    return units;
-}
 export default class Ruler extends React.PureComponent<{
     type: "horizontal" | "vertical",
-    min: number,
-    max: number,
-    zoom: number,
-    dragStart: (e: OnDragStart) => any,
-    drag: (e: OnDrag) => any,
-    dragEnd: (e: OnDragEnd) => any,
+    width: number,
+    height: number,
+    unit: number,
+    zoom?: number,
+    onDragStart: (e: OnDragStart) => any,
+    onDrag: (e: OnDrag) => any,
+    onDragEnd: (e: OnDragEnd) => any,
 }> {
-    public rulerElement!: HTMLElement;
+    public static defaultProps = {
+        zoom: 1,
+    }
+    public state = {
+        scrollPos: 0,
+    };
+    private canvasElement!: HTMLCanvasElement;
+    private canvasContext!: CanvasRenderingContext2D;
+    public ruler!: StylerInterface<HTMLElement>;
     public divisionsElement!: HTMLElement;
     private dragger!: Dragger;
     public render() {
-        const { type, min, max, zoom } = this.props;
-        const isHorizontal = type === "horizontal";
-        const scale = zoom < 1
-            ? Math.pow(2, Math.round((1 - zoom) * 3))
-            : Math.round(1 / Math.round(zoom) * 5) / 5;
-        const unit = 50 * scale;
-        const range = [
-            Math.floor(min / scale),
-            Math.ceil(max / scale),
-        ];
-        const size = zoom * unit;
-        return (
-            <RulerElement className={prefix("ruler", type)} ref={findDOMRef(this, "rulerElement")}>
-                <div className={prefix("ruler-divisions")} ref={ref(this, "divisionsElement")} style={{
-                    [isHorizontal ? "width" : "height"]: `${size}px`,
-                }}>
-                    {renderUnit(unit, size, type, range)}
-                </div>
-            </RulerElement>
-        );
+        const { type } = this.props;
+
+        return <RulerElement className={prefix("ruler", type)} ref={ref(this, "ruler")}><canvas ref={ref(this, "canvasElement")} /></RulerElement>;
     }
     public componentDidMount() {
-        const {
-            dragStart,
-            drag,
-            dragEnd,
-        } = this.props;
+        const canvas = this.canvasElement;
+        const context = canvas.getContext("2d");
 
+        this.canvasContext = context;
+
+        this.resize();
+        this.draw();
+
+        const {
+            onDragStart,
+            onDrag,
+            onDragEnd,
+        } = this.props;
+        console.log(this.ruler.getElement());
         this.dragger = new Dragger(
-            this.rulerElement, {
+            this.ruler.getElement(), {
             container: document.body,
             dragstart: e => {
                 e.datas.fromRuler = true;
-                dragStart(e);
+                onDragStart(e);
             },
-            drag,
-            dragend: dragEnd,
+            drag: onDrag,
+            dragend: onDragEnd,
         },
         );
+    }
+    public componentDidUpdate() {
+        this.resize();
+        this.draw();
     }
     public componentWillUnmount() {
         this.dragger.unset();
     }
-    public scroll(pos: number) {
-        const { type, zoom } = this.props;
-        this.divisionsElement.style.transform = `${getTranslateName(type, true)}(${-pos * zoom}px)`;
+    public scroll(scrollPos: number) {
+        this.draw(scrollPos);
     }
+    private resize() {
+        const canvas = this.canvasElement;
+        const {
+            width,
+            height,
+        } = this.props;
 
+        canvas.width = width * 2;
+        canvas.height = height * 2;
+    }
+    private draw(scrollPos = this.state.scrollPos) {
+        const {
+            width,
+            height,
+            unit,
+            zoom,
+            type,
+        } = this.props;
+        this.state.scrollPos = scrollPos;
+        const context = this.canvasContext;
+        const isHorizontal = type === "horizontal";
+
+        context.clearRect(0, 0, width * 2, height * 2);
+        context.save();
+        context.scale(2, 2);
+        context.strokeStyle = "#777777";
+        context.lineWidth = 1;
+        context.font = "10px sans-serif";
+        context.fillStyle = "#ffffff";
+        context.translate(0.5, 0);
+        context.beginPath();
+
+        const size = isHorizontal ? width : height;
+        const zoomUnit = zoom * unit;
+        const minRange = Math.floor(scrollPos * zoom / zoomUnit);
+        const maxRange = Math.ceil((scrollPos * zoom + size) / zoomUnit);
+        const length = maxRange - minRange;
+
+        for (let i = 0; i < length; ++i) {
+            const startPos = ((i + minRange) * unit - scrollPos) * zoom;
+
+            if (startPos >= -zoomUnit && startPos < size) {
+                const startX = isHorizontal ? startPos + 3 : 12;
+                const startY = isHorizontal ? 12 : startPos - 3;
+
+                if (isHorizontal) {
+                    context.fillText(`${(i + minRange) * unit}`, startX, startY);
+                } else {
+                    context.save();
+                    context.translate(startX, startY);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(`${(i + minRange) * unit}`, 0, 0);
+                    context.restore();
+                }
+            }
+
+            for (let j = 0; j < 10; ++j) {
+                const pos = startPos + j / 10 * zoomUnit;
+
+                if (pos < 0 || pos >= size) {
+                    continue;
+                }
+                const lineSize = j === 0
+                    ? 30
+                    : (j % 2 === 0 ? 10 : 7);
+
+                const x1 = isHorizontal ? pos : 30 - lineSize;
+                const x2 = isHorizontal ? pos : 30;
+                const y1 = isHorizontal ? 30 - lineSize : pos;
+                const y2 = isHorizontal ? 30 : pos;
+                context.moveTo(x1, y1);
+                context.lineTo(x2, y2);
+            }
+        }
+        context.stroke();
+        context.restore();
+    }
 }
