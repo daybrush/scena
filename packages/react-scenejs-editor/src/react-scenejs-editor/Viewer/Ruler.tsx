@@ -9,7 +9,7 @@ const RulerElement = styled("div", prefixCSS("scenejs-editor-", `
     position: absolute;
     background: #444;
     overflow: hidden;
-    z-index: 10;
+    z-index: 20;
 }
 :host.horizontal {
     width: calc(100% - 30px);
@@ -69,7 +69,7 @@ export default class Ruler extends React.PureComponent<{
             onDrag,
             onDragEnd,
         } = this.props;
-        console.log(this.ruler.getElement());
+
         this.dragger = new Dragger(
             this.ruler.getElement(), {
             container: document.body,
@@ -110,7 +110,8 @@ export default class Ruler extends React.PureComponent<{
             zoom,
             type,
         } = this.props;
-        this.state.scrollPos = scrollPos;
+        const state = this.state;
+        state.scrollPos = scrollPos;
         const context = this.canvasContext;
         const isHorizontal = type === "horizontal";
 

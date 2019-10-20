@@ -32,6 +32,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
     width?: string,
     height?: string,
     zoom?: number,
+    externalChildren?: React.ReactNode | React.ReactNode[],
     onScroll: () => any,
 }> {
     public static defaultProps = {
@@ -61,6 +62,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
             height,
             zoom,
             range,
+            externalChildren,
         } = this.props;
         const {
             loopX,
@@ -82,6 +84,7 @@ export default class InfiniteScrollViewer extends React.PureComponent<{
                     width: size,
                     height: size,
                 }}></div>
+                {externalChildren}
                 <div className={prefix("container")} ref={ref(this, "containerElement")} style={{
                     width,
                     height,

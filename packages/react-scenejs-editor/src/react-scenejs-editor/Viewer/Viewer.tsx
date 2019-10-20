@@ -16,10 +16,12 @@ const ViewerElement = styled("div", prefixCSS(PREFIX, `
     width: 100%;
     height: 100%;
 }
-.scroller {
+.scroll-viewer {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    left: 30px;
+    top: 30px;
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
 }
 .container-area {
     position: absolute;
@@ -33,7 +35,7 @@ const ViewerElement = styled("div", prefixCSS(PREFIX, `
     height: 30px;
     background: #444;
     box-sizing: border-box;
-    z-index: 20;
+    z-index: 21;
 }
 .box:before, .box:after {
     position: absolute;
@@ -58,6 +60,8 @@ const ViewerElement = styled("div", prefixCSS(PREFIX, `
 export default class Viewer extends React.PureComponent<{
     width?: string,
     height?: string,
+    externalChildren?: React.ReactNode | React.ReactNode[],
+    onScroll: () => any,
 }> {
     public scrollViewer!: InfiniteScrollViewer;
     public state = {
@@ -74,6 +78,7 @@ export default class Viewer extends React.PureComponent<{
             width,
             height,
             children,
+            externalChildren,
         } = this.props;
         const {
             zoom,
@@ -85,6 +90,15 @@ export default class Viewer extends React.PureComponent<{
             : Math.max(50 * Math.round(1 / zoom), 1);
 
         return (<ViewerElement className={prefix("viewer")}>
+            <InfiniteScrollViewer
+                ref={ref(this, "scrollViewer")}
+                width={width}
+                height={height}
+                zoom={zoom}
+                externalChildren={externalChildren}
+                onScroll={this.onScroll} range={RANGE} threshold={100}>
+                {children}
+            </InfiniteScrollViewer>
             <div className={prefix("box")} onClick={this.restoreScroll}></div>
             <Ruler ref={ref(this, "horizontalRuler")}
                 type="horizontal"
@@ -116,14 +130,6 @@ export default class Viewer extends React.PureComponent<{
                 type="vertical"
                 zoom={zoom}
             />
-            <InfiniteScrollViewer
-                ref={ref(this, "scrollViewer")}
-                width={width}
-                height={height}
-                zoom={zoom}
-                onScroll={this.onScroll} range={RANGE} threshold={100}>
-                {children}
-            </InfiniteScrollViewer>
         </ViewerElement>);
     }
     public componentDidMount() {
@@ -187,6 +193,7 @@ export default class Viewer extends React.PureComponent<{
         const [scrollLeft, scrollTop] = this.getScrollPoses();
 
         this.scroll(scrollLeft, scrollTop);
+        this.props.onScroll();
     }
     private dragStartHorizontal = e => {
         this.horizontalGuidelines.dragStartToAdd(e);

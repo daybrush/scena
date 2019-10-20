@@ -221,7 +221,7 @@ export default class App extends Component<{}> {
                 iterationCount: 1,
                 selector: true,
             });
-        this.scene.setTime(1);
+        this.scene.setTime(3);
         // this.editor.update(true);
     }
 }
