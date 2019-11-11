@@ -14,7 +14,19 @@
 
 
 ## 📦 Packages
+
 * [**react-scenejs-editor**](https://github.com/daybrush/scenejs-editor/tree/master/packages/react-scenejs-editor): **`react-scenejs-editor`** is a React Component that represents the timeline of [**Scene.js**](https://github.com/daybrush/scenejs). You can control time, properties, and items.
+
+### Dependencies
+|Repository|Version|Description|
+|---|---|---|
+|[**Scene.js**](https://github.com/daybrush/scenejs)|[![](https://img.shields.io/npm/v/scenejs.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/scenejs)|🎬 Scene.js is JavaScript & CSS timeline-based animation library.|
+|[**Scene.js Timeline**](https://github.com/daybrush/scenejs-timeline)|[![](https://img.shields.io/npm/v/@scenejs/timeline.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@scenejs/timeline)|A library that represents the timeline of Scene.js. You can control time, properties, and items.|
+|[**Moveable**](https://github.com/daybrush/moveable)|[![](https://img.shields.io/npm/v/moveable.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/moveable)|Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable! Groupable!|
+|[**Guides**](https://github.com/daybrush/guides)|[![](https://img.shields.io/npm/v/@scena/guides.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@scena/guides)|A Guides component that can draw ruler and manage guidelines.|
+|[**Ruler**](https://github.com/daybrush/ruler)|[![](https://img.shields.io/npm/v/@scena/ruler.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@scena/ruler)|A Ruler component that can draw grids and scroll infinitely.|
+|[**KeyController**](https://github.com/daybrush/keycon)|[![](https://img.shields.io/npm/v/keycon.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/keycon)|Keyboard Controller|
+|[**Dragger**](https://github.com/daybrush/drag)|[![](https://img.shields.io/npm/v/@daybrush/drag.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@daybrush/drag)|You can set up drag events in any browser.|
 
 ## ⚙️ Installation
 ```sh
