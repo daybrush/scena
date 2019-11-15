@@ -51,11 +51,12 @@
   "dependencies": {
     "@daybrush/drag": "^0.9.1",
     "@daybrush/utils": "^0.10.1",
+    "@scena/react-guides": "^0.2.2",
     "framework-utils": "^0.2.1",
     "keycon": "^0.6.0",
     "react-color": "^2.17.3",
     "react-css-styler": "^0.4.1",
-    "react-moveable": "^0.12.10",
+    "react-moveable": "^0.13.6",
     "react-pure-props": "^0.1.5",
     "react-scenejs-timeline": "^0.3.1",
     "scenejs": "^1.1.4"

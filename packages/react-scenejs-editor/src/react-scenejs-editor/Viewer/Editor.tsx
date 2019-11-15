@@ -3,7 +3,7 @@ import styled from "react-css-styler";
 import { EDITOR_CSS } from "./consts";
 import { ref } from "framework-utils";
 import Viewer from "./Viewer";
-import Moveable, { OnDrag, OnResize, OnRotate, OnRotateEnd, OnRotateGroup, OnRotateStart } from "react-moveable";
+import Moveable, { OnDrag } from "react-moveable";
 
 const EditorElement = styled("div", EDITOR_CSS);
 

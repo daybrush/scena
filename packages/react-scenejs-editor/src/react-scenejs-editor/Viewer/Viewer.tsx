@@ -4,10 +4,9 @@ import KeyController from "keycon";
 import InfiniteScrollViewer from "../InfiniteScrollViewer/InfiniteScrollViewer";
 import { RANGE } from "./consts";
 import { prefix } from "../utils";
-import Ruler from "./Ruler";
-import Guidelines from "./Guidelines";
 import styled from "react-css-styler";
 import { PREFIX } from "../consts";
+import Guides from "@scena/react-guides";
 
 KeyController.setGlobal();
 const ViewerElement = styled("div", prefixCSS(PREFIX, `
@@ -56,6 +55,19 @@ const ViewerElement = styled("div", prefixCSS(PREFIX, `
     transform-origin: 0% 0%;
     background: rgba(200, 200, 200, 0.2);
 }
+.guides {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.guides.horizontal {
+    width: 100%;
+    height: 0;
+}
+.guides.vertical {
+    height: 100%;
+    width: 0;
+}
 `));
 export default class Viewer extends React.PureComponent<{
     width?: string,
@@ -69,10 +81,8 @@ export default class Viewer extends React.PureComponent<{
         offsetWidth: 0,
         offsetHeight: 0,
     };
-    private horizontalRuler!: Ruler;
-    private verticalRuler!: Ruler;
-    private horizontalGuidelines!: Guidelines;
-    private verticalGuidelines!: Guidelines;
+    private horizontalGuides!: Guides;
+    private verticalGuides!: Guides;
     public render() {
         const {
             width,
@@ -100,36 +110,29 @@ export default class Viewer extends React.PureComponent<{
                 {children}
             </InfiniteScrollViewer>
             <div className={prefix("box")} onClick={this.restoreScroll}></div>
-            <Ruler ref={ref(this, "horizontalRuler")}
-                type="horizontal"
-                width={offsetWidth}
-                height={30}
-                unit={unit}
-                onDragStart={this.dragStartHorizontal}
-                onDrag={this.dragHorizontal}
-                onDragEnd={this.dragEndHorizontal}
-                zoom={zoom}
-            />
-            <Ruler ref={ref(this, "verticalRuler")}
-                type="vertical"
+            <Guides
+                ref={ref(this, "verticalGuides")}
+                className={prefix("guides", "vertical")}
+                type={"vertical"}
                 width={30}
                 height={offsetHeight}
                 unit={unit}
-                onDragStart={this.dragStartVertical}
-                onDrag={this.dragVertical}
-                onDragEnd={this.dragEndVertical}
                 zoom={zoom}
-            />
-            <Guidelines ref={ref(this, "horizontalGuidelines")}
-                setGuidelines={this.setGuidelines}
-                type="horizontal"
+                setGuides={this.setGuides}
+                style={{ width: "30px", height: `${offsetHeight}px` }}
+                />
+            <Guides
+                ref={ref(this, "horizontalGuides")}
+                type={"horizontal"}
+                className={prefix("guides", "horizontal")}
+                width={offsetWidth}
+                height={30}
+                unit={unit}
                 zoom={zoom}
-            />
-            <Guidelines ref={ref(this, "verticalGuidelines")}
-                setGuidelines={this.setGuidelines}
-                type="vertical"
-                zoom={zoom}
-            />
+                setGuides={this.setGuides}
+                style={{ width: `${offsetWidth}px`, height: `30px` }}
+                rulerStyle={{left: "30px", width: `calc(100% - 30px)`}}
+                />
         </ViewerElement>);
     }
     public componentDidMount() {
@@ -188,36 +191,17 @@ export default class Viewer extends React.PureComponent<{
 
         this.setZoom(Math.max(this.state.zoom * (1 + sign * delta), 0.2));
     }
-
     private onScroll = () => {
         const [scrollLeft, scrollTop] = this.getScrollPoses();
 
         this.scroll(scrollLeft, scrollTop);
         this.props.onScroll();
     }
-    private dragStartHorizontal = e => {
-        this.horizontalGuidelines.dragStartToAdd(e);
-    }
-    private dragHorizontal = e => {
-        this.horizontalGuidelines.drag(e);
-    }
-    private dragEndHorizontal = e => {
-        this.horizontalGuidelines.dragEnd(e);
-    }
-    private dragStartVertical = e => {
-        this.verticalGuidelines.dragStartToAdd(e);
-    }
-    private dragVertical = e => {
-        this.verticalGuidelines.drag(e);
-    }
-    private dragEndVertical = e => {
-        this.verticalGuidelines.dragEnd(e);
-    }
-    private setGuidelines = () => {
-        const verticalGuidelines = this.verticalGuidelines.getGuidelines();
-        const horizontalGuidelines = this.horizontalGuidelines.getGuidelines();
+    private setGuides = () => {
+        const verticalGuides = this.verticalGuides.getGuides();
+        const horizontalGuides = this.horizontalGuides.getGuides();
 
-        console.log(verticalGuidelines, horizontalGuidelines);
+        console.log(verticalGuides, horizontalGuides);
     }
     private setZoom = (zoom: number) => {
         const {
@@ -248,10 +232,9 @@ export default class Viewer extends React.PureComponent<{
         const relativeLeft = scrollLeft / zoom;
         const relativeTop = scrollTop / zoom;
 
-        this.horizontalRuler.scroll(relativeLeft);
-        this.verticalRuler.scroll(relativeTop);
-
-        this.horizontalGuidelines.scroll(relativeTop);
-        this.verticalGuidelines.scroll(relativeLeft);
+        this.horizontalGuides.scroll(relativeLeft);
+        this.horizontalGuides.scrollGuides(relativeTop);
+        this.verticalGuides.scroll(relativeTop);
+        this.verticalGuides.scrollGuides(relativeLeft);
     }
 }

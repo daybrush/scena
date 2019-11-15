@@ -11,4 +11,3 @@ export function getTranslateName(type: "vertical" | "horizontal", isReverse?: bo
 
     return `translate${(!isReverse && isHorizontal) || (isReverse && !isHorizontal) ? "Y" : "X"}`;
 }
-
