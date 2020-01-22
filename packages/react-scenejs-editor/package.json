@@ -26,14 +26,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daybrush/scenejs-editor.git"
+    "url": "git+https://github.com/daybrush/scena.git"
   },
   "author": "Daybrush",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/daybrush/scenejs-editor/issues"
+    "url": "https://github.com/daybrush/scena/issues"
   },
-  "homepage": "https://github.com/daybrush/scenejs-editor#readme",
+  "homepage": "https://github.com/daybrush/scena#readme",
   "devDependencies": {
     "@daybrush/builder": "^0.1.0",
     "@scenejs/effects": "^1.0.1",
