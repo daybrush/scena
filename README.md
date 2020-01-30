@@ -28,7 +28,7 @@
 |[**Ruler**](https://github.com/daybrush/ruler)|[![](https://img.shields.io/npm/v/@scena/ruler.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@scena/ruler)|A Ruler component that can draw grids and scroll infinitely.|
 |[**KeyController**](https://github.com/daybrush/keycon)|[![](https://img.shields.io/npm/v/keycon.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/keycon)|Keyboard Controller|
 |[**Dragger**](https://github.com/daybrush/drag)|[![](https://img.shields.io/npm/v/@daybrush/drag.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@daybrush/drag)|You can set up drag events in any browser.|
-|**InfiniteScrollViewer**|Soon|Soon|
+|[**InfiniteViewer**](https://github.com/daybrush/infinite-viewer)|[![](https://img.shields.io/npm/v/infinite-viewer.svg?style=flat-square&color=007acc&label=version)|Viewer of Infinite Zone|
 
 
 ## ⚙️ Installation
