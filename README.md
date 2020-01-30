@@ -6,16 +6,8 @@
  <a href="https://github.com/daybrush/scena/tree/master/packages/preact-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=Preact&style=flat-square&color=673ab8"></a>
 </p>
 
-<p align="middle"><strong>Scena</strong> is a Editor component that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
+<p align="middle"><strong>Scena</strong> is a Editor project that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
 
-<p align="middle"><a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a> &nbsp;/&nbsp; <a href="https://daybrush.com/scenejs/features.html#timeline"><strong>Example</strong></a></p>
-
-
-
-
-## 📦 Packages
-
-* [**react-scenejs-editor**](https://github.com/daybrush/scena/tree/master/packages/react-scenejs-editor): **`react-scenejs-editor`** is a React Component that represents the timeline of [**Scene.js**](https://github.com/daybrush/scenejs). You can control time, properties, and items.
 
 ### Dependencies
 |Repository|Version|Description|
@@ -28,22 +20,8 @@
 |[**Ruler**](https://github.com/daybrush/ruler)|[![](https://img.shields.io/npm/v/@scena/ruler.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@scena/ruler)|A Ruler component that can draw grids and scroll infinitely.|
 |[**KeyController**](https://github.com/daybrush/keycon)|[![](https://img.shields.io/npm/v/keycon.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/keycon)|Keyboard Controller|
 |[**Dragger**](https://github.com/daybrush/drag)|[![](https://img.shields.io/npm/v/@daybrush/drag.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/@daybrush/drag)|You can set up drag events in any browser.|
-|[**InfiniteViewer**](https://github.com/daybrush/infinite-viewer)|[![](https://img.shields.io/npm/v/infinite-viewer.svg?style=flat-square&color=007acc&label=version)|Viewer of Infinite Zone|
+|[**InfiniteViewer**](https://github.com/daybrush/infinite-viewer)|![](https://img.shields.io/npm/v/infinite-viewer.svg?style=flat-square&color=007acc&label=version)|Viewer of Infinite Zone|
 
-
-## ⚙️ Installation
-```sh
-$ npm i scena
-```
-
-```html
-<script src="https://daybrush.com/scena/release/latest/dist/editor.pkgd.min.js"></script>
-```
-
-
-## 🚀 How to use
-
-* Soon
 
 ## ⭐️ Show Your Support
 Please give a ⭐️ if this project helped you!
