@@ -9,7 +9,7 @@
 <p align="middle"><strong>Scena</strong> is a Editor project that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
 
 
-### Dependencies
+### Related Projects
 |Repository|Version|Description|
 |---|---|---|
 |[**Scene.js**](https://github.com/daybrush/scenejs)|[![](https://img.shields.io/npm/v/scenejs.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/scenejs)|🎬 Scene.js is JavaScript & CSS timeline-based animation library.|
