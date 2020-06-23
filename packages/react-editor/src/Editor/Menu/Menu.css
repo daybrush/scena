@@ -1,0 +1,33 @@
+body {
+    --menu: 45px;
+}
+.scena-menu {
+    position: absolute;
+    top: 0;
+    width: var(--menu);
+    height: 100%;
+    background: #2a2a2a;
+    box-sizing: border-box;
+    padding: 15px 7px 0px;
+
+}
+.scena-icon {
+    position: relative;
+    display: block;
+    font-size: 0;
+    padding: 3px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid transparent;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    transition: all ease 0.2s;
+}
+.scena-icon.scena-selected {
+    background: #4af;
+    border-color: #1a1a1a;
+}
+.scena-icon.scena-selected path {
+    fill: #fff;
+    stroke: #fff;
+}

@@ -1,0 +1,27 @@
+body {
+    --tabs: 200px;
+}
+.scena-tabs {
+    position: absolute;
+    right: 0;
+    width: var(--tabs);
+    height: 100%;
+    background: var(--back2);
+    transform: translateZ(10px);
+    z-index: 10;
+}
+.scena-tab {
+    padding: 0px 10px 10px;
+    border-bottom: 1px solid var(--back1);
+}
+.scena-tab h2 {
+    margin: 0;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px 0px;
+}
+.scena-tab-line {
+    position: relative;
+    display: block;
+}

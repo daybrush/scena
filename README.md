@@ -1,6 +1,6 @@
 <p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/scena/master/demo/images/editor.png" width="100%" style="max-width: 800px"/></p>
 
-<h2 align="middle">Scene.js Timeline Editor</h2>
+<h2 align="middle">Scena Studio</h2>
 <p align="middle"><a href="https://www.npmjs.com/package/scena" target="_blank"><img src="https://img.shields.io/npm/v/scena.svg?style=flat-square&color=007acc&label=version" alt="npm version" /></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square"/> <a href="https://github.com/daybrush/scena/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scena.svg?style=flat-square&label=license&color=08CE5D"/></a>
  <a href="https://github.com/daybrush/scena/tree/master/packages/react-scenejs-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=React&style=flat-square&color=61dafb"></a>
  <a href="https://github.com/daybrush/scena/tree/master/packages/preact-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=Preact&style=flat-square&color=673ab8"></a>
@@ -10,6 +10,18 @@
 
 
 ### Related Projects
+||||
+|:---:|:---:|:---:|
+|<a href="https://github.com/daybrush/scenejs" target="_blank"><img src="https://daybrush.com/scenejs/images/clapperboard.png" width="250" alt="scenejs" /></a>|<a href="https://github.com/daybrush/moveable" target="_blank"><img src ="https://daybrush.com/moveable/images/256x256.png" width="250" alt="Moveable" /></a>|<a href="https://github.com/daybrush/selecto" target="_blank"><img src ="https://daybrush.com/selecto/images/256x256.png" width="250" alt="Selecto" /></a>|
+|[**Scene.js**](https://github.com/daybrush/scenejs)|[**Moveable**](https://github.com/daybrush/moveable)|[**Selecto**](https://github.com/daybrush/selecto)|
+|<a href="https://github.com/daybrush/infinite-viewer" target="_blank"><img src ="https://daybrush.com/infinite-viewer/images/logo.png" width="250" alt="scenejs-timeline" /></a>|<a href="https://github.com/daybrush/guides" target="_blank"><img src ="https://daybrush.com/guides/images/guides.png" width="250" alt="Guides" /></a>|<a href="https://github.com/daybrush/scenejs-timeline" target="_blank"><img src ="https://daybrush.com/scenejs-timeline/images/logo.png" width="250" alt="scenejs-timeline" /></a>|
+|[**InfiniteViewer**](https://github.com/daybrush/infinite-viewer)|[**Guides**](https://github.com/daybrush/guides)|[**Scene.js<br/>Timeline**](https://github.com/daybrush/scenejs-timeline)|
+|<a href="https://github.com/daybrush/ruler" target="_blank"><img src ="https://daybrush.com/ruler/images/ruler.png" width="250" alt="Ruler" /></a>|<a href="https://github.com/daybrush/drag" target="_blank"><img src ="https://daybrush.com/drag/images/logo.png" width="250" alt="Dragger" /></a>|
+|[**Ruler**](https://github.com/daybrush/ruler)|[**Drag**](https://github.com/daybrush/drag)|
+
+
+
+
 |Repository|Version|Description|
 |---|---|---|
 |[**Scene.js**](https://github.com/daybrush/scenejs)|[![](https://img.shields.io/npm/v/scenejs.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/scenejs)|🎬 Scene.js is JavaScript & CSS timeline-based animation library.|

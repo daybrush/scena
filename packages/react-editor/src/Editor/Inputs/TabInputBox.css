@@ -1,0 +1,24 @@
+.scena-tab-input {
+    position: relative;
+    display: block;
+    box-sizing: border-box;
+    padding: 2px;
+}
+.scena-tab-input h3 {
+    color: white;
+    margin: 0;
+    padding: 7px 5px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.scena-tab-input.scena-half {
+    vertical-align: top;
+    display: inline-block;
+    width: 50%;
+}
+.scena-tab-input.scena-half:nth-child(2n + 1) {
+    padding-right: 5px;
+}
+.scena-tab-input.scena-half:nth-child(2n + 2) {
+    padding-left: 5px;
+}

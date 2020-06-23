@@ -1,0 +1,65 @@
+html, body, #root, .editor {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+}
+body {
+    --mainColor: #4af;
+    --back1: #1a1a1a;
+    --back2: #2a2a2a;
+    --back3: #333;
+    --back4: #444;
+}
+.editor {
+    transform-style: preserve-3d;
+}
+.editor .viewer {
+    position: absolute !important;
+    left: calc(30px + var(--menu));
+    top: 30px;
+    width: calc(100% - 30px - var(--menu));
+    height: calc(100% - 30px);
+}
+
+.viewport {
+    width: 400px;
+    height: 600px;
+    border: 1px solid #eee;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.guides {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    transform: translateZ(1px);
+}
+
+.guides.horizontal {
+    left: calc(var(--menu) + 30px);
+    width: calc(100% - 30px - var(--menu));
+    height: 30px !important;
+}
+
+.guides.vertical {
+    top: 30px;
+    left: var(--menu);
+    height: calc(100% - 30px);
+    width: 30px !important;
+}
+
+.reset {
+    position: absolute !important;
+    background: var(--back3);
+    width: 30px;
+    height: 30px;
+    z-index: 1;
+    border-right: 1px solid var(--back4);
+    border-bottom: 1px solid var(--back4);
+    box-sizing: border-box;
+    cursor: pointer;
+    left: var(--menu);
+    top: 0px;
+}
