@@ -1,7 +1,6 @@
 import * as React from "react";
-import { getKey } from "keycon";
 import Input from "./Input";
-import { isUndefined, IObject } from "@daybrush/utils";
+import { IObject } from "@daybrush/utils";
 import { prefix } from "../../utils";
 import "./Anchor.css";
 

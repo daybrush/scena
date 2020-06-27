@@ -1,6 +1,5 @@
 import Component from "@egjs/component";
 import { IObject } from "@daybrush/utils";
-import { request } from "http";
 
 class Bus extends Component {
     private eventMap: IObject<number> = {};

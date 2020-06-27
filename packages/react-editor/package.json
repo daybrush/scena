@@ -42,9 +42,9 @@
     "@scena/react-guides": "^0.8.0",
     "framework-utils": "^0.3.4",
     "keycon": "^0.8.0",
-    "moveable-helper": "^0.1.0",
+    "moveable-helper": "^0.2.0-beta4",
     "react-infinite-viewer": "^0.4.1",
-    "react-moveable": "^0.21.0-beta4",
+    "react-moveable": "^0.21.0-beta12",
     "react-selecto": "^1.4.0"
   }
 }

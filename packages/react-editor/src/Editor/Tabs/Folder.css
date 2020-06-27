@@ -1,0 +1,23 @@
+.scena-fold-icon {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 10px;
+    height: 14px;
+}
+.scena-fold-icon:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-top: 4px solid #fff;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+}
+.scena-fold-icon.scena-fold:before {
+    border-right: 0;
+    border-left: 4px solid #fff;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+}

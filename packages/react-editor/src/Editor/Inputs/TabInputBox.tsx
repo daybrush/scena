@@ -5,10 +5,10 @@ import { prefix } from "../../utils";
 import "./TabInputBox.css";
 
 export default class TabInputBox extends React.PureComponent<{
-    type: "half" | "full" | "third",
-    label: string,
+    type: "half" | "full" | "third" | "twothird",
     onChange: (v: any) => any,
     input: typeof Input,
+    label?: string,
     inputProps?: IObject<any>,
 }> {
     public input = React.createRef<Input>();
@@ -22,7 +22,7 @@ export default class TabInputBox extends React.PureComponent<{
         } = this.props;
 
         return <div className={prefix("tab-input", type)}>
-            <h3>{label}</h3>
+            {label && <h3>{label}</h3>}
             <InputType ref={this.input} onChange={onChange} inputProps={inputProps}></InputType>
         </div>;
     }

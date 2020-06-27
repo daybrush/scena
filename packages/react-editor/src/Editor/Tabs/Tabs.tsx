@@ -4,9 +4,11 @@ import "./Tabs.css";
 import TransformTab from "./TransformTab";
 import Moveable from "react-moveable";
 import Tab from "./Tab";
+import FrameTab from "./FrameTab";
 
 const TABS: Array<typeof Tab> = [
     TransformTab,
+    FrameTab,
 ];
 export default class Tabs extends React.PureComponent<{
     moveable: React.RefObject<Moveable>,
