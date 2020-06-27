@@ -1,0 +1,50 @@
+.scena-anchor-input {
+    position: relative;
+    width: 30px;
+    height: 35px;
+    margin: auto;
+    box-sizing: border-box;
+}
+.scena-anchor-input-background {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    background: var(--back1);
+}
+.scena-anchor-control {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 50%;
+    padding: 1px;
+    box-sizing: border-box;
+}
+.scena-anchor-control:before {
+    content: "";
+    position: relative;
+    display: block;
+    background: var(--back5);
+    width: 100%;
+    height: 100%;
+}
+.scena-anchor-control.scena-anchor-selected {
+    padding: 0px;
+}
+.scena-anchor-control.scena-anchor-selected:before {
+    background: white;
+}
+
+.scena-anchor-control.scena-anchor-n {
+    top: 0;
+}
+.scena-anchor-control.scena-anchor-s {
+    top: 100%;
+}
+.scena-anchor-control.scena-anchor-w {
+    left: 0;
+}
+.scena-anchor-control.scena-anchor-e {
+    left: 100%;
+}
