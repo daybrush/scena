@@ -5,6 +5,8 @@ import { OnRender } from "react-moveable";
 import EventBus from "../EventBus";
 import NumberBox from "../Inputs/NumberBox";
 import TabInputBox from "../Inputs/TabInputBox";
+import Anchor from "../Inputs/Anchor";
+import MoveableData from "../MoveableData";
 
 const inputProps = {
     step: 1,
@@ -17,9 +19,17 @@ export default class TransformTab extends Tab {
     public yInput = React.createRef<TabInputBox>();
     public wInput = React.createRef<TabInputBox>();
     public hInput = React.createRef<TabInputBox>();
+    public oInput = React.createRef<TabInputBox>();
+    public rInput = React.createRef<TabInputBox>();
     public renderTab() {
 
         return <div className={prefix("transform-tab")}>
+            <div className={prefix("tab-line")}>
+                <TabInputBox ref={this.oInput}
+                    type={"half"} label="Anchor" input={Anchor} onChange={this.onChangeOrigin} />
+                <TabInputBox ref={this.rInput}
+                    type={"half"} label="Rotation" input={NumberBox} onChange={this.onChangeRotate} />
+            </div>
             <div className={prefix("tab-line")}>
                 <TabInputBox ref={this.xInput} type={"half"} label="X" input={NumberBox} onChange={this.onChangePos} />
                 <TabInputBox ref={this.yInput} type={"half"} label="Y" input={NumberBox} onChange={this.onChangePos} />
@@ -32,32 +42,55 @@ export default class TransformTab extends Tab {
             </div>
         </div>;
     }
+    public getMoveable() {
+        return this.props.moveable.current!;
+    }
     public componentDidMount() {
         EventBus.on("render", this.onRender as any);
     }
     public componentWillUnmount() {
         EventBus.off("render", this.onRender as any);
     }
+    public onChangeRotate = (v: any) => {
+        const rotate = parseFloat(v);
+        this.getMoveable().request("rotatable", { rotate, isInstant: true });
+    }
     public onChangePos = () => {
         const x = parseFloat(this.xInput.current!.getValue());
         const y = parseFloat(this.xInput.current!.getValue());
 
-        this.props.moveable.current!.request("draggable", { x, y, isInstant: true });
+        this.getMoveable().request("draggable", { x, y, isInstant: true });
+    }
+    public onChangeOrigin = (origin: number[]) => {
+        const moveable = this.getMoveable();
+        const rect = moveable.getRect();
+
+        const ow = rect.offsetWidth * origin[0] / 100;
+        const oh = rect.offsetHeight * origin[1] / 100;
+        this.getMoveable().request("originDraggable", { origin: [ow, oh] }, true);
     }
     public onChangeSize = () => {
         const width = parseFloat(this.wInput.current!.getValue());
         const height = parseFloat(this.hInput.current!.getValue());
 
-        this.props.moveable.current!.request("resizable", { offsetWidth: width, offsetHeight: height, isInstant: true });
+        this.getMoveable().request("resizable", { offsetWidth: width, offsetHeight: height, isInstant: true });
     }
     public onRender = (e: OnRender) => {
-        const moveable = this.props.moveable.current!;
+        const moveable = this.getMoveable();
 
         const rect = moveable.getRect();
 
         this.xInput.current!.setValue(rect.left);
         this.yInput.current!.setValue(rect.top);
-        this.wInput.current!.setValue(rect.width);
-        this.hInput.current!.setValue(rect.height);
+        this.wInput.current!.setValue(rect.offsetWidth);
+        this.hInput.current!.setValue(rect.offsetHeight);
+        this.rInput.current!.setValue(Math.round(rect.rotation));
+
+        const origin = rect.transformOrigin;
+
+        this.oInput.current!.setValue([
+            origin[0] / rect.offsetWidth * 100,
+            origin[1] / rect.offsetHeight * 100,
+        ]);
     }
 }
