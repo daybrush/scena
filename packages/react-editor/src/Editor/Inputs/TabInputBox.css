@@ -16,6 +16,11 @@
     display: inline-block;
     width: 50%;
 }
+.scena-tab-input.scena-third {
+    vertical-align: top;
+    display: inline-block;
+    width: 33%;
+}
 .scena-tab-input.scena-half:nth-child(2n + 1) {
     padding-right: 5px;
 }

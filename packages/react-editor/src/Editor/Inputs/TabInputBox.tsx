@@ -5,9 +5,9 @@ import { prefix } from "../../utils";
 import "./TabInputBox.css";
 
 export default class TabInputBox extends React.PureComponent<{
-    type: "half" | "full",
+    type: "half" | "full" | "third",
     label: string,
-    onChange: (v: number | string) => any,
+    onChange: (v: any) => any,
     input: typeof Input,
     inputProps?: IObject<any>,
 }> {
@@ -26,7 +26,7 @@ export default class TabInputBox extends React.PureComponent<{
             <InputType ref={this.input} onChange={onChange} inputProps={inputProps}></InputType>
         </div>;
     }
-    public setValue(v: string | number) {
+    public setValue(v: any) {
         this.input.current!.setValue(v);
     }
     public getValue() {
