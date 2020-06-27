@@ -1,10 +1,8 @@
 import * as React from "react";
 import { IObject } from "@daybrush/utils";
-import MoveableHelper from "moveable-helper";
+import MoveableData from "../MoveableData";
 
-export default class Viewport extends React.PureComponent<{
-    moveableHelper: MoveableHelper,
-}> {
+export default class Viewport extends React.PureComponent {
     public state: {
         ids: IObject<boolean>;
         elements: any[],
@@ -34,7 +32,6 @@ export default class Viewport extends React.PureComponent<{
     }
     public appendElement(Tag: any, props: IObject<any>, frame: IObject<any> = {}): Promise<HTMLElement | SVGElement> {
         const elements = this.state.elements;
-        const moveableHelper = this.props.moveableHelper;
         const id = this.makeId();
 
         elements.push(<Tag {...props} data-moveable data-moveable-id={id} key={id}></Tag>);
@@ -44,8 +41,8 @@ export default class Viewport extends React.PureComponent<{
                 elements: [...elements],
             }, () => {
                 const target = document.querySelector<HTMLElement>(`[data-moveable-id="${id}"]`)!;
-                moveableHelper.createFrame(target, frame);
-                moveableHelper.render(target);
+                MoveableData.createFrame(target, frame);
+                MoveableData.render(target);
 
                 resolve(target);
             });

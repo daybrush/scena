@@ -12,6 +12,7 @@ import { getContentElement } from "./utils";
 import Tabs from "./Editor/Tabs/Tabs";
 import EventBus from "./Editor/EventBus";
 import { IObject } from "@daybrush/utils";
+import MoveableData from "./Editor/MoveableData";
 
 class App extends React.Component {
     public state: {
@@ -34,9 +35,6 @@ class App extends React.Component {
     public menu = React.createRef<Menu>();
     public moveable = React.createRef<Moveable>();
     public viewport = React.createRef<Viewport>();
-    public moveableHelper = MoveableHelper.create({
-        createAuto: true,
-    });
     public render() {
         const {
             horizontalGuides,
@@ -47,13 +45,14 @@ class App extends React.Component {
             menu,
             selecto,
             state,
-            moveableHelper,
         } = this;
         const {
             selectedMenu,
             targets,
             zoom,
         } = state;
+
+        (window as any).a = this;
 
         return (
             <div className="editor">
@@ -124,7 +123,7 @@ class App extends React.Component {
                         });
                     }}
                 >
-                    <Viewport ref={viewport} moveableHelper={moveableHelper}>
+                    <Viewport ref={viewport}>
                         <p className="logo"><img src="https://daybrush.com/infinite-viewer/images/logo.png" data-moveable /></p>
                         <Moveable
                             ref={moveable}
@@ -141,28 +140,34 @@ class App extends React.Component {
                             verticalGuidelines={state.verticalGuides}
                             horizontalGuidelines={state.horizontalGuides}
 
-                            onDragStart={moveableHelper.onDragStart}
-                            onDrag={moveableHelper.onDrag}
-                            onDragGroupStart={moveableHelper.onDragGroupStart}
-                            onDragGroup={moveableHelper.onDragGroup}
+                            onDragStart={MoveableData.onDragStart}
+                            onDrag={MoveableData.onDrag}
+                            onDragGroupStart={MoveableData.onDragGroupStart}
+                            onDragGroup={MoveableData.onDragGroup}
 
-                            onScaleStart={moveableHelper.onScaleStart}
-                            onScale={moveableHelper.onScale}
-                            onScaleGroupStart={moveableHelper.onScaleGroupStart}
-                            onScaleGroup={moveableHelper.onScaleGroup}
+                            onScaleStart={MoveableData.onScaleStart}
+                            onScale={MoveableData.onScale}
+                            onScaleGroupStart={MoveableData.onScaleGroupStart}
+                            onScaleGroup={MoveableData.onScaleGroup}
 
-                            onResizeStart={moveableHelper.onResizeStart}
-                            onResize={moveableHelper.onResize}
-                            onResizeGroupStart={moveableHelper.onResizeGroupStart}
-                            onResizeGroup={moveableHelper.onResizeGroup}
+                            onResizeStart={MoveableData.onResizeStart}
+                            onResize={MoveableData.onResize}
+                            onResizeGroupStart={MoveableData.onResizeGroupStart}
+                            onResizeGroup={MoveableData.onResizeGroup}
 
-                            onRotateStart={moveableHelper.onRotateStart}
-                            onRotate={moveableHelper.onRotate}
-                            onRotateGroupStart={moveableHelper.onRotateGroupStart}
-                            onRotateGroup={moveableHelper.onRotateGroup}
+                            onRotateStart={MoveableData.onRotateStart}
+                            onRotate={MoveableData.onRotate}
+                            onRotateGroupStart={MoveableData.onRotateGroupStart}
+                            onRotateGroup={MoveableData.onRotateGroup}
 
                             defaultClipPath={"circle"}
-                            onClip={moveableHelper.onClip}
+                            onClip={MoveableData.onClip}
+
+                            onDragOriginStart={MoveableData.onDragOriginStart}
+                            onDragOrigin={e => {
+                                console.log(e);
+                                MoveableData.onDragOrigin(e);
+                            }}
 
                             onClick={e => {
                                 const target = e.inputTarget as any;
@@ -176,10 +181,16 @@ class App extends React.Component {
                                 }
                             }}
                             onRender={e => {
-                                EventBus.trigger("render", e);
+                                EventBus.requestTrigger("render", e);
+                            }}
+                            onRenderGroup={e => {
+                                EventBus.requestTrigger("renderGroup", e);
                             }}
                             onRenderEnd={e => {
-                                EventBus.trigger("render", e);
+                                EventBus.requestTrigger("render", e);
+                            }}
+                            onRenderGroupEnd={e => {
+                                EventBus.requestTrigger("renderGroup", e);
                             }}
                         ></Moveable>
                     </Viewport>

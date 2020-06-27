@@ -10,6 +10,7 @@ body {
     --back2: #2a2a2a;
     --back3: #333;
     --back4: #444;
+    --back5: #555;
 }
 .editor {
     transform-style: preserve-3d;
@@ -18,7 +19,7 @@ body {
     position: absolute !important;
     left: calc(30px + var(--menu));
     top: 30px;
-    width: calc(100% - 30px - var(--menu));
+    width: calc(100% - 30px - var(--menu) - var(--tabs));
     height: calc(100% - 30px);
 }
 
