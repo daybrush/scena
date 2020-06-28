@@ -21,3 +21,10 @@
     border-top: 3px solid transparent;
     border-bottom: 3px solid transparent;
 }
+
+.scena-property {
+    border-bottom: 1px solid var(--back1);
+}
+.scena-property.scena-selected {
+    background: var(--mainColor);
+}

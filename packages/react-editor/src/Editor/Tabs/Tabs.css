@@ -9,6 +9,7 @@ body {
     background: var(--back2);
     transform: translateZ(10px);
     z-index: 10;
+    overflow: auto;
 }
 .scena-tab {
     padding: 0px 10px 10px;

@@ -11,6 +11,7 @@ body {
     --back3: #333;
     --back4: #444;
     --back5: #555;
+    --back6: #666;
 }
 .editor {
     transform-style: preserve-3d;

@@ -3,7 +3,7 @@ import { IObject } from "@daybrush/utils";
 
 class Bus extends Component {
     private eventMap: IObject<number> = {};
-    requestTrigger(name: string, params: IObject<any>) {
+    requestTrigger(name: string, params: IObject<any> = {}) {
         const eventMap = this.eventMap;
         cancelAnimationFrame(eventMap[name] || 0);
 

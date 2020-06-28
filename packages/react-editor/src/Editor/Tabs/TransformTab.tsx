@@ -41,9 +41,6 @@ export default class TransformTab extends Tab {
             </div>
         </div>;
     }
-    public getMoveable() {
-        return this.props.moveable.current!;
-    }
     public componentDidMount() {
         EventBus.on("render", this.onRender as any);
         EventBus.on("renderGroup", this.onRender as any);
@@ -76,7 +73,7 @@ export default class TransformTab extends Tab {
 
         this.getMoveable().request("resizable", { offsetWidth: width, offsetHeight: height, isInstant: true });
     }
-    public onRender = (e: OnRender) => {
+    public onRender = () => {
         const moveable = this.getMoveable();
 
         const rect = moveable.getRect();

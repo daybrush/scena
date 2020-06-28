@@ -1,0 +1,81 @@
+.scena-align {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    /* background: #f55; */
+    display: inline-block;
+    margin-right: 5px;
+}
+.scena-align:hover {
+    cursor: pointer;
+}
+.scena-align:hover * {
+    background: white;
+}
+.scena-align-line,
+.scena-align-element1,
+.scena-align-element2 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: var(--back6);
+    transform: translate(-50%, -50%);
+}
+.scena-align-vertical .scena-align-line {
+    width: 1px;
+    height: 18px;
+}
+.scena-align-vertical .scena-align-element1 {
+    width: 10px;
+    height: 5px;
+    margin-top: -3.5px;
+}
+.scena-align-vertical .scena-align-element2 {
+    width: 14px;
+    height: 5px;
+    margin-top: 3.5px;
+}
+.scena-align-vertical.scena-align-start .scena-align-line {
+    margin-left: -7px;
+}
+.scena-align-vertical.scena-align-start .scena-align-element1 {
+    margin-left: -2px;
+}
+
+.scena-align-vertical.scena-align-end .scena-align-line {
+    margin-left: 7px;
+}
+.scena-align-vertical.scena-align-end .scena-align-element1 {
+    margin-left: 2px;
+}
+
+
+
+.scena-align-horizontal .scena-align-line {
+    height: 1px;
+    width: 18px;
+}
+.scena-align-horizontal .scena-align-element1 {
+    height: 10px;
+    width: 5px;
+    margin-left: -3.5px;
+}
+.scena-align-horizontal .scena-align-element2 {
+    height: 14px;
+    width: 5px;
+    margin-left: 3.5px;
+}
+.scena-align-horizontal.scena-align-start .scena-align-line {
+    margin-top: -7px;
+}
+.scena-align-horizontal.scena-align-start .scena-align-element1 {
+    margin-top: -2px;
+}
+
+.scena-align-horizontal.scena-align-end .scena-align-line {
+    margin-top: 7px;
+}
+.scena-align-horizontal.scena-align-end .scena-align-element1 {
+    margin-top: 2px;
+}
+

@@ -16,10 +16,7 @@ export default abstract class Tab extends React.PureComponent<{
             </div>
         );
     }
-    public updateTargets() {
-        return;
-    }
-    public updateRender() {
-        return;
+    public getMoveable() {
+        return this.props.moveable.current!;
     }
 }

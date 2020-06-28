@@ -5,8 +5,10 @@ import TransformTab from "./TransformTab";
 import Moveable from "react-moveable";
 import Tab from "./Tab";
 import FrameTab from "./FrameTab";
+import AlignTab from "./AlignTab/AlignTab";
 
 const TABS: Array<typeof Tab> = [
+    AlignTab,
     TransformTab,
     FrameTab,
 ];

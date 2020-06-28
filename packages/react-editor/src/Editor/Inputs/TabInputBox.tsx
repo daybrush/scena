@@ -10,6 +10,8 @@ export default class TabInputBox extends React.PureComponent<{
     input: typeof Input,
     label?: string,
     inputProps?: IObject<any>,
+    value?: any;
+    updateValue?: boolean;
 }> {
     public input = React.createRef<Input>();
     public render() {
@@ -19,11 +21,14 @@ export default class TabInputBox extends React.PureComponent<{
             inputProps = {},
             input: InputType,
             onChange,
+            value,
+            updateValue,
         } = this.props;
 
         return <div className={prefix("tab-input", type)}>
             {label && <h3>{label}</h3>}
-            <InputType ref={this.input} onChange={onChange} inputProps={inputProps}></InputType>
+            <InputType ref={this.input} onChange={onChange}
+                inputProps={inputProps} value={value} updateValue={updateValue}></InputType>
         </div>;
     }
     public setValue(v: any) {

@@ -12,7 +12,7 @@ export default class LabelBox extends React.PureComponent<{
         } = this.props;
 
         return <div className={prefix("tab-input", type)}>
-            <h4>{label}</h4>
+            <h3>{label}</h3>
         </div>;
     }
 }

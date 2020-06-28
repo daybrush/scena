@@ -3,7 +3,6 @@ import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto from "react-selecto";
 import Moveable from "react-moveable";
-import MoveableHelper from "moveable-helper";
 import keycon from "keycon";
 import "./App.css";
 import Menu from "./Editor/Menu/Menu";
@@ -298,7 +297,7 @@ class App extends React.Component {
         return this.promiseState({
             targets,
         }).then(() => {
-            EventBus.trigger("setTargets", { targets });
+            EventBus.requestTrigger("setTargets", { targets });
         });
     }
     public componentDidMount() {
