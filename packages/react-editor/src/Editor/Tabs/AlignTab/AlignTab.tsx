@@ -12,7 +12,7 @@ const DIRECTIONS = ["start", "center", "end"] as const;
 
 
 function getDirectionPos(
-    type: "horizontal" | "vertical", direction: "start" | "center" | "end", rect: RectInfo): number {
+    type: "horizontal" | "vertical", direction: "start" | "center" | "end", rect: { left: number, top: number, width: number, height: number }): number {
     let size: number;
     let start: number;
     if (type === "horizontal") {
@@ -50,12 +50,12 @@ export default class AlignTab extends Tab {
             return;
         }
         const moveables = (moveable.moveable as MoveableGroup).moveables;
+        const rect = moveable.getRect();
+        const pos = getDirectionPos(type, direction, rect);
 
         if (moveables) {
             // Group
-            const rect = moveable.getRect();
 
-            const pos = getDirectionPos(type, direction, rect);
             const targets = moveables.map(m => {
                 const target = m.state.target!;
                 const frame = MoveableData.getFrame(target);
@@ -79,10 +79,21 @@ export default class AlignTab extends Tab {
                 if (!target) {
                     return;
                 }
-                console.log(target);
                 MoveableData.render(target);
-            })
+            });
             moveable.updateRect();
+        } else {
+            const viewportRect = {
+                width: 400,
+                height: 600,
+                left: 0,
+                top: 0,
+            }
+            const viewportPos = getDirectionPos(type, direction, viewportRect);
+            const delta = pos - viewportPos;
+
+            console.log(delta);
+            moveable.request("draggable", { [type === "horizontal" ? "deltaY" : "deltaX"]: -delta }, true);
         }
 
     }

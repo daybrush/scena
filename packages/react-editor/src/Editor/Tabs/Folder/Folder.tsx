@@ -1,9 +1,6 @@
 import * as React from "react";
 import { prefix } from "../../../utils";
-import LabelBox from "../../Inputs/LabelBox";
 import { IObject, isObject } from "@daybrush/utils";
-import TabInputBox from "../../Inputs/TabInputBox";
-import TextBox from "../../Inputs/TextBox";
 import "./Folder.css";
 import File from "./File";
 
@@ -11,24 +8,36 @@ export default class Folder extends React.PureComponent<{
     scope: string[],
     name: string,
     properties: IObject<any>,
-    selected: string | null,
-    onSelect: (e: string) => any,
+    selected: string[] | null,
+    onSelect: (e: string[]) => any,
     FileComponent: ((props: File["props"]) => any) | typeof File,
+    getId?: (value: any, id: any) => any,
+    getName?: (value: any, id: any) => any,
+    getChildren?: (value: any, id: any) => any,
 }> {
+    public static defaultProps = {
+        getId: (_: any, id: any) => id,
+        getName: (_: any, id: any) => id,
+        getChildren: (value: any) => value,
+    }
     public state = {
         fold: false,
     };
+    isSelected(key: string) {
+        const selected = this.props.selected;
+
+        return selected && selected.indexOf(key) > -1;
+    }
     render() {
         const {
             scope,
             name,
-            selected,
         } = this.props;
 
         const fullName = scope.join("///");
-        return <div className={prefix("properties")}>
-            {name && <div className={prefix("tab-input", "full", "property", fullName === selected ? "selected" : "")}
-                data-property-name={fullName} onClick={this.onClick}>
+        return <div className={prefix("folder")}>
+            {name && <div className={prefix("tab-input", "full", "file",  this.isSelected(fullName) ? "selected" : "")}
+                data-file-key={fullName} onClick={this.onClick}>
                 <div className={prefix("fold-icon", this.state.fold ? "fold" : "")} onClick={this.onClickFold}></div>
                 <h3 >{name}</h3>
             </div>}
@@ -40,9 +49,9 @@ export default class Folder extends React.PureComponent<{
         </div>
     }
     public onClick = ({ currentTarget }: any) => {
-        const name = currentTarget.getAttribute("data-property-name");
+        const key = currentTarget.getAttribute("data-file-key")!;
 
-        this.props.onSelect(name);
+        this.props.onSelect([key]);
     }
     public renderProperties() {
         const {
@@ -51,26 +60,33 @@ export default class Folder extends React.PureComponent<{
             selected,
             onSelect,
             FileComponent,
+            getId,
+            getName,
+            getChildren,
         } = this.props;
 
         if (this.state.fold) {
             return;
         }
-
         const keys = Object.keys(properties);
 
-        return keys.map(name => {
+        return keys.map(key => {
+            const value = properties[key];
+            const name = getName!(value, key);
             const nextScope = scope.slice();
 
-            nextScope.push(name);
+            nextScope.push(getId!(value, key));
             const fullName = nextScope.join("///");
-            const value = properties[name];
+            const children = getChildren!(value, key);
 
-            if (isObject(value)) {
-                return <Folder key={fullName} name={name} scope={nextScope} properties={value} selected={selected} onSelect={onSelect} FileComponent={FileComponent} />;
+            if (children && isObject(children)) {
+                return <Folder key={fullName}
+                    name={name} scope={nextScope} properties={value}
+                    getId={getId} getName={getName}
+                    selected={selected} onSelect={onSelect} FileComponent={FileComponent} />;
             }
-            return <div key={fullName} className={prefix("property", fullName === selected ? "selected" : "")}
-                data-property-name={fullName} onClick={this.onClick}>
+            return <div key={fullName} className={prefix("file", this.isSelected(fullName) ? "selected" : "")}
+                data-file-key={fullName} onClick={this.onClick}>
                 <FileComponent scope={nextScope} name={name} value={value} fullName={fullName} />
             </div>;
         });

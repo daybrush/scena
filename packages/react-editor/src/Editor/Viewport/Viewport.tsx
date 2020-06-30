@@ -1,19 +1,26 @@
 import * as React from "react";
 import { IObject } from "@daybrush/utils";
 import MoveableData from "../MoveableData";
+import EventBus from "../EventBus";
 
+export interface ElementInfo {
+    jsx: any;
+    el: HTMLElement | null;
+    id: string;
+    name: string;
+}
 export default class Viewport extends React.PureComponent {
     public state: {
-        ids: IObject<boolean>;
-        elements: any[],
+        ids: IObject<ElementInfo | null>;
+        infos: ElementInfo[],
     } = {
             ids: {},
-            elements: [],
+            infos: [],
         };
     public render() {
         return <div className="viewport">
             {this.props.children}
-            {this.state.elements}
+            {this.state.infos.map(info => info.jsx)}
         </div>;
     }
     public makeId() {
@@ -25,28 +32,48 @@ export default class Viewport extends React.PureComponent {
             if (ids[id]) {
                 continue;
             }
-            ids[id] = true;
-
             return id;
         }
     }
-    public appendElement(Tag: any, props: IObject<any>, frame: IObject<any> = {}): Promise<HTMLElement | SVGElement> {
-        const elements = this.state.elements;
+    public setInfo(id: string, info: ElementInfo) {
+        this.state.ids[id] = info;
+    }
+    public getInfo(id: string) {
+        return this.state.ids[id];
+    }
+    public appendJSX(jsx: any, name: string, frame: IObject<any> = {}): Promise<HTMLElement | SVGElement> {
+        const infos = this.state.infos;
         const id = this.makeId();
-
-        elements.push(<Tag {...props} data-moveable data-moveable-id={id} key={id}></Tag>);
+        const info: ElementInfo = {
+            jsx: React.cloneElement(jsx, {
+                "data-moveable": true,
+                "data-moveable-id": id,
+                "key": id,
+            }),
+            el: null,
+            id,
+            name,
+        };
+        this.setInfo(id, info);
+        const nextInfos = [...infos, info];
 
         return new Promise(resolve => {
             this.setState({
-                elements: [...elements],
+                infos: nextInfos,
             }, () => {
                 const target = document.querySelector<HTMLElement>(`[data-moveable-id="${id}"]`)!;
                 MoveableData.createFrame(target, frame);
                 MoveableData.render(target);
+                info.el = target;
 
+                EventBus.requestTrigger("changeLayers", {
+                    infos: nextInfos,
+                });
                 resolve(target);
             });
         });
     }
-
+    public appendElement(Tag: any, props: IObject<any>, name: string, frame: IObject<any> = {}): Promise<HTMLElement | SVGElement> {
+        return this.appendJSX(<Tag {...props}></Tag>, name, frame);
+    }
 }

@@ -4,11 +4,13 @@ import "./Tabs.css";
 import TransformTab from "./TransformTab";
 import Moveable from "react-moveable";
 import Tab from "./Tab";
-import FrameTab from "./FrameTab";
+import FrameTab from "./FrameTab/FrameTab";
 import AlignTab from "./AlignTab/AlignTab";
+import LayerTab from "./LayerTab/LayerTab";
 
 const TABS: Array<typeof Tab> = [
     AlignTab,
+    LayerTab,
     TransformTab,
     FrameTab,
 ];

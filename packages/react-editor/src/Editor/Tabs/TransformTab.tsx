@@ -1,7 +1,6 @@
 import * as React from "react";
 import Tab from "./Tab";
 import { prefix } from "../../utils";
-import { OnRender } from "react-moveable";
 import EventBus from "../EventBus";
 import NumberBox from "../Inputs/NumberBox";
 import TabInputBox from "../Inputs/TabInputBox";

@@ -1,11 +1,9 @@
 import * as React from "react";
-import { prefix } from "../../../utils";
 import LabelBox from "../../Inputs/LabelBox";
-import { IObject, isObject } from "@daybrush/utils";
 import TabInputBox from "../../Inputs/TabInputBox";
 import TextBox from "../../Inputs/TextBox";
-import "./Folder.css";
-import File from "./File";
+import "../Folder/Folder.css";
+import File from "../Folder/File";
 
 export default class Property extends File<{
     onChange: (scope: string[], value: any) => any
