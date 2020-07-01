@@ -21,7 +21,9 @@ export default class LayerTab extends Tab {
         const { infos, selected } = this.state;
 
         return <Folder
-            scope={[]} name="" properties={infos}
+            scope={[]}
+            name="" properties={infos}
+            multiselect={true}
             getId={(v: ElementInfo) => v.id}
             getName={(v: ElementInfo) => v.name}
             getChildren={() => false}

@@ -3,12 +3,14 @@ import { prefix } from "../../../utils";
 import { IObject, isObject } from "@daybrush/utils";
 import "./Folder.css";
 import File from "./File";
+import KeyController from "keycon";
 
 export default class Folder extends React.PureComponent<{
     scope: string[],
     name: string,
     properties: IObject<any>,
     selected: string[] | null,
+    multiselect?: boolean,
     onSelect: (e: string[]) => any,
     FileComponent: ((props: File["props"]) => any) | typeof File,
     getId?: (value: any, id: any) => any,
@@ -50,14 +52,35 @@ export default class Folder extends React.PureComponent<{
     }
     public onClick = ({ currentTarget }: any) => {
         const key = currentTarget.getAttribute("data-file-key")!;
+        const {
+            multiselect,
+            onSelect,
+            selected,
+        } = this.props;
+        if (multiselect) {
+            let nextSelected = (selected || []).slice();
+            const index = nextSelected.indexOf(key);
 
-        this.props.onSelect([key]);
+            if (KeyController.global.shiftKey) {
+                if (index > -1) {
+                    nextSelected.splice(index, 1);
+                } else {
+                    nextSelected.push(key);
+                }
+            } else {
+                nextSelected = [key];
+            }
+            onSelect(nextSelected);
+        } else {
+            onSelect([key]);
+        }
     }
     public renderProperties() {
         const {
             scope,
             properties,
             selected,
+            multiselect,
             onSelect,
             FileComponent,
             getId,
@@ -82,6 +105,7 @@ export default class Folder extends React.PureComponent<{
             if (children && isObject(children)) {
                 return <Folder key={fullName}
                     name={name} scope={nextScope} properties={value}
+                    multiselect={multiselect}
                     getId={getId} getName={getName}
                     selected={selected} onSelect={onSelect} FileComponent={FileComponent} />;
             }

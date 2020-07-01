@@ -21,7 +21,12 @@
     border-top: 3px solid transparent;
     border-bottom: 3px solid transparent;
 }
-
+.scena-folder {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 .scena-file {
     border-bottom: 1px solid var(--back1);
 }
