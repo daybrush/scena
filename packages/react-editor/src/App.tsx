@@ -1,7 +1,7 @@
 import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
-import Selecto from "react-selecto";
+import Selecto, { Rect } from "react-selecto";
 import Moveable from "react-moveable";
 import keycon from "keycon";
 import "./App.css";
@@ -123,7 +123,6 @@ class App extends React.Component {
                     }}
                 >
                     <Viewport ref={viewport}>
-                        <p className="logo"><img src="https://daybrush.com/infinite-viewer/images/logo.png" data-moveable /></p>
                         <Moveable
                             ref={moveable}
                             targets={targets}
@@ -136,6 +135,7 @@ class App extends React.Component {
                             rotatable={true}
                             snappable={true}
                             snapCenter={true}
+                            roundable={true}
                             verticalGuidelines={state.verticalGuides}
                             horizontalGuidelines={state.horizontalGuides}
 
@@ -164,9 +164,10 @@ class App extends React.Component {
 
                             onDragOriginStart={MoveableData.onDragOriginStart}
                             onDragOrigin={e => {
-                                console.log(e);
                                 MoveableData.onDragOrigin(e);
                             }}
+
+                            onRound={MoveableData.onRound}
 
                             onClick={e => {
                                 const target = e.inputTarget as any;
@@ -240,9 +241,6 @@ class App extends React.Component {
                             e.stop();
                         }
                     }}
-                    onSelect={e => {
-                        console.log(e.rect);
-                    }}
                     onScroll={({ direction }) => {
                         infiniteViewer.current!.scrollBy(direction[0] * 10, direction[1] * 10);
                     }}
@@ -250,30 +248,8 @@ class App extends React.Component {
                         if (isDragStart) {
                             inputEvent.preventDefault();
                         }
-                        if (selectedMenu === "Text") {
-                            const container = document.querySelector(".viewport")!.getBoundingClientRect();
-
-                            const top = rect.top - container.top;
-                            const left = rect.left - container.left;
-                            const width = rect.width;
-                            const height = rect.height;
-
-                            if (width && height) {
-                                const style = {
-                                    top: `${top}px`,
-                                    left: `${left}px`,
-                                    position: "absolute",
-                                    width: `${width}px`,
-                                    height: `${height}px`,
-                                } as any;
-                                viewport.current!.appendElement("div", {
-                                    contentEditable: true,
-                                }, style).then(target => {
-                                    this.setTargets([target]);
-                                    target.focus();
-                                });
-                                return;
-                            }
+                        if (this.selectEndMaker(rect)) {
+                            return;
                         }
                         this.setTargets(selected).then(() => {
                             if (!isDragStart) {
@@ -325,11 +301,71 @@ class App extends React.Component {
         }, {
             passive: false,
         });
+        const viewport = this.viewport.current!
+
+        viewport.appendJSX(
+            <img src="https://daybrush.com/infinite-viewer/images/logo.png" data-moveable />, "Logo", {
+                position: "absolute",
+                top: `50px`,
+                left: `50px`,
+                width: "200px",
+                height: "200px",
+            } as any).then(target => {
+                this.setTargets([target]);
+                target.focus();
+            });
+
+        EventBus.on("selectLayers", (e: any) => {
+            const selected = e.selected as string[];
+
+            this.setTargets(selected.map(key => viewport.getInfo(key)!.el!));
+        });
     }
     private onMenuChange = (id: string) => {
         this.setState({
             selectedMenu: id,
         });
+    }
+    public dragStartMaker(rect: Rect) {
+
+    }
+    public dragMaker(rect: Rect) {
+
+    }
+    public dragEndMaker(rect: Rect) {
+
+    }
+    public selectEndMaker(rect: Rect) {
+        const infiniteViewer = this.infiniteViewer.current!;
+        const viewport = this.viewport.current!;
+        const selectIcon = this.menu.current!.getSelected();
+        const width = rect.width;
+        const height = rect.height;
+
+        if (!selectIcon || !selectIcon.maker || !width || !height) {
+            return false;
+        }
+        const maker = selectIcon.maker;
+        const scrollTop = -infiniteViewer.getScrollTop() + 30;
+        const scrollLeft = -infiniteViewer.getScrollLeft() + 75;
+        const top = rect.top - scrollTop;
+        const left = rect.left - scrollLeft;
+
+
+        const style = {
+            top: `${top}px`,
+            left: `${left}px`,
+            position: "absolute",
+            width: `${width}px`,
+            height: `${height}px`,
+            ...maker.style,
+        } as any;
+        viewport.appendElement(
+            maker.tag, maker.props, `(${selectIcon.id})`, style).then(target => {
+            this.setTargets([target]);
+            target.focus();
+        });
+        return true;
     }
 }
 

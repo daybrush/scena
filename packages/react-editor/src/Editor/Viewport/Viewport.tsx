@@ -36,7 +36,9 @@ export default class Viewport extends React.PureComponent {
         }
     }
     public setInfo(id: string, info: ElementInfo) {
-        this.state.ids[id] = info;
+        const ids = this.state.ids;
+
+        ids[id] = info;
     }
     public getInfo(id: string) {
         return this.state.ids[id];

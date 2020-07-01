@@ -5,7 +5,6 @@ import "./AlignTab.css";
 import Align from "./Align";
 import MoveableGroup from "react-moveable/declaration/MoveableGroup";
 import MoveableData from "../../MoveableData";
-import { RectInfo } from "react-moveable";
 
 const TYPES = ["vertical", "horizontal"] as const;
 const DIRECTIONS = ["start", "center", "end"] as const;

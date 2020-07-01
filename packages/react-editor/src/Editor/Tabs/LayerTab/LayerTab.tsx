@@ -1,13 +1,9 @@
 import * as React from "react";
 import Tab from "../Tab";
-import { prefix } from "../../../utils";
 import EventBus from "../../EventBus";
-import MoveableData from "../../MoveableData";
 
 import Folder from "../Folder/Folder";
-import Property from "../FrameTab/Property";
 import File from "../Folder/File";
-import { Frame } from "scenejs";
 import { ElementInfo } from "../../Viewport/Viewport";
 import Layer from "./Layer";
 

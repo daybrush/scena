@@ -7,8 +7,9 @@ import CropIcon from "./CropIcon";
 import RectIcon from "./RectIcon";
 import OvalIcon from "./OvalIcon";
 import RoundRectIcon from "./RoundRectIcon";
+import Icon from "./Icon";
 
-const MENUS = [
+const MENUS: Array<typeof Icon> = [
     MoveToolIcon,
     TextIcon,
     CropIcon,
@@ -20,7 +21,7 @@ export default class Menu extends React.PureComponent<{
     onSelect: (id: string) => any
 }> {
     public state = {
-        selectedID: "MoveTool",
+        selected: "MoveTool",
     };
     public render() {
         return (
@@ -30,17 +31,21 @@ export default class Menu extends React.PureComponent<{
         );
     }
     public renderMenus() {
-        const selectedID = this.state.selectedID;
+        const selected = this.state.selected;
 
         return MENUS.map(MenuClass => {
-            const menuID = MenuClass.id;
-            return <MenuClass selected={selectedID === menuID} onSelect={this.select} />;
+            const id = MenuClass.id;
+            return <MenuClass selected={selected === id} onSelect={this.select} />;
         });
     }
     public select = (id: string) => {
         this.setState({
-            selectedID: id,
+            selected: id,
         });
         this.props.onSelect(id);
+    }
+    public getSelected(): typeof Icon | undefined {
+        const selected = this.state.selected;
+        return MENUS.filter(m => m.id === selected)[0];
     }
 }

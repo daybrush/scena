@@ -3,6 +3,14 @@ import Icon from "./Icon";
 
 export default class RoundRectIcon extends Icon {
     public static id = "RoundRect";
+    public static maker = {
+        tag: "div",
+        props: {},
+        style: {
+            background: "#4af",
+            "border-radius": "10px",
+        },
+    };
     public renderIcon() {
         return (
             <svg viewBox="0 0 73 73">

@@ -3,6 +3,13 @@ import Icon from "./Icon";
 
 export default class RectIcon extends Icon {
     public static id = "Rect";
+    public static maker = {
+        tag: "div",
+        props: {},
+        style: {
+            background: "#4af",
+        },
+    };
     public renderIcon() {
         return (
             <svg viewBox="0 0 73 73">

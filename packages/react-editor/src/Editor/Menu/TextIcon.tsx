@@ -3,6 +3,15 @@ import Icon from "./Icon";
 
 export default class TextIcon extends Icon {
     public static id = "Text";
+    public static maker = {
+        tag: "div",
+        props: {
+            contentEditable: true,
+        },
+        style: {
+
+        },
+    };
     public renderIcon() {
         return (
             <svg viewBox="0 0 80 80">

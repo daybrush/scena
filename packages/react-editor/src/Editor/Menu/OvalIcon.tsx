@@ -3,6 +3,14 @@ import Icon from "./Icon";
 
 export default class OvalIcon extends Icon {
     public static id = "Oval";
+    public static maker = {
+        tag: "div",
+        props: {},
+        style: {
+            background: "#4af",
+            "border-radius": "50%",
+        },
+    };
     public renderIcon() {
         return (
             <svg viewBox="0 0 73 73">

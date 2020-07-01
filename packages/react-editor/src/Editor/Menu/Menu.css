@@ -27,7 +27,7 @@ body {
     background: #4af;
     border-color: #1a1a1a;
 }
-.scena-icon.scena-selected path {
+.scena-icon.scena-selected path, .scena-icon.scena-selected ellipse {
     fill: #fff;
     stroke: #fff;
 }
