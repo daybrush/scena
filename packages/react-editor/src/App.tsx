@@ -12,6 +12,13 @@ import Tabs from "./Editor/Tabs/Tabs";
 import EventBus from "./Editor/EventBus";
 import { IObject } from "@daybrush/utils";
 import MoveableData from "./Editor/MoveableData";
+import Memory from "./Editor/Memory";
+
+
+EventBus.on("setTargets", ({ targets }) => {
+   Memory.set("targets", targets);
+});
+
 
 class App extends React.Component {
     public state: {
@@ -93,6 +100,8 @@ class App extends React.Component {
                     zoom={zoom}
                     onDragStart={e => {
                         const target = e.inputEvent.target;
+                        this.checkBlur();
+
                         if (
                             target.nodeName === "A"
                             || moveable.current!.isMoveableElement(target)
@@ -138,7 +147,7 @@ class App extends React.Component {
                             roundable={true}
                             verticalGuidelines={state.verticalGuides}
                             horizontalGuidelines={state.horizontalGuides}
-
+                            clipArea={true}
                             onDragStart={MoveableData.onDragStart}
                             onDrag={MoveableData.onDrag}
                             onDragGroupStart={MoveableData.onDragGroupStart}
@@ -159,7 +168,7 @@ class App extends React.Component {
                             onRotateGroupStart={MoveableData.onRotateGroupStart}
                             onRotateGroup={MoveableData.onRotateGroup}
 
-                            defaultClipPath={"circle"}
+                            defaultClipPath={Memory.get("crop") || "inset"}
                             onClip={MoveableData.onClip}
 
                             onDragOriginStart={MoveableData.onDragOriginStart}
@@ -222,10 +231,8 @@ class App extends React.Component {
                         const inputEvent = e.inputEvent;
                         const target = inputEvent.target;
 
-                        if (
-                            selectedMenu === "Text"
-                            && target.isContentEditable
-                        ) {
+                        this.checkBlur();
+                        if (selectedMenu === "Text" && target.isContentEditable) {
                             const contentElement = getContentElement(target);
 
                             if (contentElement && contentElement.hasAttribute("data-moveable")) {
@@ -320,6 +327,9 @@ class App extends React.Component {
 
             this.setTargets(selected.map(key => viewport.getInfo(key)!.el!));
         });
+        EventBus.on("update", () => {
+            this.forceUpdate();
+        });
     }
     private onMenuChange = (id: string) => {
         this.setState({
@@ -345,7 +355,7 @@ class App extends React.Component {
         if (!selectIcon || !selectIcon.maker || !width || !height) {
             return false;
         }
-        const maker = selectIcon.maker;
+        const maker = selectIcon.maker();
         const scrollTop = -infiniteViewer.getScrollTop() + 30;
         const scrollLeft = -infiniteViewer.getScrollLeft() + 75;
         const top = rect.top - scrollTop;
@@ -366,6 +376,13 @@ class App extends React.Component {
             target.focus();
         });
         return true;
+    }
+    private checkBlur() {
+        const activeElement = document.activeElement;
+        if (activeElement && activeElement.tagName === "INPUT") {
+            (activeElement as any).blur();
+        }
+        EventBus.trigger("blur");
     }
 }
 

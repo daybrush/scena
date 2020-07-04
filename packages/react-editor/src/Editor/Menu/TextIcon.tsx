@@ -1,17 +1,18 @@
 import * as React from "react";
 import Icon from "./Icon";
+import Memory from "../Memory";
 
 export default class TextIcon extends Icon {
     public static id = "Text";
-    public static maker = {
+    public static maker = () => ({
         tag: "div",
         props: {
             contentEditable: true,
         },
         style: {
-
+            color: Memory.get("color"),
         },
-    };
+    });
     public renderIcon() {
         return (
             <svg viewBox="0 0 80 80">

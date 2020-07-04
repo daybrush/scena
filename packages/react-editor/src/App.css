@@ -40,7 +40,7 @@ body {
 
 .guides.horizontal {
     left: calc(var(--menu) + 30px);
-    width: calc(100% - 30px - var(--menu));
+    width: calc(100% - 30px - var(--menu) - var(--tabs));
     height: 30px !important;
 }
 

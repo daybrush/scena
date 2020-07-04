@@ -43,10 +43,12 @@ export default class TransformTab extends Tab {
     public componentDidMount() {
         EventBus.on("render", this.onRender as any);
         EventBus.on("renderGroup", this.onRender as any);
+        EventBus.on("setTargets", this.onRender as any);
     }
     public componentWillUnmount() {
         EventBus.off("render", this.onRender as any);
         EventBus.off("renderGroup", this.onRender as any);
+        EventBus.off("setTargets", this.onRender as any);
     }
     public onChangeRotate = (v: any) => {
         const rotate = parseFloat(v);

@@ -2,7 +2,7 @@ import * as React from "react";
 import Tab from "../Tab";
 import { prefix } from "../../../utils";
 import EventBus from "../../EventBus";
-import MoveableData from "../../MoveableData";
+import MoveableData, { getSelectedFrames, renderFrames } from "../../MoveableData";
 
 import Folder from "../Folder/Folder";
 import Property from "./Property";
@@ -52,18 +52,17 @@ export default class FrameTab extends Tab {
         })
     }
     private onChange = (scope: string[], value: any) => {
-        const { target, frame } = this.state;
+        const frames = getSelectedFrames();
 
-        if (!frame || !target) {
+        if (!frames.length) {
             return;
         }
-        frame.set(...scope, value);
-
-        MoveableData.render(target, frame);
+        getSelectedFrames().forEach(frame => {
+            frame.set(...scope, value);
+        });
+        renderFrames();
         this.props.moveable.current!.updateRect();
-
         EventBus.requestTrigger("render");
-
     }
     private onRender = () => {
         this.forceUpdate();
@@ -71,8 +70,8 @@ export default class FrameTab extends Tab {
     private setTargets = ({ targets }: any) => {
         const length = targets.length;
         const target = length === 1 ? targets[0] : null;
+
         this.setState({
-            target,
             frame: MoveableData.getFrame(target as any),
             selected: null,
         });

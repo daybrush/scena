@@ -1,16 +1,17 @@
 import * as React from "react";
 import Icon from "./Icon";
+import Memory from "../Memory";
 
 export default class RoundRectIcon extends Icon {
     public static id = "RoundRect";
-    public static maker = {
+    public static maker = () => ({
         tag: "div",
         props: {},
         style: {
-            background: "#4af",
+            "background-color": Memory.get("background-color"),
             "border-radius": "10px",
         },
-    };
+    });
     public renderIcon() {
         return (
             <svg viewBox="0 0 73 73">

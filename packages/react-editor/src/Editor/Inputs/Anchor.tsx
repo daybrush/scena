@@ -53,6 +53,6 @@ export default class Anchor extends Input {
         });
     }
     public getValue() {
-        return "1";
+        return this.state.origin;
     }
 }

@@ -2,8 +2,8 @@ import * as React from "react";
 import Icon from "./Icon";
 import Memory from "../Memory";
 
-export default class OvalIcon extends Icon {
-    public static id = "Oval";
+export default class CircleIcon extends Icon {
+    public static id = "Circle";
     public static maker = () => ({
         tag: "div",
         props: {},
@@ -15,7 +15,7 @@ export default class OvalIcon extends Icon {
     public renderIcon() {
         return (
             <svg viewBox="0 0 73 73">
-                <ellipse fill="#555" cx="36.5" cy="36.5" rx="20" ry="15"
+                <ellipse fill="#555" cx="36.5" cy="36.5" rx="15" ry="15"
                     stroke-linejoin="round" stroke-width="3" stroke="#fff"></ellipse></svg>
         );
     }
