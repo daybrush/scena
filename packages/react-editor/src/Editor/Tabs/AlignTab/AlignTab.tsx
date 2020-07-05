@@ -1,10 +1,10 @@
 import * as React from "react";
 import Tab from "../Tab";
-import { prefix } from "../../../utils";
+import { prefix } from "../../utils/utils";
 import "./AlignTab.css";
 import Align from "./Align";
 import MoveableGroup from "react-moveable/declaration/MoveableGroup";
-import MoveableData from "../../MoveableData";
+import MoveableData from "../../utils/MoveableData";
 
 const TYPES = ["vertical", "horizontal"] as const;
 const DIRECTIONS = ["start", "center", "end"] as const;

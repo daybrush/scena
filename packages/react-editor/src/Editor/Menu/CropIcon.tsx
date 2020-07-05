@@ -1,17 +1,17 @@
 import * as React from "react";
 import Icon from "./Icon";
-import MoveableData, { getSelectedFrames, renderFrames, getTargets } from "../MoveableData";
-import Memory from "../Memory";
-import { splitBracket, camelize } from "@daybrush/utils";
+import { getSelectedFrames, renderFrames, getTargets } from "../utils/MoveableData";
+import Memory from "../utils/Memory";
+import { splitBracket } from "@daybrush/utils";
 import OvalIcon from "./OvalIcon";
-import { prefix } from "../../utils";
 import RectIcon from "./RectIcon";
-import EventBus from "../EventBus";
+import EventBus from "../utils/EventBus";
 import CircleIcon from "./CircleIcon";
 import PolygonIcon from "./PolygonIcon";
 
 export default class CropIcon extends Icon {
     public static id = "Crop";
+    public keys = ["c"];
     public renderIcon() {
         return (
             <svg viewBox="0 0 80 80">
@@ -39,11 +39,6 @@ export default class CropIcon extends Icon {
             this.renderSubIcon(CircleIcon, "circle", cropType === "circle"),
             this.renderSubIcon(OvalIcon, "ellipse", cropType === "ellipse"),
             this.renderSubIcon(PolygonIcon, "polygon", cropType === "polygon"),
-            // "Inset",
-            // "Rect",
-            // "Polygon",
-            // "Circle",
-            // "Ellipse",
         ];
     }
     public onSubSelect(id: string) {

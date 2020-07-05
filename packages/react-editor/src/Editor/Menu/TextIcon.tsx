@@ -1,9 +1,10 @@
 import * as React from "react";
 import Icon from "./Icon";
-import Memory from "../Memory";
+import Memory from "../utils/Memory";
 
 export default class TextIcon extends Icon {
     public static id = "Text";
+    public keys = ["t"];
     public static maker = () => ({
         tag: "div",
         props: {
@@ -13,6 +14,9 @@ export default class TextIcon extends Icon {
             color: Memory.get("color"),
         },
     });
+    public static makeThen = (target: HTMLElement | SVGElement) => {
+        target.focus();
+    };
     public renderIcon() {
         return (
             <svg viewBox="0 0 80 80">

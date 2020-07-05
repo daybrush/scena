@@ -1,6 +1,6 @@
 import * as React from "react";
 import Icon from "./Icon";
-import Memory from "../Memory";
+import Memory from "../utils/Memory";
 
 export default class CircleIcon extends Icon {
     public static id = "Circle";

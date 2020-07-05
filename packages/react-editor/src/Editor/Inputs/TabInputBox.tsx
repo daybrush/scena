@@ -1,7 +1,7 @@
 import * as React from "react";
 import { IObject } from "@daybrush/utils";
 import Input from "./Input";
-import { prefix } from "../../utils";
+import { prefix } from "../utils/utils";
 import "./TabInputBox.css";
 
 export default class TabInputBox extends React.PureComponent<{

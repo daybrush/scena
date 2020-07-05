@@ -1,7 +1,8 @@
 import * as React from "react";
 import { IObject } from "@daybrush/utils";
-import MoveableData from "../MoveableData";
-import EventBus from "../EventBus";
+import MoveableData from "../utils/MoveableData";
+import EventBus from "../utils/EventBus";
+import Memory from "../utils/Memory";
 
 export interface ElementInfo {
     jsx: any;
@@ -68,6 +69,7 @@ export default class Viewport extends React.PureComponent {
                 MoveableData.render(target);
                 info.el = target;
 
+                Memory.set("viewportInfos", nextInfos);
                 EventBus.requestTrigger("changeLayers", {
                     infos: nextInfos,
                 });

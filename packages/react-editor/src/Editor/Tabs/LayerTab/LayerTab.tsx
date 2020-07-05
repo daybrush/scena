@@ -1,24 +1,21 @@
 import * as React from "react";
 import Tab from "../Tab";
-import EventBus from "../../EventBus";
+import EventBus from "../../utils/EventBus";
 
 import Folder from "../Folder/Folder";
 import File from "../Folder/File";
 import { ElementInfo } from "../../Viewport/Viewport";
 import Layer from "./Layer";
+import Memory from "../../utils/Memory";
+import { getTargets } from "../../utils/MoveableData";
 
 export default class LayerTab extends Tab {
     public static id = "Layers";
     public title = "Layers";
-    public state: {
-        infos: ElementInfo[],
-        selected: string[] | null,
-    } = {
-        infos: [],
-        selected: null,
-    };
+
     public renderTab() {
-        const { infos, selected } = this.state;
+        const infos = Memory.get("viewportInfos") || [];
+        const selected = getTargets().map(target => target.getAttribute("data-moveable-id")!)
 
         return <Folder
             scope={[]}
@@ -31,7 +28,7 @@ export default class LayerTab extends Tab {
             onSelect={this.onSelect}
             FileComponent={this.renderFile} />;
     }
-    public renderFile= ({ name, fullName, scope, value }: File["props"]) => {
+    public renderFile = ({ name, fullName, scope, value }: File["props"]) => {
         return <Layer name={name} fullName={fullName} scope={scope} value={value}></Layer>;
     }
     public componentDidMount() {
@@ -48,14 +45,10 @@ export default class LayerTab extends Tab {
             selected,
         })
     }
-    private changeLayers = ({ infos }: { infos: ElementInfo[] }) => {
-        this.setState({
-            infos,
-        });
+    private changeLayers = () => {
+        this.forceUpdate();
     }
-    private setTargets = ({ targets }: { targets: HTMLElement[] }) => {
-        this.setState({
-            selected: targets.map(target => target.getAttribute("data-moveable-id")!),
-        });
+    private setTargets = () => {
+        this.forceUpdate();
     }
 }

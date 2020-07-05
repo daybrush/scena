@@ -1,7 +1,8 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils/utils";
 import { IObject, camelize } from "@daybrush/utils";
-import EventBus from "../EventBus";
+import EventBus from "../utils/EventBus";
+import { keydown } from "../KeyManager/KeyManager";
 
 
 export interface Maker {
@@ -15,6 +16,8 @@ export default abstract class Icon extends React.PureComponent<{
 }> {
     public static id: string;
     public static maker?: () => Maker;
+    public static makeThen: (target: HTMLElement | SVGElement) => any = () => {};
+    public keys: string[] = [];
     public abstract renderIcon(): any;
     private subContainer = React.createRef<HTMLDivElement>();
     public render() {
@@ -92,6 +95,13 @@ export default abstract class Icon extends React.PureComponent<{
     public onSubSelect(id: string) {}
     public componentDidMount() {
         EventBus.on("blur", this.blur);
+
+        const keys = this.keys;
+        if (keys.length) {
+            keydown(keys, () => {
+                this.props.onSelect!((this.constructor as any).id);
+            });
+        }
     }
     public componentWillUnmount() {
         EventBus.off("blur", this.blur);

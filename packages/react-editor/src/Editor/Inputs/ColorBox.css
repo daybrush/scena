@@ -2,10 +2,11 @@
     position: relative;
 }
 .scena-color-picker {
-    position: fixed;
-    top: 0;
-    right: var(--tabs);
-    transform: translateX(-10px) translateZ(1px);
+    position: absolute;
+    top: 100%;
+    right: 0;
+    transform: translateY(10px) translateZ(1px);
+    z-index: 10;
 }
 
 .scena-color-background {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils/utils";
 
 export default class LabelBox extends React.PureComponent<{
     type: "half" | "full" | "third",

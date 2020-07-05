@@ -1,5 +1,5 @@
 import { prefixNames } from "framework-utils";
-import { PREFIX } from "./consts";
+import { PREFIX } from "../../consts";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);

@@ -3,6 +3,7 @@ import Icon from "./Icon";
 
 export default class MoveToolIcon extends Icon {
     public static id = "MoveTool";
+    public keys = ["v"];
     public renderIcon() {
         return (
             <svg viewBox="0 0 80 80">

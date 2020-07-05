@@ -1,5 +1,5 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils/utils";
 import MoveToolIcon from "./MoveToolIcon";
 import "./Menu.css";
 import TextIcon from "./TextIcon";

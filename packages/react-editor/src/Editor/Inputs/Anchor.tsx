@@ -1,7 +1,7 @@
 import * as React from "react";
 import Input from "./Input";
 import { IObject } from "@daybrush/utils";
-import { prefix } from "../../utils";
+import { prefix } from "../utils/utils";
 import "./Anchor.css";
 
 

@@ -1,26 +1,29 @@
 import * as React from "react";
 import Tab from "../Tab";
-import { prefix } from "../../../utils";
+import { prefix } from "../../utils/utils";
 import ColorBox from "../../Inputs/ColorBox";
 import TabInputBox from "../../Inputs/TabInputBox";
-import EventBus from "../../EventBus";
-import Memory from "../../Memory";
-import MoveableData, { getSelectedFrames, renderFrames } from "../../MoveableData";
+import EventBus from "../../utils/EventBus";
+import Memory from "../../utils/Memory";
+import { getSelectedFrames, renderFrames } from "../../utils/MoveableData";
 
 export default class ColorTab extends Tab {
     public static id = "Colors";
     public title = "Colors";
 
-    public state = {
-        targets: [],
-        backgroundColor: Memory.get("background-color"),
-        color: Memory.get("color"),
-    };
     public renderTab() {
-        const {
-            color,
-            backgroundColor,
-        } = this.state;
+        const frames = getSelectedFrames();
+        let backgroundColor = Memory.get("background-color");
+        let color = Memory.get("color");
+
+        if (frames.length) {
+            const backgroundColors = frames.map(frame => frame.get("background-color"));
+            const colors = frames.map(frame => frame.get("color"));
+
+            backgroundColor = backgroundColors.filter(color => color)[0] || "transparent";
+            color = colors.filter(color => color)[0] || "#333";
+        }
+
         return <div className={prefix("current-tab")}>
             <TabInputBox type={"full"}
                 label="Background Color"
@@ -46,40 +49,21 @@ export default class ColorTab extends Tab {
     }
     public onChangeBackgroundColor = (v: string) => {
         Memory.set("background-color", v);
-        this.setState({
-            backgroundColor: v,
-        });
         getSelectedFrames().forEach(frame => {
             frame.set("background-color", v);
         });
         renderFrames();
+        this.forceUpdate();
     }
     public onChangeTextColor = (v: string) => {
         Memory.set("color", v);
-        this.setState({
-            color: v,
-        });
         getSelectedFrames().forEach(frame => {
             frame.set("color", v);
         });
         renderFrames();
+        this.forceUpdate();
     }
     private onRender = () => {
-        const frames = getSelectedFrames();
-
-        if (!frames.length) {
-            this.setState({
-                backgroundColor: Memory.get("background-color"),
-                color: Memory.get("color"),
-            });
-            return;
-        }
-        const backgroundColors = frames.map(frame => frame.get("background-color"));
-        const colors = frames.map(frame => frame.get("color"));
-
-        this.setState({
-            backgroundColor: backgroundColors.filter(color => color)[0] || "transparent",
-            color: colors.filter(color => color)[0] || "#333",
-        });
+        this.forceUpdate();
     }
 }

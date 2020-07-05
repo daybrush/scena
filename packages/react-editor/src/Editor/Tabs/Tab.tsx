@@ -1,5 +1,5 @@
 import * as React from "react";
-import { prefix } from "../../utils";
+import { prefix } from "../utils/utils";
 import Moveable from "react-moveable";
 
 export default abstract class Tab extends React.PureComponent<{

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { prefix } from "../../../utils";
+import { prefix } from "../../utils/utils";
 import { IObject, isObject } from "@daybrush/utils";
 import "./Folder.css";
 import File from "./File";

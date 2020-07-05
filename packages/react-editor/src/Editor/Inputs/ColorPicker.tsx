@@ -1,8 +1,9 @@
 import * as React from "react";
-import { getKey } from "keycon";
 import Input from "./Input";
-import { IObject, splitBracket } from "@daybrush/utils";
+import { IObject } from "@daybrush/utils";
 import { ChromePicker, ColorResult } from "react-color";
+
+const AnyChromePicker = ChromePicker as any;
 
 export default class ColorPicker extends Input {
     protected inputAttributes: IObject<any> = {};
@@ -13,7 +14,8 @@ export default class ColorPicker extends Input {
         const color = this.state.color;
 
         return (
-            <ChromePicker
+            <AnyChromePicker
+                width={"180px"}
                 color={color}
                 onChange={this.onChange}
                 onChangeComplete={this.onChangeComplete}

@@ -1,5 +1,6 @@
 body {
-    --tabs: 200px;
+    --tabs: 80px;
+    --tab: 200px;
 }
 .scena-tabs {
     position: absolute;
@@ -8,10 +9,38 @@ body {
     height: 100%;
     background: var(--back2);
     z-index: 10;
-    overflow-y: auto;
+    transform: translateZ(10px);
+    box-sizing: border-box;
+    padding-top: 30px;
+}
+.scena-tab-icon {
+    position: relative;
+    margin: 5px;
+}
+.scena-tab-icon-label {
+    position: relative;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    word-break: break-all;
+    padding: 5px;
+    width: 70px;
+    line-height: 20px;
+    height: 30px;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+.scena-tab-icon.scena-selected .scena-tab-icon-label {
+    background: var(--mainColor);
 }
 .scena-tab {
+    position: absolute;
+    right: 100%;
+    top: 0;
+    transform: translate(-10px);
+    width: var(--tab);
     padding: 0px 10px 10px;
+    background: var(--back2);
     border-bottom: 1px solid var(--back1);
 }
 .scena-tab h2 {
