@@ -17,3 +17,20 @@
     background: var(--back1);
     font-size: 12px;
 }
+.scena-select {
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    display: block;
+    width: 100%;
+    height: 30px;
+    padding: 5px;
+    background: transparent;
+    color: var(--mainColor);
+    font-weight: bold;
+    background: var(--back1);
+    border: 0;
+    box-sizing: border-box;
+    text-align: center;
+}

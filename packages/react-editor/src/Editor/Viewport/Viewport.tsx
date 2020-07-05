@@ -3,6 +3,7 @@ import { IObject } from "@daybrush/utils";
 import MoveableData from "../utils/MoveableData";
 import EventBus from "../utils/EventBus";
 import Memory from "../utils/Memory";
+import { prefix } from "../utils/utils";
 
 export interface ElementInfo {
     jsx: any;
@@ -19,7 +20,7 @@ export default class Viewport extends React.PureComponent {
             infos: [],
         };
     public render() {
-        return <div className="viewport">
+        return <div className={prefix("viewport")}>
             {this.props.children}
             {this.state.infos.map(info => info.jsx)}
         </div>;

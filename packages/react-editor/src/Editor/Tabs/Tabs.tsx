@@ -8,10 +8,12 @@ import FrameTab from "./FrameTab/FrameTab";
 import AlignTab from "./AlignTab/AlignTab";
 import LayerTab from "./LayerTab/LayerTab";
 import CurrentTab from "./ColorTab/ColorTab";
+import FontTab from "./FontTab/FontTab";
 
 const TABS: Array<typeof Tab> = [
     CurrentTab,
     AlignTab,
+    FontTab,
     LayerTab,
     TransformTab,
     FrameTab,

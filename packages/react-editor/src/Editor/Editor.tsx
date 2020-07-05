@@ -7,7 +7,7 @@ import keycon from "keycon";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
 import Viewport from "./Viewport/Viewport";
-import { getContentElement } from "./utils/utils";
+import { getContentElement, prefix } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -60,14 +60,14 @@ export class Editor extends React.Component {
         } = state;
 
         return (
-            <div className="editor">
+            <div className={prefix("editor")}>
                 <Tabs moveable={moveable}></Tabs>
                 <Menu ref={menu} onSelect={this.onMenuChange} />
-                <div className="reset" onClick={e => {
+                <div className={prefix("reset")} onClick={e => {
                     infiniteViewer.current!.scrollCenter();
                 }}></div>
                 <Guides ref={horizontalGuides}
-                    type="horizontal" className="guides horizontal" style={{}}
+                    type="horizontal" className={prefix("guides", "horizontal")} style={{}}
                     snapThreshold={5}
                     snaps={state.horizontalGuides}
                     displayDragPos={true}
@@ -80,7 +80,7 @@ export class Editor extends React.Component {
                     }}
                 ></Guides>
                 <Guides ref={verticalGuides}
-                    type="vertical" className="guides vertical" style={{}}
+                    type="vertical" className={prefix("guides", "vertical")} style={{}}
                     snapThreshold={5}
                     snaps={state.verticalGuides}
                     displayDragPos={true}
@@ -93,7 +93,7 @@ export class Editor extends React.Component {
                     }}
                 ></Guides>
                 <InfiniteViewer ref={infiniteViewer}
-                    className="viewer"
+                    className={prefix("viewer")}
                     usePinch={true}
                     pinchThreshold={50}
                     zoom={zoom}
@@ -188,6 +188,9 @@ export class Editor extends React.Component {
                                     }
                                 }
                             }}
+                            onClickGroup={e => {
+                                this.selecto.current!.clickTarget(e.inputEvent, e.inputTarget);
+                            }}
                             onRender={e => {
                                 EventBus.requestTrigger("render", e);
                             }}
@@ -205,7 +208,7 @@ export class Editor extends React.Component {
                 </InfiniteViewer>
                 <Selecto
                     ref={selecto}
-                    dragContainer={".viewer"}
+                    dragContainer={".scena-viewer"}
                     hitRate={0}
                     selectableTargets={["[data-moveable]"]}
                     selectByClick={true}

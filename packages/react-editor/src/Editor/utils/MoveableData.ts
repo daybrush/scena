@@ -22,3 +22,24 @@ export function renderFrames() {
         MoveableData.render(target);
     });
 }
+
+export function setProperty(names: string[], value: any) {
+    getSelectedFrames().forEach(frame => {
+        frame.set(...names, value);
+    });
+    renderFrames();
+}
+
+export function getProperties(properties: string[][], defaultValues: any[]) {
+    const frames = getSelectedFrames();
+
+    if (!frames.length) {
+        return properties.map((property, i) => Memory.get(property.join("///")) || defaultValues[i]);
+    }
+
+    return properties.map((property, i) => {
+        const frameValues = frames.map(frame => frame.get(...property));
+
+        return frameValues.filter(color => color)[0] || defaultValues[i];
+    });
+}
