@@ -16,23 +16,11 @@ class App extends React.Component {
     }
     public componentDidMount() {
         (window as any).a = this.editor.current!;
-        this.editor.current!.appendJSX(
-            <div className="moveable" contentEditable="true">Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
-            "(Description)",
+        this.editor.current!.appendJSXs([
             {
-                position: "absolute",
-                left: "0%",
-                top: "50%",
-                width: "400px",
-                "font-size": "14px",
-                "text-align": "center",
-                "font-weight": "400",
-            },
-        ).then(() => {
-            this.editor.current!.appendJSX(
-                <div className="moveable" contentEditable="true">Moveable</div>,
-                "(Logo)",
-                {
+                jsx: <div className="moveable" contentEditable="true">Moveable</div>,
+                name: "(Logo)",
+                frame: {
                     position: "absolute",
                     left: "50%",
                     top: "30%",
@@ -46,8 +34,21 @@ class App extends React.Component {
                     "text-align": "center",
                     "font-weight": 100,
                 },
-            );
-        })
+            },
+            {
+                jsx: <div className="moveable" contentEditable="true">Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
+                name: "(Description)",
+                frame: {
+                    position: "absolute",
+                    left: "0%",
+                    top: "50%",
+                    width: "400px",
+                    "font-size": "14px",
+                    "text-align": "center",
+                    "font-weight": "normal",
+                },
+            }
+        ]);
     }
 }
 

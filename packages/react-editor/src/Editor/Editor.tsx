@@ -21,7 +21,14 @@ EventBus.on("setTargets", ({ targets }) => {
 });
 
 
-export class Editor extends React.Component {
+export class Editor extends React.PureComponent<{
+    width: number,
+    height: number,
+}> {
+    public static defaultProps = {
+        width: 400,
+        height: 600,
+    };
     public state: {
         targets: Array<SVGElement | HTMLElement>,
         horizontalGuides: number[],
@@ -58,7 +65,12 @@ export class Editor extends React.Component {
             targets,
             zoom,
         } = state;
-
+        const {
+            width,
+            height,
+        } = this.props;
+        const horizontalSnapGuides = [0, height, height / 2, ...state.horizontalGuides];
+        const verticalSnapGuides = [0, width, width / 2, ...state.verticalGuides];
         return (
             <div className={prefix("editor")}>
                 <Tabs moveable={moveable}></Tabs>
@@ -69,7 +81,7 @@ export class Editor extends React.Component {
                 <Guides ref={horizontalGuides}
                     type="horizontal" className={prefix("guides", "horizontal")} style={{}}
                     snapThreshold={5}
-                    snaps={state.horizontalGuides}
+                    snaps={horizontalSnapGuides}
                     displayDragPos={true}
                     dragPosFormat={v => `${v}px`}
                     zoom={zoom}
@@ -82,7 +94,7 @@ export class Editor extends React.Component {
                 <Guides ref={verticalGuides}
                     type="vertical" className={prefix("guides", "vertical")} style={{}}
                     snapThreshold={5}
-                    snaps={state.verticalGuides}
+                    snaps={verticalSnapGuides}
                     displayDragPos={true}
                     dragPosFormat={v => `${v}px`}
                     zoom={zoom}
@@ -130,7 +142,10 @@ export class Editor extends React.Component {
                         });
                     }}
                 >
-                    <Viewport ref={viewport}>
+                    <Viewport ref={viewport} style={{
+                        width: `${width}px`,
+                        height: `${height}px`,
+                    }}>
                         <Moveable
                             ref={moveable}
                             targets={targets}
@@ -144,8 +159,8 @@ export class Editor extends React.Component {
                             snappable={true}
                             snapCenter={true}
                             roundable={true}
-                            verticalGuidelines={state.verticalGuides}
-                            horizontalGuidelines={state.horizontalGuides}
+                            verticalGuidelines={verticalSnapGuides}
+                            horizontalGuidelines={horizontalSnapGuides}
                             clipArea={true}
                             onDragStart={MoveableData.onDragStart}
                             onDrag={MoveableData.onDrag}
@@ -243,7 +258,7 @@ export class Editor extends React.Component {
                             }
                         }
                         if (
-                            inputEvent.type === "touchstart"
+                            (inputEvent.type === "touchstart" && e.isTrusted)
                             || moveable.current!.isMoveableElement(target)
                             || state.targets.some(t => t === target || t.contains(target))
                         ) {
@@ -299,7 +314,20 @@ export class Editor extends React.Component {
             return target;
         });
     }
+    public appendJSXs(jsxs: Array<{ jsx: any, name: string, frame: IObject<any> }>): Promise<Array<HTMLElement | SVGElement>> {
+        return this.viewport.current!.appendJSXs(jsxs).then(targets => {
+            this.setTargets([targets[0]]);
 
+            return targets;
+        });
+    }
+    public appendElements(elements: Array<{ tag: any, props: IObject<any>, name: string, frame: IObject<any> }>): Promise<Array<HTMLElement | SVGElement>> {
+        return this.viewport.current!.appendElements(elements).then(targets => {
+            this.setTargets([targets[0]]);
+
+            return targets;
+        });
+    }
     public componentDidMount() {
         const {
             infiniteViewer,
@@ -371,6 +399,9 @@ export class Editor extends React.Component {
     }
     private checkBlur() {
         const activeElement = document.activeElement;
+        if (activeElement) {
+            (activeElement as HTMLElement).blur();
+        }
         if (activeElement && (
             activeElement.tagName === "INPUT"
             || (activeElement as any).isContentEditable

@@ -44,11 +44,11 @@
     "framework-utils": "^0.3.4",
     "i": "^0.3.6",
     "keycon": "^0.8.0",
-    "moveable-helper": "^0.2.0-beta4",
+    "moveable-helper": "^0.2.0-beta5",
     "npm": "^6.14.5",
     "react-color": "^2.18.1",
-    "react-infinite-viewer": "^0.4.1",
+    "react-infinite-viewer": "^0.4.2",
     "react-moveable": "^0.21.0-beta14",
-    "react-selecto": "^1.4.0"
+    "react-selecto": "^1.4.1"
   }
 }

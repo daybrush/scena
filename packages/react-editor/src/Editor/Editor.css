@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&display=swap");
-
 [class*="scena-"] {
     font-family: "Open Sans", sans-serif;
 }
+
 .scena-editor {
     position: relative;
     width: 100%;
@@ -17,6 +17,7 @@
     --back6: #666;
     transform-style: preserve-3d;
 }
+
 .scena-editor .scena-viewer {
     position: absolute !important;
     left: calc(30px + var(--menu));

@@ -16,7 +16,7 @@ export default class OvalIcon extends Icon {
         return (
             <svg viewBox="0 0 73 73">
                 <ellipse fill="#555" cx="36.5" cy="36.5" rx="20" ry="15"
-                    stroke-linejoin="round" stroke-width="3" stroke="#fff"></ellipse></svg>
+                    strokeLinejoin="round" strokeWidth="3" stroke="#fff"></ellipse></svg>
         );
     }
 }

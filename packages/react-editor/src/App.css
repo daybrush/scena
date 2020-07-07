@@ -14,14 +14,15 @@ html, body, #root, .app, .editor {
     padding: 5px;
     background: #222;
     box-sizing: border-box;
+    text-align: center;
 }
 .bottom a {
     position: relative;
     display: inline-block;
     color: white;
-    text-decoration: none;
+    /* text-decoration: none; */
     font-weight: bold;
-    font-size: 14px;
-    padding: 10px 20px;
+    font-size: 13px;
+    padding: 15px 20px;
     box-sizing: border-box;
 }

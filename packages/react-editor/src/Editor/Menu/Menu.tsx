@@ -35,7 +35,7 @@ export default class Menu extends React.PureComponent<{
 
         return MENUS.map(MenuClass => {
             const id = MenuClass.id;
-            return <MenuClass selected={selected === id} onSelect={this.select} />;
+            return <MenuClass key={id} selected={selected === id} onSelect={this.select} />;
         });
     }
     public select = (id: string) => {
