@@ -91,7 +91,6 @@ export default class AlignTab extends Tab {
             const viewportPos = getDirectionPos(type, direction, viewportRect);
             const delta = pos - viewportPos;
 
-            console.log(delta);
             moveable.request("draggable", { [type === "horizontal" ? "deltaY" : "deltaX"]: -delta }, true);
         }
 

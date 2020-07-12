@@ -39,16 +39,14 @@
   "dependencies": {
     "@daybrush/utils": "^0.10.5",
     "@egjs/component": "^2.1.2",
-    "@scena/react-guides": "^0.8.0",
+    "@scena/react-guides": "^0.9.0",
     "@types/react-color": "^3.0.4",
     "framework-utils": "^0.3.4",
-    "i": "^0.3.6",
     "keycon": "^0.8.0",
     "moveable-helper": "^0.2.0-beta5",
-    "npm": "^6.14.5",
     "react-color": "^2.18.1",
-    "react-infinite-viewer": "^0.4.2",
-    "react-moveable": "^0.21.0-beta14",
-    "react-selecto": "^1.4.1"
+    "react-infinite-viewer": "^0.5.0",
+    "react-moveable": "^0.21.0-beta20",
+    "react-selecto": "^1.5.0"
   }
 }

@@ -26,3 +26,9 @@ html, body, #root, .app, .editor {
     padding: 15px 20px;
     box-sizing: border-box;
 }
+.badges img {
+    padding: 2px;
+}
+.badgets a {
+    margin: 2px;
+}
