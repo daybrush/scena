@@ -32,7 +32,7 @@ export default class MoveableManager extends React.PureComponent<{
         const elementGuidelines = [...MoveableData.getTargets()].filter(el => {
             return targets.indexOf(el) === -1;
         });
-
+        const isShift = KeyController.global.shiftKey;
         return <Moveable
             ref={this.moveable}
             targets={targets}
@@ -42,7 +42,8 @@ export default class MoveableManager extends React.PureComponent<{
             clippable={selectedMenu === "Crop"}
             dragArea={targets.length > 1 || selectedMenu !== "Text"}
             checkInput={selectedMenu === "Text"}
-            keepRatio={KeyController.global.shiftKey}
+            throttleDragRotate={isShift ? 45 : 0}
+            keepRatio={isShift}
             rotatable={true}
             snappable={true}
             snapCenter={true}
