@@ -2,7 +2,6 @@ import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
-import Moveable from "react-moveable";
 import keycon from "keycon";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
@@ -11,9 +10,11 @@ import { getContentElement, prefix } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
-import MoveableData from "./utils/MoveableData";
 import Memory from "./utils/Memory";
 import KeyController from "keycon";
+import MoveableManager from "./Viewport/MoveableMananger";
+import { keyup } from "./KeyManager/KeyManager";
+import MoveableData, { getTargets } from "./utils/MoveableData";
 
 
 EventBus.on("setTargets", ({ targets }) => {
@@ -47,14 +48,14 @@ export class Editor extends React.PureComponent<{
     public infiniteViewer = React.createRef<InfiniteViewer>();
     public selecto = React.createRef<Selecto>();
     public menu = React.createRef<Menu>();
-    public moveable = React.createRef<Moveable>();
+    public moveableManager = React.createRef<MoveableManager>();
     public viewport = React.createRef<Viewport>();
     public render() {
         const {
             horizontalGuides,
             verticalGuides,
             infiniteViewer,
-            moveable,
+            moveableManager,
             viewport,
             menu,
             selecto,
@@ -73,7 +74,7 @@ export class Editor extends React.PureComponent<{
         const verticalSnapGuides = [0, width, width / 2, ...state.verticalGuides];
         return (
             <div className={prefix("editor")}>
-                <Tabs moveable={moveable}></Tabs>
+                <Tabs moveableManager={moveableManager}></Tabs>
                 <Menu ref={menu} onSelect={this.onMenuChange} />
                 <div className={prefix("reset")} onClick={e => {
                     infiniteViewer.current!.scrollCenter();
@@ -115,7 +116,7 @@ export class Editor extends React.PureComponent<{
 
                         if (
                             target.nodeName === "A"
-                            || moveable.current!.isMoveableElement(target)
+                            || moveableManager.current!.getMoveable().isMoveableElement(target)
                             || targets.some(t => t === target || t.contains(target))
                         ) {
                             e.stop();
@@ -146,79 +147,15 @@ export class Editor extends React.PureComponent<{
                         width: `${width}px`,
                         height: `${height}px`,
                     }}>
-                        <Moveable
-                            ref={moveable}
+                        <MoveableManager
+                            ref={moveableManager}
                             targets={targets}
-                            draggable={true}
-                            resizable={true}
-                            throttleResize={1}
-                            clippable={selectedMenu === "Crop"}
-                            dragArea={targets.length > 1 || selectedMenu !== "Text"}
-                            checkInput={selectedMenu === "Text"}
-                            rotatable={true}
-                            snappable={true}
-                            snapCenter={true}
-                            roundable={true}
+                            selectedMenu={selectedMenu}
+                            selecto={selecto}
+                            menu={menu}
                             verticalGuidelines={verticalSnapGuides}
                             horizontalGuidelines={horizontalSnapGuides}
-                            clipArea={true}
-                            onDragStart={MoveableData.onDragStart}
-                            onDrag={MoveableData.onDrag}
-                            onDragGroupStart={MoveableData.onDragGroupStart}
-                            onDragGroup={MoveableData.onDragGroup}
-
-                            onScaleStart={MoveableData.onScaleStart}
-                            onScale={MoveableData.onScale}
-                            onScaleGroupStart={MoveableData.onScaleGroupStart}
-                            onScaleGroup={MoveableData.onScaleGroup}
-
-                            onResizeStart={MoveableData.onResizeStart}
-                            onResize={MoveableData.onResize}
-                            onResizeGroupStart={MoveableData.onResizeGroupStart}
-                            onResizeGroup={MoveableData.onResizeGroup}
-
-                            onRotateStart={MoveableData.onRotateStart}
-                            onRotate={MoveableData.onRotate}
-                            onRotateGroupStart={MoveableData.onRotateGroupStart}
-                            onRotateGroup={MoveableData.onRotateGroup}
-
-                            defaultClipPath={Memory.get("crop") || "inset"}
-                            onClip={MoveableData.onClip}
-
-                            onDragOriginStart={MoveableData.onDragOriginStart}
-                            onDragOrigin={e => {
-                                MoveableData.onDragOrigin(e);
-                            }}
-
-                            onRound={MoveableData.onRound}
-
-                            onClick={e => {
-                                const target = e.inputTarget as any;
-                                if (e.isDouble && target.isContentEditable) {
-                                    menu.current!.select("Text");
-                                    const el = getContentElement(target);
-
-                                    if (el) {
-                                        el.focus();
-                                    }
-                                }
-                            }}
-                            onClickGroup={e => {
-                                this.selecto.current!.clickTarget(e.inputEvent, e.inputTarget);
-                            }}
-                            onRender={e => {
-                                EventBus.requestTrigger("render", e);
-                            }}
-                            onRenderGroup={e => {
-                                EventBus.requestTrigger("renderGroup", e);
-                            }}
-                            onRenderEnd={e => {
-                                EventBus.requestTrigger("render", e);
-                            }}
-                            onRenderGroupEnd={e => {
-                                EventBus.requestTrigger("renderGroup", e);
-                            }}
-                        ></Moveable>
+                        ></MoveableManager>
                     </Viewport>
                 </InfiniteViewer>
                 <Selecto
@@ -259,7 +196,7 @@ export class Editor extends React.PureComponent<{
                         }
                         if (
                             (inputEvent.type === "touchstart" && e.isTrusted)
-                            || moveable.current!.isMoveableElement(target)
+                            || moveableManager.current!.getMoveable().isMoveableElement(target)
                             || state.targets.some(t => t === target || t.contains(target))
                         ) {
                             e.stop();
@@ -279,7 +216,7 @@ export class Editor extends React.PureComponent<{
                             if (!isDragStart) {
                                 return;
                             }
-                            moveable.current!.dragStart(inputEvent);
+                            moveableManager.current!.getMoveable().dragStart(inputEvent);
                         });
                     }}
                 ></Selecto>
@@ -335,17 +272,9 @@ export class Editor extends React.PureComponent<{
         requestAnimationFrame(() => {
             infiniteViewer.current!.scrollCenter();
         });
-
-        window.addEventListener("resize", this.onResize);
         keycon.setGlobal();
-        window.addEventListener("wheel", e => {
-            if (keycon.global.altKey) {
-                e.preventDefault();
-                this.setState({
-                    zoom: Math.max(0.1, this.state.zoom + e.deltaY / 300),
-                });
-            }
-        }, {
+        window.addEventListener("resize", this.onResize);
+        window.addEventListener("wheel", this.onWheel, {
             passive: false,
         });
         const viewport = this.viewport.current!
@@ -359,11 +288,24 @@ export class Editor extends React.PureComponent<{
         EventBus.on("update", () => {
             this.forceUpdate();
         });
+
+        keyup(["backspace"], () => {
+            const targets = getTargets();
+
+            targets.forEach(target => {
+                MoveableData.removeFrame(target);
+            });
+            this.setTargets([]).then(() => {
+                this.viewport.current!.removeTargets(targets);
+            });
+        });
     }
     public componentWillUnmount() {
         EventBus.off();
         Memory.clear();
         KeyController.global.destroy();
+        window.removeEventListener("resize", this.onResize);
+        window.removeEventListener("wheel", this.onWheel);
     }
     private onMenuChange = (id: string) => {
         this.setState({
@@ -402,16 +344,31 @@ export class Editor extends React.PureComponent<{
         if (activeElement) {
             (activeElement as HTMLElement).blur();
         }
-        if (activeElement && (
-            activeElement.tagName === "INPUT"
-            || (activeElement as any).isContentEditable
-        )) {
-            (activeElement as any).blur();
+        const selection = document.getSelection()!;
+
+        if (selection) {
+            selection.removeAllRanges();
         }
+        // if (activeElement && (
+        //     activeElement.tagName === "INPUT" ||
+        //     activeElement.tagName === "TEXTAREA"
+        //     || (activeElement as any).isContentEditable
+        // )) {
+
+
+        // }
         EventBus.trigger("blur");
     }
     private onResize = () => {
         this.horizontalGuides.current!.resize();
         this.verticalGuides.current!.resize();
+    }
+    private onWheel = (e: any) => {
+        if (keycon.global.altKey) {
+            e.preventDefault();
+            this.setState({
+                zoom: Math.max(0.1, this.state.zoom + e.deltaY / 300),
+            });
+        }
     }
 }
