@@ -43,10 +43,10 @@
     "@types/react-color": "^3.0.4",
     "framework-utils": "^0.3.4",
     "keycon": "^0.8.0",
-    "moveable-helper": "^0.2.0-beta5",
+    "moveable-helper": "^0.2.0",
     "react-color": "^2.18.1",
     "react-infinite-viewer": "^0.5.0",
-    "react-moveable": "^0.21.2",
+    "react-moveable": "^0.21.5",
     "react-selecto": "^1.5.0"
   }
 }

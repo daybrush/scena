@@ -58,7 +58,7 @@ export default class FrameTab extends Tab {
             frame.set(...scope, value);
         });
         renderFrames();
-        this.props.moveable.current!.updateRect();
+        this.getMoveable().updateRect();
         EventBus.requestTrigger("render");
     }
     private onRender = () => {

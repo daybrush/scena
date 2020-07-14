@@ -2,7 +2,6 @@ import * as React from "react";
 import { prefix } from "../utils/utils";
 import "./Tabs.css";
 import TransformTab from "./TransformTab";
-import Moveable from "react-moveable";
 import Tab from "./Tab";
 import FrameTab from "./FrameTab/FrameTab";
 import AlignTab from "./AlignTab/AlignTab";
@@ -10,6 +9,7 @@ import LayerTab from "./LayerTab/LayerTab";
 import CurrentTab from "./ColorTab/ColorTab";
 import FontTab from "./FontTab/FontTab";
 import EventBus from "../utils/EventBus";
+import MoveableManager from "../Viewport/MoveableMananger";
 
 const TABS: Array<typeof Tab> = [
     CurrentTab,
@@ -20,7 +20,7 @@ const TABS: Array<typeof Tab> = [
     FrameTab,
 ];
 export default class Tabs extends React.PureComponent<{
-    moveable: React.RefObject<Moveable>,
+    moveableManager: React.RefObject<MoveableManager>,
 }> {
     public tabs = React.createRef<HTMLDivElement>();
     public state = {
@@ -32,14 +32,14 @@ export default class Tabs extends React.PureComponent<{
         </div>;
     }
     public renderTabs() {
-        const moveable = this.props.moveable;
+        const moveableManager = this.props.moveableManager;
         const selected = this.state.selected;
         return TABS.map(UserTab => {
             const id = UserTab.id;
             const isSelected = id === selected;
             return <div key={id} className={prefix("tab-icon", isSelected ? "selected" : "")}>
                 <div data-target-id={id} className={prefix("tab-icon-label")} onClick={this.onClick}><span>{UserTab.id}</span></div>
-                {isSelected && <UserTab moveable={moveable} />}
+                {isSelected && <UserTab moveableManager={moveableManager} />}
             </div>;
             // return <UserTab moveable={moveable} />;
         });

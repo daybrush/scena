@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IObject } from "@daybrush/utils";
+import { IObject, find } from "@daybrush/utils";
 import MoveableData from "../utils/MoveableData";
 import EventBus from "../utils/EventBus";
 import Memory from "../utils/Memory";
@@ -109,5 +109,29 @@ export default class Viewport extends React.PureComponent<{
             name,
             frame,
         })));
+    }
+    public removeTargets(targets: Array<HTMLElement | SVGElement>) {
+        const { ids, infos } = this.state;
+
+        targets.forEach(target => {
+            const info = find(infos, ({ el }) => el === target);
+
+            if (!info) {
+                return;
+            }
+
+            delete ids[info.id];
+            infos.splice(infos.indexOf(info), 1);
+        });
+
+        this.setState({
+            ids: { ...ids },
+            infos: [...infos],
+        }, () => {
+            Memory.set("viewportInfos", infos);
+            EventBus.requestTrigger("changeLayers", {
+                infos,
+            });
+        })
     }
 }

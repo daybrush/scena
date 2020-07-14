@@ -1,9 +1,9 @@
 import * as React from "react";
 import { prefix } from "../utils/utils";
-import Moveable from "react-moveable";
+import MoveableManager from "../Viewport/MoveableMananger";
 
 export default abstract class Tab extends React.PureComponent<{
-    moveable: React.RefObject<Moveable>,
+    moveableManager: React.RefObject<MoveableManager>,
 }> {
     public static id: string;
     public abstract title: string;
@@ -17,6 +17,6 @@ export default abstract class Tab extends React.PureComponent<{
         );
     }
     public getMoveable() {
-        return this.props.moveable.current!;
+        return this.props.moveableManager.current!.getMoveable();
     }
 }

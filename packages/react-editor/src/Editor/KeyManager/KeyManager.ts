@@ -21,4 +21,12 @@ export function keydown(keys: string[], callback: (e: any) => any) {
         callback(e);
     });
 }
+export function keyup(keys: string[], callback: (e: any) => any) {
+    KeyController.global.keyup(keys, e => {
+        if (!check(e)) {
+            return false;
+        }
+        callback(e);
+    });
+}
 // KeyController.global.
