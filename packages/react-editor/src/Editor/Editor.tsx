@@ -265,6 +265,18 @@ export class Editor extends React.PureComponent<{
             return targets;
         });
     }
+    public removeElements(targets: Array<HTMLElement | SVGElement>) {
+        const currentTargets = getTargets();
+        const nextTargets = currentTargets.filter(target => {
+            return targets.indexOf(target) === -1;
+        });
+        targets.forEach(target => {
+            MoveableData.removeFrame(target);
+        });
+        return this.setTargets(nextTargets).then(() => {
+            this.viewport.current!.removeTargets(targets);
+        });
+    }
     public componentDidMount() {
         const {
             infiniteViewer,
@@ -290,14 +302,7 @@ export class Editor extends React.PureComponent<{
         });
 
         keyup(["backspace"], () => {
-            const targets = getTargets();
-
-            targets.forEach(target => {
-                MoveableData.removeFrame(target);
-            });
-            this.setTargets([]).then(() => {
-                this.viewport.current!.removeTargets(targets);
-            });
+            this.removeElements(getTargets());
         });
     }
     public componentWillUnmount() {
