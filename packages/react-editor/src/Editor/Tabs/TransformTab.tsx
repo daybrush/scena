@@ -58,7 +58,7 @@ export default class TransformTab extends Tab {
     }
     public onChangePos = () => {
         const x = parseFloat(this.xInput.current!.getValue());
-        const y = parseFloat(this.xInput.current!.getValue());
+        const y = parseFloat(this.yInput.current!.getValue());
 
         this.getMoveable().request("draggable", { x, y, isInstant: true });
     }
