@@ -104,6 +104,6 @@ export default class FontTab extends Tab {
     }
     private changeProperty(name: string, v: any) {
         this.memory.set(name, v);
-        this.moveableData.setProperty([name], v);
+        this.editor.setProperty([name], v, true);
     }
 }

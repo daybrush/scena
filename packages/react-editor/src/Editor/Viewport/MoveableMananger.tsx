@@ -1,8 +1,63 @@
 import * as React from "react";
 import Moveable from "react-moveable";
-import { getContentElement } from "../utils/utils";
+import { getContentElement, connectEditorProps } from "../utils/utils";
 import Editor from "../Editor";
+import { EditorInterface } from "../types";
+import { IObject } from "@daybrush/utils";
+import { diff } from "@egjs/list-differ";
 
+function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, editor: Editor) {
+    const el = editor.viewport.current!.getElement(id);
+
+    if (!el) {
+        console.error("No Element");
+        return false;
+    }
+    const moveableData = editor.moveableData;
+    const frame = moveableData.getFrame(el);;
+
+    frame.clear();
+    frame.set(state);
+
+    const result = diff(Object.keys(prevState), Object.keys(state));
+    const { removed, prevList } = result;
+
+    removed.forEach(index => {
+        el.style.removeProperty(prevList[index]);
+    });
+    moveableData.render(el);
+    return true;
+}
+function undoRender({ id, prev, next }: IObject<any>, editor: Editor) {
+    if (!restoreRender(id, prev, next, editor)) {
+        return;
+    }
+    editor.moveableManager.current!.updateRect();
+    editor.eventBus.trigger("render");
+}
+function redoRender({ id, prev, next }: IObject<any>, editor: Editor) {
+    if (!restoreRender(id, next, prev, editor)) {
+        return;
+    }
+    editor.moveableManager.current!.updateRect();
+    editor.eventBus.trigger("render");
+}
+function undoRenders({ infos }: IObject<any>, editor: Editor) {
+    infos.forEach(({ id, prev, next }: IObject<any>) => {
+        restoreRender(id, prev, prev, editor);
+    });
+    editor.moveableManager.current!.updateRect();
+    editor.eventBus.trigger("render");
+}
+function redoRenders({ infos }: IObject<any>, editor: Editor) {
+    infos.forEach(({ id, next, prev }: IObject<any>) => {
+        restoreRender(id, next, prev, editor);
+    });
+    editor.moveableManager.current!.updateRect();
+    editor.eventBus.trigger("render");
+}
+
+@connectEditorProps
 export default class MoveableManager extends React.PureComponent<{
     editor: Editor,
     selectedTargets: Array<HTMLElement | SVGElement>;
@@ -99,28 +154,64 @@ export default class MoveableManager extends React.PureComponent<{
             onClickGroup={e => {
                 selecto.current!.clickTarget(e.inputEvent, e.inputTarget);
             }}
+            onRenderStart={e => {
+                e.datas.prevData = moveableData.getFrame(e.target).get();
+            }}
             onRender={e => {
-                eventBus.requestTrigger("render", e);
+                e.datas.isRender = true;
+                eventBus.requestTrigger("render");
+            }}
+            onRenderEnd={e => {
+                eventBus.requestTrigger("render");
+
+                if (!e.datas.isRender) {
+                    return;
+                }
+                this.historyManager.addAction("render", {
+                    id: e.target.getAttribute("data-scena-element-id"),
+                    prev: e.datas.prevData,
+                    next: moveableData.getFrame(e.target).get(),
+                });
+            }}
+            onRenderGroupStart={e => {
+                e.datas.prevDatas = e.targets.map(target => moveableData.getFrame(target).get());
             }}
             onRenderGroup={e => {
                 eventBus.requestTrigger("renderGroup", e);
-            }}
-            onRenderEnd={e => {
-                eventBus.requestTrigger("render", e);
+                e.datas.isRender = true;
             }}
             onRenderGroupEnd={e => {
                 eventBus.requestTrigger("renderGroup", e);
+
+                if (!e.datas.isRender) {
+                    return;
+                }
+                const prevDatas = e.datas.prevDatas;
+                const infos = e.targets.map((target, i) => {
+                    return {
+                        id: target.getAttribute("data-scena-element-id"),
+                        prev: prevDatas[i],
+                        next: moveableData.getFrame(target).get(),
+                    }
+                });
+                this.historyManager.addAction("renders", {
+                    infos,
+                });
             }}
         ></Moveable>
     }
     public componentDidMount() {
-        const keyManager = this.props.editor.keyManager;
-
-        keyManager.keydown(["shift"], () => {
+        this.historyManager.registerType("render", undoRender, redoRender);
+        this.historyManager.registerType("renders", undoRenders, redoRenders);
+        this.keyManager.keydown(["shift"], () => {
             this.forceUpdate();
         });
-        keyManager.keyup(["shift"], () => {
+        this.keyManager.keyup(["shift"], () => {
             this.forceUpdate();
         });
     }
+    public updateRect() {
+        this.getMoveable().updateRect();
+    }
 }
+export default interface MoveableManager extends EditorInterface {}

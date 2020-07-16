@@ -40,6 +40,7 @@
   "dependencies": {
     "@daybrush/utils": "^0.10.5",
     "@egjs/component": "^2.1.2",
+    "@egjs/list-differ": "^1.0.0",
     "@scena/react-guides": "^0.9.0",
     "@types/react-color": "^3.0.4",
     "framework-utils": "^0.3.4",

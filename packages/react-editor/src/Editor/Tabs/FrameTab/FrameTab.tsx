@@ -47,12 +47,7 @@ export default class FrameTab extends Tab {
         if (!frames.length) {
             return;
         }
-        this.moveableData.getSelectedFrames().forEach(frame => {
-            frame.set(...scope, value);
-        });
-        this.moveableData.renderFrames();
-        this.getMoveable().updateRect();
-        this.eventBus.requestTrigger("render");
+        this.editor.setProperty(scope, value, true);
     }
     private onRender = () => {
         this.forceUpdate();

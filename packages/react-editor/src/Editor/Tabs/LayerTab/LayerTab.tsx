@@ -11,7 +11,7 @@ export default class LayerTab extends Tab {
 
     public renderTab() {
         const infos = this.editor.getViewportInfos();
-        const selected = this.moveableData.getSelectedTargets().map(target => target.getAttribute("data-moveable-id")!)
+        const selected = this.moveableData.getSelectedTargets().map(target => target.getAttribute("data-scena-element-id")!)
 
         return <Folder
             scope={[]}

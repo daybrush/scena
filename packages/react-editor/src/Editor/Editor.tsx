@@ -4,7 +4,7 @@ import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
-import Viewport, { JSXInfo } from "./Viewport/Viewport";
+import Viewport, { JSXInfo, ElementInfo } from "./Viewport/Viewport";
 import { getContentElement, prefix } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
@@ -14,11 +14,25 @@ import MoveableManager from "./Viewport/MoveableMananger";
 import MoveableData from "./utils/MoveableData";
 import KeyManager from "./KeyManager/KeyManager";
 import { ScenaEditorState, TagAppendInfo } from "./types";
+import HistoryManager from "./utils/HistoryManager";
+import Debugger from "./utils/Debugger";
 
-
+function undoCreateElements({ infos }: IObject<any>, editor: Editor) {
+    editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
+}
+function restoreElements({ infos }: IObject<any>, editor: Editor) {
+    editor.appendJSXs(infos.map((info: ElementInfo) => ({
+        id: info.id,
+        jsx: info.jsx,
+        frame: info.frame,
+        name: info.name,
+        index: info.addedIndex,
+    })), true);
+}
 export default class Editor extends React.PureComponent<{
     width: number,
     height: number,
+    debug?: boolean,
 }, Partial<ScenaEditorState>> {
     public static defaultProps = {
         width: 400,
@@ -31,10 +45,13 @@ export default class Editor extends React.PureComponent<{
         zoom: 1,
         selectedMenu: "MoveTool",
     };
+    public historyManager = new HistoryManager(this);
+    public console = new Debugger(this.props.debug);
     public eventBus = new EventBus();
     public memory = new Memory();
     public moveableData = new MoveableData(this.memory);
-    public keyManager = new KeyManager();
+    public keyManager = new KeyManager(this.console);
+
     public horizontalGuides = React.createRef<Guides>();
     public verticalGuides = React.createRef<Guides>();
     public infiniteViewer = React.createRef<InfiniteViewer>();
@@ -155,7 +172,7 @@ export default class Editor extends React.PureComponent<{
                     ref={selecto}
                     dragContainer={".scena-viewer"}
                     hitRate={0}
-                    selectableTargets={["[data-moveable]"]}
+                    selectableTargets={["[data-scena-element]"]}
                     selectByClick={true}
                     selectFromInside={false}
                     toggleContinueSelect={["shift"]}
@@ -182,7 +199,7 @@ export default class Editor extends React.PureComponent<{
                         if (selectedMenu === "Text" && target.isContentEditable) {
                             const contentElement = getContentElement(target);
 
-                            if (contentElement && contentElement.hasAttribute("data-moveable")) {
+                            if (contentElement && contentElement.hasAttribute("data-scena-element")) {
                                 e.stop();
                                 this.setSelectedTargets([contentElement]);
                             }
@@ -241,13 +258,14 @@ export default class Editor extends React.PureComponent<{
     public appendElement(tag: any, props: IObject<any>, name: string, frame: IObject<any> = {}) {
         return this.appendElements([{ tag, props, name, frame }]).then(target => target[0]);
     }
-    public appendJSXs(jsxs: JSXInfo[]): Promise<Array<HTMLElement | SVGElement>> {
+    public appendJSXs(jsxs: JSXInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
         return this.viewport.current!.appendJSXs(jsxs).then(({
             added,
         }) => {
+            !isRestore && this.historyManager.addAction("createElements", { infos: added });
             const data = this.moveableData;
-            const targets = added.map((info, i) => {
-                data.createFrame(info.el!, jsxs[i].frame || {});
+            const targets = added.map(info => {
+                data.createFrame(info.el!, info.frame);
                 data.render(info.el!);
 
                 return info.el!;
@@ -264,7 +282,10 @@ export default class Editor extends React.PureComponent<{
             frame,
         })));
     }
-    public removeElements(targets: Array<HTMLElement | SVGElement>) {
+    public removeByIds(ids: string[], isRestore?: boolean) {
+        return this.removeElements(this.viewport.current!.getElements(ids), isRestore);
+    }
+    public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
         const currentTargets = this.moveableData.getSelectedTargets();
         const nextTargets = currentTargets.filter(target => {
             return targets.indexOf(target) === -1;
@@ -273,8 +294,23 @@ export default class Editor extends React.PureComponent<{
             this.moveableData.removeFrame(target);
         });
         return this.setSelectedTargets(nextTargets).then(() => {
-            this.viewport.current!.removeTargets(targets);
+            return this.viewport.current!.removeTargets(targets).then(({ removed }) => {
+                !isRestore && this.historyManager.addAction("removeElements", {
+                    infos: removed,
+                });
+                return targets;
+            });
         });
+    }
+    public setProperty(scope: string[], value: any, isUpdate?: boolean) {
+        const infos = this.moveableData.setProperty(scope, value);
+
+        this.historyManager.addAction("renders", { infos });
+
+        if (isUpdate) {
+            this.moveableManager.current!.updateRect();
+        }
+        this.eventBus.requestTrigger("render");
     }
     public selectMenu(menu: string) {
         this.menu.current!.select(menu);
@@ -314,9 +350,19 @@ export default class Editor extends React.PureComponent<{
             this.forceUpdate();
         });
 
+        this.keyManager.keydown(["meta", "z"], () => {
+            this.historyManager.undo();
+        }, "Undo");
+        this.keyManager.keydown(["meta", "shift", "z"], () => {
+            this.historyManager.redo();
+        }, "Redo");
         this.keyManager.keyup(["backspace"], () => {
             this.removeElements(this.moveableData.getSelectedTargets());
-        });
+        }, "Delete");
+
+        this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
+        this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
+        this.console.log("keylist", this.keyManager.keylist);
     }
     public componentWillUnmount() {
         this.eventBus.off();
@@ -326,6 +372,7 @@ export default class Editor extends React.PureComponent<{
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("wheel", this.onWheel);
     }
+
     private onMenuChange = (id: string) => {
         this.setState({
             selectedMenu: id,

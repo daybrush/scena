@@ -200,8 +200,6 @@ export default class Viewer extends React.PureComponent<{
     private setGuides = () => {
         const verticalGuides = this.verticalGuides.getGuides();
         const horizontalGuides = this.horizontalGuides.getGuides();
-
-        console.log(verticalGuides, horizontalGuides);
     }
     private setZoom = (zoom: number) => {
         const {

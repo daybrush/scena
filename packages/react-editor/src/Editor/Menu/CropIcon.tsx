@@ -49,8 +49,9 @@ export default class CropIcon extends Icon {
                 const cropType = splitBracket(clipPath).prefix!;
 
                 if (id !== cropType) {
-                    moveableData.removeProperty("clip-path");
-                    moveableData.removeProperty("clip");
+                    const infos = moveableData.removeProperties("clip-path", "clip");
+
+                    this.historyManager.addAction("renders", { infos });
                 }
             }
         }

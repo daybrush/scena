@@ -6,7 +6,10 @@ class App extends React.Component {
     public editor = React.createRef<Editor>();
     public render() {
         return <div className="app">
-            <Editor ref={this.editor} />
+            <Editor
+                ref={this.editor}
+                debug={true}
+                />
             <div className="bottom">
                 <a href="https://github.com/daybrush/moveable" target="_blank">Download</a>
                 <a href="https://daybrush.com/moveable/release/latest/doc" target="_blank">API</a>
@@ -73,7 +76,7 @@ class App extends React.Component {
                     "font-weight": "normal",
                 },
             },
-        ]);
+        ], true);
     }
 }
 

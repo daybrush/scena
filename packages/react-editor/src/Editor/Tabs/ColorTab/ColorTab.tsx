@@ -43,13 +43,11 @@ export default class ColorTab extends Tab {
     }
     public onChangeBackgroundColor = (v: string) => {
         this.memory.set("background-color", v);
-        this.moveableData.setProperty(["background-color"], v);
-        this.forceUpdate();
+        this.editor.setProperty(["background-color"], v);
     }
     public onChangeTextColor = (v: string) => {
         this.memory.set("color", v);
-        this.moveableData.setProperty(["color"], v);
-        this.forceUpdate();
+        this.editor.setProperty(["color"], v);
     }
     private onRender = () => {
         this.forceUpdate();

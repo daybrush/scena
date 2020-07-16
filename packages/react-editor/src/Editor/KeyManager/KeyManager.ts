@@ -1,4 +1,5 @@
 import KeyController from "keycon";
+import Debugger from "../utils/Debugger";
 
 function check(e: any) {
     const inputEvent = e.inputEvent;
@@ -14,6 +15,7 @@ function check(e: any) {
     return true;
 }
 export default class KeyManager {
+    constructor(private console: Debugger) {}
     public keycon = new KeyController();
     public keylist: Array<[string[], string]> = [];
     public keydown(keys: string[], callback: (e: any) => any, description?: any) {
@@ -21,9 +23,12 @@ export default class KeyManager {
             if (!check(e)) {
                 return false;
             }
+
+            if (description) {
+                this.console.log(`keydown: ${keys.join(" + ")}`, description);
+            }
             callback(e);
         });
-
         if (description) {
             this.keylist.push([
                 keys,
@@ -31,13 +36,22 @@ export default class KeyManager {
             ]);
         }
     }
-    public keyup(keys: string[], callback: (e: any) => any) {
+    public keyup(keys: string[], callback: (e: any) => any, description?: any) {
         this.keycon.keyup(keys, e => {
             if (!check(e)) {
                 return false;
             }
+            if (description) {
+                this.console.log(`keyup: ${keys.join(" + ")}`, description);
+            }
             callback(e);
         });
+        if (description) {
+            this.keylist.push([
+                keys,
+                description,
+            ]);
+        }
     }
     get altKey() {
         return this.keycon.altKey;

@@ -1,6 +1,7 @@
 import MoveableHelper from "moveable-helper";
 import Memory from "./Memory";
 import { Frame } from "scenejs";
+import { DATA_SCENA_ELEMENT_ID } from "../consts";
 
 export default class MoveableData extends MoveableHelper {
     public selectedTargets: Array<HTMLElement | SVGElement> = [];
@@ -24,15 +25,33 @@ export default class MoveableData extends MoveableHelper {
         });
     }
     public setProperty(names: string[], value: any) {
-        this.getSelectedFrames().forEach(frame => {
+        const targets = this.getSelectedTargets();
+
+        const infos = targets.map(target => {
+            const frame = this.getFrame(target);
+            const prev = frame.get();
             frame.set(...names, value);
+            const next = frame.get();
+
+            return { id: target.getAttribute(DATA_SCENA_ELEMENT_ID), prev, next };
+
         });
         this.renderFrames();
+
+        return infos;
     }
-    public removeProperty(name: string) {
-        this.getSelectedTargets().forEach(target => {
-            this.getFrame(target).remove(name);
-            target.style.removeProperty(name);
+    public removeProperties(...names: string[]) {
+        return this.getSelectedTargets().map(target => {
+            const frame = this.getFrame(target);
+            const prev = frame.get();
+
+            names.forEach(name => {
+                frame.remove(name);
+                target.style.removeProperty(name);
+            });
+            const next = frame.get();
+
+            return { id: target.getAttribute(DATA_SCENA_ELEMENT_ID), prev, next };
         });
     }
     public getProperties(properties: string[][], defaultValues: any[]) {

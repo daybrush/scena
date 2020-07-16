@@ -53,12 +53,12 @@ export default class AlignTab extends Tab {
 
         if (moveables) {
             // Group
-
-            moveables.forEach(m => {
+            const infos = moveables.map(m => {
                 const target = m.state.target!;
                 const frame = this.moveableData.getFrame(target);
 
                 if (frame) {
+                    const prev = frame.get();
                     const subRect = m.getRect();
                     const subPos = getDirectionPos(type, direction, subRect);
                     const delta = pos - subPos;
@@ -69,10 +69,16 @@ export default class AlignTab extends Tab {
                     translate[type === "horizontal" ? 1 : 0] += delta;
 
                     frame.set("transform", "translate", translate.map((t: number) => `${t}px`).join(", "));
-                }
-                return target;
-            });
 
+                    return { id: target.getAttribute("data-scena-element-id"), prev, next: frame.get() };
+                }
+                return false;
+            }).filter(target => target);
+
+
+            this.historyManager.addAction("renders", {
+                infos,
+            });
             this.moveableData.renderFrames();
             moveable.updateRect();
         } else {
@@ -87,6 +93,5 @@ export default class AlignTab extends Tab {
 
             moveable.request("draggable", { [type === "horizontal" ? "deltaY" : "deltaX"]: -delta }, true);
         }
-
     }
 }
