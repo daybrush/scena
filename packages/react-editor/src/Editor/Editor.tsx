@@ -298,6 +298,9 @@ export default class Editor extends React.PureComponent<{
     public removeByIds(ids: string[], isRestore?: boolean) {
         return this.removeElements(this.viewport.current!.getElements(ids), isRestore);
     }
+    public getMoveable() {
+        return this.moveableManager.current!.getMoveable();
+    }
     public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
         targets.forEach(target => {
             this.moveableData.removeFrame(target);
@@ -371,6 +374,22 @@ export default class Editor extends React.PureComponent<{
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "z"], () => {
             this.historyManager.redo();
         }, "Redo");
+        this.keyManager.keydown(["left"], e => {
+            this.getMoveable().request("draggable", { deltaX: -10}, true);
+            e.inputEvent.preventDefault();
+        }, "Move Left");
+        this.keyManager.keydown(["up"], e => {
+            this.getMoveable().request("draggable", { deltaY: -10}, true);
+            e.inputEvent.preventDefault();
+        }, "Move Up");
+        this.keyManager.keydown(["right"], e => {
+            this.getMoveable().request("draggable", { deltaX: 10}, true);
+            e.inputEvent.preventDefault();
+        }, "Move Right");
+        this.keyManager.keydown(["down"], e => {
+            this.getMoveable().request("draggable", { deltaY: 10}, true);
+            e.inputEvent.preventDefault();
+        }, "Move Down");
         this.keyManager.keyup(["backspace"], () => {
             this.removeElements(this.moveableData.getSelectedTargets());
         }, "Delete");
