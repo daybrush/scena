@@ -4,11 +4,11 @@ import Memory from "../utils/Memory";
 
 export default class RectIcon extends Icon {
     public static id = "Rect";
-    public static maker = () => ({
+    public static maker = (memory: Memory) => ({
         tag: "div",
         props: {},
         style: {
-            "background-color": Memory.get("background-color"),
+            "background-color": memory.get("background-color"),
         },
     });
     public renderIcon() {

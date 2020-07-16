@@ -1,5 +1,12 @@
-const Memory = new Map<any, any>();
-
-Memory.set("background-color", "#4af");
-Memory.set("color", "#333");
-export default Memory;
+export default class Memory {
+    public map = new Map<any, any>();
+    public get(key: any) {
+        return this.map.get(key);
+    }
+    public set(key: any, value: any) {
+        return this.map.set(key, value);
+    }
+    public clear() {
+        this.map.clear();
+    }
+}

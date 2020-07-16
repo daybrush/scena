@@ -1,21 +1,17 @@
 import * as React from "react";
 import Tab from "../Tab";
-import EventBus from "../../utils/EventBus";
-
 import Folder from "../Folder/Folder";
 import File from "../Folder/File";
 import { ElementInfo } from "../../Viewport/Viewport";
 import Layer from "./Layer";
-import Memory from "../../utils/Memory";
-import { getTargets } from "../../utils/MoveableData";
 
 export default class LayerTab extends Tab {
     public static id = "Layers";
     public title = "Layers";
 
     public renderTab() {
-        const infos = Memory.get("viewportInfos") || [];
-        const selected = getTargets().map(target => target.getAttribute("data-moveable-id")!)
+        const infos = this.editor.getViewportInfos();
+        const selected = this.moveableData.getSelectedTargets().map(target => target.getAttribute("data-moveable-id")!)
 
         return <Folder
             scope={[]}
@@ -32,23 +28,15 @@ export default class LayerTab extends Tab {
         return <Layer name={name} fullName={fullName} scope={scope} value={value}></Layer>;
     }
     public componentDidMount() {
-        EventBus.on("setTargets", this.setTargets as any);
-        EventBus.on("changeLayers", this.changeLayers as any);
-    }
-    public componentWillUnmount() {
-        EventBus.off("setTargets", this.setTargets as any);
-        EventBus.off("changeLayers", this.changeLayers as any);
+        this.addEvent("setSelectedTargets", this.setSelectedTargets);
     }
 
     private onSelect = (selected: string[]) => {
-        EventBus.requestTrigger("selectLayers", {
+        this.eventBus.requestTrigger("selectLayers", {
             selected,
         })
     }
-    private changeLayers = () => {
-        this.forceUpdate();
-    }
-    private setTargets = () => {
+    private setSelectedTargets = () => {
         this.forceUpdate();
     }
 }

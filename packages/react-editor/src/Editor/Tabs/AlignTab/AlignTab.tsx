@@ -4,7 +4,6 @@ import { prefix } from "../../utils/utils";
 import "./AlignTab.css";
 import Align from "./Align";
 import MoveableGroup from "react-moveable/declaration/MoveableGroup";
-import MoveableData from "../../utils/MoveableData";
 
 const TYPES = ["vertical", "horizontal"] as const;
 const DIRECTIONS = ["start", "center", "end"] as const;
@@ -55,9 +54,9 @@ export default class AlignTab extends Tab {
         if (moveables) {
             // Group
 
-            const targets = moveables.map(m => {
+            moveables.forEach(m => {
                 const target = m.state.target!;
-                const frame = MoveableData.getFrame(target);
+                const frame = this.moveableData.getFrame(target);
 
                 if (frame) {
                     const subRect = m.getRect();
@@ -74,12 +73,7 @@ export default class AlignTab extends Tab {
                 return target;
             });
 
-            targets.forEach(target => {
-                if (!target) {
-                    return;
-                }
-                MoveableData.render(target);
-            });
+            this.moveableData.renderFrames();
             moveable.updateRect();
         } else {
             const viewportRect = {

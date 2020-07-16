@@ -2,47 +2,39 @@ import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
-import keycon from "keycon";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
-import Viewport from "./Viewport/Viewport";
+import Viewport, { JSXInfo } from "./Viewport/Viewport";
 import { getContentElement, prefix } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
 import Memory from "./utils/Memory";
-import KeyController from "keycon";
 import MoveableManager from "./Viewport/MoveableMananger";
-import { keyup } from "./KeyManager/KeyManager";
-import MoveableData, { getTargets } from "./utils/MoveableData";
+import MoveableData from "./utils/MoveableData";
+import KeyManager from "./KeyManager/KeyManager";
+import { ScenaEditorState, TagAppendInfo } from "./types";
 
 
-EventBus.on("setTargets", ({ targets }) => {
-    Memory.set("targets", targets);
-});
-
-
-export class Editor extends React.PureComponent<{
+export default class Editor extends React.PureComponent<{
     width: number,
     height: number,
-}> {
+}, Partial<ScenaEditorState>> {
     public static defaultProps = {
         width: 400,
         height: 600,
     };
-    public state: {
-        targets: Array<SVGElement | HTMLElement>,
-        horizontalGuides: number[],
-        verticalGuides: number[],
-        selectedMenu: string,
-        zoom: number,
-    } = {
-            targets: [],
-            horizontalGuides: [],
-            verticalGuides: [],
-            zoom: 1,
-            selectedMenu: "MoveTool",
-        };
+    public state: ScenaEditorState = {
+        selectedTargets: [],
+        horizontalGuides: [],
+        verticalGuides: [],
+        zoom: 1,
+        selectedMenu: "MoveTool",
+    };
+    public eventBus = new EventBus();
+    public memory = new Memory();
+    public moveableData = new MoveableData(this.memory);
+    public keyManager = new KeyManager();
     public horizontalGuides = React.createRef<Guides>();
     public verticalGuides = React.createRef<Guides>();
     public infiniteViewer = React.createRef<InfiniteViewer>();
@@ -50,6 +42,7 @@ export class Editor extends React.PureComponent<{
     public menu = React.createRef<Menu>();
     public moveableManager = React.createRef<MoveableManager>();
     public viewport = React.createRef<Viewport>();
+    public tabs = React.createRef<Tabs>();
     public render() {
         const {
             horizontalGuides,
@@ -58,12 +51,13 @@ export class Editor extends React.PureComponent<{
             moveableManager,
             viewport,
             menu,
+            tabs,
             selecto,
             state,
         } = this;
         const {
             selectedMenu,
-            targets,
+            selectedTargets,
             zoom,
         } = state;
         const {
@@ -74,8 +68,8 @@ export class Editor extends React.PureComponent<{
         const verticalSnapGuides = [0, width, width / 2, ...state.verticalGuides];
         return (
             <div className={prefix("editor")}>
-                <Tabs moveableManager={moveableManager}></Tabs>
-                <Menu ref={menu} onSelect={this.onMenuChange} />
+                <Tabs ref={tabs} editor={this}></Tabs>
+                <Menu ref={menu} editor={this} onSelect={this.onMenuChange} />
                 <div className={prefix("reset")} onClick={e => {
                     infiniteViewer.current!.scrollCenter();
                 }}></div>
@@ -117,7 +111,7 @@ export class Editor extends React.PureComponent<{
                         if (
                             target.nodeName === "A"
                             || moveableManager.current!.getMoveable().isMoveableElement(target)
-                            || targets.some(t => t === target || t.contains(target))
+                            || selectedTargets.some(t => t === target || t.contains(target))
                         ) {
                             e.stop();
                         }
@@ -149,12 +143,11 @@ export class Editor extends React.PureComponent<{
                     }}>
                         <MoveableManager
                             ref={moveableManager}
-                            targets={targets}
+                            selectedTargets={selectedTargets}
                             selectedMenu={selectedMenu}
-                            selecto={selecto}
-                            menu={menu}
                             verticalGuidelines={verticalSnapGuides}
                             horizontalGuidelines={horizontalSnapGuides}
+                            editor={this}
                         ></MoveableManager>
                     </Viewport>
                 </InfiniteViewer>
@@ -191,13 +184,13 @@ export class Editor extends React.PureComponent<{
 
                             if (contentElement && contentElement.hasAttribute("data-moveable")) {
                                 e.stop();
-                                this.setTargets([contentElement]);
+                                this.setSelectedTargets([contentElement]);
                             }
                         }
                         if (
                             (inputEvent.type === "touchstart" && e.isTrusted)
                             || moveableManager.current!.getMoveable().isMoveableElement(target)
-                            || state.targets.some(t => t === target || t.contains(target))
+                            || state.selectedTargets.some(t => t === target || t.contains(target))
                         ) {
                             e.stop();
                         }
@@ -212,7 +205,7 @@ export class Editor extends React.PureComponent<{
                         if (this.selectEndMaker(rect)) {
                             return;
                         }
-                        this.setTargets(selected).then(() => {
+                        this.setSelectedTargets(selected).then(() => {
                             if (!isDragStart) {
                                 return;
                             }
@@ -223,68 +216,84 @@ export class Editor extends React.PureComponent<{
             </div>
         );
     }
-    public promiseState(state: IObject<any>) {
+    public promiseState(state: Partial<ScenaEditorState>) {
         return new Promise(resolve => {
             this.setState(state, () => {
                 resolve();
             });
         });
     }
-    public setTargets(targets: Array<HTMLElement | SVGElement>) {
+    public getSelectedTargets() {
+        return this.state.selectedTargets;
+    }
+    public setSelectedTargets(targets: Array<HTMLElement | SVGElement>) {
         return this.promiseState({
-            targets,
+            selectedTargets: targets,
         }).then(() => {
-            EventBus.requestTrigger("setTargets", { targets });
+            this.moveableData.setSelectedTargets(targets);
+            this.eventBus.trigger("setSelectedTargets");
+            return targets;
         });
     }
     public appendJSX(jsx: any, name: string, frame: IObject<any> = {}) {
-        return this.viewport.current!.appendJSX(jsx, name, frame).then(target => {
-            this.setTargets([target]);
-
-            return target;
-        });
+        return this.appendJSXs([{ jsx, name, frame }]).then(targets => targets[0]);
     }
     public appendElement(tag: any, props: IObject<any>, name: string, frame: IObject<any> = {}) {
-        return this.viewport.current!.appendElement(tag, props, name, frame).then(target => {
-            this.setTargets([target]);
-
-            return target;
-        });
+        return this.appendElements([{ tag, props, name, frame }]).then(target => target[0]);
     }
-    public appendJSXs(jsxs: Array<{ jsx: any, name: string, frame: IObject<any> }>): Promise<Array<HTMLElement | SVGElement>> {
-        return this.viewport.current!.appendJSXs(jsxs).then(targets => {
-            this.setTargets([targets[0]]);
+    public appendJSXs(jsxs: JSXInfo[]): Promise<Array<HTMLElement | SVGElement>> {
+        return this.viewport.current!.appendJSXs(jsxs).then(({
+            added,
+        }) => {
+            const data = this.moveableData;
+            const targets = added.map((info, i) => {
+                data.createFrame(info.el!, jsxs[i].frame || {});
+                data.render(info.el!);
+
+                return info.el!;
+            }).filter(el => el);
+            this.setSelectedTargets([added[0].el!]);
 
             return targets;
         });
     }
-    public appendElements(elements: Array<{ tag: any, props: IObject<any>, name: string, frame: IObject<any> }>): Promise<Array<HTMLElement | SVGElement>> {
-        return this.viewport.current!.appendElements(elements).then(targets => {
-            this.setTargets([targets[0]]);
-
-            return targets;
-        });
+    public appendElements(elements: TagAppendInfo[]): Promise<Array<HTMLElement | SVGElement>> {
+        return this.appendJSXs(elements.map(({ props, name, frame, tag: Tag }) => ({
+            jsx: <Tag {...props}></Tag>,
+            name,
+            frame,
+        })));
     }
     public removeElements(targets: Array<HTMLElement | SVGElement>) {
-        const currentTargets = getTargets();
+        const currentTargets = this.moveableData.getSelectedTargets();
         const nextTargets = currentTargets.filter(target => {
             return targets.indexOf(target) === -1;
         });
         targets.forEach(target => {
-            MoveableData.removeFrame(target);
+            this.moveableData.removeFrame(target);
         });
-        return this.setTargets(nextTargets).then(() => {
+        return this.setSelectedTargets(nextTargets).then(() => {
             this.viewport.current!.removeTargets(targets);
         });
+    }
+    public selectMenu(menu: string) {
+        this.menu.current!.select(menu);
+    }
+    public getViewportInfos() {
+        return this.viewport.current!.state.infos;
     }
     public componentDidMount() {
         const {
             infiniteViewer,
+            memory,
+            eventBus,
         } = this;
+        memory.set("background-color", "#4af");
+        memory.set("color", "#333");
+
         requestAnimationFrame(() => {
             infiniteViewer.current!.scrollCenter();
         });
-        keycon.setGlobal();
         window.addEventListener("resize", this.onResize);
         window.addEventListener("wheel", this.onWheel, {
             passive: false,
@@ -292,23 +301,28 @@ export class Editor extends React.PureComponent<{
         const viewport = this.viewport.current!
 
 
-        EventBus.on("selectLayers", (e: any) => {
+        eventBus.on("blur", () => {
+            this.menu.current!.blur();
+            this.tabs.current!.blur();
+        });
+        eventBus.on("selectLayers", (e: any) => {
             const selected = e.selected as string[];
 
-            this.setTargets(selected.map(key => viewport.getInfo(key)!.el!));
+            this.setSelectedTargets(selected.map(key => viewport.getInfo(key)!.el!));
         });
-        EventBus.on("update", () => {
+        eventBus.on("update", () => {
             this.forceUpdate();
         });
 
-        keyup(["backspace"], () => {
-            this.removeElements(getTargets());
+        this.keyManager.keyup(["backspace"], () => {
+            this.removeElements(this.moveableData.getSelectedTargets());
         });
     }
     public componentWillUnmount() {
-        EventBus.off();
-        Memory.clear();
-        KeyController.global.destroy();
+        this.eventBus.off();
+        this.memory.clear();
+        this.moveableData.clear();
+        this.keyManager.destroy();
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("wheel", this.onWheel);
     }
@@ -326,7 +340,7 @@ export class Editor extends React.PureComponent<{
         if (!selectIcon || !selectIcon.maker || !width || !height) {
             return false;
         }
-        const maker = selectIcon.maker();
+        const maker = selectIcon.maker(this.memory);
         const scrollTop = -infiniteViewer.getScrollTop() + 30;
         const scrollLeft = -infiniteViewer.getScrollLeft() + 75;
         const top = rect.top - scrollTop;
@@ -354,22 +368,14 @@ export class Editor extends React.PureComponent<{
         if (selection) {
             selection.removeAllRanges();
         }
-        // if (activeElement && (
-        //     activeElement.tagName === "INPUT" ||
-        //     activeElement.tagName === "TEXTAREA"
-        //     || (activeElement as any).isContentEditable
-        // )) {
-
-
-        // }
-        EventBus.trigger("blur");
+        this.eventBus.trigger("blur");
     }
     private onResize = () => {
         this.horizontalGuides.current!.resize();
         this.verticalGuides.current!.resize();
     }
     private onWheel = (e: any) => {
-        if (keycon.global.altKey) {
+        if (this.keyManager.altKey) {
             e.preventDefault();
             this.setState({
                 zoom: Math.max(0.1, this.state.zoom + e.deltaY / 300),

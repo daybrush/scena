@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Editor } from "./Editor/Editor";
+import Editor from "./Editor/Editor";
 import "./App.css";
 
 class App extends React.Component {

@@ -1,7 +1,6 @@
 import * as React from "react";
 import Tab from "./Tab";
 import { prefix } from "../utils/utils";
-import EventBus from "../utils/EventBus";
 import NumberBox from "../Inputs/NumberBox";
 import TabInputBox from "../Inputs/TabInputBox";
 import Anchor from "../Inputs/Anchor";
@@ -41,16 +40,11 @@ export default class TransformTab extends Tab {
         </div>;
     }
     public componentDidMount() {
-        EventBus.on("render", this.onRender as any);
-        EventBus.on("renderGroup", this.onRender as any);
-        EventBus.on("setTargets", this.onRender as any);
+        this.addEvent("render", this.onRender);
+        this.addEvent("renderGroup", this.onRender);
+        this.addEvent("setSelectedTargets", this.onRender);
 
         this.onRender();
-    }
-    public componentWillUnmount() {
-        EventBus.off("render", this.onRender as any);
-        EventBus.off("renderGroup", this.onRender as any);
-        EventBus.off("setTargets", this.onRender as any);
     }
     public onChangeRotate = (v: any) => {
         const rotate = parseFloat(v);

@@ -13,20 +13,45 @@ function check(e: any) {
     }
     return true;
 }
-export function keydown(keys: string[], callback: (e: any) => any) {
-    KeyController.global.keydown(keys, e => {
-        if (!check(e)) {
-            return false;
+export default class KeyManager {
+    public keycon = new KeyController();
+    public keylist: Array<[string[], string]> = [];
+    public keydown(keys: string[], callback: (e: any) => any, description?: any) {
+        this.keycon.keydown(keys, e => {
+            if (!check(e)) {
+                return false;
+            }
+            callback(e);
+        });
+
+        if (description) {
+            this.keylist.push([
+                keys,
+                description,
+            ]);
         }
-        callback(e);
-    });
+    }
+    public keyup(keys: string[], callback: (e: any) => any) {
+        this.keycon.keyup(keys, e => {
+            if (!check(e)) {
+                return false;
+            }
+            callback(e);
+        });
+    }
+    get altKey() {
+        return this.keycon.altKey;
+    }
+    get shiftKey() {
+        return this.keycon.shiftKey;
+    }
+    get metaKey() {
+        return this.keycon.metaKey;
+    }
+    get ctrlKey() {
+        return this.keycon.ctrlKey;
+    }
+    public destroy() {
+        this.keycon.destroy();
+    }
 }
-export function keyup(keys: string[], callback: (e: any) => any) {
-    KeyController.global.keyup(keys, e => {
-        if (!check(e)) {
-            return false;
-        }
-        callback(e);
-    });
-}
-// KeyController.global.

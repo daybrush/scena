@@ -1,8 +1,9 @@
 import * as React from "react";
-import { prefix } from "../utils/utils";
+import { prefix, connectEditorProps } from "../utils/utils";
 import { IObject, camelize } from "@daybrush/utils";
-import EventBus from "../utils/EventBus";
-import { keydown } from "../KeyManager/KeyManager";
+import Memory from "../utils/Memory";
+import Editor from "../Editor";
+import { EditorInterface } from "../types";
 
 
 export interface Maker {
@@ -10,13 +11,16 @@ export interface Maker {
     props: IObject<any>,
     style: IObject<any>,
 }
+
+@connectEditorProps
 export default abstract class Icon extends React.PureComponent<{
+    editor: Editor,
     selected?: boolean,
     onSelect?: (id: string) => any;
 }> {
     public static id: string;
-    public static maker?: () => Maker;
-    public static makeThen: (target: HTMLElement | SVGElement) => any = () => {};
+    public static maker?: (memory: Memory) => Maker;
+    public static makeThen: (target: HTMLElement | SVGElement) => any = () => { };
     public keys: string[] = [];
     public abstract renderIcon(): any;
     private subContainer = React.createRef<HTMLDivElement>();
@@ -40,7 +44,7 @@ export default abstract class Icon extends React.PureComponent<{
             this.props.selected && <div key={"extends-container"}
                 className={prefix("extends-container")} ref={this.subContainer}
                 onClick={this.onSubClick}
-                >
+            >
                 {subIcons}
             </div>,
         ];
@@ -52,7 +56,7 @@ export default abstract class Icon extends React.PureComponent<{
         return <div key={id} className={prefix("icon", "sub-icon", isSelect ? "selected" : "")} onClick={() => {
             this.onSubSelect!(id);
         }}>
-            <IconClass selected={false} />
+            <IconClass editor={this.props.editor} selected={false} />
             <div className={prefix("sub-icon-label")}>
                 {camelize(` ${id}`)}
             </div>
@@ -82,7 +86,6 @@ export default abstract class Icon extends React.PureComponent<{
         } else {
             subContainer.style.display = "block";
         }
-
     }
     public blur = () => {
         const subContainer = this.subContainer.current;
@@ -92,18 +95,15 @@ export default abstract class Icon extends React.PureComponent<{
 
         subContainer.style.display = "none";
     }
-    public onSubSelect(id: string) {}
+    public onSubSelect(id: string) { }
     public componentDidMount() {
-        EventBus.on("blur", this.blur);
-
         const keys = this.keys;
         if (keys.length) {
-            keydown(keys, () => {
+            this.keyManager.keydown(keys, () => {
                 this.props.onSelect!((this.constructor as any).id);
-            });
+            }, (this.constructor as any).id);
         }
     }
-    public componentWillUnmount() {
-        EventBus.off("blur", this.blur);
-    }
 }
+
+export default interface Icon extends EditorInterface {}

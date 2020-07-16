@@ -1,8 +1,5 @@
 import * as React from "react";
 import { IObject, find } from "@daybrush/utils";
-import MoveableData from "../utils/MoveableData";
-import EventBus from "../utils/EventBus";
-import Memory from "../utils/Memory";
 import { prefix } from "../utils/utils";
 
 export interface ElementInfo {
@@ -10,6 +7,19 @@ export interface ElementInfo {
     el: HTMLElement | null;
     id: string;
     name: string;
+}
+export interface AddedInfo {
+    added: ElementInfo[];
+    next: ElementInfo[];
+}
+export interface RemovedInfo {
+    removed: ElementInfo[];
+    next: ElementInfo[];
+}
+export interface JSXInfo {
+    jsx: any;
+    name: string;
+    frame?: IObject<any>;
 }
 export default class Viewport extends React.PureComponent<{
     style: IObject<any>,
@@ -48,7 +58,7 @@ export default class Viewport extends React.PureComponent<{
     public getInfo(id: string) {
         return this.state.ids[id];
     }
-    public appendJSXs(jsxs: Array<{ jsx: any, name: string, frame: IObject<any> }>): Promise<Array<HTMLElement | SVGElement>> {
+    public appendJSXs(jsxs: JSXInfo[]): Promise<AddedInfo> {
         const infos = this.state.infos;
         const jsxInfos = jsxs.map(({ jsx, name }) => {
             const id = this.makeId();
@@ -73,65 +83,46 @@ export default class Viewport extends React.PureComponent<{
             this.setState({
                 infos: nextInfos,
             }, () => {
-
-                const targets = jsxInfos.map((info, i) => {
+                const infos = jsxInfos.map((info, i) => {
                     const id = info.id;
-                    const frame = jsxs[i].frame || {};
 
                     const target = document.querySelector<HTMLElement>(`[data-moveable-id="${id}"]`)!;
-                    MoveableData.createFrame(target, frame);
-                    MoveableData.render(target);
                     info.el = target;
 
-                    return target;
+                    return info;
                 });
-                Memory.set("viewportInfos", nextInfos);
-                EventBus.requestTrigger("changeLayers", {
-                    infos: nextInfos,
+
+                resolve({
+                    added: infos,
+                    next: nextInfos,
                 });
-                resolve(targets);
             });
         });
     }
-    public appendJSX(jsx: any, name: string, frame: IObject<any> = {}): Promise<HTMLElement | SVGElement> {
-        return this.appendJSXs([{
-            jsx,
-            name,
-            frame,
-        }]).then(targets => targets[0]);
-    }
-    public appendElement(Tag: any, props: IObject<any>, name: string, frame: IObject<any> = {}): Promise<HTMLElement | SVGElement> {
-        return this.appendJSX(<Tag {...props}></Tag>, name, frame);
-    }
-    public appendElements(elements: Array<{ tag: any, props: IObject<any>, name: string, frame: IObject<any> }>): Promise<Array<HTMLElement | SVGElement>> {
-        return this.appendJSXs(elements.map(({ props, name, frame, tag: Tag }) => ({
-            jsx: <Tag {...props}></Tag>,
-            name,
-            frame,
-        })));
-    }
-    public removeTargets(targets: Array<HTMLElement | SVGElement>) {
+    public removeTargets(targets: Array<HTMLElement | SVGElement>): Promise<RemovedInfo> {
         const { ids, infos } = this.state;
 
-        targets.forEach(target => {
+        const removed = targets.map(target => {
             const info = find(infos, ({ el }) => el === target);
 
             if (!info) {
-                return;
+                return undefined;
             }
 
             delete ids[info.id];
-            infos.splice(infos.indexOf(info), 1);
-        });
+            return infos.splice(infos.indexOf(info), 1)[0];
+        }).filter(info => info) as ElementInfo[];
 
-        this.setState({
-            ids: { ...ids },
-            infos: [...infos],
-        }, () => {
-            Memory.set("viewportInfos", infos);
-            EventBus.requestTrigger("changeLayers", {
-                infos,
-            });
-        })
+        return new Promise(resolve => {
+            this.setState({
+                ids: { ...ids },
+                infos: [...infos],
+            }, () => {
+                resolve({
+                    removed,
+                    next: infos,
+                });
+            })
+        });
     }
 }

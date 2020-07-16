@@ -1,11 +1,8 @@
 import * as React from "react";
 import Icon from "./Icon";
-import { getSelectedFrames, renderFrames, getTargets } from "../utils/MoveableData";
-import Memory from "../utils/Memory";
 import { splitBracket } from "@daybrush/utils";
 import OvalIcon from "./OvalIcon";
 import RectIcon from "./RectIcon";
-import EventBus from "../utils/EventBus";
 import CircleIcon from "./CircleIcon";
 import PolygonIcon from "./PolygonIcon";
 
@@ -23,8 +20,8 @@ export default class CropIcon extends Icon {
         );
     }
     public renderSubIcons() {
-        const frame = getSelectedFrames()[0];
-        let cropType = Memory.get("crop") || "inset";
+        const frame = this.moveableData.getSelectedFrames()[0];
+        let cropType = this.memory.get("crop") || "inset";
 
         if (frame) {
             const clipPath = frame.get("clip-path") || frame.get("clip");
@@ -42,7 +39,8 @@ export default class CropIcon extends Icon {
         ];
     }
     public onSubSelect(id: string) {
-        const frame = getSelectedFrames()[0];
+        const moveableData = this.moveableData;
+        const frame = moveableData.getSelectedFrames()[0];
 
         if (frame) {
             const clipPath = frame.get("clip-path") || frame.get("clip");
@@ -51,18 +49,14 @@ export default class CropIcon extends Icon {
                 const cropType = splitBracket(clipPath).prefix!;
 
                 if (id !== cropType) {
-                    frame.remove("clip-path");
-                    frame.remove("clip");
-                    const target = getTargets()[0];
-                    target.style.removeProperty("clip");
-                    target.style.removeProperty("clip-path");
-                    renderFrames();
+                    moveableData.removeProperty("clip-path");
+                    moveableData.removeProperty("clip");
                 }
             }
         }
-        Memory.set("crop", id);
 
-        EventBus.requestTrigger("update");
+        this.memory.set("crop", id);
+        this.eventBus.requestTrigger("update");
 
         this.forceUpdate();
     }

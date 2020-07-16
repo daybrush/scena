@@ -1,19 +1,12 @@
 import * as React from "react";
 import Moveable from "react-moveable";
-import MoveableData from "../utils/MoveableData";
-import Memory from "../utils/Memory";
 import { getContentElement } from "../utils/utils";
-import EventBus from "../utils/EventBus";
-import Menu from "../Menu/Menu";
-import Selecto from "react-selecto";
-import { keydown, keyup } from "../KeyManager/KeyManager";
-import KeyController from "keycon";
+import Editor from "../Editor";
 
 export default class MoveableManager extends React.PureComponent<{
+    editor: Editor,
+    selectedTargets: Array<HTMLElement | SVGElement>;
     selectedMenu: string,
-    targets: Array<HTMLElement | SVGElement>,
-    menu: React.RefObject<Menu>,
-    selecto: React.RefObject<Selecto>,
     verticalGuidelines: number[],
     horizontalGuidelines: number[],
 }> {
@@ -23,24 +16,33 @@ export default class MoveableManager extends React.PureComponent<{
     }
     public render() {
         const {
-            selectedMenu, targets, menu, selecto,
+            editor,
             verticalGuidelines,
             horizontalGuidelines,
+            selectedTargets,
+            selectedMenu,
         } = this.props;
         // const
 
-        const elementGuidelines = [...MoveableData.getTargets()].filter(el => {
-            return targets.indexOf(el) === -1;
+        const {
+            moveableData,
+            keyManager,
+            eventBus,
+            selecto,
+            memory,
+        } = editor;
+        const elementGuidelines = [...moveableData.getTargets()].filter(el => {
+            return selectedTargets.indexOf(el) === -1;
         });
-        const isShift = KeyController.global.shiftKey;
+        const isShift = keyManager.shiftKey;
         return <Moveable
             ref={this.moveable}
-            targets={targets}
+            targets={selectedTargets}
             draggable={true}
             resizable={true}
             throttleResize={1}
             clippable={selectedMenu === "Crop"}
-            dragArea={targets.length > 1 || selectedMenu !== "Text"}
+            dragArea={selectedTargets.length > 1 || selectedMenu !== "Text"}
             checkInput={selectedMenu === "Text"}
             throttleDragRotate={isShift ? 45 : 0}
             keepRatio={isShift}
@@ -53,40 +55,40 @@ export default class MoveableManager extends React.PureComponent<{
             horizontalGuidelines={horizontalGuidelines}
             elementGuidelines={elementGuidelines}
             clipArea={true}
-            onDragStart={MoveableData.onDragStart}
-            onDrag={MoveableData.onDrag}
-            onDragGroupStart={MoveableData.onDragGroupStart}
-            onDragGroup={MoveableData.onDragGroup}
+            onDragStart={moveableData.onDragStart}
+            onDrag={moveableData.onDrag}
+            onDragGroupStart={moveableData.onDragGroupStart}
+            onDragGroup={moveableData.onDragGroup}
 
-            onScaleStart={MoveableData.onScaleStart}
-            onScale={MoveableData.onScale}
-            onScaleGroupStart={MoveableData.onScaleGroupStart}
-            onScaleGroup={MoveableData.onScaleGroup}
+            onScaleStart={moveableData.onScaleStart}
+            onScale={moveableData.onScale}
+            onScaleGroupStart={moveableData.onScaleGroupStart}
+            onScaleGroup={moveableData.onScaleGroup}
 
-            onResizeStart={MoveableData.onResizeStart}
-            onResize={MoveableData.onResize}
-            onResizeGroupStart={MoveableData.onResizeGroupStart}
-            onResizeGroup={MoveableData.onResizeGroup}
+            onResizeStart={moveableData.onResizeStart}
+            onResize={moveableData.onResize}
+            onResizeGroupStart={moveableData.onResizeGroupStart}
+            onResizeGroup={moveableData.onResizeGroup}
 
-            onRotateStart={MoveableData.onRotateStart}
-            onRotate={MoveableData.onRotate}
-            onRotateGroupStart={MoveableData.onRotateGroupStart}
-            onRotateGroup={MoveableData.onRotateGroup}
+            onRotateStart={moveableData.onRotateStart}
+            onRotate={moveableData.onRotate}
+            onRotateGroupStart={moveableData.onRotateGroupStart}
+            onRotateGroup={moveableData.onRotateGroup}
 
-            defaultClipPath={Memory.get("crop") || "inset"}
-            onClip={MoveableData.onClip}
+            defaultClipPath={memory.get("crop") || "inset"}
+            onClip={moveableData.onClip}
 
-            onDragOriginStart={MoveableData.onDragOriginStart}
+            onDragOriginStart={moveableData.onDragOriginStart}
             onDragOrigin={e => {
-                MoveableData.onDragOrigin(e);
+                moveableData.onDragOrigin(e);
             }}
 
-            onRound={MoveableData.onRound}
+            onRound={moveableData.onRound}
 
             onClick={e => {
                 const target = e.inputTarget as any;
                 if (e.isDouble && target.isContentEditable) {
-                    menu.current!.select("Text");
+                    editor.selectMenu("Text");
                     const el = getContentElement(target);
 
                     if (el) {
@@ -98,24 +100,26 @@ export default class MoveableManager extends React.PureComponent<{
                 selecto.current!.clickTarget(e.inputEvent, e.inputTarget);
             }}
             onRender={e => {
-                EventBus.requestTrigger("render", e);
+                eventBus.requestTrigger("render", e);
             }}
             onRenderGroup={e => {
-                EventBus.requestTrigger("renderGroup", e);
+                eventBus.requestTrigger("renderGroup", e);
             }}
             onRenderEnd={e => {
-                EventBus.requestTrigger("render", e);
+                eventBus.requestTrigger("render", e);
             }}
             onRenderGroupEnd={e => {
-                EventBus.requestTrigger("renderGroup", e);
+                eventBus.requestTrigger("renderGroup", e);
             }}
         ></Moveable>
     }
     public componentDidMount() {
-        keydown(["shift"], () => {
+        const keyManager = this.props.editor.keyManager;
+
+        keyManager.keydown(["shift"], () => {
             this.forceUpdate();
         });
-        keyup(["shift"], () => {
+        keyManager.keyup(["shift"], () => {
             this.forceUpdate();
         });
     }

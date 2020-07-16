@@ -4,11 +4,11 @@ import Memory from "../utils/Memory";
 
 export default class OvalIcon extends Icon {
     public static id = "Oval";
-    public static maker = () => ({
+    public static maker = (memory: Memory) => ({
         tag: "div",
         props: {},
         style: {
-            "background-color": Memory.get("background-color"),
+            "background-color": memory.get("background-color"),
             "border-radius": "50%",
         },
     });

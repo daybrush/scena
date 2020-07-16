@@ -1,9 +1,6 @@
 import * as React from "react";
 import Tab from "../Tab";
 import { prefix } from "../../utils/utils";
-import EventBus from "../../utils/EventBus";
-import { getSelectedFrames, renderFrames } from "../../utils/MoveableData";
-
 import Folder from "../Folder/Folder";
 import Property from "./Property";
 import File from "../Folder/File";
@@ -22,7 +19,7 @@ export default class FrameTab extends Tab {
             selected,
         } = this.state;
 
-        const frame = getSelectedFrames()[0];
+        const frame = this.moveableData.getSelectedFrames()[0];
 
         if (!frame) {
             return;
@@ -33,12 +30,8 @@ export default class FrameTab extends Tab {
         </div>;
     }
     public componentDidMount() {
-        EventBus.on("render", this.onRender as any);
-        EventBus.on("setTargets", this.setTargets as any);
-    }
-    public componentWillUnmount() {
-        EventBus.off("render", this.onRender as any);
-        EventBus.off("setTargets", this.setTargets as any);
+        this.addEvent("render", this.onRender as any);
+        this.addEvent("setSelectedTargets", this.setTargets as any);
     }
     private renderProperty = ({ name, fullName, scope, value }: File["props"]) => {
         return <Property name={name} fullName={fullName} scope={scope} value={value} onChange={this.onChange}></Property>;
@@ -49,17 +42,17 @@ export default class FrameTab extends Tab {
         })
     }
     private onChange = (scope: string[], value: any) => {
-        const frames = getSelectedFrames();
+        const frames = this.moveableData.getSelectedFrames();
 
         if (!frames.length) {
             return;
         }
-        getSelectedFrames().forEach(frame => {
+        this.moveableData.getSelectedFrames().forEach(frame => {
             frame.set(...scope, value);
         });
-        renderFrames();
+        this.moveableData.renderFrames();
         this.getMoveable().updateRect();
-        EventBus.requestTrigger("render");
+        this.eventBus.requestTrigger("render");
     }
     private onRender = () => {
         this.forceUpdate();

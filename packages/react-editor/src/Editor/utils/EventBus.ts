@@ -1,7 +1,7 @@
 import Component from "@egjs/component";
 import { IObject } from "@daybrush/utils";
 
-class Bus extends Component {
+class EventBus extends Component {
     private eventMap: IObject<number> = {};
     requestTrigger(name: string, params: IObject<any> = {}) {
         const eventMap = this.eventMap;
@@ -12,6 +12,4 @@ class Bus extends Component {
         });
     }
 }
-const EventBus = new Bus();
-
 export default EventBus;

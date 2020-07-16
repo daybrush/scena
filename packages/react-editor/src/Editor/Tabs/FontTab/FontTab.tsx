@@ -5,9 +5,6 @@ import { prefix } from "../../utils/utils";
 import TabInputBox from "../../Inputs/TabInputBox";
 import SelectBox from "../../Inputs/SelectBox";
 import TextBox from "../../Inputs/TextBox";
-import Memory from "../../utils/Memory";
-import { setProperty, getProperties } from "../../utils/MoveableData";
-import EventBus from "../../utils/EventBus";
 
 const FONT_FAMILY_PROPS = {
     options: ["sans-serif"],
@@ -35,7 +32,7 @@ export default class FontTab extends Tab {
             style,
             weight,
             decoration,
-        ] = getProperties([
+        ] = this.moveableData.getProperties([
             ["font-family"],
             ["font-size"],
             ["text-align"],
@@ -78,12 +75,8 @@ export default class FontTab extends Tab {
         </div>;
     }
     public componentDidMount() {
-        EventBus.on("render", this.onRender as any);
-        EventBus.on("setTargets", this.setTargets as any);
-    }
-    public componentWillUnmount() {
-        EventBus.off("render", this.onRender as any);
-        EventBus.off("setTargets", this.setTargets as any);
+        this.addEvent("render", this.onRender as any);
+        this.addEvent("setSelectedTargets", this.setTargets as any);
     }
     private onChangeSize = (v: any) => {
         this.changeProperty("font-size", v);
@@ -110,7 +103,7 @@ export default class FontTab extends Tab {
         this.forceUpdate();
     }
     private changeProperty(name: string, v: any) {
-        Memory.set(name, v);
-        setProperty([name], v);
+        this.memory.set(name, v);
+        this.moveableData.setProperty([name], v);
     }
 }

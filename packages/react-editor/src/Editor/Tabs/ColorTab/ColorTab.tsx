@@ -3,18 +3,16 @@ import Tab from "../Tab";
 import { prefix } from "../../utils/utils";
 import ColorBox from "../../Inputs/ColorBox";
 import TabInputBox from "../../Inputs/TabInputBox";
-import EventBus from "../../utils/EventBus";
-import Memory from "../../utils/Memory";
-import { getSelectedFrames, renderFrames } from "../../utils/MoveableData";
+
 
 export default class ColorTab extends Tab {
     public static id = "Colors";
     public title = "Colors";
 
     public renderTab() {
-        const frames = getSelectedFrames();
-        let backgroundColor = Memory.get("background-color");
-        let color = Memory.get("color");
+        const frames = this.moveableData.getSelectedFrames();
+        let backgroundColor = this.memory.get("background-color");
+        let color = this.memory.get("color");
 
         if (frames.length) {
             const backgroundColors = frames.map(frame => frame.get("background-color"));
@@ -40,27 +38,17 @@ export default class ColorTab extends Tab {
         </div>;
     }
     public componentDidMount() {
-        EventBus.on("render", this.onRender as any);
-        EventBus.on("setTargets", this.onRender as any);
-    }
-    public componentWillUnmount() {
-        EventBus.off("render", this.onRender as any);
-        EventBus.off("setTargets", this.onRender as any);
+        this.addEvent("render", this.onRender as any);
+        this.addEvent("setSelectedTargets", this.onRender as any);
     }
     public onChangeBackgroundColor = (v: string) => {
-        Memory.set("background-color", v);
-        getSelectedFrames().forEach(frame => {
-            frame.set("background-color", v);
-        });
-        renderFrames();
+        this.memory.set("background-color", v);
+        this.moveableData.setProperty(["background-color"], v);
         this.forceUpdate();
     }
     public onChangeTextColor = (v: string) => {
-        Memory.set("color", v);
-        getSelectedFrames().forEach(frame => {
-            frame.set("color", v);
-        });
-        renderFrames();
+        this.memory.set("color", v);
+        this.moveableData.setProperty(["color"], v);
         this.forceUpdate();
     }
     private onRender = () => {

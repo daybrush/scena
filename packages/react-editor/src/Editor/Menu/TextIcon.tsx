@@ -5,13 +5,13 @@ import Memory from "../utils/Memory";
 export default class TextIcon extends Icon {
     public static id = "Text";
     public keys = ["t"];
-    public static maker = () => ({
+    public static maker = (memory: Memory) => ({
         tag: "div",
         props: {
             contentEditable: true,
         },
         style: {
-            color: Memory.get("color"),
+            color: memory.get("color"),
         },
     });
     public static makeThen = (target: HTMLElement | SVGElement) => {
