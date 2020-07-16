@@ -5,7 +5,7 @@ import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
 import Viewport, { JSXInfo, ElementInfo } from "./Viewport/Viewport";
-import { getContentElement, prefix, getIds } from "./utils/utils";
+import { getContentElement, prefix, getIds, getId } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -309,8 +309,11 @@ export default class Editor extends React.PureComponent<{
         return this.moveableManager.current!.getMoveable();
     }
     public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
+        const frameMap: IObject<any> = {};
+        const moveableData = this.moveableData;
         targets.forEach(target => {
-            this.moveableData.removeFrame(target);
+            frameMap[getId(target)] = moveableData.getFrame(target).get();
+            moveableData.removeFrame(target);
         });
         const viewport = this.viewport.current!;
         const indexes = getIds(targets).map(id => viewport.findIndex(id!)).filter(id => id > -1);
@@ -322,7 +325,10 @@ export default class Editor extends React.PureComponent<{
 
             this.setSelectedTargets(selectedTarget ? [selectedTarget.el!] : [], true);
             !isRestore && this.historyManager.addAction("removeElements", {
-                infos: removed,
+                infos: removed.map(info => ({
+                    ...info,
+                    frame: frameMap[info.id] || info.frame,
+                })),
             });
             return targets;
         });
