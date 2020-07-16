@@ -6,6 +6,7 @@
     height: 100%;
     z-index: 100;
     transform-style: preserve-3d;
+    transform: translateZ(15px);
     background: rgba(0, 0, 0, 0.2);
 }
 

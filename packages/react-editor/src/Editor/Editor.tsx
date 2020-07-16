@@ -91,6 +91,11 @@ export default class Editor extends React.PureComponent<{
         } = this.props;
         const horizontalSnapGuides = [0, height, height / 2, ...state.horizontalGuides];
         const verticalSnapGuides = [0, width, width / 2, ...state.verticalGuides];
+        let unit = 50;
+
+        if (zoom < 0.8) {
+            unit = Math.floor(1 / zoom) * 50;
+        }
         return (
             <div className={prefix("editor")} ref={this.editorElement}>
                 <Tabs ref={tabs} editor={this}></Tabs>
@@ -105,6 +110,7 @@ export default class Editor extends React.PureComponent<{
                     displayDragPos={true}
                     dragPosFormat={v => `${v}px`}
                     zoom={zoom}
+                    unit={unit}
                     onChangeGuides={e => {
                         this.setState({
                             horizontalGuides: e.guides,
@@ -118,6 +124,7 @@ export default class Editor extends React.PureComponent<{
                     displayDragPos={true}
                     dragPosFormat={v => `${v}px`}
                     zoom={zoom}
+                    unit={unit}
                     onChangeGuides={e => {
                         this.setState({
                             verticalGuides: e.guides,
