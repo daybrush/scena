@@ -1,5 +1,5 @@
 import { prefixNames } from "framework-utils";
-import { PREFIX } from "../consts";
+import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
 
 export function prefix(...classNames: string[]) {
@@ -30,3 +30,10 @@ export function connectEditorProps(component: any) {
         });
     })
 };
+
+export function getId(el: HTMLElement | SVGElement) {
+    return el.getAttribute(DATA_SCENA_ELEMENT_ID)!;
+}
+export function getIds(els: Array<HTMLElement | SVGElement>): string[] {
+    return els.map(el => getId(el));
+}

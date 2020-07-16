@@ -1,7 +1,7 @@
 import MoveableHelper from "moveable-helper";
 import Memory from "./Memory";
 import { Frame } from "scenejs";
-import { DATA_SCENA_ELEMENT_ID } from "../consts";
+import { getId } from "./utils";
 
 export default class MoveableData extends MoveableHelper {
     public selectedTargets: Array<HTMLElement | SVGElement> = [];
@@ -33,7 +33,7 @@ export default class MoveableData extends MoveableHelper {
             frame.set(...names, value);
             const next = frame.get();
 
-            return { id: target.getAttribute(DATA_SCENA_ELEMENT_ID), prev, next };
+            return { id: getId(target), prev, next };
 
         });
         this.renderFrames();
@@ -51,7 +51,7 @@ export default class MoveableData extends MoveableHelper {
             });
             const next = frame.get();
 
-            return { id: target.getAttribute(DATA_SCENA_ELEMENT_ID), prev, next };
+            return { id: getId(target), prev, next };
         });
     }
     public getProperties(properties: string[][], defaultValues: any[]) {

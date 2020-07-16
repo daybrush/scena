@@ -4,6 +4,7 @@ import Folder from "../Folder/Folder";
 import File from "../Folder/File";
 import { ElementInfo } from "../../Viewport/Viewport";
 import Layer from "./Layer";
+import { getIds } from "../../utils/utils";
 
 export default class LayerTab extends Tab {
     public static id = "Layers";
@@ -11,7 +12,7 @@ export default class LayerTab extends Tab {
 
     public renderTab() {
         const infos = this.editor.getViewportInfos();
-        const selected = this.moveableData.getSelectedTargets().map(target => target.getAttribute("data-scena-element-id")!)
+        const selected = getIds(this.moveableData.getSelectedTargets());
 
         return <Folder
             scope={[]}

@@ -5,7 +5,7 @@ import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
 import Viewport, { JSXInfo, ElementInfo } from "./Viewport/Viewport";
-import { getContentElement, prefix } from "./utils/utils";
+import { getContentElement, prefix, getIds } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -28,6 +28,12 @@ function restoreElements({ infos }: IObject<any>, editor: Editor) {
         name: info.name,
         index: info.addedIndex,
     })), true);
+}
+function undoSelectTargets({ prevs, nexts }: IObject<any>, editor: Editor) {
+    editor.setSelectedTargets(editor.viewport.current!.getElements(prevs), true);
+}
+function redoSelectTargets({ prevs, nexts }: IObject<any>, editor: Editor) {
+    editor.setSelectedTargets(editor.viewport.current!.getElements(nexts), true);
 }
 export default class Editor extends React.PureComponent<{
     width: number,
@@ -243,10 +249,15 @@ export default class Editor extends React.PureComponent<{
     public getSelectedTargets() {
         return this.state.selectedTargets;
     }
-    public setSelectedTargets(targets: Array<HTMLElement | SVGElement>) {
+    public setSelectedTargets(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
         return this.promiseState({
             selectedTargets: targets,
         }).then(() => {
+            if (!isRestore) {
+                const prevs = getIds(this.moveableData.getSelectedTargets());
+                const nexts = getIds(targets);
+                this.historyManager.addAction("selectTargets", { prevs, nexts });
+            }
             this.moveableData.setSelectedTargets(targets);
             this.eventBus.trigger("setSelectedTargets");
             return targets;
@@ -270,7 +281,7 @@ export default class Editor extends React.PureComponent<{
 
                 return info.el!;
             }).filter(el => el);
-            this.setSelectedTargets([added[0].el!]);
+            this.setSelectedTargets([added[0].el!], true);
 
             return targets;
         });
@@ -286,20 +297,22 @@ export default class Editor extends React.PureComponent<{
         return this.removeElements(this.viewport.current!.getElements(ids), isRestore);
     }
     public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
-        const currentTargets = this.moveableData.getSelectedTargets();
-        const nextTargets = currentTargets.filter(target => {
-            return targets.indexOf(target) === -1;
-        });
         targets.forEach(target => {
             this.moveableData.removeFrame(target);
         });
-        return this.setSelectedTargets(nextTargets).then(() => {
-            return this.viewport.current!.removeTargets(targets).then(({ removed }) => {
-                !isRestore && this.historyManager.addAction("removeElements", {
-                    infos: removed,
-                });
-                return targets;
+        const viewport = this.viewport.current!;
+        const indexes = getIds(targets).map(id => viewport.findIndex(id!)).filter(id => id > -1);
+        const index = indexes.length ? Math.min(...indexes) : -1;
+
+        return viewport.removeTargets(targets).then(({ removed }) => {
+            const infos = viewport.getInfos();
+            const selectedTarget = infos[index] || infos[index - 1];
+
+            this.setSelectedTargets(selectedTarget ? [selectedTarget.el!] : [], true);
+            !isRestore && this.historyManager.addAction("removeElements", {
+                infos: removed,
             });
+            return targets;
         });
     }
     public setProperty(scope: string[], value: any, isUpdate?: boolean) {
@@ -362,6 +375,7 @@ export default class Editor extends React.PureComponent<{
 
         this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
         this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
+        this.historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets);
         this.console.log("keylist", this.keyManager.keylist);
     }
     public componentWillUnmount() {

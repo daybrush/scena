@@ -1,5 +1,5 @@
 import * as React from "react";
-import { IObject, find } from "@daybrush/utils";
+import { IObject, find, findIndex } from "@daybrush/utils";
 import { prefix } from "../utils/utils";
 import { isNumber } from "util";
 
@@ -122,6 +122,9 @@ export default class Viewport extends React.PureComponent<{
                 });
             });
         });
+    }
+    public findIndex(id: string) {
+        return findIndex(this.state.infos, info => info.id === id);
     }
     public getElements(ids: string[]) {
         return ids.map(id => this.getElement(id)).filter(el => el) as Array<HTMLElement | SVGElement>;

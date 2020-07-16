@@ -1,6 +1,6 @@
 import * as React from "react";
 import Moveable from "react-moveable";
-import { getContentElement, connectEditorProps } from "../utils/utils";
+import { getContentElement, connectEditorProps, getId } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import { IObject } from "@daybrush/utils";
@@ -168,7 +168,7 @@ export default class MoveableManager extends React.PureComponent<{
                     return;
                 }
                 this.historyManager.addAction("render", {
-                    id: e.target.getAttribute("data-scena-element-id"),
+                    id: getId(e.target),
                     prev: e.datas.prevData,
                     next: moveableData.getFrame(e.target).get(),
                 });
@@ -189,7 +189,7 @@ export default class MoveableManager extends React.PureComponent<{
                 const prevDatas = e.datas.prevDatas;
                 const infos = e.targets.map((target, i) => {
                     return {
-                        id: target.getAttribute("data-scena-element-id"),
+                        id: getId(target),
                         prev: prevDatas[i],
                         next: moveableData.getFrame(target).get(),
                     }
