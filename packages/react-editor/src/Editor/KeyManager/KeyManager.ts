@@ -18,9 +18,17 @@ export default class KeyManager {
     constructor(private console: Debugger) {}
     public keycon = new KeyController();
     public keylist: Array<[string[], string]> = [];
+    public isEnable = true;
+
+    public enable() {
+        this.isEnable = true;
+    }
+    public disable() {
+        this.isEnable = false;
+    }
     public keydown(keys: string[], callback: (e: any) => any, description?: any) {
         this.keycon.keydown(keys, e => {
-            if (!check(e)) {
+            if (!this.isEnable || !check(e)) {
                 return false;
             }
 
@@ -38,7 +46,7 @@ export default class KeyManager {
     }
     public keyup(keys: string[], callback: (e: any) => any, description?: any) {
         this.keycon.keyup(keys, e => {
-            if (!check(e)) {
+            if (!this.isEnable || !check(e)) {
                 return false;
             }
             if (description) {

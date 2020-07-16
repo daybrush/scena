@@ -16,7 +16,16 @@
     user-select: none;
 }
 
-.scena-menu svg {
+.scena-menu-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 15px 7px 0px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.scena-menu svg, .scena-menu .scena-i {
     pointer-events: none;
 }
 
@@ -94,4 +103,32 @@
     padding: 0;
     margin: 0;
     margin-left: 5px;
+}
+
+
+.scena-keyboard {
+    background: #fff;
+    border-radius: 3px;
+    width: 90%;
+    height: 15px;
+    margin: 3px 0px 7px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 2px;
+}
+
+.scena-key {
+    display: inline-block;
+    width: 2px;
+    height: 2px;
+    background: var(--back2);
+    margin: 1px;
+}
+.scena-space {
+    display: inline-block;
+    width: 12px;
+    height: 2px;
+    background: var(--back2);
+    margin: 1px;
+    border-radius: 1px;
 }

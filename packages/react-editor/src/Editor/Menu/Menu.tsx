@@ -9,6 +9,7 @@ import OvalIcon from "./OvalIcon";
 import RoundRectIcon from "./RoundRectIcon";
 import Icon from "./Icon";
 import Editor from "../Editor";
+import KeyboardIcon from "./KeyboardIcon";
 
 const MENUS: Array<typeof Icon> = [
     MoveToolIcon,
@@ -30,6 +31,9 @@ export default class Menu extends React.PureComponent<{
         return (
             <div className={prefix("menu")}>
                 {this.renderMenus()}
+                <div className={prefix("menu-bottom")}>
+                    <KeyboardIcon editor={this.props.editor} />
+                </div>
             </div>
         );
     }

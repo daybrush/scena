@@ -100,7 +100,7 @@ export default abstract class Icon extends React.PureComponent<{
         const keys = this.keys;
         if (keys.length) {
             this.keyManager.keydown(keys, () => {
-                this.props.onSelect!((this.constructor as any).id);
+                this.onClick();
             }, (this.constructor as any).id);
         }
     }

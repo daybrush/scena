@@ -16,6 +16,7 @@ import KeyManager from "./KeyManager/KeyManager";
 import { ScenaEditorState, TagAppendInfo } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
+import { isMacintosh } from "./consts";
 
 function undoCreateElements({ infos }: IObject<any>, editor: Editor) {
     editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
@@ -66,6 +67,7 @@ export default class Editor extends React.PureComponent<{
     public moveableManager = React.createRef<MoveableManager>();
     public viewport = React.createRef<Viewport>();
     public tabs = React.createRef<Tabs>();
+    public editorElement = React.createRef<HTMLDivElement>();
     public render() {
         const {
             horizontalGuides,
@@ -90,7 +92,7 @@ export default class Editor extends React.PureComponent<{
         const horizontalSnapGuides = [0, height, height / 2, ...state.horizontalGuides];
         const verticalSnapGuides = [0, width, width / 2, ...state.verticalGuides];
         return (
-            <div className={prefix("editor")}>
+            <div className={prefix("editor")} ref={this.editorElement}>
                 <Tabs ref={tabs} editor={this}></Tabs>
                 <Menu ref={menu} editor={this} onSelect={this.onMenuChange} />
                 <div className={prefix("reset")} onClick={e => {
@@ -363,10 +365,10 @@ export default class Editor extends React.PureComponent<{
             this.forceUpdate();
         });
 
-        this.keyManager.keydown(["meta", "z"], () => {
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
             this.historyManager.undo();
         }, "Undo");
-        this.keyManager.keydown(["meta", "shift", "z"], () => {
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "z"], () => {
             this.historyManager.redo();
         }, "Redo");
         this.keyManager.keyup(["backspace"], () => {
