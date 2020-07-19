@@ -1,21 +1,18 @@
 import KeyController from "keycon";
 import Debugger from "../utils/Debugger";
+import { checkInput } from "../utils/utils";
 
 function check(e: any) {
     const inputEvent = e.inputEvent;
     const target = inputEvent.target;
-    const tagName = target.tagName;
 
-    if (
-        target.isContentEditable
-        || tagName === "INPUT" || tagName === "TEXTAREA"
-    ) {
+    if (checkInput(target)) {
         return false;
     }
     return true;
 }
 export default class KeyManager {
-    constructor(private console: Debugger) {}
+    constructor(private console: Debugger) { }
     public keycon = new KeyController();
     public keylist: Array<[string[], string]> = [];
     public isEnable = true;
@@ -27,39 +24,10 @@ export default class KeyManager {
         this.isEnable = false;
     }
     public keydown(keys: string[], callback: (e: any) => any, description?: any) {
-        this.keycon.keydown(keys, e => {
-            if (!this.isEnable || !check(e)) {
-                return false;
-            }
-
-            if (description) {
-                this.console.log(`keydown: ${keys.join(" + ")}`, description);
-            }
-            callback(e);
-        });
-        if (description) {
-            this.keylist.push([
-                keys,
-                description,
-            ]);
-        }
+        this.keycon.keydown(keys, this.addCallback("keydown", keys, callback, description));
     }
     public keyup(keys: string[], callback: (e: any) => any, description?: any) {
-        this.keycon.keyup(keys, e => {
-            if (!this.isEnable || !check(e)) {
-                return false;
-            }
-            if (description) {
-                this.console.log(`keyup: ${keys.join(" + ")}`, description);
-            }
-            callback(e);
-        });
-        if (description) {
-            this.keylist.push([
-                keys,
-                description,
-            ]);
-        }
+        this.keycon.keyup(keys, this.addCallback("keyup", keys, callback, description));
     }
     get altKey() {
         return this.keycon.altKey;
@@ -75,5 +43,23 @@ export default class KeyManager {
     }
     public destroy() {
         this.keycon.destroy();
+    }
+    private addCallback(type: string, keys: string[], callback: (e: any) => any, description?: string) {
+        if (description) {
+            this.keylist.push([
+                keys,
+                description,
+            ]);
+        }
+        return (e: any) => {
+            if (!this.isEnable || !check(e)) {
+                return false;
+            }
+            const result = callback(e);
+
+            if (result !== false && description) {
+                this.console.log(`${type}: ${keys.join(" + ")}`, description);
+            }
+        };
     }
 }

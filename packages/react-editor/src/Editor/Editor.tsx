@@ -4,8 +4,8 @@ import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
-import Viewport, { JSXInfo, ElementInfo } from "./Viewport/Viewport";
-import { getContentElement, prefix, getIds, getId } from "./utils/utils";
+import Viewport, { JSXInfo, ElementInfo, AddedInfo } from "./Viewport/Viewport";
+import { getContentElement, prefix, getIds, getId, checkImageLoaded } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -13,21 +13,18 @@ import Memory from "./utils/Memory";
 import MoveableManager from "./Viewport/MoveableMananger";
 import MoveableData from "./utils/MoveableData";
 import KeyManager from "./KeyManager/KeyManager";
-import { ScenaEditorState, TagAppendInfo } from "./types";
+import { ScenaEditorState, TagAppendInfo, SavedInfo } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import { isMacintosh } from "./consts";
+import ClipboardManager from "./utils/ClipboardManager";
 
 function undoCreateElements({ infos }: IObject<any>, editor: Editor) {
     editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
 }
 function restoreElements({ infos }: IObject<any>, editor: Editor) {
     editor.appendJSXs(infos.map((info: ElementInfo) => ({
-        id: info.id,
-        jsx: info.jsx,
-        frame: info.frame,
-        name: info.name,
-        index: info.addedIndex,
+        ...info,
     })), true);
 }
 function undoSelectTargets({ prevs, nexts }: IObject<any>, editor: Editor) {
@@ -58,6 +55,7 @@ export default class Editor extends React.PureComponent<{
     public memory = new Memory();
     public moveableData = new MoveableData(this.memory);
     public keyManager = new KeyManager(this.console);
+    public clipboardManager = new ClipboardManager(this);
 
     public horizontalGuides = React.createRef<Guides>();
     public verticalGuides = React.createRef<Guides>();
@@ -68,6 +66,10 @@ export default class Editor extends React.PureComponent<{
     public viewport = React.createRef<Viewport>();
     public tabs = React.createRef<Tabs>();
     public editorElement = React.createRef<HTMLDivElement>();
+    public constructor(props: any) {
+        super(props);
+        console.log("??");
+    }
     public render() {
         const {
             horizontalGuides,
@@ -279,21 +281,26 @@ export default class Editor extends React.PureComponent<{
         return this.appendElements([{ tag, props, name, frame }]).then(target => target[0]);
     }
     public appendJSXs(jsxs: JSXInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
-        return this.viewport.current!.appendJSXs(jsxs).then(({
-            added,
-        }) => {
-            !isRestore && this.historyManager.addAction("createElements", { infos: added });
-            const data = this.moveableData;
-            const targets = added.map(info => {
-                data.createFrame(info.el!, info.frame);
-                data.render(info.el!);
+        const viewport = this.getViewport();
+        const indexes = getIds(this.getSelectedTargets()).map(id => viewport.findIndex(id!)).filter(id => id > -1);
+        const index = indexes.length ? Math.max(...indexes) : -1;
 
-                return info.el!;
-            }).filter(el => el);
-            this.setSelectedTargets([added[0].el!], true);
-
-            return targets;
+        return this.getViewport().appendJSXs(jsxs).then(info => {
+            return this.appendComplete(info, isRestore);
         });
+    }
+    public appendComplete({ added }: AddedInfo, isRestore?: boolean) {
+        !isRestore && this.historyManager.addAction("createElements", { infos: added });
+        const data = this.moveableData;
+        const targets = added.map(info => {
+            data.createFrame(info.el!, info.frame);
+            data.render(info.el!);
+
+            return info.el!;
+        }).filter(el => el);
+
+        this.setSelectedTargets(targets, true);
+        return targets;
     }
     public appendElements(elements: TagAppendInfo[]): Promise<Array<HTMLElement | SVGElement>> {
         return this.appendJSXs(elements.map(({ props, name, frame, tag: Tag }) => ({
@@ -303,7 +310,7 @@ export default class Editor extends React.PureComponent<{
         })));
     }
     public removeByIds(ids: string[], isRestore?: boolean) {
-        return this.removeElements(this.viewport.current!.getElements(ids), isRestore);
+        return this.removeElements(this.getViewport().getElements(ids), isRestore);
     }
     public getMoveable() {
         return this.moveableManager.current!.getMoveable();
@@ -315,7 +322,7 @@ export default class Editor extends React.PureComponent<{
             frameMap[getId(target)] = moveableData.getFrame(target).get();
             moveableData.removeFrame(target);
         });
-        const viewport = this.viewport.current!;
+        const viewport = this.getViewport();
         const indexes = getIds(targets).map(id => viewport.findIndex(id!)).filter(id => id > -1);
         const index = indexes.length ? Math.min(...indexes) : -1;
 
@@ -324,6 +331,8 @@ export default class Editor extends React.PureComponent<{
             const selectedTarget = infos[index] || infos[index - 1];
 
             this.setSelectedTargets(selectedTarget ? [selectedTarget.el!] : [], true);
+
+            this.console.log("removeTargets", removed);
             !isRestore && this.historyManager.addAction("removeElements", {
                 infos: removed.map(info => ({
                     ...info,
@@ -346,8 +355,35 @@ export default class Editor extends React.PureComponent<{
     public selectMenu(menu: string) {
         this.menu.current!.select(menu);
     }
+    public saveTargets(targets: Array<HTMLElement | SVGElement>): SavedInfo[] {
+        this.console.log("save targets", targets);
+        return targets.map(target => {
+            const info = this.getViewport().getInfoByElement(target)!;
+
+            return {
+                name: info.name,
+                isContentEditable: info.isContentEditable,
+                innerText: info.isContentEditable ? (target as HTMLElement).innerText : "",
+                tagName: target.tagName.toLowerCase(),
+                frame: this.moveableData.getFrame(target).get(),
+            };
+        });
+    }
+    public getViewport() {
+        return this.viewport.current!;
+    }
     public getViewportInfos() {
-        return this.viewport.current!.state.infos;
+        return this.getViewport().state.infos;
+    }
+    public appendBlob(blob: Blob) {
+        const url = URL.createObjectURL(blob);
+
+        return this.appendJSX(<img src={url} />, "(Image)").then(target => {
+            return checkImageLoaded(target as HTMLImageElement).then(() => {
+                this.getMoveable().updateRect();
+                return target as HTMLImageElement;
+            });
+        });
     }
     public componentDidMount() {
         const {
@@ -365,7 +401,7 @@ export default class Editor extends React.PureComponent<{
         window.addEventListener("wheel", this.onWheel, {
             passive: false,
         });
-        const viewport = this.viewport.current!
+        const viewport = this.getViewport();
 
 
         eventBus.on("blur", () => {
@@ -381,42 +417,44 @@ export default class Editor extends React.PureComponent<{
             this.forceUpdate();
         });
 
+
+        this.keyManager.keydown(["left"], e => {
+            this.move(-10, 0);
+            e.inputEvent.preventDefault();
+        }, "Move Left");
+        this.keyManager.keydown(["up"], e => {
+            this.move(0, -10);
+            e.inputEvent.preventDefault();
+        }, "Move Up");
+        this.keyManager.keydown(["right"], e => {
+            this.move(10, 0);
+            e.inputEvent.preventDefault();
+        }, "Move Right");
+        this.keyManager.keydown(["down"], e => {
+            this.move(0, 10);
+            e.inputEvent.preventDefault();
+        }, "Move Down");
+        this.keyManager.keyup(["backspace"], () => {
+            this.removeElements(this.moveableData.getSelectedTargets());
+        }, "Delete");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "v"], () => { }, "Paste");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
             this.historyManager.undo();
         }, "Undo");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "z"], () => {
             this.historyManager.redo();
         }, "Redo");
-        this.keyManager.keydown(["left"], e => {
-            this.getMoveable().request("draggable", { deltaX: -10}, true);
-            e.inputEvent.preventDefault();
-        }, "Move Left");
-        this.keyManager.keydown(["up"], e => {
-            this.getMoveable().request("draggable", { deltaY: -10}, true);
-            e.inputEvent.preventDefault();
-        }, "Move Up");
-        this.keyManager.keydown(["right"], e => {
-            this.getMoveable().request("draggable", { deltaX: 10}, true);
-            e.inputEvent.preventDefault();
-        }, "Move Right");
-        this.keyManager.keydown(["down"], e => {
-            this.getMoveable().request("draggable", { deltaY: 10}, true);
-            e.inputEvent.preventDefault();
-        }, "Move Down");
-        this.keyManager.keyup(["backspace"], () => {
-            this.removeElements(this.moveableData.getSelectedTargets());
-        }, "Delete");
-
         this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
         this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
         this.historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets);
-        this.console.log("keylist", this.keyManager.keylist);
     }
     public componentWillUnmount() {
         this.eventBus.off();
         this.memory.clear();
         this.moveableData.clear();
         this.keyManager.destroy();
+        this.clipboardManager.destroy();
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("wheel", this.onWheel);
     }
@@ -452,6 +490,9 @@ export default class Editor extends React.PureComponent<{
         } as any;
         this.appendElement(maker.tag, maker.props, `(${selectIcon.id})`, style).then(selectIcon.makeThen);
         return true;
+    }
+    private move(deltaX: number, deltaY: number) {
+        this.getMoveable().request("draggable", { deltaX, deltaY }, true);
     }
     private checkBlur() {
         const activeElement = document.activeElement;

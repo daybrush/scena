@@ -37,3 +37,22 @@ export function getId(el: HTMLElement | SVGElement) {
 export function getIds(els: Array<HTMLElement | SVGElement>): string[] {
     return els.map(el => getId(el));
 }
+
+export function checkInput(target: HTMLElement) {
+    const tagName = target.tagName.toLowerCase();
+
+    return target.isContentEditable || tagName === "input" || tagName === "textarea";
+}
+export function checkImageLoaded(el: HTMLImageElement) {
+    return new Promise(resolve => {
+        if (el.complete) {
+            resolve();
+        } else {
+            el.addEventListener("load", function loaded() {
+                resolve();
+
+                el.removeEventListener("load", loaded);
+            })
+        }
+    });
+}
