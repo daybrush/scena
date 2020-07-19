@@ -1,15 +1,14 @@
 import * as React from "react";
 import { IObject, find, findIndex } from "@daybrush/utils";
-import { prefix } from "../utils/utils";
+import { prefix, getId } from "../utils/utils";
 import { isNumber } from "util";
+import { DATA_SCENA_ELEMENT, DATA_SCENA_ELEMENT_ID } from "../consts";
 
-export interface ElementInfo {
+export interface ElementInfo extends JSXInfo {
     jsx: any;
     el: HTMLElement | null;
     id: string;
-    name: string;
     frame: IObject<any>;
-    addedIndex?: number;
 }
 
 export interface AddedInfo {
@@ -26,6 +25,8 @@ export interface JSXInfo {
     frame?: IObject<any>;
     id?: string;
     index?: number;
+    isContentEditable?: boolean;
+    innerText?: string;
 }
 export default class Viewport extends React.PureComponent<{
     style: IObject<any>,
@@ -64,6 +65,9 @@ export default class Viewport extends React.PureComponent<{
     public getInfo(id: string) {
         return this.state.ids[id];
     }
+    public getInfoByElement(el: HTMLElement | SVGElement) {
+        return this.state.ids[getId(el)];
+    }
     public getElement(id: string) {
         const info = this.getInfo(id);
 
@@ -74,31 +78,30 @@ export default class Viewport extends React.PureComponent<{
     }
     public appendJSXs(jsxs: JSXInfo[]): Promise<AddedInfo> {
         const infos = this.state.infos;
-        const jsxInfos = jsxs.map(({ jsx, name, id: prevId, frame, index }) => {
-            const id = prevId || this.makeId();
-            const info: ElementInfo = {
-                jsx: React.cloneElement(jsx, {
-                    "data-scena-element": true,
-                    "data-scena-element-id": id,
+        const jsxInfos = jsxs.map(info => {
+            const id = info.id || this.makeId();
+            const elementInfo: ElementInfo = {
+                ...info,
+                jsx: React.cloneElement(info.jsx, {
+                    [DATA_SCENA_ELEMENT]: true,
+                    [DATA_SCENA_ELEMENT_ID]: id,
                     "key": id,
                 }),
-                frame: frame || {},
+                frame: info.frame || {},
                 el: null,
                 id,
-                name,
-                addedIndex: index,
             };
-            this.setInfo(id, info);
+            this.setInfo(id, elementInfo);
 
-            return info;
+            return elementInfo;
         });
         const nextInfos = [...infos];
 
         jsxInfos.forEach(info => {
-            if (isNumber(info.addedIndex)) {
-                nextInfos.splice(info.addedIndex, 0, info);
+            if (isNumber(info.index)) {
+                nextInfos.splice(info.index, 0, info);
             } else {
-                info.addedIndex = nextInfos.length;
+                info.index = nextInfos.length;
                 nextInfos.push(info);
             }
         });
@@ -112,6 +115,19 @@ export default class Viewport extends React.PureComponent<{
 
                     const target = document.querySelector<HTMLElement>(`[data-scena-element-id="${id}"]`)!;
                     info.el = target;
+
+                    target.setAttribute(DATA_SCENA_ELEMENT, "true");
+                    target.setAttribute(DATA_SCENA_ELEMENT_ID, id);
+
+                    info.isContentEditable = info.isContentEditable || !!target.getAttribute("contenteditable");
+
+                    if (info.isContentEditable) {
+                        target.setAttribute("contenteditable", "true");
+
+                        if ("innerText" in info) {
+                            (target as HTMLElement).innerText = info.innerText || "";
+                        }
+                    }
 
                     return { ...info };
                 });
@@ -138,13 +154,16 @@ export default class Viewport extends React.PureComponent<{
             if (!info) {
                 return undefined;
             }
-
+            let innerText = "";
+            if (info.isContentEditable) {
+                innerText = (target as HTMLElement).innerText;
+            }
             delete ids[info.id];
             delete info.el;
 
             infos.splice(infos.indexOf(info), 1);
 
-            return { ...info };
+            return { ...info, innerText };
         }).filter(info => info) as ElementInfo[];
 
         return new Promise(resolve => {
