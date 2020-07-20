@@ -1,15 +1,9 @@
 import * as React from "react";
 import { IObject, find, findIndex } from "@daybrush/utils";
-import { prefix, getId } from "../utils/utils";
+import { prefix, getId, getScenaAttrs } from "../utils/utils";
 import { isNumber } from "util";
-import { DATA_SCENA_ELEMENT, DATA_SCENA_ELEMENT_ID } from "../consts";
-
-export interface ElementInfo extends JSXInfo {
-    jsx: any;
-    el: HTMLElement | null;
-    id: string;
-    frame: IObject<any>;
-}
+import { DATA_SCENA_ELEMENT_ID } from "../consts";
+import { ScenaJSXElement, ScenaComponent } from "../types";
 
 export interface AddedInfo {
     added: ElementInfo[];
@@ -19,18 +13,26 @@ export interface RemovedInfo {
     removed: ElementInfo[];
     next: ElementInfo[];
 }
-export interface JSXInfo {
-    jsx: any;
+export interface ElementInfo {
+    jsx: ScenaJSXElement;
     name: string;
     frame?: IObject<any>;
+
+    attrs?: IObject<any>;
+    componentId?: string;
+    jsxId?: string;
+    el?: HTMLElement | null;
     id?: string;
     index?: number;
-    isContentEditable?: boolean;
     innerText?: string;
+    innerHTML?: string;
 }
 export default class Viewport extends React.PureComponent<{
     style: IObject<any>,
+    onBlur: (e: any) => any,
 }> {
+    public components: IObject<ScenaComponent> = {};
+    public jsxs: IObject<ScenaJSXElement> = {};
     public state: {
         ids: IObject<ElementInfo | null>;
         infos: ElementInfo[],
@@ -38,9 +40,15 @@ export default class Viewport extends React.PureComponent<{
             ids: {},
             infos: [],
         };
+    public getJSX(id: string) {
+        return this.jsxs[id];
+    }
+    public getComponent(id: string) {
+        return this.components[id];
+    }
     public render() {
         const style = this.props.style;
-        return <div className={prefix("viewport")} style={style}>
+        return <div className={prefix("viewport")} onBlur={this.props.onBlur} style={style}>
             {this.props.children}
             {this.state.infos.map(info => info.jsx)}
         </div>;
@@ -76,17 +84,34 @@ export default class Viewport extends React.PureComponent<{
     public getInfos() {
         return this.state.infos;
     }
-    public appendJSXs(jsxs: JSXInfo[]): Promise<AddedInfo> {
+    public appendJSXs(jsxs: ElementInfo[]): Promise<AddedInfo> {
         const infos = this.state.infos;
         const jsxInfos = jsxs.map(info => {
             const id = info.id || this.makeId();
+            const jsx = info.jsx;
+            let componentId = "";
+
+            const props: IObject<any> = {
+                "key": id,
+            };
+            if (typeof jsx.type === "string") {
+                props[DATA_SCENA_ELEMENT_ID] = id;
+            } else {
+                const component = jsx.type;
+                componentId = component.scenaComponentId;
+
+                this.components[componentId] = component;
+
+
+                props.scenaElementId = id;
+                props.scenaAttrs = info.attrs || {};
+                props.scenaText = info.innerText;
+                props.scenaHTML = info.innerHTML;
+            }
             const elementInfo: ElementInfo = {
                 ...info,
-                jsx: React.cloneElement(info.jsx, {
-                    [DATA_SCENA_ELEMENT]: true,
-                    [DATA_SCENA_ELEMENT_ID]: id,
-                    "key": id,
-                }),
+                jsx: React.cloneElement(info.jsx, props) as ScenaJSXElement,
+                componentId,
                 frame: info.frame || {},
                 el: null,
                 id,
@@ -110,28 +135,36 @@ export default class Viewport extends React.PureComponent<{
             this.setState({
                 infos: nextInfos,
             }, () => {
-                const infos = jsxInfos.map((info, i) => {
-                    const id = info.id;
+                const infos = jsxInfos.map(info => {
+                    const id = info.id!;
 
-                    const target = document.querySelector<HTMLElement>(`[data-scena-element-id="${id}"]`)!;
+                    const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
+                    const attrs = info.attrs;
+
                     info.el = target;
 
-                    target.setAttribute(DATA_SCENA_ELEMENT, "true");
-                    target.setAttribute(DATA_SCENA_ELEMENT_ID, id);
-
-                    info.isContentEditable = info.isContentEditable || !!target.getAttribute("contenteditable");
-
-                    if (info.isContentEditable) {
-                        target.setAttribute("contenteditable", "true");
-
-                        if ("innerText" in info) {
-                            (target as HTMLElement).innerText = info.innerText || "";
+                    if (attrs) {
+                        for (const name in attrs) {
+                            target.setAttribute(name, attrs[name]);
                         }
                     }
+                    info.attrs = getScenaAttrs(target);
 
+                    if (info.attrs!.contenteditable) {
+                        if ("innerText" in info) {
+                            (target as HTMLElement).innerText = info.innerText || "";
+                        } else {
+                            info.innerText = (target as HTMLElement).innerText || "";
+                        }
+                    } else if (!info.componentId) {
+                        if ("innerHTML" in info) {
+                            target.innerHTML = info.innerHTML || "";
+                        } else {
+                            info.innerHTML = target.innerHTML || "";
+                        }
+                    }
                     return { ...info };
                 });
-
                 resolve({
                     added: infos,
                     next: nextInfos,
@@ -155,15 +188,18 @@ export default class Viewport extends React.PureComponent<{
                 return undefined;
             }
             let innerText = "";
-            if (info.isContentEditable) {
+            let innerHTML = "";
+            if (info.attrs!.contenteditable) {
                 innerText = (target as HTMLElement).innerText;
+            } else {
+                innerHTML = target.innerHTML;
             }
-            delete ids[info.id];
+            delete ids[info.id!];
             delete info.el;
 
             infos.splice(infos.indexOf(info), 1);
 
-            return { ...info, innerText };
+            return { ...info, innerText, innerHTML, attrs: getScenaAttrs(target) };
         }).filter(info => info) as ElementInfo[];
 
         return new Promise(resolve => {

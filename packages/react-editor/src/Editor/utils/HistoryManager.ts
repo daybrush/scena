@@ -10,11 +10,12 @@ export default class HistoryManager {
     private undoStack: HistoryAction[] = [];
     private redoStack: HistoryAction[] = [];
     private types: IObject<{ redo: RestoreCallback, undo: RestoreCallback }> = {};
-    constructor(private editor: Editor) {}
+    constructor(private editor: Editor) { }
     public registerType(type: string, undo: RestoreCallback, redo: RestoreCallback) {
         this.types[type] = { undo, redo };
     }
     public addAction(type: string, props: IObject<any>) {
+        this.editor.console.log(`Add History:`, type, props);
         this.undoStack.push({
             type,
             props,

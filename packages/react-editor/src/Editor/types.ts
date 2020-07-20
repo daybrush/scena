@@ -7,6 +7,7 @@ import KeyManager from "./KeyManager/KeyManager";
 import Editor from "./Editor";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
+import * as React from "react";
 
 export interface ScenaEditorState {
     selectedTargets: Array<SVGElement | HTMLElement>;
@@ -42,10 +43,24 @@ export interface ClipboardItem {
 }
 
 
-export interface SavedInfo {
+export interface SavedScenaData {
     name: string;
+    jsxId: string;
+    componentId: string;
     tagName: string;
-    isContentEditable?: boolean,
     innerText?: string,
+    attrs: IObject<any>;
     frame: IObject<any>;
 }
+export interface ScenaProps {
+    scenaElementId?: string;
+    scenaAttrs?: IObject<any>;
+    scenaText?: string;
+    scneaHTML?: string;
+}
+
+export type ScenaFunctionalComponent<T> = ((props: T & ScenaProps) => React.ReactElement<any, any>) & { scenaComponentId: string };
+export type ScenaComponent = React.JSXElementConstructor<ScenaProps> & { scenaComponentId: string };
+export type ScenaJSXElement
+    = React.ReactElement<any, string>
+    | React.ReactElement<any, React.JSXElementConstructor<ScenaProps> & { scenaComponentId: string }>;

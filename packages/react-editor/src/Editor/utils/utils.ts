@@ -1,6 +1,8 @@
 import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
+import { ScenaFunctionalComponent, ScenaProps } from "../types";
+import { IObject } from "@daybrush/utils";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -38,14 +40,17 @@ export function getIds(els: Array<HTMLElement | SVGElement>): string[] {
     return els.map(el => getId(el));
 }
 
-export function checkInput(target: HTMLElement) {
+export function checkInput(target: HTMLElement | SVGElement) {
     const tagName = target.tagName.toLowerCase();
 
-    return target.isContentEditable || tagName === "input" || tagName === "textarea";
+    return (target as HTMLElement).isContentEditable || tagName === "input" || tagName === "textarea";
 }
-export function checkImageLoaded(el: HTMLImageElement) {
+export function checkImageLoaded(el: HTMLElement | SVGElement): Promise<any> {
+    if (el.tagName.toLowerCase() !== "img") {
+        return Promise.all([].slice.call(el.querySelectorAll("img")).map(el => checkImageLoaded(el)));
+    }
     return new Promise(resolve => {
-        if (el.complete) {
+        if ((el as HTMLImageElement).complete) {
             resolve();
         } else {
             el.addEventListener("load", function loaded() {
@@ -55,4 +60,37 @@ export function checkImageLoaded(el: HTMLImageElement) {
             })
         }
     });
+}
+
+export function getParnetScenaElement(el: HTMLElement | SVGElement): HTMLElement | SVGElement | null {
+    if (!el) {
+        return null;
+    }
+    if (el.hasAttribute(DATA_SCENA_ELEMENT_ID)) {
+        return el;
+    }
+    return getParnetScenaElement(el.parentElement as HTMLElement | SVGElement);
+}
+
+export function makeScenaFunctionalComponent<T = IObject<any>>(id: string, component: (props: ScenaProps & T) => React.ReactElement<any, any>): ScenaFunctionalComponent<T> {
+    (component as ScenaFunctionalComponent<T>).scenaComponentId = id;
+
+    return component as ScenaFunctionalComponent<T>;
+}
+
+export function getScenaAttrs(el: HTMLElement | SVGElement) {
+    const attributes = el.attributes;
+    const length = attributes.length;
+    const attrs: IObject<any> = {};
+
+    for (let i = 0; i < length; ++i) {
+        const { name, value } = attributes[i];
+
+        if (name === DATA_SCENA_ELEMENT_ID || name === "style") {
+            continue;
+        }
+        attrs[name] = value;
+    }
+
+    return attrs;
 }

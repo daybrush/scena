@@ -4,8 +4,8 @@ import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
-import Viewport, { JSXInfo, ElementInfo, AddedInfo } from "./Viewport/Viewport";
-import { getContentElement, prefix, getIds, getId, checkImageLoaded } from "./utils/utils";
+import Viewport, { ElementInfo, AddedInfo } from "./Viewport/Viewport";
+import { getContentElement, prefix, getIds, getId, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -13,10 +13,10 @@ import Memory from "./utils/Memory";
 import MoveableManager from "./Viewport/MoveableMananger";
 import MoveableData from "./utils/MoveableData";
 import KeyManager from "./KeyManager/KeyManager";
-import { ScenaEditorState, TagAppendInfo, SavedInfo } from "./types";
+import { ScenaEditorState, TagAppendInfo, SavedScenaData, ScenaJSXElement } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
-import { isMacintosh } from "./consts";
+import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 
 function undoCreateElements({ infos }: IObject<any>, editor: Editor) {
@@ -32,6 +32,16 @@ function undoSelectTargets({ prevs, nexts }: IObject<any>, editor: Editor) {
 }
 function redoSelectTargets({ prevs, nexts }: IObject<any>, editor: Editor) {
     editor.setSelectedTargets(editor.viewport.current!.getElements(nexts), true);
+}
+function undoChangeText({ prev, next, id }: IObject<any>, editor: Editor) {
+    const info = editor.getViewport().getInfo(id)!;
+    info.innerText = prev;
+    info.el!.innerText = prev;
+}
+function redoChangeText({ prev, next, id }: IObject<any>, editor: Editor) {
+    const info = editor.getViewport().getInfo(id)!;
+    info.innerText = next;
+    info.el!.innerText = next;
 }
 export default class Editor extends React.PureComponent<{
     width: number,
@@ -66,10 +76,7 @@ export default class Editor extends React.PureComponent<{
     public viewport = React.createRef<Viewport>();
     public tabs = React.createRef<Tabs>();
     public editorElement = React.createRef<HTMLDivElement>();
-    public constructor(props: any) {
-        super(props);
-        console.log("??");
-    }
+
     public render() {
         const {
             horizontalGuides,
@@ -171,10 +178,12 @@ export default class Editor extends React.PureComponent<{
                         });
                     }}
                 >
-                    <Viewport ref={viewport} style={{
-                        width: `${width}px`,
-                        height: `${height}px`,
-                    }}>
+                    <Viewport ref={viewport}
+                        onBlur={this.onBlur}
+                        style={{
+                            width: `${width}px`,
+                            height: `${height}px`,
+                        }}>
                         <MoveableManager
                             ref={moveableManager}
                             selectedTargets={selectedTargets}
@@ -189,7 +198,7 @@ export default class Editor extends React.PureComponent<{
                     ref={selecto}
                     dragContainer={".scena-viewer"}
                     hitRate={0}
-                    selectableTargets={["[data-scena-element]"]}
+                    selectableTargets={[`[${DATA_SCENA_ELEMENT_ID}]`]}
                     selectByClick={true}
                     selectFromInside={false}
                     toggleContinueSelect={["shift"]}
@@ -216,7 +225,7 @@ export default class Editor extends React.PureComponent<{
                         if (selectedMenu === "Text" && target.isContentEditable) {
                             const contentElement = getContentElement(target);
 
-                            if (contentElement && contentElement.hasAttribute("data-scena-element")) {
+                            if (contentElement && contentElement.hasAttribute(DATA_SCENA_ELEMENT_ID)) {
                                 e.stop();
                                 this.setSelectedTargets([contentElement]);
                             }
@@ -264,23 +273,29 @@ export default class Editor extends React.PureComponent<{
         return this.promiseState({
             selectedTargets: targets,
         }).then(() => {
+            console.log(isRestore, (this.selecto.current! as any).selecto.selectedTargets, targets);
+
             if (!isRestore) {
                 const prevs = getIds(this.moveableData.getSelectedTargets());
                 const nexts = getIds(targets);
                 this.historyManager.addAction("selectTargets", { prevs, nexts });
+            } else {
+                this.selecto.current!.setSelectedTargets(targets);
             }
+
+
             this.moveableData.setSelectedTargets(targets);
             this.eventBus.trigger("setSelectedTargets");
             return targets;
         });
     }
-    public appendJSX(jsx: any, name: string, frame: IObject<any> = {}) {
+    public appendJSX(jsx: ScenaJSXElement, name: string, frame: IObject<any> = {}) {
         return this.appendJSXs([{ jsx, name, frame }]).then(targets => targets[0]);
     }
     public appendElement(tag: any, props: IObject<any>, name: string, frame: IObject<any> = {}) {
         return this.appendElements([{ tag, props, name, frame }]).then(target => target[0]);
     }
-    public appendJSXs(jsxs: JSXInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
+    public appendJSXs(jsxs: ElementInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
         const viewport = this.getViewport();
         const indexes = getIds(this.getSelectedTargets()).map(id => viewport.findIndex(id!)).filter(id => id > -1);
         const index = indexes.length ? Math.max(...indexes) : -1;
@@ -299,8 +314,11 @@ export default class Editor extends React.PureComponent<{
             return info.el!;
         }).filter(el => el);
 
-        this.setSelectedTargets(targets, true);
-        return targets;
+        return Promise.all(targets.map(target => checkImageLoaded(target))).then(() => {
+            this.setSelectedTargets(targets, true);
+
+            return targets;
+        });
     }
     public appendElements(elements: TagAppendInfo[]): Promise<Array<HTMLElement | SVGElement>> {
         return this.appendJSXs(elements.map(({ props, name, frame, tag: Tag }) => ({
@@ -336,7 +354,7 @@ export default class Editor extends React.PureComponent<{
             !isRestore && this.historyManager.addAction("removeElements", {
                 infos: removed.map(info => ({
                     ...info,
-                    frame: frameMap[info.id] || info.frame,
+                    frame: frameMap[info.id!] || info.frame,
                 })),
             });
             return targets;
@@ -355,15 +373,43 @@ export default class Editor extends React.PureComponent<{
     public selectMenu(menu: string) {
         this.menu.current!.select(menu);
     }
-    public saveTargets(targets: Array<HTMLElement | SVGElement>): SavedInfo[] {
+    public loadDatas(datas: SavedScenaData[]) {
+        const viewport = this.getViewport();
+        return this.appendJSXs(datas.map(data => {
+            const { componentId, jsxId } = data;
+
+            let jsx: ScenaJSXElement;
+
+            if (jsxId) {
+                jsx = viewport.getJSX(jsxId);
+            } else if (componentId) {
+                const Component = viewport.getComponent(componentId);
+
+                jsx = <Component />;
+            } else {
+                jsx = React.createElement(data.tagName);
+            }
+            if (!jsx) {
+                return undefined;
+            }
+            return {
+                ...data,
+                jsx,
+            };
+        }).filter(info => info) as ElementInfo[]);
+    }
+    public saveTargets(targets: Array<HTMLElement | SVGElement>): SavedScenaData[] {
         this.console.log("save targets", targets);
         return targets.map(target => {
             const info = this.getViewport().getInfoByElement(target)!;
-
+            const isContentEditable = info.attrs!.contenteditable;
             return {
                 name: info.name,
-                isContentEditable: info.isContentEditable,
-                innerText: info.isContentEditable ? (target as HTMLElement).innerText : "",
+                attrs: getScenaAttrs(target),
+                jsxId: info.jsxId || "",
+                componentId: info.componentId!,
+                innerHTML: isContentEditable ? "" : target.innerHTML,
+                innerText: isContentEditable ? (target as HTMLElement).innerText : "",
                 tagName: target.tagName.toLowerCase(),
                 frame: this.moveableData.getFrame(target).get(),
             };
@@ -378,12 +424,7 @@ export default class Editor extends React.PureComponent<{
     public appendBlob(blob: Blob) {
         const url = URL.createObjectURL(blob);
 
-        return this.appendJSX(<img src={url} />, "(Image)").then(target => {
-            return checkImageLoaded(target as HTMLImageElement).then(() => {
-                this.getMoveable().updateRect();
-                return target as HTMLImageElement;
-            });
-        });
+        return this.appendJSX(<img src={url} alt="appended blob" />, "(Image)");
     }
     public componentDidMount() {
         const {
@@ -435,8 +476,9 @@ export default class Editor extends React.PureComponent<{
             e.inputEvent.preventDefault();
         }, "Move Down");
         this.keyManager.keyup(["backspace"], () => {
-            this.removeElements(this.moveableData.getSelectedTargets());
+            this.removeElements(this.getSelectedTargets());
         }, "Delete");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "v"], () => { }, "Paste");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
@@ -448,6 +490,7 @@ export default class Editor extends React.PureComponent<{
         this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
         this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
         this.historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets);
+        this.historyManager.registerType("changeText", undoChangeText, redoChangeText);
     }
     public componentWillUnmount() {
         this.eventBus.off();
@@ -517,5 +560,34 @@ export default class Editor extends React.PureComponent<{
                 zoom: Math.max(0.1, this.state.zoom + e.deltaY / 300),
             });
         }
+    }
+    private onBlur = (e: any) => {
+        const target = e.target as HTMLElement | SVGElement;
+
+        if (!checkInput(target)) {
+            return;
+        }
+        const parentTarget = getParnetScenaElement(target);
+
+        if (!parentTarget) {
+            return;
+        }
+        const info = this.getViewport().getInfoByElement(parentTarget)!;
+
+
+        if (!info.attrs!.contenteditable) {
+            return
+        }
+        const nextText = (parentTarget as HTMLElement).innerText;
+
+        if (info.innerText === nextText) {
+            return;
+        }
+        this.historyManager.addAction("changeText", {
+            id: info.id,
+            prev: info.innerText,
+            next: nextText,
+        });
+        info.innerText = nextText;
     }
 }

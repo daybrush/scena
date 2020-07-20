@@ -1,6 +1,26 @@
 import * as React from "react";
 import Editor from "./Editor/Editor";
 import "./App.css";
+import { ScenaProps } from "./Editor/types";
+import { makeScenaFunctionalComponent } from "./Editor";
+
+const Badge = makeScenaFunctionalComponent("Badget", function Badge(props: ScenaProps) {
+    return <p className="badges" data-scena-element-id={props.scenaElementId}>
+        <a href="https://www.npmjs.com/package/moveable" target="_blank">
+            <img src="https://img.shields.io/npm/v/moveable.svg?style=flat-square&amp;color=007acc&amp;label=version" alt="npm version" /></a>
+        <a href="https://github.com/daybrush/moveable" target="_blank">
+            <img src="https://img.shields.io/github/stars/daybrush/moveable.svg?color=42b883&amp;style=flat-square" /></a>
+        <a href="https://github.com/daybrush/moveable" target="_blank">
+            <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square" />
+        </a>
+        <br />
+        <a href="https://github.com/daybrush/moveable/tree/master/packages/react-moveable" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&amp;message=React&amp;style=flat-square&amp;color=61daeb" /></a>
+        <a href="https://github.com/daybrush/moveable/tree/master/packages/preact-moveable" target="_blank"><img alt="Preact" src="https://img.shields.io/static/v1.svg?label=&amp;message=Preact&amp;style=flat-square&amp;color=673ab8" /></a>
+        <a href="https://github.com/daybrush/moveable/tree/master/packages/ngx-moveable" target="_blank"><img alt="Angular" src="https://img.shields.io/static/v1.svg?label=&amp;message=Angular&amp;style=flat-square&amp;color=C82B38" /></a>
+        <a href="https://github.com/probil/vue-moveable" target="_blank"><img alt="Vue" src="https://img.shields.io/static/v1.svg?label=&amp;message=Vue&amp;style=flat-square&amp;color=3fb984" /></a>
+        <a href="https://github.com/daybrush/moveable/tree/master/packages/svelte-moveable" target="_blank"><img alt="Svelte" src="https://img.shields.io/static/v1.svg?label=&amp;message=Svelte&amp;style=flat-square&amp;color=C82B38" /></a>
+    </p>;
+});
 
 class App extends React.Component {
     public editor = React.createRef<Editor>();
@@ -9,7 +29,7 @@ class App extends React.Component {
             <Editor
                 ref={this.editor}
                 debug={true}
-                />
+            />
             <div className="bottom">
                 <a href="https://github.com/daybrush/moveable" target="_blank">Download</a>
                 <a href="https://daybrush.com/moveable/release/latest/doc" target="_blank">API</a>
@@ -18,7 +38,7 @@ class App extends React.Component {
         </div>;
     }
     public componentDidMount() {
-        // (window as any).a = this.editor.current!;
+        (window as any).a = this.editor.current!;
         this.editor.current!.appendJSXs([
             {
                 jsx: <div className="moveable" contentEditable="true">Moveable</div>,
@@ -39,21 +59,7 @@ class App extends React.Component {
                 },
             },
             {
-                jsx: <p className="badges">
-                    <a href="https://www.npmjs.com/package/moveable" target="_blank">
-                        <img src="https://img.shields.io/npm/v/moveable.svg?style=flat-square&amp;color=007acc&amp;label=version" alt="npm version" /></a>
-                    <a href="https://github.com/daybrush/moveable" target="_blank">
-                        <img src="https://img.shields.io/github/stars/daybrush/moveable.svg?color=42b883&amp;style=flat-square" /></a>
-                    <a href="https://github.com/daybrush/moveable" target="_blank">
-                        <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square" />
-                    </a>
-                    <br/>
-                    <a href="https://github.com/daybrush/moveable/tree/master/packages/react-moveable" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&amp;message=React&amp;style=flat-square&amp;color=61daeb" /></a>
-                    <a href="https://github.com/daybrush/moveable/tree/master/packages/preact-moveable" target="_blank"><img alt="Preact" src="https://img.shields.io/static/v1.svg?label=&amp;message=Preact&amp;style=flat-square&amp;color=673ab8" /></a>
-                    <a href="https://github.com/daybrush/moveable/tree/master/packages/ngx-moveable" target="_blank"><img alt="Angular" src="https://img.shields.io/static/v1.svg?label=&amp;message=Angular&amp;style=flat-square&amp;color=C82B38" /></a>
-                    <a href="https://github.com/probil/vue-moveable" target="_blank"><img alt="Vue" src="https://img.shields.io/static/v1.svg?label=&amp;message=Vue&amp;style=flat-square&amp;color=3fb984" /></a>
-                    <a href="https://github.com/daybrush/moveable/tree/master/packages/svelte-moveable" target="_blank"><img alt="Svelte" src="https://img.shields.io/static/v1.svg?label=&amp;message=Svelte&amp;style=flat-square&amp;color=C82B38" /></a>
-                </p>,
+                jsx: <Badge />,
                 name: "(Badges)",
                 frame: {
                     position: "absolute",
@@ -76,7 +82,9 @@ class App extends React.Component {
                     "font-weight": "normal",
                 },
             },
-        ], true);
+        ], true).then(targets => {
+            this.editor.current!.setSelectedTargets([targets[0]], true);
+        });
     }
 }
 
