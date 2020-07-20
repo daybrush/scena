@@ -1,35 +1,51 @@
 import * as React from "react";
-import { ClipboardItem, SavedInfo } from "../types";
+import { ClipboardItem, SavedScenaData } from "../types";
 import Editor from "../Editor";
 import { checkInput } from "./utils";
 
 export default class ClipboardManager {
     constructor(private editor: Editor) {
+        document.addEventListener("cut", this.onCut);
         document.addEventListener("copy", this.onCopy);
         document.addEventListener("paste", this.onPaste);
     }
     public destroy() {
+        document.removeEventListener("cut", this.onCut);
         document.removeEventListener("copy", this.onCopy);
         document.removeEventListener("paste", this.onPaste);
     }
+    private onCut = (e: any) => {
+        const copied = this.onCopy(e);
+
+        if (!copied) {
+            return;
+        }
+        this.editor.console.log("cut scena data");
+        this.editor.removeElements(this.editor.getSelectedTargets());
+    }
     private onCopy = (e: any) => {
         if (checkInput(e.target)) {
-            return;
+            return false;
         }
         const clipboardData = (e as any).clipboardData as DataTransfer;
         const moveableData = this.editor.moveableData;
         const targets = moveableData.getSelectedTargets();
-        const savedData = this.editor.saveTargets(targets);
+        const SavedScenaData = this.editor.saveTargets(targets);
 
-        this.editor.console.log("copy scena data", savedData);
+        this.editor.console.log("copy scena data", SavedScenaData);
 
 
         clipboardData.setData("text/plain", "Scena Copy");
-        clipboardData.setData("text/scena", JSON.stringify(savedData));
+        clipboardData.setData("text/scena", JSON.stringify(SavedScenaData));
 
         e.preventDefault();
+        return true;
     }
     private onPaste = (e: any) => {
+        if (checkInput(e.target)) {
+            return;
+        }
+
         this.read((e as any).clipboardData);
         e.preventDefault();
     }
@@ -38,13 +54,11 @@ export default class ClipboardManager {
         const hasScena = types.indexOf("text/scena") > -1;
 
         if (hasScena) {
-            const scenaData = JSON.parse(data.getData("text/scena")) as SavedInfo[];
+            const scenaDatas = JSON.parse(data.getData("text/scena")) as SavedScenaData[];
 
-            this.editor.console.log("paste scena data", scenaData);
-            this.editor.appendJSXs(scenaData.map(data => ({
-                ...data,
-                jsx: React.createElement(data.tagName),
-            })));
+            this.editor.console.log("paste scena data", scenaDatas);
+
+            this.editor.loadDatas(scenaDatas);
             return true;
         }
         return false;
@@ -74,13 +88,11 @@ export default class ClipboardManager {
         if (!isPaste && hasText) {
             const text = await navigator.clipboard.readText();
 
-            const addedInfo = await this.editor.getViewport().appendJSXs([{
+            this.editor.appendJSXs([{
                 jsx: <div contentEditable="true"></div>,
                 name: "(Text)",
+                innerText: text,
             }]);
-
-            addedInfo.added[0].el!.innerText = text;
-            this.editor.appendComplete(addedInfo);
         }
     }
 }
