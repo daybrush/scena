@@ -4,7 +4,7 @@ import "./App.css";
 import { ScenaProps } from "./Editor/types";
 import { makeScenaFunctionalComponent } from "./Editor";
 
-const Badge = makeScenaFunctionalComponent("Badget", function Badge(props: ScenaProps) {
+const Badge = makeScenaFunctionalComponent("Badge", function Badge(props: ScenaProps) {
     return <p className="badges" data-scena-element-id={props.scenaElementId}>
         <a href="https://www.npmjs.com/package/moveable" target="_blank">
             <img src="https://img.shields.io/npm/v/moveable.svg?style=flat-square&amp;color=007acc&amp;label=version" alt="npm version" /></a>

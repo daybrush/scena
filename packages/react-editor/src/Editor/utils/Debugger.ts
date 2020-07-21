@@ -4,6 +4,6 @@ export default class Debugger {
         if (!this.isDebug) {
             return;
         }
-        console.log("Scena Debugger:", ...args);
+        console.log("%c Scena Debugger:", "padding: 1px; background: #4af; color: #fff;", ...args);
     }
 }

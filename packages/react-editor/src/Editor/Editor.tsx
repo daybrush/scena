@@ -19,8 +19,14 @@ import Debugger from "./utils/Debugger";
 import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 
-function undoCreateElements({ infos }: IObject<any>, editor: Editor) {
-    editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
+function undoCreateElements({ infos, prevSelected }: IObject<any>, editor: Editor) {
+    const res = editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
+
+    if (prevSelected) {
+        res.then(() => {
+            editor.setSelectedTargets(editor.getViewport().getElements(prevSelected), true);
+        })
+    }
 }
 function restoreElements({ infos }: IObject<any>, editor: Editor) {
     editor.appendJSXs(infos.map((info: ElementInfo) => ({
@@ -273,8 +279,6 @@ export default class Editor extends React.PureComponent<{
         return this.promiseState({
             selectedTargets: targets,
         }).then(() => {
-            console.log(isRestore, (this.selecto.current! as any).selecto.selectedTargets, targets);
-
             if (!isRestore) {
                 const prevs = getIds(this.moveableData.getSelectedTargets());
                 const nexts = getIds(targets);
@@ -305,7 +309,10 @@ export default class Editor extends React.PureComponent<{
         });
     }
     public appendComplete({ added }: AddedInfo, isRestore?: boolean) {
-        !isRestore && this.historyManager.addAction("createElements", { infos: added });
+        !isRestore && this.historyManager.addAction("createElements", {
+            infos: added,
+            prevSelected: getIds(this.getSelectedTargets()),
+        });
         const data = this.moveableData;
         const targets = added.map(info => {
             data.createFrame(info.el!, info.frame);
