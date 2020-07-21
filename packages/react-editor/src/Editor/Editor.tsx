@@ -302,9 +302,9 @@ export default class Editor extends React.PureComponent<{
     public appendJSXs(jsxs: ElementInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
         const viewport = this.getViewport();
         const indexes = getIds(this.getSelectedTargets()).map(id => viewport.findIndex(id!)).filter(id => id > -1);
-        const index = indexes.length ? Math.max(...indexes) : -1;
+        const index = indexes.length ? Math.max(...indexes) + 1 : -1;
 
-        return this.getViewport().appendJSXs(jsxs).then(info => {
+        return this.getViewport().appendJSXs(jsxs, isRestore ? -1 : index).then(info => {
             return this.appendComplete(info, isRestore);
         });
     }

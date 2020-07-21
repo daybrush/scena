@@ -84,7 +84,7 @@ export default class Viewport extends React.PureComponent<{
     public getInfos() {
         return this.state.infos;
     }
-    public appendJSXs(jsxs: ElementInfo[]): Promise<AddedInfo> {
+    public appendJSXs(jsxs: ElementInfo[], appendIndex: number): Promise<AddedInfo> {
         const infos = this.state.infos;
         const jsxInfos = jsxs.map(info => {
             const id = info.id || this.makeId();
@@ -122,8 +122,11 @@ export default class Viewport extends React.PureComponent<{
         });
         const nextInfos = [...infos];
 
-        jsxInfos.forEach(info => {
-            if (isNumber(info.index)) {
+        jsxInfos.forEach((info, i) => {
+            if (appendIndex > -1) {
+                nextInfos.splice(appendIndex + i, 0, info);
+                info.index = appendIndex + i;
+            } else if (isNumber(info.index)) {
                 nextInfos.splice(info.index, 0, info);
             } else {
                 info.index = nextInfos.length;
