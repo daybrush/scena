@@ -1,9 +1,9 @@
 import * as React from "react";
 import "./App.css";
 import { ScenaProps } from "../Editor/types";
-import Editor, { makeScenaFunctionalComponent } from "../Editor";
+import Editor, { makeScenaFunctionComponent } from "../Editor";
 
-const Badge = makeScenaFunctionalComponent("Badge", function Badge(props: ScenaProps) {
+const Badge = makeScenaFunctionComponent("Badge", function Badge(props: ScenaProps) {
     return <p className="badges" data-scena-element-id={props.scenaElementId}>
         <a href="https://www.npmjs.com/package/moveable" target="_blank">
             <img src="https://img.shields.io/npm/v/moveable.svg?style=flat-square&amp;color=007acc&amp;label=version" alt="npm version" /></a>
@@ -40,7 +40,7 @@ class App extends React.Component {
         (window as any).a = this.editor.current!;
         this.editor.current!.appendJSXs([
             {
-                jsx: <div className="moveable" contentEditable="true">Moveable</div>,
+                jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable</div>,
                 name: "(Logo)",
                 frame: {
                     position: "absolute",
@@ -69,7 +69,7 @@ class App extends React.Component {
                 },
             },
             {
-                jsx: <div className="moveable" contentEditable="true">Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
+                jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
                 name: "(Description)",
                 frame: {
                     position: "absolute",

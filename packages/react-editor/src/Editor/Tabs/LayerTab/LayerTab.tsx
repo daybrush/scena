@@ -34,7 +34,6 @@ export default class LayerTab extends Tab {
     }
 
     private onSelect = (selected: string[]) => {
-        console.log(selected);
         this.eventBus.requestTrigger("selectLayers", {
             selected,
         })

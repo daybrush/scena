@@ -48,9 +48,11 @@ export interface SavedScenaData {
     jsxId: string;
     componentId: string;
     tagName: string;
-    innerText?: string,
+    innerHTML?: string;
+    innerText?: string;
     attrs: IObject<any>;
     frame: IObject<any>;
+    children: SavedScenaData[];
 }
 export interface ScenaProps {
     scenaElementId?: string;
@@ -59,8 +61,9 @@ export interface ScenaProps {
     scneaHTML?: string;
 }
 
-export type ScenaFunctionalComponent<T> = ((props: T & ScenaProps) => React.ReactElement<any, any>) & { scenaComponentId: string };
+export type ScenaFunctionComponent<T> = ((props: T & ScenaProps) => React.ReactElement<any, any>) & { scenaComponentId: string };
 export type ScenaComponent = React.JSXElementConstructor<ScenaProps> & { scenaComponentId: string };
 export type ScenaJSXElement
     = React.ReactElement<any, string>
-    | React.ReactElement<any, React.JSXElementConstructor<ScenaProps> & { scenaComponentId: string }>;
+    | React.ReactElement<any, ScenaComponent>;
+export type ScenaJSXType = ScenaJSXElement | string | ScenaComponent;

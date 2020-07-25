@@ -1,8 +1,9 @@
 import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
-import { ScenaFunctionalComponent, ScenaProps } from "../types";
+import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement } from "../types";
 import { IObject } from "@daybrush/utils";
+import { isFunction, isObject } from "util";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -72,10 +73,10 @@ export function getParnetScenaElement(el: HTMLElement | SVGElement): HTMLElement
     return getParnetScenaElement(el.parentElement as HTMLElement | SVGElement);
 }
 
-export function makeScenaFunctionalComponent<T = IObject<any>>(id: string, component: (props: ScenaProps & T) => React.ReactElement<any, any>): ScenaFunctionalComponent<T> {
-    (component as ScenaFunctionalComponent<T>).scenaComponentId = id;
+export function makeScenaFunctionComponent<T = IObject<any>>(id: string, component: (props: ScenaProps & T) => React.ReactElement<any, any>): ScenaFunctionComponent<T> {
+    (component as ScenaFunctionComponent<T>).scenaComponentId = id;
 
-    return component as ScenaFunctionalComponent<T>;
+    return component as ScenaFunctionComponent<T>;
 }
 
 export function getScenaAttrs(el: HTMLElement | SVGElement) {
@@ -93,4 +94,16 @@ export function getScenaAttrs(el: HTMLElement | SVGElement) {
     }
 
     return attrs;
+}
+
+export function isScenaFunction(value: any): value is ScenaComponent {
+    return isFunction(value) && "scenaComponentId" in value;
+}
+
+export function isScenaElement(value: any): value is ScenaJSXElement {
+    return isObject(value) && !isScenaFunction(value);
+}
+
+export function isNumber(value: any): value is number {
+    return typeof value === "number";
 }

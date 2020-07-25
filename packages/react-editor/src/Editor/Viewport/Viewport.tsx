@@ -1,9 +1,8 @@
 import * as React from "react";
-import { IObject, find, findIndex, isString } from "@daybrush/utils";
-import { prefix, getId, getScenaAttrs } from "../utils/utils";
-import { isNumber } from "util";
+import { IObject, isString, isArray } from "@daybrush/utils";
+import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isNumber } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
-import { ScenaJSXElement, ScenaComponent } from "../types";
+import { ScenaJSXElement, ScenaComponent, ScenaJSXType } from "../types";
 
 export interface AddedInfo {
     added: ElementInfo[];
@@ -12,7 +11,7 @@ export interface RemovedInfo {
     removed: ElementInfo[];
 }
 export interface ElementInfo {
-    jsx: ScenaJSXElement;
+    jsx: ScenaJSXType;
     name: string;
     frame?: IObject<any>;
 
@@ -53,12 +52,35 @@ export default class Viewport extends React.PureComponent<{
     public renderChildren(children: ElementInfo[]): ScenaJSXElement[] {
         return children.map(info => {
             const jsx = info.jsx;
-            const nextChildren = info.children;
-            if (!nextChildren || !nextChildren.length || !isString(jsx.type)) {
-                return jsx;
+            const nextChildren = info.children!;
+            const renderedChildren = this.renderChildren(nextChildren);
+            const id = info.id!;
+            const props: IObject<any> = {
+                key: id,
+            };
+            if (isString(jsx)) {
+                props[DATA_SCENA_ELEMENT_ID] = id;
+                return React.createElement(jsx, props, ...renderedChildren) as ScenaJSXElement;
+            } else if (isScenaFunction(jsx)) {
+                props.scenaElementId = id;
+                props.scenaAttrs = info.attrs || {};
+                props.scenaText = info.innerText;
+                props.scenaHTML = info.innerHTML;
+
+                return React.createElement(jsx, props) as ScenaJSXElement;
+            } else if (isString(jsx.type)) {
+                props[DATA_SCENA_ELEMENT_ID] = id;
+            } else {
+                props.scenaElementId = id;
+                props.scenaAttrs = info.attrs || {};
+                props.scenaText = info.innerText;
+                props.scenaHTML = info.innerHTML;
             }
-            const children = jsx.props.children || [];
-            return React.cloneElement(jsx, jsx.props, ...children, ...this.renderChildren(nextChildren)) as ScenaJSXElement;
+            const jsxChildren = jsx.props.children;
+            return React.cloneElement(jsx, {...jsx.props, ...props},
+                ...(isArray(jsxChildren) ? jsxChildren : [jsxChildren]),
+                ...this.renderChildren(nextChildren),
+            ) as ScenaJSXElement;
         });
     }
     public getJSX(id: string) {
@@ -68,8 +90,7 @@ export default class Viewport extends React.PureComponent<{
         return this.components[id];
     }
 
-    public makeId() {
-        const ids = this.ids;
+    public makeId(ids: IObject<any> = this.ids) {
 
         while (true) {
             const id = `scena${Math.floor(Math.random() * 100000000)}`;
@@ -144,27 +165,24 @@ export default class Viewport extends React.PureComponent<{
             const children = info.children || [];
             const scopeId = parentScopeId || info.scopeId || "viewport";
             let componentId = "";
+            let jsxId = "";
 
-            const props: IObject<any> = {
-                "key": id,
-            };
-            if (typeof jsx.type === "string") {
-                props[DATA_SCENA_ELEMENT_ID] = id;
-            } else {
-                const component = jsx.type;
-                componentId = component.scenaComponentId;
-                props.scenaElementId = id;
-                props.scenaAttrs = info.attrs || {};
-                props.scenaText = info.innerText;
-                props.scenaHTML = info.innerHTML;
-                this.components[componentId] = component;
+
+            if (isScenaElement(jsx)) {
+                jsxId = this.makeId(this.jsxs);
+
+                this.jsxs[jsxId] = jsx;
+                // const component = jsx.type;
+                // componentId = component.scenaComponentId;
+                // this.components[componentId] = component;
             }
             const elementInfo: ElementInfo = {
                 ...info,
-                jsx: React.cloneElement(info.jsx, props) as ScenaJSXElement,
+                jsx,
                 children: this.registerChildren(children, id),
                 scopeId,
                 componentId,
+                jsxId,
                 frame: info.frame || {},
                 el: null,
                 id,
@@ -174,7 +192,7 @@ export default class Viewport extends React.PureComponent<{
         });
     }
     public appendJSXs(jsxs: ElementInfo[], appendIndex: number, scopeId?: string): Promise<AddedInfo> {
-        const jsxInfos = this.registerChildren(jsxs);
+        const jsxInfos = this.registerChildren(jsxs, scopeId);
 
         jsxInfos.forEach((info, i) => {
             const scopeInfo = this.getInfo(scopeId || info.scopeId!);
@@ -273,7 +291,7 @@ export default class Viewport extends React.PureComponent<{
         });
     }
     public removeTargets(targets: Array<HTMLElement | SVGElement>): Promise<RemovedInfo> {
-        const removedChildren = targets.map(target => {
+        const removedChildren = this.getSortedTargets(targets).map(target => {
             return this.getInfoByElement(target);
         }).filter(info => info) as ElementInfo[];
         const indexes = removedChildren.map(info => this.getIndex(info.id!));
@@ -289,5 +307,34 @@ export default class Viewport extends React.PureComponent<{
                 });
             })
         });
+    }
+    public getSortedIndexesList(targets: Array<string | HTMLElement | SVGElement | number[]>) {
+        const indexesList = targets.map(target => {
+            if (Array.isArray(target)) {
+                return target;
+            }
+            return this.getIndexes(target!)
+        });
+
+        indexesList.sort((a, b) => {
+            const aLength = a.length;
+            const bLength = b.length;
+            const length = Math.min(aLength, bLength);
+
+            for (let i = 0; i < length; ++i) {
+                if (a[i] === b[i]) {
+                    continue;
+                }
+                return a[i] - b[i];
+            }
+            return aLength - bLength;
+        });
+
+        return indexesList;
+    }
+    public getSortedTargets(targets: Array<string | HTMLElement | SVGElement>) {
+        const indexesList = this.getSortedIndexesList(targets);
+
+        return indexesList.map(indexes => this.getInfoByIndexes(indexes).el!);
     }
 }

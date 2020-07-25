@@ -5,7 +5,7 @@ import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
 import Viewport, { ElementInfo, AddedInfo } from "./Viewport/Viewport";
-import { getContentElement, prefix, getIds, getId, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs } from "./utils/utils";
+import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -276,18 +276,21 @@ export default class Editor extends React.PureComponent<{
         return this.state.selectedTargets;
     }
     public setSelectedTargets(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
+        targets = targets.filter(target => {
+            return targets.every(parnetTarget => parnetTarget === target || !parnetTarget.contains(target));
+        });
         return this.promiseState({
             selectedTargets: targets,
         }).then(() => {
             if (!isRestore) {
                 const prevs = getIds(this.moveableData.getSelectedTargets());
                 const nexts = getIds(targets);
-                this.historyManager.addAction("selectTargets", { prevs, nexts });
-            } else {
-                this.selecto.current!.setSelectedTargets(targets);
+
+                if (!prevs.every((prev, i) => nexts[i] === prev)) {
+                    this.historyManager.addAction("selectTargets", { prevs, nexts });
+                }
             }
-
-
+            this.selecto.current!.setSelectedTargets(targets);
             this.moveableData.setSelectedTargets(targets);
             this.eventBus.trigger("setSelectedTargets");
             return targets;
@@ -301,18 +304,23 @@ export default class Editor extends React.PureComponent<{
     }
     public appendJSXs(jsxs: ElementInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
         const viewport = this.getViewport();
-        const indexesList = this.getSortedIndexesList(this.getSelectedTargets());
+        const indexesList = viewport.getSortedIndexesList(this.getSelectedTargets());
         const indexesListLength = indexesList.length;
         let appendIndex = -1;
         let scopeId: string = "";
 
         if (!isRestore && indexesListLength) {
             const indexes = indexesList[indexesListLength - 1];
+
+
             const info = viewport.getInfoByIndexes(indexes);
 
             scopeId = info.scopeId!;
+            console.log(indexes, scopeId);
             appendIndex = indexes[indexes.length - 1] + 1;
         }
+
+        this.console.log("append jsxs", jsxs, appendIndex, scopeId);
 
         return this.getViewport().appendJSXs(jsxs, appendIndex, scopeId).then(info => {
             return this.appendComplete(info, isRestore);
@@ -366,7 +374,7 @@ export default class Editor extends React.PureComponent<{
                 removeFrame(childInfo.el!);
             });
         });
-        const indexesList = this.getSortedIndexesList(targets);
+        const indexesList = viewport.getSortedIndexesList(targets);
         const indexesListLength = indexesList.length;
         let scopeId = "";
         let selectedInfo: ElementInfo | null = null;
@@ -412,8 +420,8 @@ export default class Editor extends React.PureComponent<{
     }
     public loadDatas(datas: SavedScenaData[]) {
         const viewport = this.getViewport();
-        return this.appendJSXs(datas.map(data => {
-            const { componentId, jsxId } = data;
+        return this.appendJSXs(datas.map(function loadData(data): any {
+            const { componentId, jsxId, children } = data;
 
             let jsx: ScenaJSXElement;
 
@@ -426,19 +434,19 @@ export default class Editor extends React.PureComponent<{
             } else {
                 jsx = React.createElement(data.tagName);
             }
-            if (!jsx) {
-                return undefined;
-            }
             return {
                 ...data,
+                children: children.map(loadData),
                 jsx,
             };
         }).filter(info => info) as ElementInfo[]);
     }
     public saveTargets(targets: Array<HTMLElement | SVGElement>): SavedScenaData[] {
+        const viewport = this.getViewport();
+        const moveableData = this.moveableData;
         this.console.log("save targets", targets);
-        return targets.map(target => {
-            const info = this.getViewport().getInfoByElement(target)!;
+        return targets.map(target => viewport.getInfoByElement(target)).map(function saveTarget(info): SavedScenaData {
+            const target = info.el!;
             const isContentEditable = info.attrs!.contenteditable;
             return {
                 name: info.name,
@@ -448,7 +456,8 @@ export default class Editor extends React.PureComponent<{
                 innerHTML: isContentEditable ? "" : target.innerHTML,
                 innerText: isContentEditable ? (target as HTMLElement).innerText : "",
                 tagName: target.tagName.toLowerCase(),
-                frame: this.moveableData.getFrame(target).get(),
+                frame: moveableData.getFrame(target).get(),
+                children: info.children!.map(saveTarget),
             };
         });
     }
@@ -523,6 +532,10 @@ export default class Editor extends React.PureComponent<{
         }, "Undo");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "z"], () => {
             this.historyManager.redo();
+        }, "Redo");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "a"], e => {
+            this.setSelectedTargets(this.getViewportInfos().map(info => info.el!));
+            e.inputEvent.preventDefault();
         }, "Redo");
         this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
         this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
@@ -626,25 +639,5 @@ export default class Editor extends React.PureComponent<{
             next: nextText,
         });
         info.innerText = nextText;
-    }
-    private getSortedIndexesList(targets: Array<string | HTMLElement | SVGElement>) {
-        const viewport = this.getViewport();
-        const indexesList = targets.map(target => viewport.getIndexes(target!));
-
-        indexesList.sort((a, b) => {
-            const aLength = a.length;
-            const bLength = b.length;
-            const length = Math.min(aLength, bLength);
-
-            for (let i = 0; i < length; ++i) {
-                if (a[i] === b[i]) {
-                    continue;
-                }
-                return a[i] - b[i];
-            }
-            return aLength - bLength;
-        });
-
-        return indexesList;
     }
 }
