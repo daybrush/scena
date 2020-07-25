@@ -301,10 +301,20 @@ export default class Editor extends React.PureComponent<{
     }
     public appendJSXs(jsxs: ElementInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
         const viewport = this.getViewport();
-        const indexes = getIds(this.getSelectedTargets()).map(id => viewport.findIndex(id!)).filter(id => id > -1);
-        const index = indexes.length ? Math.max(...indexes) + 1 : -1;
+        const indexesList = this.getSortedIndexesList(this.getSelectedTargets());
+        const indexesListLength = indexesList.length;
+        let appendIndex = -1;
+        let scopeId: string = "";
 
-        return this.getViewport().appendJSXs(jsxs, isRestore ? -1 : index).then(info => {
+        if (!isRestore && indexesListLength) {
+            const indexes = indexesList[indexesListLength - 1];
+            const info = viewport.getInfoByIndexes(indexes);
+
+            scopeId = info.scopeId!;
+            appendIndex = indexes[indexes.length - 1] + 1;
+        }
+
+        return this.getViewport().appendJSXs(jsxs, appendIndex, scopeId).then(info => {
             return this.appendComplete(info, isRestore);
         });
     }
@@ -314,10 +324,11 @@ export default class Editor extends React.PureComponent<{
             prevSelected: getIds(this.getSelectedTargets()),
         });
         const data = this.moveableData;
-        const targets = added.map(info => {
+        const targets = added.map(function registerFrame(info) {
             data.createFrame(info.el!, info.frame);
             data.render(info.el!);
 
+            info.children!.forEach(registerFrame);
             return info.el!;
         }).filter(el => el);
 
@@ -343,26 +354,45 @@ export default class Editor extends React.PureComponent<{
     public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
         const frameMap: IObject<any> = {};
         const moveableData = this.moveableData;
-        targets.forEach(target => {
-            frameMap[getId(target)] = moveableData.getFrame(target).get();
-            moveableData.removeFrame(target);
-        });
         const viewport = this.getViewport();
-        const indexes = getIds(targets).map(id => viewport.findIndex(id!)).filter(id => id > -1);
-        const index = indexes.length ? Math.min(...indexes) : -1;
 
+        targets.forEach(function removeFrame(target) {
+            const info = viewport.getInfoByElement(target)!;
+
+            frameMap[info.id!] = moveableData.getFrame(target).get();
+            moveableData.removeFrame(target);
+
+            info.children!.forEach(childInfo => {
+                removeFrame(childInfo.el!);
+            });
+        });
+        const indexesList = this.getSortedIndexesList(targets);
+        const indexesListLength = indexesList.length;
+        let scopeId = "";
+        let selectedInfo: ElementInfo | null = null;
+
+        if (indexesListLength) {
+            const lastInfo = viewport.getInfoByIndexes(indexesList[indexesListLength - 1]);
+            const nextInfo = viewport.getNextInfo(lastInfo.id!);
+
+            scopeId = lastInfo.scopeId!;
+            selectedInfo = nextInfo;
+        }
+        // return;
         return viewport.removeTargets(targets).then(({ removed }) => {
-            const infos = viewport.getInfos();
-            const selectedTarget = infos[index] || infos[index - 1];
+            let selectedTarget = selectedInfo || viewport.getLastChildInfo(scopeId)! || viewport.getInfo(scopeId);
 
-            this.setSelectedTargets(selectedTarget ? [selectedTarget.el!] : [], true);
+            this.setSelectedTargets(selectedTarget && selectedTarget.el ? [selectedTarget.el!] : [], true);
 
             this.console.log("removeTargets", removed);
             !isRestore && this.historyManager.addAction("removeElements", {
-                infos: removed.map(info => ({
-                    ...info,
-                    frame: frameMap[info.id!] || info.frame,
-                })),
+                infos: removed.map(function removeTarget(info: ElementInfo): ElementInfo {
+                    return {
+                        ...info,
+                        children: info.children!.map(removeTarget),
+                        frame: frameMap[info.id!] || info.frame,
+                    };
+                }),
             });
             return targets;
         });
@@ -426,7 +456,7 @@ export default class Editor extends React.PureComponent<{
         return this.viewport.current!;
     }
     public getViewportInfos() {
-        return this.getViewport().state.infos;
+        return this.getViewport().getViewportInfos();
     }
     public appendBlob(blob: Blob) {
         const url = URL.createObjectURL(blob);
@@ -596,5 +626,25 @@ export default class Editor extends React.PureComponent<{
             next: nextText,
         });
         info.innerText = nextText;
+    }
+    private getSortedIndexesList(targets: Array<string | HTMLElement | SVGElement>) {
+        const viewport = this.getViewport();
+        const indexesList = targets.map(target => viewport.getIndexes(target!));
+
+        indexesList.sort((a, b) => {
+            const aLength = a.length;
+            const bLength = b.length;
+            const length = Math.min(aLength, bLength);
+
+            for (let i = 0; i < length; ++i) {
+                if (a[i] === b[i]) {
+                    continue;
+                }
+                return a[i] - b[i];
+            }
+            return aLength - bLength;
+        });
+
+        return indexesList;
     }
 }

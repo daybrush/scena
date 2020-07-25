@@ -81,6 +81,34 @@ class App extends React.Component {
                     "font-weight": "normal",
                 },
             },
+            {
+                jsx: <div className="moveable">Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
+                name: "(Description)",
+                frame: {
+                    position: "absolute",
+                    left: "0%",
+                    top: "65%",
+                    width: "400px",
+                    "font-size": "14px",
+                    "text-align": "center",
+                    "font-weight": "normal",
+                },
+                children: [
+                    {
+                        jsx: <div className="moveable">HI</div>,
+                        name: "(Des2)",
+                        frame: {
+                            position: "absolute",
+                            left: "0%",
+                            top: "65%",
+                            width: "400px",
+                            "font-size": "14px",
+                            "text-align": "center",
+                            "font-weight": "normal",
+                        },
+                    }
+                ]
+            },
         ], true).then(targets => {
             this.editor.current!.setSelectedTargets([targets[0]], true);
         });

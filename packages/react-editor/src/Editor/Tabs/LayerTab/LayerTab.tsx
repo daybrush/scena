@@ -19,8 +19,9 @@ export default class LayerTab extends Tab {
             name="" properties={infos}
             multiselect={true}
             getId={(v: ElementInfo) => v.id}
+            getFullId={id => id}
             getName={(v: ElementInfo) => v.name}
-            getChildren={() => false}
+            getChildren={(v: ElementInfo) => v.children || []}
             selected={selected}
             onSelect={this.onSelect}
             FileComponent={this.renderFile} />;
@@ -33,6 +34,7 @@ export default class LayerTab extends Tab {
     }
 
     private onSelect = (selected: string[]) => {
+        console.log(selected);
         this.eventBus.requestTrigger("selectLayers", {
             selected,
         })

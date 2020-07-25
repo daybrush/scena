@@ -1,6 +1,6 @@
 import * as React from "react";
 import { prefix } from "../../utils/utils";
-import { IObject, isObject } from "@daybrush/utils";
+import { IObject, isObject, isArray } from "@daybrush/utils";
 import "./Folder.css";
 import File from "./File";
 import KeyController from "keycon";
@@ -14,11 +14,13 @@ export default class Folder extends React.PureComponent<{
     onSelect: (e: string[]) => any,
     FileComponent: ((props: File["props"]) => any) | typeof File,
     getId?: (value: any, id: any) => any,
+    getFullId?: (id: string, scope: string[]) => string,
     getName?: (value: any, id: any) => any,
     getChildren?: (value: any, id: any) => any,
 }> {
     public static defaultProps = {
-        getId: (_: any, id: any) => id,
+        getFullId: (id: string, scope: string[]) => [...scope, id].join("///"),
+        getId: (_: any, id: any, scope: string[]) => id,
         getName: (_: any, id: any) => id,
         getChildren: (value: any) => value,
     }
@@ -34,9 +36,10 @@ export default class Folder extends React.PureComponent<{
         const {
             scope,
             name,
+            getFullId,
         } = this.props;
 
-        const fullName = scope.join("///");
+        const fullName = scope.length ? getFullId!(scope[scope.length - 1], scope.slice(-1)) : "";
         return <div className={prefix("folder")}>
             {name && <div className={prefix("tab-input", "full", "file",  this.isSelected(fullName) ? "selected" : "")}
                 data-file-key={fullName} onClick={this.onClick}>
@@ -82,6 +85,7 @@ export default class Folder extends React.PureComponent<{
             selected,
             multiselect,
             onSelect,
+            getFullId,
             FileComponent,
             getId,
             getName,
@@ -94,19 +98,24 @@ export default class Folder extends React.PureComponent<{
         const keys = Object.keys(properties);
 
         return keys.map(key => {
+
             const value = properties[key];
             const name = getName!(value, key);
             const nextScope = scope.slice();
+            const id = getId!(value, key);
+            const fullName = getFullId!(id, nextScope);
+            nextScope.push(id);
 
-            nextScope.push(getId!(value, key));
-            const fullName = nextScope.join("///");
             const children = getChildren!(value, key);
 
-            if (children && isObject(children)) {
+            if (children && (isArray(children) ? children.length : isObject(children))) {
                 return <Folder key={fullName}
-                    name={name} scope={nextScope} properties={value}
+                    name={name} scope={nextScope} properties={children}
                     multiselect={multiselect}
-                    getId={getId} getName={getName}
+                    getId={getId}
+                    getName={getName}
+                    getFullId={getFullId}
+                    getChildren={getChildren}
                     selected={selected} onSelect={onSelect} FileComponent={FileComponent} />;
             }
             return <div key={fullName} className={prefix("file", this.isSelected(fullName) ? "selected" : "")}
