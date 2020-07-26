@@ -6,7 +6,7 @@ export default class RectIcon extends Icon {
     public static id = "Rect";
     public static maker = (memory: Memory) => ({
         tag: "div",
-        props: {},
+        attrs: {},
         style: {
             "background-color": memory.get("background-color"),
         },

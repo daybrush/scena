@@ -1,7 +1,7 @@
 import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
-import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement } from "../types";
+import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement } from "../types";
 import { IObject } from "@daybrush/utils";
 import { isFunction, isObject } from "util";
 
@@ -102,6 +102,9 @@ export function isScenaFunction(value: any): value is ScenaComponent {
 
 export function isScenaElement(value: any): value is ScenaJSXElement {
     return isObject(value) && !isScenaFunction(value);
+}
+export function isScenaFunctionElement(value: any): value is ScenaFunctionJSXElement {
+    return isScenaElement(value) && isFunction(value.type);
 }
 
 export function isNumber(value: any): value is number {

@@ -6,7 +6,7 @@ export default class RoundRectIcon extends Icon {
     public static id = "RoundRect";
     public static maker = (memory: Memory) => ({
         tag: "div",
-        props: {},
+        attrs: {},
         style: {
             "background-color": memory.get("background-color"),
             "border-radius": "10px",

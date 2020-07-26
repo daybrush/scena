@@ -8,7 +8,7 @@ import { EditorInterface } from "../types";
 
 export interface Maker {
     tag: string,
-    props: IObject<any>,
+    attrs: IObject<any>,
     style: IObject<any>,
 }
 

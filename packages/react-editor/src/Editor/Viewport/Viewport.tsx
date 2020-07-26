@@ -1,14 +1,19 @@
 import * as React from "react";
 import { IObject, isString, isArray } from "@daybrush/utils";
-import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isNumber } from "../utils/utils";
+import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isNumber, isScenaFunctionElement } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
 import { ScenaJSXElement, ScenaComponent, ScenaJSXType } from "../types";
+import { promises } from "fs";
+import { isObject } from "util";
 
 export interface AddedInfo {
     added: ElementInfo[];
 }
 export interface RemovedInfo {
     removed: ElementInfo[];
+}
+export interface MovedInfo {
+    moved: ElementInfo[];
 }
 export interface ElementInfo {
     jsx: ScenaJSXType;
@@ -336,5 +341,60 @@ export default class Viewport extends React.PureComponent<{
         const indexesList = this.getSortedIndexesList(targets);
 
         return indexesList.map(indexes => this.getInfoByIndexes(indexes).el!);
+    }
+    public moveInside(target: HTMLElement | SVGElement | string): Promise<MovedInfo> {
+        const info = isString(target) ? this.getInfo(target)! : this.getInfoByElement(target)!;
+
+        const prevInfo = this.getPrevInfo(info.id!);
+
+        let moved: ElementInfo[];
+
+        if (!prevInfo || isScenaFunction(prevInfo.jsx) || isScenaFunctionElement(prevInfo.jsx)) {
+            moved = [];
+        } else {
+            prevInfo.children!.push(info);
+            const parentChildren = this.getInfo(info.scopeId!).children!;
+
+            parentChildren.splice(parentChildren.indexOf(info), 1);
+
+            info.scopeId = prevInfo.id!;
+            moved = [info];
+        }
+        return this.moveComplete(moved);
+    }
+    public moveOutside(target: HTMLElement | SVGElement | string): Promise<MovedInfo> {
+        const info = isString(target) ? this.getInfo(target)! : this.getInfoByElement(target)!;
+        const parentInfo = this.getInfo(info.scopeId!);
+        const rootInfo = this.getInfo(parentInfo.scopeId!);
+        let moved: ElementInfo[];
+
+        if (!rootInfo) {
+            moved = [];
+        } else {
+            const rootChildren = rootInfo.children!;
+            const parnetChildren = parentInfo.children!;
+
+            parnetChildren.splice(parnetChildren.indexOf(info), 1);
+            rootChildren.splice(rootChildren.indexOf(parentInfo) + 1, 0, info);
+            info.scopeId = rootInfo.id;
+            moved = [info];
+        }
+        return this.moveComplete(moved);
+    }
+
+    private moveComplete(moved: ElementInfo[]): Promise<MovedInfo> {
+        return new Promise(resolve => {
+            this.forceUpdate(() => {
+                moved.forEach(function moveInfo(info) {
+                    const id = info.id!;
+                    const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
+
+                    info.el = target;
+
+                    info.children!.forEach(moveInfo);
+                });
+                resolve({ moved });
+            })
+        });
     }
 }

@@ -7,8 +7,8 @@ export default class TextIcon extends Icon {
     public keys = ["t"];
     public static maker = (memory: Memory) => ({
         tag: "div",
-        props: {
-            contentEditable: true,
+        attrs: {
+            contenteditable: true,
         },
         style: {
             color: memory.get("color"),

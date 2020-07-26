@@ -6,7 +6,7 @@ export default class OvalIcon extends Icon {
     public static id = "Oval";
     public static maker = (memory: Memory) => ({
         tag: "div",
-        props: {},
+        attrs: {},
         style: {
             "background-color": memory.get("background-color"),
             "border-radius": "50%",

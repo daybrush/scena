@@ -32,8 +32,8 @@ export default class KeyboardIcon extends Icon {
             <h2>Shortcuts</h2>
             <ul className={prefix("key-list")}>
                 {this.keyManager.keylist.map(([keys, description]) => {
-                    return <li>
-                        <p className={prefix("key-description")}>{description} <strong>{keys.map(key => <span>{key}</span>)}</strong></p>
+                    return <li key={keys.join("+")}>
+                        <p className={prefix("key-description")}>{description} <strong>{keys.map(key => <span key={key}>{key}</span>)}</strong></p>
                     </li>
                 })}
             </ul>

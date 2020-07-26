@@ -65,5 +65,6 @@ export type ScenaFunctionComponent<T> = ((props: T & ScenaProps) => React.ReactE
 export type ScenaComponent = React.JSXElementConstructor<ScenaProps> & { scenaComponentId: string };
 export type ScenaJSXElement
     = React.ReactElement<any, string>
-    | React.ReactElement<any, ScenaComponent>;
+    | ScenaFunctionJSXElement;
+export type ScenaFunctionJSXElement = React.ReactElement<any, ScenaComponent>;
 export type ScenaJSXType = ScenaJSXElement | string | ScenaComponent;

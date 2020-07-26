@@ -296,12 +296,10 @@ export default class Editor extends React.PureComponent<{
             return targets;
         });
     }
-    public appendJSX(jsx: ScenaJSXElement, name: string, frame: IObject<any> = {}) {
-        return this.appendJSXs([{ jsx, name, frame }]).then(targets => targets[0]);
+    public appendJSX(info: ElementInfo) {
+        return this.appendJSXs([info]).then(targets => targets[0]);
     }
-    public appendElement(tag: any, props: IObject<any>, name: string, frame: IObject<any> = {}) {
-        return this.appendElements([{ tag, props, name, frame }]).then(target => target[0]);
-    }
+
     public appendJSXs(jsxs: ElementInfo[], isRestore?: boolean): Promise<Array<HTMLElement | SVGElement>> {
         const viewport = this.getViewport();
         const indexesList = viewport.getSortedIndexesList(this.getSelectedTargets());
@@ -322,17 +320,17 @@ export default class Editor extends React.PureComponent<{
 
         this.console.log("append jsxs", jsxs, appendIndex, scopeId);
 
-        return this.getViewport().appendJSXs(jsxs, appendIndex, scopeId).then(info => {
-            return this.appendComplete(info, isRestore);
+        return this.getViewport().appendJSXs(jsxs, appendIndex, scopeId).then(({ added }) => {
+            return this.appendComplete(added, isRestore);
         });
     }
-    public appendComplete({ added }: AddedInfo, isRestore?: boolean) {
+    public appendComplete(infos: ElementInfo[], isRestore?: boolean) {
         !isRestore && this.historyManager.addAction("createElements", {
-            infos: added,
+            infos,
             prevSelected: getIds(this.getSelectedTargets()),
         });
         const data = this.moveableData;
-        const targets = added.map(function registerFrame(info) {
+        const targets = infos.map(function registerFrame(info) {
             data.createFrame(info.el!, info.frame);
             data.render(info.el!);
 
@@ -346,20 +344,13 @@ export default class Editor extends React.PureComponent<{
             return targets;
         });
     }
-    public appendElements(elements: TagAppendInfo[]): Promise<Array<HTMLElement | SVGElement>> {
-        return this.appendJSXs(elements.map(({ props, name, frame, tag: Tag }) => ({
-            jsx: <Tag {...props}></Tag>,
-            name,
-            frame,
-        })));
-    }
     public removeByIds(ids: string[], isRestore?: boolean) {
         return this.removeElements(this.getViewport().getElements(ids), isRestore);
     }
     public getMoveable() {
         return this.moveableManager.current!.getMoveable();
     }
-    public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
+    public removeFrames(targets: Array<HTMLElement | SVGElement>) {
         const frameMap: IObject<any> = {};
         const moveableData = this.moveableData;
         const viewport = this.getViewport();
@@ -374,6 +365,26 @@ export default class Editor extends React.PureComponent<{
                 removeFrame(childInfo.el!);
             });
         });
+
+        return frameMap;
+    }
+    public restoreFrames(infos: ElementInfo[], frameMap: IObject<any>) {
+        const viewport = this.getViewport();
+        const moveableData = this.moveableData;
+
+        infos.forEach(function registerFrame(info) {
+            info.frame = frameMap[info.id!];
+            delete frameMap[info.id!];
+
+            info.children!.forEach(registerFrame);
+        });
+        for (const id in frameMap) {
+            moveableData.createFrame(viewport.getInfo(id).el!, frameMap[id]);
+        }
+    }
+    public removeElements(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
+        const viewport = this.getViewport();
+        const frameMap = this.removeFrames(targets);
         const indexesList = viewport.getSortedIndexesList(targets);
         const indexesListLength = indexesList.length;
         let scopeId = "";
@@ -470,7 +481,10 @@ export default class Editor extends React.PureComponent<{
     public appendBlob(blob: Blob) {
         const url = URL.createObjectURL(blob);
 
-        return this.appendJSX(<img src={url} alt="appended blob" />, "(Image)");
+        return this.appendJSX({
+            jsx: <img src={url} alt="appended blob" />,
+            name: "(Image)",
+        });
     }
     public componentDidMount() {
         const {
@@ -537,6 +551,14 @@ export default class Editor extends React.PureComponent<{
             this.setSelectedTargets(this.getViewportInfos().map(info => info.el!));
             e.inputEvent.preventDefault();
         }, "Redo");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "alt", "g"], e => {
+            e.inputEvent.preventDefault();
+            this.moveInside();
+        }, "Move Inside");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "alt", "g"], e => {
+            e.inputEvent.preventDefault();
+            this.moveOutside();
+        }, "Move Outside");
         this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
         this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
         this.historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets);
@@ -581,7 +603,12 @@ export default class Editor extends React.PureComponent<{
             height: `${height}px`,
             ...maker.style,
         } as any;
-        this.appendElement(maker.tag, maker.props, `(${selectIcon.id})`, style).then(selectIcon.makeThen);
+        this.appendJSX({
+            jsx: maker.tag,
+            attrs: maker.attrs,
+            name: `(${selectIcon.id})`,
+            frame: style,
+        }).then(selectIcon.makeThen);
         return true;
     }
     private move(deltaX: number, deltaY: number) {
@@ -639,5 +666,46 @@ export default class Editor extends React.PureComponent<{
             next: nextText,
         });
         info.innerText = nextText;
+    }
+    private moveInside() {
+        let targets = this.getSelectedTargets();
+
+        const length = targets.length;
+        if (length !== 1) {
+            return;
+        }
+        targets = [targets[0]];
+
+        const frameMap = this.removeFrames(targets);
+        this.getViewport().moveInside(targets[0]).then(({ moved }) => {
+            this.console.log("move inside", moved);
+            this.restoreFrames(moved, frameMap);
+
+
+            if (moved.length) {
+                // move complete
+                this.appendComplete(moved, true);
+            }
+        });
+    }
+    private moveOutside() {
+        let targets = this.getSelectedTargets();
+
+        const length = targets.length;
+        if (length !== 1) {
+            return;
+        }
+        targets = [targets[0]];
+
+        const frameMap = this.removeFrames(targets);
+        this.getViewport().moveOutside(targets[0]).then(({ moved }) => {
+            this.console.log("move outside", moved);
+            this.restoreFrames(moved, frameMap);
+
+            if (moved.length) {
+                // move complete
+                this.appendComplete(moved, true);
+            }
+        });
     }
 }
