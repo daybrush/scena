@@ -4,7 +4,7 @@ import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
-import Viewport, { ElementInfo, AddedInfo } from "./Viewport/Viewport";
+import Viewport, { ElementInfo, MovedInfo, MovedResult } from "./Viewport/Viewport";
 import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
@@ -13,7 +13,7 @@ import Memory from "./utils/Memory";
 import MoveableManager from "./Viewport/MoveableMananger";
 import MoveableData from "./utils/MoveableData";
 import KeyManager from "./KeyManager/KeyManager";
-import { ScenaEditorState, TagAppendInfo, SavedScenaData, ScenaJSXElement } from "./types";
+import { ScenaEditorState, SavedScenaData, ScenaJSXElement } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
@@ -48,6 +48,12 @@ function redoChangeText({ prev, next, id }: IObject<any>, editor: Editor) {
     const info = editor.getViewport().getInfo(id)!;
     info.innerText = next;
     info.el!.innerText = next;
+}
+function undoMove({ prevInfos }: MovedResult, editor: Editor) {
+    editor.moves(prevInfos, true);
+}
+function redoMove({ nextInfos }: MovedResult, editor: Editor) {
+    editor.moves(nextInfos, true);
 }
 export default class Editor extends React.PureComponent<{
     width: number,
@@ -264,6 +270,94 @@ export default class Editor extends React.PureComponent<{
                 ></Selecto>
             </div>
         );
+    }
+    public componentDidMount() {
+        const {
+            infiniteViewer,
+            memory,
+            eventBus,
+        } = this;
+        memory.set("background-color", "#4af");
+        memory.set("color", "#333");
+
+        requestAnimationFrame(() => {
+            infiniteViewer.current!.scrollCenter();
+        });
+        window.addEventListener("resize", this.onResize);
+        window.addEventListener("wheel", this.onWheel, {
+            passive: false,
+        });
+        const viewport = this.getViewport();
+
+
+        eventBus.on("blur", () => {
+            this.menu.current!.blur();
+            this.tabs.current!.blur();
+        });
+        eventBus.on("selectLayers", (e: any) => {
+            const selected = e.selected as string[];
+
+            this.setSelectedTargets(selected.map(key => viewport.getInfo(key)!.el!));
+        });
+        eventBus.on("update", () => {
+            this.forceUpdate();
+        });
+
+
+        this.keyManager.keydown(["left"], e => {
+            this.move(-10, 0);
+            e.inputEvent.preventDefault();
+        }, "Move Left");
+        this.keyManager.keydown(["up"], e => {
+            this.move(0, -10);
+            e.inputEvent.preventDefault();
+        }, "Move Up");
+        this.keyManager.keydown(["right"], e => {
+            this.move(10, 0);
+            e.inputEvent.preventDefault();
+        }, "Move Right");
+        this.keyManager.keydown(["down"], e => {
+            this.move(0, 10);
+            e.inputEvent.preventDefault();
+        }, "Move Down");
+        this.keyManager.keyup(["backspace"], () => {
+            this.removeElements(this.getSelectedTargets());
+        }, "Delete");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "v"], () => { }, "Paste");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
+            this.historyManager.undo();
+        }, "Undo");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "z"], () => {
+            this.historyManager.redo();
+        }, "Redo");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "a"], e => {
+            this.setSelectedTargets(this.getViewportInfos().map(info => info.el!));
+            e.inputEvent.preventDefault();
+        }, "Redo");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "alt", "g"], e => {
+            e.inputEvent.preventDefault();
+            this.moveInside();
+        }, "Move Inside");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "alt", "g"], e => {
+            e.inputEvent.preventDefault();
+            this.moveOutside();
+        }, "Move Outside");
+        this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
+        this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
+        this.historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets);
+        this.historyManager.registerType("changeText", undoChangeText, redoChangeText);
+        this.historyManager.registerType("move", undoMove, redoMove);
+    }
+    public componentWillUnmount() {
+        this.eventBus.off();
+        this.memory.clear();
+        this.moveableData.clear();
+        this.keyManager.destroy();
+        this.clipboardManager.destroy();
+        window.removeEventListener("resize", this.onResize);
+        window.removeEventListener("wheel", this.onWheel);
     }
     public promiseState(state: Partial<ScenaEditorState>) {
         return new Promise(resolve => {
@@ -486,93 +580,12 @@ export default class Editor extends React.PureComponent<{
             name: "(Image)",
         });
     }
-    public componentDidMount() {
-        const {
-            infiniteViewer,
-            memory,
-            eventBus,
-        } = this;
-        memory.set("background-color", "#4af");
-        memory.set("color", "#333");
+    public moves(movedInfos: MovedInfo[], isRestore?: boolean) {
+        const frameMap = this.removeFrames(movedInfos.map(({ info }) => info.el!));
 
-        requestAnimationFrame(() => {
-            infiniteViewer.current!.scrollCenter();
-        });
-        window.addEventListener("resize", this.onResize);
-        window.addEventListener("wheel", this.onWheel, {
-            passive: false,
-        });
-        const viewport = this.getViewport();
-
-
-        eventBus.on("blur", () => {
-            this.menu.current!.blur();
-            this.tabs.current!.blur();
-        });
-        eventBus.on("selectLayers", (e: any) => {
-            const selected = e.selected as string[];
-
-            this.setSelectedTargets(selected.map(key => viewport.getInfo(key)!.el!));
-        });
-        eventBus.on("update", () => {
-            this.forceUpdate();
-        });
-
-
-        this.keyManager.keydown(["left"], e => {
-            this.move(-10, 0);
-            e.inputEvent.preventDefault();
-        }, "Move Left");
-        this.keyManager.keydown(["up"], e => {
-            this.move(0, -10);
-            e.inputEvent.preventDefault();
-        }, "Move Up");
-        this.keyManager.keydown(["right"], e => {
-            this.move(10, 0);
-            e.inputEvent.preventDefault();
-        }, "Move Right");
-        this.keyManager.keydown(["down"], e => {
-            this.move(0, 10);
-            e.inputEvent.preventDefault();
-        }, "Move Down");
-        this.keyManager.keyup(["backspace"], () => {
-            this.removeElements(this.getSelectedTargets());
-        }, "Delete");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "v"], () => { }, "Paste");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
-            this.historyManager.undo();
-        }, "Undo");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "z"], () => {
-            this.historyManager.redo();
-        }, "Redo");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "a"], e => {
-            this.setSelectedTargets(this.getViewportInfos().map(info => info.el!));
-            e.inputEvent.preventDefault();
-        }, "Redo");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "alt", "g"], e => {
-            e.inputEvent.preventDefault();
-            this.moveInside();
-        }, "Move Inside");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "alt", "g"], e => {
-            e.inputEvent.preventDefault();
-            this.moveOutside();
-        }, "Move Outside");
-        this.historyManager.registerType("createElements", undoCreateElements, restoreElements);
-        this.historyManager.registerType("removeElements", restoreElements, undoCreateElements);
-        this.historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets);
-        this.historyManager.registerType("changeText", undoChangeText, redoChangeText);
+        return this.getViewport().moves(movedInfos).then(result => this.moveComplete(result, frameMap, isRestore));
     }
-    public componentWillUnmount() {
-        this.eventBus.off();
-        this.memory.clear();
-        this.moveableData.clear();
-        this.keyManager.destroy();
-        this.clipboardManager.destroy();
-        window.removeEventListener("resize", this.onResize);
-        window.removeEventListener("wheel", this.onWheel);
-    }
+
 
     private onMenuChange = (id: string) => {
         this.setState({
@@ -676,17 +689,11 @@ export default class Editor extends React.PureComponent<{
         }
         targets = [targets[0]];
 
+
+        const viewport = this.getViewport();
         const frameMap = this.removeFrames(targets);
-        this.getViewport().moveInside(targets[0]).then(({ moved }) => {
-            this.console.log("move inside", moved);
-            this.restoreFrames(moved, frameMap);
 
-
-            if (moved.length) {
-                // move complete
-                this.appendComplete(moved, true);
-            }
-        });
+        return viewport.moveInside(targets[0]).then(result => this.moveComplete(result, frameMap));
     }
     private moveOutside() {
         let targets = this.getSelectedTargets();
@@ -698,14 +705,26 @@ export default class Editor extends React.PureComponent<{
         targets = [targets[0]];
 
         const frameMap = this.removeFrames(targets);
-        this.getViewport().moveOutside(targets[0]).then(({ moved }) => {
-            this.console.log("move outside", moved);
-            this.restoreFrames(moved, frameMap);
+        this.getViewport().moveOutside(targets[0]).then(result => this.moveComplete(result, frameMap));
 
-            if (moved.length) {
-                // move complete
-                this.appendComplete(moved, true);
+    }
+    private moveComplete(result: MovedResult, frameMap: IObject<any>, isRestore?: boolean) {
+        this.console.log("move complte", result);
+
+        const { moved, prevInfos, nextInfos } = result;
+        this.restoreFrames(moved, frameMap);
+
+        if (moved.length) {
+            if (!isRestore) {
+                this.historyManager.addAction("move", {
+                    prevInfos,
+                    nextInfos,
+                });
             }
-        });
+            // move complete
+            this.appendComplete(moved, true);
+        }
+
+        return result;
     }
 }
