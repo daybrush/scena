@@ -33,6 +33,9 @@ export function connectEditorProps(component: any) {
         });
     })
 };
+export function between(val: number, min: number, max: number) {
+    return Math.min(Math.max(min, val), max);
+}
 
 export function getId(el: HTMLElement | SVGElement) {
     return el.getAttribute(DATA_SCENA_ELEMENT_ID)!;

@@ -38,6 +38,7 @@
     ]
   },
   "dependencies": {
+    "@daybrush/drag": "^0.19.1",
     "@daybrush/utils": "^0.10.5",
     "@egjs/component": "^2.1.2",
     "@egjs/list-differ": "^1.0.0",
