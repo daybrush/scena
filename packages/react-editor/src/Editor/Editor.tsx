@@ -339,7 +339,7 @@ export default class Editor extends React.PureComponent<{
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "a"], e => {
             this.setSelectedTargets(this.getViewportInfos().map(info => info.el!));
             e.inputEvent.preventDefault();
-        }, "Redo");
+        }, "Select All");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "alt", "g"], e => {
             e.inputEvent.preventDefault();
             this.moveInside();
