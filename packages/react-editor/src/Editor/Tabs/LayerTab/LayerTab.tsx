@@ -30,8 +30,8 @@ export default class LayerTab extends Tab {
             onMove={this.onMove}
             FileComponent={this.renderFile} />;
     }
-    public renderFile = ({ name, fullName, scope, value }: File["props"]) => {
-        return <Layer name={name} fullName={fullName} scope={scope} value={value}></Layer>;
+    public renderFile = ({ name, fullId, scope, value }: File["props"]) => {
+        return <Layer name={name} fullId={fullId} scope={scope} value={value}></Layer>;
     }
     public componentDidMount() {
         this.addEvent("setSelectedTargets", this.setSelectedTargets);
@@ -45,12 +45,14 @@ export default class LayerTab extends Tab {
     private onMove = (parentInfo?: FileInfo<ElementInfo>, prevInfo?: FileInfo<ElementInfo>) => {
         const editor = this.editor;
         const viewport = editor.getViewport();
-
-        this.editor.moves([{
-            info: viewport.getInfoByElement(editor.getSelectedTargets()[0]),
+        const targets = editor.getSelectedTargets();
+        this.editor.moves(targets.map((target, i) => ({
+            info: viewport.getInfoByElement(target),
             parentInfo: viewport.getInfo(parentInfo ? parentInfo.fullId : "viewport"),
-            prevInfo: viewport.getInfo(prevInfo ? prevInfo.fullId : ""),
-        }]);
+            prevInfo: i === 0
+                ? viewport.getInfo(prevInfo ? prevInfo.fullId : "")
+                : viewport.getInfoByElement(targets[i - 1]),
+        })));
     }
     private checkMove = (prevInfo: FileInfo<ElementInfo>) => {
         const jsx = prevInfo.value.jsx;

@@ -36,7 +36,9 @@ export interface EditorInterface {
     moveableManager: React.RefObject<MoveableManager>;
 }
 
-
+export interface Clipboard {
+    write(items: ClipboardItem[]): Promise<void>;
+}
 export interface ClipboardItem {
     types: string[];
     getType(type: string): Promise<Blob>;

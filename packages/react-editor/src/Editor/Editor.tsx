@@ -210,7 +210,7 @@ export default class Editor extends React.PureComponent<{
                     ref={selecto}
                     dragContainer={".scena-viewer"}
                     hitRate={0}
-                    selectableTargets={[`[${DATA_SCENA_ELEMENT_ID}]`]}
+                    selectableTargets={[`.scena-viewport [${DATA_SCENA_ELEMENT_ID}]`]}
                     selectByClick={true}
                     selectFromInside={false}
                     toggleContinueSelect={["shift"]}
@@ -325,6 +325,10 @@ export default class Editor extends React.PureComponent<{
         }, "Delete");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
+        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "c"], e => {
+            this.clipboardManager.copyImage();
+            e.inputEvent.preventDefault();
+        }, "Copy to Image");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "v"], () => { }, "Paste");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
             this.historyManager.undo();
@@ -371,8 +375,11 @@ export default class Editor extends React.PureComponent<{
     }
     public setSelectedTargets(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
         targets = targets.filter(target => {
-            return targets.every(parnetTarget => parnetTarget === target || !parnetTarget.contains(target));
+            return targets.every(parnetTarget => {
+                return parnetTarget === target || !parnetTarget.contains(target);
+            });
         });
+
         return this.promiseState({
             selectedTargets: targets,
         }).then(() => {
@@ -380,7 +387,7 @@ export default class Editor extends React.PureComponent<{
                 const prevs = getIds(this.moveableData.getSelectedTargets());
                 const nexts = getIds(targets);
 
-                if (!prevs.every((prev, i) => nexts[i] === prev)) {
+                if (prevs.length !== nexts.length || !prevs.every((prev, i) => nexts[i] === prev)) {
                     this.historyManager.addAction("selectTargets", { prevs, nexts });
                 }
             }
@@ -408,7 +415,6 @@ export default class Editor extends React.PureComponent<{
             const info = viewport.getInfoByIndexes(indexes);
 
             scopeId = info.scopeId!;
-            console.log(indexes, scopeId);
             appendIndex = indexes[indexes.length - 1] + 1;
         }
 

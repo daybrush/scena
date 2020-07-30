@@ -33,8 +33,8 @@ export default class FrameTab extends Tab {
         this.addEvent("render", this.onRender as any);
         this.addEvent("setSelectedTargets", this.setTargets as any);
     }
-    private renderProperty = ({ name, fullName, scope, value }: File["props"]) => {
-        return <Property name={name} fullName={fullName} scope={scope} value={value} onChange={this.onChange}></Property>;
+    private renderProperty = ({ name, fullId, scope, value }: File["props"]) => {
+        return <Property name={name} fullId={fullId} scope={scope} value={value} onChange={this.onChange}></Property>;
     }
     private onSelect = (selected: string[]) => {
         this.setState({

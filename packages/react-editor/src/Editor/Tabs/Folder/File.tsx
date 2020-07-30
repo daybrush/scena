@@ -4,7 +4,7 @@ import "./Folder.css";
 export default class File<T = {}> extends React.PureComponent<{
     name: string,
     scope: string[],
-    fullName: string,
+    fullId: string,
     value: any,
 } & T> {
 }

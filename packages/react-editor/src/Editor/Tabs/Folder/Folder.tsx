@@ -1,17 +1,28 @@
 import * as React from "react";
 import { prefix, between } from "../../utils/utils";
-import { IObject, isObject, isArray, hasClass, findIndex } from "@daybrush/utils";
+import { IObject, isObject, isArray, findIndex, hasClass } from "@daybrush/utils";
 import "./Folder.css";
 import File from "./File";
 import KeyController from "keycon";
-import Dragger from "@daybrush/drag";
+import Dragger, { OnDrag, OnDragStart, OnDragEnd, Client } from "@daybrush/drag";
 
 export interface FileInfo<T> {
     id: string;
+    scope: string[],
     fullId: string;
     parentId: string;
     depth: number;
     value: T;
+}
+
+function getCurrentFile(target: HTMLElement) {
+    while (target) {
+        if (target.hasAttribute("data-file-key")) {
+            break;
+        }
+        target = target.parentElement as HTMLElement;
+    }
+    return target;
 }
 export default class Folder<T = any> extends React.PureComponent<{
     scope: string[],
@@ -22,7 +33,7 @@ export default class Folder<T = any> extends React.PureComponent<{
     isMove?: boolean,
     checkMove?: (prevInfo: FileInfo<T>) => boolean,
     onMove?: (parentInfo?: FileInfo<T>, prevInfo?: FileInfo<T>) => any,
-    onSelect: (e: string[]) => any,
+    onSelect?: (e: string[]) => any,
     FileComponent: ((props: File["props"]) => any) | typeof File,
     getId?: (value: any, id: any) => any,
     getFullId?: (id: string, scope: string[]) => string,
@@ -32,6 +43,7 @@ export default class Folder<T = any> extends React.PureComponent<{
     public static defaultProps = {
         onMove: () => { },
         checkMove: () => true,
+        onSelect: () => {},
         getFullId: (id: string, scope: string[]) => [...scope, id].join("///"),
         getId: (_: any, id: any, scope: string[]) => id,
         getName: (_: any, id: any) => id,
@@ -39,9 +51,14 @@ export default class Folder<T = any> extends React.PureComponent<{
     }
     public moveDragger!: Dragger;
     public folderRef = React.createRef<HTMLDivElement>();
-    public state = {
-        fold: false,
-    };
+    public shadowRef = React.createRef<HTMLDivElement>();
+    public state: {
+        fold: boolean,
+        shadows: Array<FileInfo<T>>,
+    } = {
+            fold: false,
+            shadows: [],
+        };
     public isSelected(key: string) {
         const selected = this.props.selected;
 
@@ -54,16 +71,17 @@ export default class Folder<T = any> extends React.PureComponent<{
             getFullId,
         } = this.props;
 
-        const fullName = scope.length ? getFullId!(scope[scope.length - 1], scope.slice(-1)) : "";
+        const fullId = scope.length ? getFullId!(scope[scope.length - 1], scope.slice(-1)) : "";
         return <div className={prefix("folder")} ref={this.folderRef}>
-            {name && <div className={prefix("tab-input", "full", "file", this.isSelected(fullName) ? "selected" : "")}
-                data-file-key={fullName} onClick={this.onClick}>
+            {name && <div className={prefix("tab-input", "full", "file", this.isSelected(fullId) ? "selected" : "")}
+                data-file-key={fullId} onClick={this.onClick}>
                 <div className={prefix("fold-icon", this.state.fold ? "fold" : "")} onClick={this.onClickFold}></div>
                 <h3 >{name}</h3>
             </div>}
             <div className={prefix("properties")}>
                 {this.renderProperties()}
             </div>
+            {this.renderShadows()}
         </div>
     }
     public componentDidMount() {
@@ -71,110 +89,9 @@ export default class Folder<T = any> extends React.PureComponent<{
             const folderElement = this.folderRef.current!;
             this.moveDragger = new Dragger(folderElement, {
                 container: window,
-                dragstart: e => {
-                    const rect = folderElement.getBoundingClientRect();
-                    e.datas.folderLine = rect.left + rect.width - 10;
-                },
-                drag: e => {
-                    const { clientX, clientY, datas } = e;
-
-                    this.clearPointers();
-                    datas.prevInfo = null;
-                    datas.isTop = false;
-
-                    let target = document.elementFromPoint(datas.folderLine, e.clientY) as HTMLElement;
-
-                    while (target) {
-                        if (target.hasAttribute("data-file-key")) {
-                            break;
-                        }
-                        target = target.parentElement as HTMLElement;
-                    }
-
-                    if (!target) {
-                        return;
-                    }
-                    const infos = this.flatChildren();
-                    let rect = target.getBoundingClientRect();
-                    let isTop = rect.top + rect.height / 2 > clientY;
-
-                    let key = target.getAttribute("data-file-key")!;
-                    let siblingIndex = findIndex(infos, info => info.fullId === key);
-                    let targetInfo = infos[siblingIndex];
-                    let prevInfo = infos[siblingIndex - 1];
-
-                    if (prevInfo && isTop) {
-                        --siblingIndex;
-                        targetInfo = infos[siblingIndex];
-                        prevInfo = infos[siblingIndex - 1];
-                        key = targetInfo.fullId!;
-                        target = folderElement.querySelector<HTMLElement>(`[data-file-key="${key}"]`)!;
-                        rect = target.getBoundingClientRect();
-                        isTop = false;
-                    }
-                    const selected = this.props.selected!;
-                    const isFolder = hasClass(target.parentElement!, prefix("folder"));
-                    const nextInfo = infos[siblingIndex + 1];
-                    const targetDepth = targetInfo.depth;
-                    const nextDepth = nextInfo ? nextInfo.depth : 0;
-                    const depthRange = [
-                        Math.min(nextDepth, targetDepth) - targetDepth,
-                        Math.max(targetDepth + 1, nextDepth) - targetDepth,
-                    ];
-                    let distX = clientX - rect.left;
-                    console.log(distX);
-                    const distDepth = isTop ? 0
-                        : between(Math.round((distX > 0 ? distX * 0.2 : distX) / 10), depthRange[0], depthRange[1]);
-
-                    if (nextInfo && !isTop && selected.indexOf(nextInfo.fullId) > -1 && targetDepth + distDepth === nextDepth) {
-                        return;
-                    }
-                    if (selected.indexOf(key) > -1 && distDepth >= 0) {
-                        return;
-                    }
-                    if (distDepth > 0 && !this.props.checkMove!(targetInfo)) {
-                        console.log(distDepth, prevInfo);
-                        return;
-                    }
-                    target.style.setProperty("--pointer-depth", `${distDepth}`);
-                    target.classList.add(prefix(isTop ? "top-pointer" : "bottom-pointer"));
-
-
-                    datas.depth = distDepth;
-                    datas.isTop = isTop;
-                    datas.prevInfo = targetInfo;
-                },
-                dragend: e => {
-                    this.clearPointers();
-                    const datas = e.datas;
-                    const depth = datas.depth;
-                    let prevInfo: FileInfo<T> | undefined = datas.prevInfo;
-                    const isTop = datas.isTop;
-                    const onMove = this.props.onMove!;
-                    const objMap = this.flatMap();
-
-                    let parentInfo: FileInfo<T> | undefined;
-
-                    if (prevInfo) {
-                        if (depth <= 0) {
-                            const length = Math.abs(depth);
-
-                            for (let i = 0; i < length; ++i) {
-                                prevInfo = objMap[prevInfo!.parentId];
-                            }
-                            parentInfo = objMap[prevInfo.parentId];
-                        } else {
-                            parentInfo = prevInfo;
-                            prevInfo = undefined;
-                        }
-                    }
-
-                    if (!parentInfo && isTop) {
-                        onMove();
-                    } else if (parentInfo || prevInfo) {
-                        onMove!(parentInfo, prevInfo);
-                    }
-                }
+                dragstart: this.onDragStart,
+                drag: this.onDrag,
+                dragend: this.onDragEnd,
             });
         }
     }
@@ -192,6 +109,7 @@ export default class Folder<T = any> extends React.PureComponent<{
             onSelect,
             getFullId,
             FileComponent,
+            isMove,
             getId,
             getName,
             getChildren,
@@ -207,32 +125,56 @@ export default class Folder<T = any> extends React.PureComponent<{
             const name = getName!(value, key);
             const nextScope = scope.slice();
             const id = getId!(value, key);
-            const fullName = getFullId!(id, nextScope);
+            const fullId = getFullId!(id, nextScope);
             nextScope.push(id);
 
             const children = getChildren!(value, key);
 
             if (children && (isArray(children) ? children.length : isObject(children))) {
-                return <Folder<T> key={fullName}
+                return <Folder<T> key={fullId}
                     name={name} scope={nextScope} properties={children}
                     multiselect={multiselect}
                     getId={getId}
                     getName={getName}
                     getFullId={getFullId}
                     getChildren={getChildren}
-                    selected={selected} onSelect={onSelect} FileComponent={FileComponent} />;
+                    selected={selected} onSelect={isMove ? undefined : onSelect} FileComponent={FileComponent} />;
             }
-            return <div key={fullName} className={prefix("file", this.isSelected(fullName) ? "selected" : "")}
-                data-file-key={fullName} onClick={this.onClick}>
-                <FileComponent scope={nextScope} name={name} value={value} fullName={fullName} />
+            return <div key={fullId} className={prefix("file", this.isSelected(fullId) ? "selected" : "")}
+                data-file-key={fullId} onClick={isMove ? undefined : this.onClick}>
+                <FileComponent scope={nextScope} name={name} value={value} fullId={fullId} />
             </div>;
         });
+    }
+    private renderShadows() {
+        const {
+            FileComponent,
+            getName,
+            scope,
+        } = this.props;
+        if (scope.length) {
+            return;
+        }
+        return <div className={prefix("shadows")} ref={this.shadowRef}>
+            {this.state.shadows.map(info => {
+                const {
+                    scope: fileScope,
+                    value,
+                    fullId,
+                    id,
+                } = info;
+                const name = getName!(value, id);
+                return <div key={fullId} className={prefix("file", "selected", "shadow")}>
+                    <FileComponent scope={fileScope} name={name} value={value} fullId={fullId} />
+                </div>;
+            })}
+        </div>;
     }
     private onClickFold = (e: any) => {
         e.stopPropagation();
         this.setState({
             fold: !this.state.fold,
-        })
+        });
     }
     private onClick = ({ currentTarget }: any) => {
         const key = currentTarget.getAttribute("data-file-key")!;
@@ -254,10 +196,187 @@ export default class Folder<T = any> extends React.PureComponent<{
             } else {
                 nextSelected = [key];
             }
-            onSelect(nextSelected);
+            onSelect!(nextSelected);
         } else {
-            onSelect([key]);
+            onSelect!([key]);
         }
+    }
+    private onDragStart = (e: OnDragStart) => {
+        if (hasClass(e.inputEvent.target, prefix("fold-icon"))) {
+            return false;
+        }
+        const folderElement = this.folderRef.current!;
+        const rect = folderElement.getBoundingClientRect();
+        const datas = e.datas;
+        const offsetX = e.clientX - rect.left;
+        // const offsetY = e.clientY - rect.top;
+
+        datas.offsetX = offsetX;
+        datas.folderRect = rect;
+        datas.folderLine = rect.left + rect.width - 10;
+
+        e.inputEvent.preventDefault();
+        e.inputEvent.stopPropagation();
+    }
+
+    private onDrag = (e: OnDrag) => {
+        const folderElement = this.folderRef.current!;
+        const { clientX, clientY, datas } = e;
+
+        this.clearPointers();
+        datas.prevInfo = null;
+        datas.isTop = false;
+        const selected = this.props.selected!;
+        const objMap = this.flatMap();
+
+
+        if (!datas.dragFirst) {
+            datas.dragFirst = true;
+            const clickedTarget: HTMLElement = getCurrentFile(e.inputEvent.target);
+
+            if (clickedTarget && selected.indexOf(clickedTarget.getAttribute("data-file-key")!) === -1) {
+                this.onClick({ currentTarget: clickedTarget });
+                return;
+            }
+        }
+        if (!selected.length) {
+            return;
+        }
+        const fileInfos = selected.map(id => objMap[id]);
+
+        if (!this.state.shadows.length) {
+            this.setState({
+                shadows: fileInfos,
+            }, () => {
+                // datas.offsetY = 0;
+                this.updateShadowPosition(datas.folderRect, e);
+            });
+            return;
+        } else {
+            this.updateShadowPosition(datas.folderRect, e);
+        }
+        let target = getCurrentFile(document.elementFromPoint(datas.folderLine, e.clientY) as HTMLElement);
+
+        if (!target) {
+            return;
+        }
+        const infos = this.flatChildren();
+        let rect = target.getBoundingClientRect();
+        let isTop = rect.top + rect.height / 2 > clientY;
+
+        let key = target.getAttribute("data-file-key")!;
+        let siblingIndex = findIndex(infos, info => info.fullId === key);
+        let targetInfo = infos[siblingIndex];
+        let prevInfo = infos[siblingIndex - 1];
+
+        if (prevInfo && isTop) {
+            --siblingIndex;
+            targetInfo = infos[siblingIndex];
+            prevInfo = infos[siblingIndex - 1];
+            key = targetInfo.fullId!;
+            target = folderElement.querySelector<HTMLElement>(`[data-file-key="${key}"]`)!;
+
+            if (!target) {
+                return;
+            }
+            rect = target.getBoundingClientRect();
+            isTop = false;
+        }
+        const nextInfo = infos[siblingIndex + 1];
+        const targetDepth = targetInfo.depth;
+        const nextDepth = nextInfo ? nextInfo.depth : 0;
+        const depthRange = [
+            Math.min(nextDepth, targetDepth) - targetDepth,
+            Math.max(targetDepth + 1, nextDepth) - targetDepth,
+        ];
+        let distX = clientX - rect.left;
+        const distDepth = isTop ? 0
+            : between(Math.round((distX > 0 ? distX * 0.2 : distX) / 10), depthRange[0], depthRange[1]);
+
+        if (nextInfo && !isTop && selected.indexOf(nextInfo.fullId) > -1 && targetDepth + distDepth === nextDepth) {
+            return;
+        }
+        if (this.contains(selected, key)) {
+            return;
+        }
+        if (selected.indexOf(key) > -1 && distDepth >= 0) {
+            return;
+        }
+        if (distDepth > 0 && !this.props.checkMove!(targetInfo)) {
+            return;
+        }
+        target.style.setProperty("--pointer-depth", `${distDepth}`);
+        target.classList.add(prefix(isTop ? "top-pointer" : "bottom-pointer"));
+
+
+        datas.depth = distDepth;
+        datas.isTop = isTop;
+        datas.prevInfo = targetInfo;
+    }
+    private onDragEnd = (e: OnDragEnd) => {
+        this.clearPointers();
+
+        if (!e.isDrag) {
+            const currentTarget = getCurrentFile(e.inputEvent.target);
+
+            this.onClick({ currentTarget });
+            return;
+        }
+        const datas = e.datas;
+        const depth = datas.depth;
+        let prevInfo: FileInfo<T> | undefined = datas.prevInfo;
+        const isTop = datas.isTop;
+        const onMove = this.props.onMove!;
+        const objMap = this.flatMap();
+
+        let parentInfo: FileInfo<T> | undefined;
+
+        if (prevInfo) {
+            if (depth <= 0) {
+                const length = Math.abs(depth);
+
+                for (let i = 0; i < length; ++i) {
+                    prevInfo = objMap[prevInfo!.parentId];
+                }
+                parentInfo = objMap[prevInfo.parentId];
+            } else {
+                parentInfo = prevInfo;
+                prevInfo = undefined;
+            }
+        }
+
+        if (!parentInfo && isTop) {
+            onMove();
+        } else if (parentInfo || prevInfo) {
+            onMove!(parentInfo, prevInfo);
+        }
+        this.setState({
+            shadows: [],
+        }, () => {
+            this.shadowRef.current!.style.cssText = "display: none";
+        })
+    }
+    private updateShadowPosition(rect: ClientRect, e: OnDragStart | OnDrag) {
+        const el = this.shadowRef.current;
+
+        if (!el || !this.state.shadows.length) {
+            return;
+        }
+        const datas = e.datas;
+        el.style.cssText
+            = `display: block; transform: translate(${e.clientX - rect.left - datas.offsetX}px, ${e.clientY - rect.top}px) translateY(-50%)`;
+    }
+    private contains(ids: string[], key: string, objMap = this.flatMap()): boolean {
+        const info = objMap[key];
+        const parentId = info.parentId;
+
+        if (!parentId) {
+            return false;
+        }
+        if (ids.indexOf(parentId) > -1) {
+            return true;
+        }
+        return this.contains(ids, parentId, objMap);
     }
     private flatMap() {
         const children = this.flatChildren();
@@ -278,7 +397,6 @@ export default class Folder<T = any> extends React.PureComponent<{
         const {
             getFullId,
             getId,
-            getName,
             getChildren,
         } = this.props;
         const depth = scope.length;
@@ -296,6 +414,7 @@ export default class Folder<T = any> extends React.PureComponent<{
                 fullId,
                 parentId,
                 depth,
+                scope,
                 value,
             });
             if (valueChildren && (isArray(valueChildren) ? valueChildren.length : isObject(valueChildren))) {
