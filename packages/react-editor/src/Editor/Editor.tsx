@@ -325,10 +325,10 @@ export default class Editor extends React.PureComponent<{
         }, "Delete");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
-        this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "c"], e => {
-            this.clipboardManager.copyImage();
-            e.inputEvent.preventDefault();
-        }, "Copy to Image");
+        // this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "c"], e => {
+        //     this.clipboardManager.copyImage();
+        //     e.inputEvent.preventDefault();
+        // }, "Copy to Image");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "v"], () => { }, "Paste");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "z"], () => {
             this.historyManager.undo();
