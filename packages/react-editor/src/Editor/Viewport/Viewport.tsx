@@ -52,12 +52,19 @@ export default class Viewport extends React.PureComponent<{
         viewport: this.viewport,
     };
     public state = {};
+    public viewportRef = React.createRef<HTMLDivElement>();
     public render() {
         const style = this.props.style;
-        return <div className={prefix("viewport")} onBlur={this.props.onBlur} style={style}>
+
+        return <div className={prefix("viewport-container")} onBlur={this.props.onBlur} style={style}>
             {this.props.children}
-            {this.renderChildren(this.getViewportInfos())}
+            <div className={prefix("viewport")} {...{ [DATA_SCENA_ELEMENT_ID]: "viewport" }} ref={this.viewportRef}>
+                {this.renderChildren(this.getViewportInfos())}
+            </div>
         </div>;
+    }
+    public componentDidMount() {
+        this.ids.viewport.el = this.viewportRef.current!;
     }
     public renderChildren(children: ElementInfo[]): ScenaJSXElement[] {
         return children.map(info => {

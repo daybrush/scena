@@ -79,6 +79,9 @@ export default class MoveableManager extends React.PureComponent<{
         } = this.props;
         // const
 
+        if (!selectedTargets.length) {
+            return this.renderViewportMoveable();
+        }
         const {
             moveableData,
             keyManager,
@@ -90,6 +93,7 @@ export default class MoveableManager extends React.PureComponent<{
             return selectedTargets.indexOf(el) === -1;
         });
         const isShift = keyManager.shiftKey;
+
         return <Moveable
             ref={this.moveable}
             targets={selectedTargets}
@@ -200,6 +204,20 @@ export default class MoveableManager extends React.PureComponent<{
             }}
         ></Moveable>
     }
+    public renderViewportMoveable() {
+        const moveableData = this.moveableData;
+        const viewport = this.editor.getViewport();
+        const target = viewport ? viewport.viewportRef.current! : null;
+
+        return <Moveable
+            ref={this.moveable}
+            rotatable={true}
+            target={target}
+            origin={false}
+            onRotateStart={moveableData.onRotateStart}
+            onRotate={moveableData.onRotate}
+        ></Moveable>
+    }
     public componentDidMount() {
         this.historyManager.registerType("render", undoRender, redoRender);
         this.historyManager.registerType("renders", undoRenders, redoRenders);
@@ -214,4 +232,4 @@ export default class MoveableManager extends React.PureComponent<{
         this.getMoveable().updateRect();
     }
 }
-export default interface MoveableManager extends EditorInterface {}
+export default interface MoveableManager extends EditorInterface { }
