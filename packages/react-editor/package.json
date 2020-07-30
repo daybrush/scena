@@ -52,7 +52,7 @@
     "keycon": "^0.8.0",
     "moveable-helper": "^0.2.0",
     "react-color": "^2.18.1",
-    "react-infinite-viewer": "^0.5.1",
+    "react-infinite-viewer": "^0.6.0",
     "react-moveable": "^0.21.6",
     "react-selecto": "^1.5.2",
     "scenejs": "^1.2.0"

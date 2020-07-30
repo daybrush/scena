@@ -284,9 +284,6 @@ export default class Editor extends React.PureComponent<{
             infiniteViewer.current!.scrollCenter();
         });
         window.addEventListener("resize", this.onResize);
-        window.addEventListener("wheel", this.onWheel, {
-            passive: false,
-        });
         const viewport = this.getViewport();
 
 
@@ -361,7 +358,6 @@ export default class Editor extends React.PureComponent<{
         this.keyManager.destroy();
         this.clipboardManager.destroy();
         window.removeEventListener("resize", this.onResize);
-        window.removeEventListener("wheel", this.onWheel);
     }
     public promiseState(state: Partial<ScenaEditorState>) {
         return new Promise(resolve => {
@@ -650,14 +646,6 @@ export default class Editor extends React.PureComponent<{
     private onResize = () => {
         this.horizontalGuides.current!.resize();
         this.verticalGuides.current!.resize();
-    }
-    private onWheel = (e: any) => {
-        if (this.keyManager.altKey) {
-            e.preventDefault();
-            this.setState({
-                zoom: Math.max(0.1, this.state.zoom + e.deltaY / 300),
-            });
-        }
     }
     private onBlur = (e: any) => {
         const target = e.target as HTMLElement | SVGElement;
