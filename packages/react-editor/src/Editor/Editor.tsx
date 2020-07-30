@@ -534,15 +534,17 @@ export default class Editor extends React.PureComponent<{
         return this.appendJSXs(datas.map(function loadData(data): any {
             const { componentId, jsxId, children } = data;
 
-            let jsx: ScenaJSXElement;
+            let jsx!: ScenaJSXElement;
 
             if (jsxId) {
                 jsx = viewport.getJSX(jsxId);
-            } else if (componentId) {
+            }
+            if (!jsx && componentId) {
                 const Component = viewport.getComponent(componentId);
 
                 jsx = <Component />;
-            } else {
+            }
+            if (!jsx) {
                 jsx = React.createElement(data.tagName);
             }
             return {
@@ -715,7 +717,7 @@ export default class Editor extends React.PureComponent<{
 
     }
     private moveComplete(result: MovedResult, frameMap: IObject<any>, isRestore?: boolean) {
-        this.console.log("move complte", result);
+        this.console.log("Move", result);
 
         const { moved, prevInfos, nextInfos } = result;
         this.restoreFrames(moved, frameMap);

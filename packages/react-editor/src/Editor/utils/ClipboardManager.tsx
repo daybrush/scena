@@ -45,8 +45,7 @@ export default class ClipboardManager {
                     const context = canvas.getContext("2d")!;
                     const rects = moveables.map(m => m.getRect());
 
-                    console.log(rects);
-                    rects.map((rect, i) => {
+                    rects.forEach((rect, i) => {
                         context.drawImage(images[i], rect.left - parentRect.left, rect.top - parentRect.top);
                     });
 

@@ -4,7 +4,7 @@ import { IObject, isObject, isArray, findIndex, hasClass } from "@daybrush/utils
 import "./Folder.css";
 import File from "./File";
 import KeyController from "keycon";
-import Dragger, { OnDrag, OnDragStart, OnDragEnd, Client } from "@daybrush/drag";
+import Dragger, { OnDrag, OnDragStart, OnDragEnd } from "@daybrush/drag";
 
 export interface FileInfo<T> {
     id: string;
