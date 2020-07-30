@@ -1,5 +1,5 @@
 import * as React from "react";
-import Moveable from "react-moveable";
+import Moveable, { MoveableManagerInterface } from "react-moveable";
 import { getContentElement, connectEditorProps, getId } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
@@ -57,6 +57,28 @@ function redoRenders({ infos }: IObject<any>, editor: Editor) {
     editor.eventBus.trigger("render");
 }
 
+export interface DimensionViewableProps {
+    dimensionViewable?: boolean;
+}
+const DimensionViewable = {
+    name: "dimensionViewable",
+    props: {
+        dimensionViewable: Boolean,
+    },
+    events: {},
+    render(moveable: MoveableManagerInterface) {
+        const { left, top } = moveable.state;
+
+        const rect = moveable.getRect();
+
+        return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
+            left: `${rect.left + rect.width / 2 - left}px`,
+            top: `${rect.top + rect.height + 20 - top}px`,
+        }}>
+            {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
+        </div>
+    }
+}
 @connectEditorProps
 export default class MoveableManager extends React.PureComponent<{
     editor: Editor,
@@ -94,9 +116,11 @@ export default class MoveableManager extends React.PureComponent<{
         });
         const isShift = keyManager.shiftKey;
 
-        return <Moveable
+        return <Moveable<DimensionViewableProps>
+            ables={[DimensionViewable]}
             ref={this.moveable}
             targets={selectedTargets}
+            dimensionViewable={true}
             draggable={true}
             resizable={true}
             throttleResize={1}

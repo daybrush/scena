@@ -80,3 +80,15 @@
     z-index: 100;
     background: rgba(0, 0, 0, 0.2);
 }
+.moveable-dimension {
+    position: absolute;
+    background: var(--mainColor);
+    border-radius: 2px;
+    padding: 1px 3px;
+    color: white;
+    font-size: 13px;
+    white-space: nowrap;
+    font-weight: bold;
+    transform: translate(-50%);
+    pointer-events: none;
+}
