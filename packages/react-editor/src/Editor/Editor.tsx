@@ -18,6 +18,7 @@ import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
+import { NameType } from "scenejs";
 
 function undoCreateElements({ infos, prevSelected }: IObject<any>, editor: Editor) {
     const res = editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
@@ -514,6 +515,16 @@ export default class Editor extends React.PureComponent<{
     }
     public setProperty(scope: string[], value: any, isUpdate?: boolean) {
         const infos = this.moveableData.setProperty(scope, value);
+
+        this.historyManager.addAction("renders", { infos });
+
+        if (isUpdate) {
+            this.moveableManager.current!.updateRect();
+        }
+        this.eventBus.requestTrigger("render");
+    }
+    public setOrders(scope: string[], orders: NameType[], isUpdate?: boolean) {
+        const infos = this.moveableData.setOrders(scope, orders);
 
         this.historyManager.addAction("renders", { infos });
 

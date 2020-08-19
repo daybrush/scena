@@ -339,7 +339,9 @@ export default class Folder<T = any> extends React.PureComponent<{
         if (!e.isDrag) {
             const currentTarget = getCurrentFile(e.inputEvent.target);
 
-            this.onClick({ currentTarget });
+            if (currentTarget) {
+                this.onClick({ currentTarget });
+            }
             return;
         }
         const datas = e.datas;

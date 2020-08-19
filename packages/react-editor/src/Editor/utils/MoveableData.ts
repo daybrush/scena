@@ -1,6 +1,6 @@
 import MoveableHelper from "moveable-helper";
 import Memory from "./Memory";
-import { Frame } from "scenejs";
+import { Frame, NameType } from "scenejs";
 import { getId } from "./utils";
 
 export default class MoveableData extends MoveableHelper {
@@ -8,7 +8,8 @@ export default class MoveableData extends MoveableHelper {
     constructor(private memory: Memory) {
         super({
             createAuto: true,
-        })
+            useBeforeRender: true,
+        });
     }
     public setSelectedTargets(targets: Array<HTMLElement | SVGElement>) {
         this.selectedTargets = targets;
@@ -24,34 +25,22 @@ export default class MoveableData extends MoveableHelper {
             this.render(target);
         });
     }
-    public setProperty(names: string[], value: any) {
-        const targets = this.getSelectedTargets();
-
-        const infos = targets.map(target => {
-            const frame = this.getFrame(target);
-            const prev = frame.get();
-            frame.set(...names, value);
-            const next = frame.get();
-
-            return { id: getId(target), prev, next };
-
+    public setOrders(scope: string[], orders: NameType[]) {
+        return this.setValue(frame => {
+            frame.setOrders(scope, orders);
         });
-        this.renderFrames();
-
-        return infos;
+    }
+    public setProperty(names: string[], value: any) {
+        return this.setValue(frame => {
+            frame.set(...names, value);
+        });
     }
     public removeProperties(...names: string[]) {
-        return this.getSelectedTargets().map(target => {
-            const frame = this.getFrame(target);
-            const prev = frame.get();
-
+        return this.setValue((frame, target) => {
             names.forEach(name => {
                 frame.remove(name);
                 target.style.removeProperty(name);
             });
-            const next = frame.get();
-
-            return { id: getId(target), prev, next };
         });
     }
     public getProperties(properties: string[][], defaultValues: any[]) {
@@ -67,6 +56,25 @@ export default class MoveableData extends MoveableHelper {
 
             return frameValues.filter(color => color)[0] || defaultValues[i];
         });
+    }
+    private setValue(callback: (frame: Frame, target: HTMLElement | SVGElement) => void) {
+        const targets = this.getSelectedTargets();
+
+        const infos = targets.map(target => {
+            const frame = this.getFrame(target);
+            const prevOrders = frame.getOrderObject();
+            const prev = frame.get();
+
+            callback(frame, target);
+            const next = frame.get();
+            const nextOrders = frame.getOrderObject();
+
+            return { id: getId(target), prev, prevOrders, next, nextOrders };
+
+        });
+        this.renderFrames();
+
+        return infos;
     }
 
 }

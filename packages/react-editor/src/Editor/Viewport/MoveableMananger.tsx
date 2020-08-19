@@ -6,7 +6,7 @@ import { EditorInterface } from "../types";
 import { IObject } from "@daybrush/utils";
 import { diff } from "@egjs/list-differ";
 
-function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, editor: Editor) {
+function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, orders: any, editor: Editor) {
     const el = editor.viewport.current!.getElement(id);
 
     if (!el) {
@@ -18,6 +18,7 @@ function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>,
 
     frame.clear();
     frame.set(state);
+    frame.setOrderObject(orders);
 
     const result = diff(Object.keys(prevState), Object.keys(state));
     const { removed, prevList } = result;
@@ -28,30 +29,30 @@ function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>,
     moveableData.render(el);
     return true;
 }
-function undoRender({ id, prev, next }: IObject<any>, editor: Editor) {
-    if (!restoreRender(id, prev, next, editor)) {
+function undoRender({ id, prev, next, prevOrders }: IObject<any>, editor: Editor) {
+    if (!restoreRender(id, prev, next, prevOrders, editor)) {
         return;
     }
     editor.moveableManager.current!.updateRect();
     editor.eventBus.trigger("render");
 }
-function redoRender({ id, prev, next }: IObject<any>, editor: Editor) {
-    if (!restoreRender(id, next, prev, editor)) {
+function redoRender({ id, prev, next, nextOrders }: IObject<any>, editor: Editor) {
+    if (!restoreRender(id, next, prev, nextOrders, editor)) {
         return;
     }
     editor.moveableManager.current!.updateRect();
     editor.eventBus.trigger("render");
 }
 function undoRenders({ infos }: IObject<any>, editor: Editor) {
-    infos.forEach(({ id, prev, next }: IObject<any>) => {
-        restoreRender(id, prev, prev, editor);
+    infos.forEach(({ id, prev, next, prevOrders }: IObject<any>) => {
+        restoreRender(id, prev, next, prevOrders, editor);
     });
     editor.moveableManager.current!.updateRect();
     editor.eventBus.trigger("render");
 }
 function redoRenders({ infos }: IObject<any>, editor: Editor) {
-    infos.forEach(({ id, next, prev }: IObject<any>) => {
-        restoreRender(id, next, prev, editor);
+    infos.forEach(({ id, next, prev, nextOrders }: IObject<any>) => {
+        restoreRender(id, next, prev, nextOrders, editor);
     });
     editor.moveableManager.current!.updateRect();
     editor.eventBus.trigger("render");
@@ -138,6 +139,9 @@ export default class MoveableManager extends React.PureComponent<{
             horizontalGuidelines={horizontalGuidelines}
             elementGuidelines={elementGuidelines}
             clipArea={true}
+
+            onBeforeRenderStart={moveableData.onBeforeRenderStart}
+            onBeforeRenderGroupStart={moveableData.onBeforeRenderGroupStart}
             onDragStart={moveableData.onDragStart}
             onDrag={moveableData.onDrag}
             onDragGroupStart={moveableData.onDragGroupStart}

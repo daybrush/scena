@@ -53,13 +53,13 @@ export default class AlignTab extends Tab {
 
         if (moveables) {
             // Group
-            const infos = moveables.map(m => {
-                const target = m.state.target!;
+            const infos = moveables.map(child => {
+                const target = child.state.target!;
                 const frame = this.moveableData.getFrame(target);
 
                 if (frame) {
                     const prev = frame.get();
-                    const subRect = m.getRect();
+                    const subRect = child.getRect();
                     const subPos = getDirectionPos(type, direction, subRect);
                     const delta = pos - subPos;
 
