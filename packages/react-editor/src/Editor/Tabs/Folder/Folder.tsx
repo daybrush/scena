@@ -31,16 +31,18 @@ export default class Folder<T = any> extends React.PureComponent<{
     selected: string[] | null,
     multiselect?: boolean,
     isMove?: boolean,
+    isMoveChildren?: boolean,
     checkMove?: (prevInfo: FileInfo<T>) => boolean,
-    onMove?: (parentInfo?: FileInfo<T>, prevInfo?: FileInfo<T>) => any,
+    onMove?: (selectedInfos: Array<FileInfo<T>>, parentInfo?: FileInfo<T>, prevInfo?: FileInfo<T>) => any,
     onSelect?: (e: string[]) => any,
     FileComponent: ((props: File["props"]) => any) | typeof File,
     getId?: (value: any, id: any) => any,
     getFullId?: (id: string, scope: string[]) => string,
     getName?: (value: any, id: any) => any,
-    getChildren?: (value: any, id: any) => any,
+    getChildren?: (value: any, id: any, scope: any[]) => any,
 }> {
     public static defaultProps = {
+        selected: [],
         onMove: () => { },
         checkMove: () => true,
         onSelect: () => {},
@@ -71,7 +73,7 @@ export default class Folder<T = any> extends React.PureComponent<{
             getFullId,
         } = this.props;
 
-        const fullId = scope.length ? getFullId!(scope[scope.length - 1], scope.slice(-1)) : "";
+        const fullId = scope.length ? getFullId!(scope[scope.length - 1], scope.slice(0, -1)) : "";
         return <div className={prefix("folder")} ref={this.folderRef}>
             {name && <div className={prefix("tab-input", "full", "file", this.isSelected(fullId) ? "selected" : "")}
                 data-file-key={fullId} onClick={this.onClick}>
@@ -89,6 +91,7 @@ export default class Folder<T = any> extends React.PureComponent<{
             const folderElement = this.folderRef.current!;
             this.moveDragger = new Dragger(folderElement, {
                 container: window,
+                checkInput: true,
                 dragstart: this.onDragStart,
                 drag: this.onDrag,
                 dragend: this.onDragEnd,
@@ -128,7 +131,7 @@ export default class Folder<T = any> extends React.PureComponent<{
             const fullId = getFullId!(id, nextScope);
             nextScope.push(id);
 
-            const children = getChildren!(value, key);
+            const children = getChildren!(value, key, scope);
 
             if (children && (isArray(children) ? children.length : isObject(children))) {
                 return <Folder<T> key={fullId}
@@ -214,6 +217,7 @@ export default class Folder<T = any> extends React.PureComponent<{
         datas.offsetX = offsetX;
         datas.folderRect = rect;
         datas.folderLine = rect.left + rect.width - 10;
+        datas.objMap = this.flatMap();
 
         e.inputEvent.preventDefault();
         e.inputEvent.stopPropagation();
@@ -227,7 +231,7 @@ export default class Folder<T = any> extends React.PureComponent<{
         datas.prevInfo = null;
         datas.isTop = false;
         const selected = this.props.selected!;
-        const objMap = this.flatMap();
+        const objMap = datas.objMap;
 
 
         if (!datas.dragFirst) {
@@ -239,10 +243,10 @@ export default class Folder<T = any> extends React.PureComponent<{
                 return;
             }
         }
-        if (!selected.length) {
+        if (!selected || !selected.length) {
             return;
         }
-        const fileInfos = selected.map(id => objMap[id]);
+        const fileInfos: Array<FileInfo<T>> = selected.map(id => objMap[id]);
 
         if (!this.state.shadows.length) {
             this.setState({
@@ -290,7 +294,7 @@ export default class Folder<T = any> extends React.PureComponent<{
             Math.max(targetDepth + 1, nextDepth) - targetDepth,
         ];
         let distX = clientX - rect.left;
-        const distDepth = isTop ? 0
+        let distDepth = isTop ? 0
             : between(Math.round((distX > 0 ? distX * 0.2 : distX) / 10), depthRange[0], depthRange[1]);
 
         if (nextInfo && !isTop && selected.indexOf(nextInfo.fullId) > -1 && targetDepth + distDepth === nextDepth) {
@@ -302,8 +306,24 @@ export default class Folder<T = any> extends React.PureComponent<{
         if (selected.indexOf(key) > -1 && distDepth >= 0) {
             return;
         }
-        if (distDepth > 0 && !this.props.checkMove!(targetInfo)) {
-            return;
+        const {
+            isMoveChildren,
+            checkMove,
+        } = this.props;
+
+        if (isMoveChildren) {
+            const prevScope = targetInfo.scope;
+            const parentScope = [...targetInfo.scope, targetInfo.id];
+
+            if (fileInfos.every(info => info.scope.every((v, i) => v === prevScope[i]))) {
+                distDepth = 0;
+            } else if(fileInfos.every(info => info.scope.every((v, i) => v === parentScope[i]))) {
+                distDepth = 1;
+            } else {
+                return;
+            }
+        } else if (distDepth > 0 && !checkMove!(targetInfo)) {
+            distDepth = 0;
         }
         target.style.setProperty("--pointer-depth", `${distDepth}`);
         target.classList.add(prefix(isTop ? "top-pointer" : "bottom-pointer"));
@@ -327,7 +347,8 @@ export default class Folder<T = any> extends React.PureComponent<{
         let prevInfo: FileInfo<T> | undefined = datas.prevInfo;
         const isTop = datas.isTop;
         const onMove = this.props.onMove!;
-        const objMap = this.flatMap();
+        const objMap = datas.objMap;
+        const selectedInfos: Array<FileInfo<T>> = (this.props.selected || []).map(id => objMap[id]);
 
         let parentInfo: FileInfo<T> | undefined;
 
@@ -338,7 +359,7 @@ export default class Folder<T = any> extends React.PureComponent<{
                 for (let i = 0; i < length; ++i) {
                     prevInfo = objMap[prevInfo!.parentId];
                 }
-                parentInfo = objMap[prevInfo.parentId];
+                parentInfo = objMap[prevInfo!.parentId];
             } else {
                 parentInfo = prevInfo;
                 prevInfo = undefined;
@@ -346,9 +367,9 @@ export default class Folder<T = any> extends React.PureComponent<{
         }
 
         if (!parentInfo && isTop) {
-            onMove();
+            onMove([]);
         } else if (parentInfo || prevInfo) {
-            onMove!(parentInfo, prevInfo);
+            onMove!(selectedInfos, parentInfo, prevInfo);
         }
         this.setState({
             shadows: [],
@@ -407,7 +428,7 @@ export default class Folder<T = any> extends React.PureComponent<{
             const fullId = getFullId!(id, nextScope);
             nextScope.push(id);
 
-            const valueChildren = getChildren!(value, key);
+            const valueChildren = getChildren!(value, key, scope);
 
             children.push({
                 id,

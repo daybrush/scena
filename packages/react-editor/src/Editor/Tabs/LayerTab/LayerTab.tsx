@@ -40,18 +40,17 @@ export default class LayerTab extends Tab {
     private onSelect = (selected: string[]) => {
         this.eventBus.requestTrigger("selectLayers", {
             selected,
-        })
+        });
     }
-    private onMove = (parentInfo?: FileInfo<ElementInfo>, prevInfo?: FileInfo<ElementInfo>) => {
+    private onMove = (selectedInfos: Array<FileInfo<ElementInfo>>, parentInfo?: FileInfo<ElementInfo>, prevInfo?: FileInfo<ElementInfo>) => {
         const editor = this.editor;
         const viewport = editor.getViewport();
-        const targets = editor.getSelectedTargets();
-        this.editor.moves(targets.map((target, i) => ({
-            info: viewport.getInfoByElement(target),
+        this.editor.moves(selectedInfos.map((info, i) => ({
+            info: info.value,
             parentInfo: viewport.getInfo(parentInfo ? parentInfo.fullId : "viewport"),
             prevInfo: i === 0
                 ? viewport.getInfo(prevInfo ? prevInfo.fullId : "")
-                : viewport.getInfoByElement(targets[i - 1]),
+                : selectedInfos[i - 1].value,
         })));
     }
     private checkMove = (prevInfo: FileInfo<ElementInfo>) => {
