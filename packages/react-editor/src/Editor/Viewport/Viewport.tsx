@@ -1,8 +1,10 @@
 import * as React from "react";
-import { IObject, isString, isArray } from "@daybrush/utils";
-import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isNumber, isScenaFunctionElement } from "../utils/utils";
+import { IObject, isString, isArray, isNumber } from "@daybrush/utils";
+import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isScenaFunctionElement } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
 import { ScenaJSXElement, ScenaComponent, ScenaJSXType } from "../types";
+import { mat4 } from "gl-matrix";
+import { getElementMatrixStack } from "react-moveable";
 
 export interface AddedInfo {
     added: ElementInfo[];
@@ -14,16 +16,22 @@ export interface MovedInfo {
     info: ElementInfo;
     parentInfo: ElementInfo;
     prevInfo?: ElementInfo;
+    moveMatrix?: mat4;
 }
 export interface MovedResult {
-    moved: ElementInfo[];
     prevInfos: MovedInfo[];
     nextInfos: MovedInfo[];
+}
+export interface FrameInfo {
+    frame: IObject<any>;
+    order: IObject<any>;
 }
 export interface ElementInfo {
     jsx: ScenaJSXType;
     name: string;
     frame?: IObject<any>;
+    frameOrder?: IObject<any>;
+    moveMatrix?: mat4;
 
     scopeId?: string;
     children?: ElementInfo[];
@@ -381,12 +389,23 @@ export default class Viewport extends React.PureComponent<{
 
         return this.move(moved, rootInfo, parentInfo);
     }
-    public moves(nextInfos: Array<{ info: ElementInfo, parentInfo: ElementInfo, prevInfo?: ElementInfo }>): Promise<MovedResult> {
-        const prevInfos = nextInfos.map(({ info }) => {
+    public moves(infos: Array<{ info: ElementInfo, parentInfo: ElementInfo, prevInfo?: ElementInfo }>): Promise<MovedResult> {
+        const container = this.viewportRef.current!;
+        const nextInfos = infos.map(info => {
+            // const parentStack = caculateMatrixStack(info.parentInfo.el!, container);
+            const targetStack = getElementMatrixStack(info.info.el!, container);
+
+            return {
+                ...info,
+                moveMatrix: targetStack.offsetMatrix as any,
+            };
+        })
+        const prevInfos = nextInfos.map(({ info, moveMatrix }) => {
             return {
                 info,
                 parentInfo: this.getInfo(info.scopeId!),
                 prevInfo: this.getPrevInfo(info.id!),
+                // moveMatrix: mat4.invert(mat4.create(), moveMatrix!),
             };
         });
         nextInfos.forEach(({ info, parentInfo, prevInfo }) => {
@@ -401,11 +420,11 @@ export default class Viewport extends React.PureComponent<{
             info.scopeId = parentInfo.id;
         });
 
-        const infos = nextInfos.map(({ info }) => info);
-
         return new Promise(resolve => {
+            const movedInfos = nextInfos.map(({ info }) => info);
+
             this.forceUpdate(() => {
-                infos.forEach(function moveInfo(info) {
+                movedInfos.forEach(function moveInfo(info) {
                     const id = info.id!;
                     const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
 
@@ -414,7 +433,6 @@ export default class Viewport extends React.PureComponent<{
                     info.children!.forEach(moveInfo);
                 });
                 resolve({
-                    moved: infos,
                     prevInfos,
                     nextInfos,
                 });

@@ -2,8 +2,9 @@ import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
 import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement } from "../types";
-import { IObject } from "@daybrush/utils";
-import { isFunction, isObject } from "util";
+import { IObject, splitComma, isArray, isFunction, isObject  } from "@daybrush/utils";
+import { Frame } from "scenejs";
+import { mat4 } from "gl-matrix";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -12,7 +13,7 @@ export function getContentElement(el: HTMLElement): HTMLElement | null {
     if (el.contentEditable === "inherit") {
         return getContentElement(el.parentElement!);
     }
-    if (el.contentEditable === "true")  {
+    if (el.contentEditable === "true") {
         return el;
     }
     return null;
@@ -110,6 +111,24 @@ export function isScenaFunctionElement(value: any): value is ScenaFunctionJSXEle
     return isScenaElement(value) && isFunction(value.type);
 }
 
-export function isNumber(value: any): value is number {
-    return typeof value === "number";
+export function setMoveMatrix(frame: Frame, moveMatrix: mat4) {
+    const transformOrders = [...(frame.getOrders(["transform"]) || [])];
+
+    if (`${transformOrders[0]}`.indexOf("matrix3d") > -1) {
+        const matrix3d = frame.get("transform", transformOrders[0]);
+        const prevMatrix = isArray(matrix3d)
+            ? matrix3d
+            : splitComma(matrix3d).map(v => parseFloat(v));
+
+        frame.set("transform", transformOrders[0], mat4.multiply([] as any, moveMatrix, prevMatrix as any));
+    } else if (frame.has("transform", "matrix3d")) {
+        let num = 1;
+        while (frame.has("transform", `matrix3d${++num}`)) { }
+
+        frame.set("transform", `matrix3d${num}`, [...moveMatrix]);
+        frame.setOrders(["transform"], [`matrix3d${num}`, ...transformOrders]);
+    } else {
+        frame.set("transform", "matrix3d", [...moveMatrix]);
+        frame.setOrders(["transform"], ["matrix3d", ...transformOrders]);
+    }
 }

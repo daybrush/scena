@@ -4,8 +4,8 @@ import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
 import "./Editor.css";
 import Menu from "./Menu/Menu";
-import Viewport, { ElementInfo, MovedInfo, MovedResult } from "./Viewport/Viewport";
-import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs } from "./utils/utils";
+import Viewport, { ElementInfo, MovedInfo, MovedResult, FrameInfo } from "./Viewport/Viewport";
+import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs, setMoveMatrix } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -19,6 +19,8 @@ import Debugger from "./utils/Debugger";
 import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
+import { mat4 } from "gl-matrix";
+import { getElementMatrixStack } from "react-moveable";
 
 function undoCreateElements({ infos, prevSelected }: IObject<any>, editor: Editor) {
     const res = editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
@@ -427,14 +429,33 @@ export default class Editor extends React.PureComponent<{
             prevSelected: getIds(this.getSelectedTargets()),
         });
         const data = this.moveableData;
+        const container = this.getViewport().viewportRef.current!;
         const targets = infos.map(function registerFrame(info) {
-            data.createFrame(info.el!, info.frame);
+            const frame = data.createFrame(info.el!, info.frame);
+
+            if (info.frameOrder) {
+                frame.setOrderObject(info.frameOrder);
+            }
             data.render(info.el!);
 
             info.children!.forEach(registerFrame);
             return info.el!;
         }).filter(el => el);
+        infos.forEach(info => {
+            if (!info.moveMatrix) {
+                return;
+            }
+            const frame = data.getFrame(info.el!);
+            const nextMatrixStack = getElementMatrixStack(info.el!, container);
+            const nextMatrix = nextMatrixStack.offsetMatrix as any;
 
+            mat4.invert(nextMatrix, nextMatrix);
+
+            const moveMatrix = mat4.multiply(mat4.create(), nextMatrix, info.moveMatrix);
+
+            setMoveMatrix(frame, moveMatrix);
+            data.render(info.el!);
+        });
         return Promise.all(targets.map(target => checkImageLoaded(target))).then(() => {
             this.setSelectedTargets(targets, true);
 
@@ -454,8 +475,11 @@ export default class Editor extends React.PureComponent<{
 
         targets.forEach(function removeFrame(target) {
             const info = viewport.getInfoByElement(target)!;
-
-            frameMap[info.id!] = moveableData.getFrame(target).get();
+            const frame = moveableData.getFrame(target);
+            frameMap[info.id!] = {
+                frame: frame.get(),
+                order: frame.getOrderObject(),
+            };
             moveableData.removeFrame(target);
 
             info.children!.forEach(childInfo => {
@@ -465,16 +489,18 @@ export default class Editor extends React.PureComponent<{
 
         return frameMap;
     }
-    public restoreFrames(infos: ElementInfo[], frameMap: IObject<any>) {
+    public restoreFrames(infos: MovedInfo[], frameMap: IObject<FrameInfo>) {
         const viewport = this.getViewport();
         const moveableData = this.moveableData;
 
-        infos.forEach(function registerFrame(info) {
-            info.frame = frameMap[info.id!];
+        infos.map(({ info }) => info).forEach(function registerFrame(info: ElementInfo) {
+            info.frame = frameMap[info.id!].frame;
+            info.frameOrder = frameMap[info.id!].order;
             delete frameMap[info.id!];
 
             info.children!.forEach(registerFrame);
         });
+
         for (const id in frameMap) {
             moveableData.createFrame(viewport.getInfo(id).el!, frameMap[id]);
         }
@@ -718,10 +744,11 @@ export default class Editor extends React.PureComponent<{
     private moveComplete(result: MovedResult, frameMap: IObject<any>, isRestore?: boolean) {
         this.console.log("Move", result);
 
-        const { moved, prevInfos, nextInfos } = result;
-        this.restoreFrames(moved, frameMap);
+        const { prevInfos, nextInfos } = result;
 
-        if (moved.length) {
+        this.restoreFrames(nextInfos, frameMap);
+
+        if (nextInfos.length) {
             if (!isRestore) {
                 this.historyManager.addAction("move", {
                     prevInfos,
@@ -729,7 +756,12 @@ export default class Editor extends React.PureComponent<{
                 });
             }
             // move complete
-            this.appendComplete(moved, true);
+            this.appendComplete(nextInfos.map(({ info, moveMatrix }) => {
+                return {
+                    ...info,
+                    moveMatrix,
+                };
+            }), true);
         }
 
         return result;

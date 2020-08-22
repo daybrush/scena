@@ -45,6 +45,7 @@ export default class LayerTab extends Tab {
     private onMove = (selectedInfos: Array<FileInfo<ElementInfo>>, parentInfo?: FileInfo<ElementInfo>, prevInfo?: FileInfo<ElementInfo>) => {
         const editor = this.editor;
         const viewport = editor.getViewport();
+
         this.editor.moves(selectedInfos.map((info, i) => ({
             info: info.value,
             parentInfo: viewport.getInfo(parentInfo ? parentInfo.fullId : "viewport"),

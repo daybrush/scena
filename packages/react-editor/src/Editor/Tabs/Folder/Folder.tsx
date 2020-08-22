@@ -369,7 +369,7 @@ export default class Folder<T = any> extends React.PureComponent<{
         }
 
         if (!parentInfo && isTop) {
-            onMove([]);
+            onMove(selectedInfos);
         } else if (parentInfo || prevInfo) {
             onMove!(selectedInfos, parentInfo, prevInfo);
         }
