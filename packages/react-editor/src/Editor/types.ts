@@ -8,6 +8,7 @@ import Editor from "./Editor";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import * as React from "react";
+import { mat4 } from "gl-matrix";
 
 export interface ScenaEditorState {
     selectedTargets: Array<SVGElement | HTMLElement>;
@@ -70,3 +71,44 @@ export type ScenaJSXElement
     | ScenaFunctionJSXElement;
 export type ScenaFunctionJSXElement = React.ReactElement<any, ScenaComponent>;
 export type ScenaJSXType = ScenaJSXElement | string | ScenaComponent;
+
+
+
+export interface AddedInfo {
+    added: ElementInfo[];
+}
+export interface RemovedInfo {
+    removed: ElementInfo[];
+}
+export interface MovedInfo {
+    info: ElementInfo;
+    parentInfo: ElementInfo;
+    prevInfo?: ElementInfo;
+    moveMatrix?: mat4;
+}
+export interface MovedResult {
+    prevInfos: MovedInfo[];
+    nextInfos: MovedInfo[];
+}
+export interface FrameInfo {
+    frame: IObject<any>;
+    order: IObject<any>;
+}
+export interface ElementInfo {
+    jsx: ScenaJSXType;
+    name: string;
+    frame?: IObject<any>;
+    frameOrder?: IObject<any>;
+    moveMatrix?: mat4;
+
+    scopeId?: string;
+    children?: ElementInfo[];
+    attrs?: IObject<any>;
+    componentId?: string;
+    jsxId?: string;
+    el?: HTMLElement | null;
+    id?: string;
+    index?: number;
+    innerText?: string;
+    innerHTML?: string;
+}

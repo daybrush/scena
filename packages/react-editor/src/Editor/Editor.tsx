@@ -2,10 +2,10 @@ import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
-import "./Editor.css";
+import EditorElement from "";
 import Menu from "./Menu/Menu";
-import Viewport, { ElementInfo, MovedInfo, MovedResult, FrameInfo } from "./Viewport/Viewport";
-import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs, setMoveMatrix } from "./utils/utils";
+import Viewport from "./Viewport/Viewport";
+import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs, setMoveMatrix, getOffsetOriginMatrix } from "./utils/utils";
 import Tabs from "./Tabs/Tabs";
 import EventBus from "./utils/EventBus";
 import { IObject } from "@daybrush/utils";
@@ -13,14 +13,13 @@ import Memory from "./utils/Memory";
 import MoveableManager from "./Viewport/MoveableMananger";
 import MoveableData from "./utils/MoveableData";
 import KeyManager from "./KeyManager/KeyManager";
-import { ScenaEditorState, SavedScenaData, ScenaJSXElement } from "./types";
+import { ScenaEditorState, SavedScenaData, ScenaJSXElement, ElementInfo, MovedResult, MovedInfo, FrameInfo } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
 import { mat4 } from "gl-matrix";
-import { getElementMatrixStack } from "react-moveable";
 
 function undoCreateElements({ infos, prevSelected }: IObject<any>, editor: Editor) {
     const res = editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
@@ -446,9 +445,7 @@ export default class Editor extends React.PureComponent<{
                 return;
             }
             const frame = data.getFrame(info.el!);
-            const nextMatrixStack = getElementMatrixStack(info.el!, container);
-            const nextMatrix = nextMatrixStack.offsetMatrix as any;
-
+            const nextMatrix = getOffsetOriginMatrix(info.el!, container);
             mat4.invert(nextMatrix, nextMatrix);
 
             const moveMatrix = mat4.multiply(mat4.create(), nextMatrix, info.moveMatrix);

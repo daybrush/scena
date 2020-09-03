@@ -1,49 +1,9 @@
 import * as React from "react";
 import { IObject, isString, isArray, isNumber } from "@daybrush/utils";
-import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isScenaFunctionElement } from "../utils/utils";
+import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isScenaFunctionElement, getOffsetOriginMatrix, updateElements } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
-import { ScenaJSXElement, ScenaComponent, ScenaJSXType } from "../types";
-import { mat4 } from "gl-matrix";
-import { getElementMatrixStack } from "react-moveable";
+import { ScenaJSXElement, ScenaComponent, ElementInfo, AddedInfo, RemovedInfo, MovedResult } from "../types";
 
-export interface AddedInfo {
-    added: ElementInfo[];
-}
-export interface RemovedInfo {
-    removed: ElementInfo[];
-}
-export interface MovedInfo {
-    info: ElementInfo;
-    parentInfo: ElementInfo;
-    prevInfo?: ElementInfo;
-    moveMatrix?: mat4;
-}
-export interface MovedResult {
-    prevInfos: MovedInfo[];
-    nextInfos: MovedInfo[];
-}
-export interface FrameInfo {
-    frame: IObject<any>;
-    order: IObject<any>;
-}
-export interface ElementInfo {
-    jsx: ScenaJSXType;
-    name: string;
-    frame?: IObject<any>;
-    frameOrder?: IObject<any>;
-    moveMatrix?: mat4;
-
-    scopeId?: string;
-    children?: ElementInfo[];
-    attrs?: IObject<any>;
-    componentId?: string;
-    jsxId?: string;
-    el?: HTMLElement | null;
-    id?: string;
-    index?: number;
-    innerText?: string;
-    innerHTML?: string;
-}
 export default class Viewport extends React.PureComponent<{
     style: IObject<any>,
     onBlur: (e: any) => any,
@@ -236,39 +196,8 @@ export default class Viewport extends React.PureComponent<{
 
         return new Promise(resolve => {
             this.forceUpdate(() => {
-                const infos = jsxInfos.map(function registerElement(info) {
-                    const id = info.id!;
-
-                    const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
-                    const attrs = info.attrs || {};
-
-                    info.el = target;
-
-                    for (const name in attrs) {
-                        target.setAttribute(name, attrs[name]);
-                    }
-                    info.attrs = getScenaAttrs(target);
-                    const children = info.children || [];
-
-                    if (children.length) {
-                        children.forEach(registerElement);
-                    } else if (info.attrs!.contenteditable) {
-                        if ("innerText" in info) {
-                            (target as HTMLElement).innerText = info.innerText || "";
-                        } else {
-                            info.innerText = (target as HTMLElement).innerText || "";
-                        }
-                    } else if (!info.componentId) {
-                        if ("innerHTML" in info) {
-                            target.innerHTML = info.innerHTML || "";
-                        } else {
-                            info.innerHTML = target.innerHTML || "";
-                        }
-                    }
-                    return { ...info };
-                });
                 resolve({
-                    added: infos,
+                    added: updateElements(jsxInfos),
                 });
             });
         });
@@ -392,12 +321,10 @@ export default class Viewport extends React.PureComponent<{
     public moves(infos: Array<{ info: ElementInfo, parentInfo: ElementInfo, prevInfo?: ElementInfo }>): Promise<MovedResult> {
         const container = this.viewportRef.current!;
         const nextInfos = infos.map(info => {
-            // const parentStack = caculateMatrixStack(info.parentInfo.el!, container);
-            const targetStack = getElementMatrixStack(info.info.el!, container);
 
             return {
                 ...info,
-                moveMatrix: targetStack.offsetMatrix as any,
+                moveMatrix: getOffsetOriginMatrix(info.info.el!, container),
             };
         })
         const prevInfos = nextInfos.map(({ info, moveMatrix }) => {
@@ -424,14 +351,7 @@ export default class Viewport extends React.PureComponent<{
             const movedInfos = nextInfos.map(({ info }) => info);
 
             this.forceUpdate(() => {
-                movedInfos.forEach(function moveInfo(info) {
-                    const id = info.id!;
-                    const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
-
-                    info.el = target;
-
-                    info.children!.forEach(moveInfo);
-                });
+                updateElements(movedInfos);
                 resolve({
                     prevInfos,
                     nextInfos,

@@ -1,10 +1,12 @@
 import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
-import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement } from "../types";
-import { IObject, splitComma, isArray, isFunction, isObject  } from "@daybrush/utils";
+import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo } from "../types";
+import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
 import { mat4 } from "gl-matrix";
+import { createMatrix } from "css-to-mat";
+import { getElementMatrixStack } from "react-moveable";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -131,4 +133,46 @@ export function setMoveMatrix(frame: Frame, moveMatrix: mat4) {
         frame.set("transform", "matrix3d", [...moveMatrix]);
         frame.setOrders(["transform"], ["matrix3d", ...transformOrders]);
     }
+}
+
+export function getOffsetOriginMatrix(el: HTMLElement | SVGElement, container: HTMLElement) {
+    const stack = getElementMatrixStack(el, container);
+    const origin = stack.targetOrigin;
+    const translation = mat4.fromTranslation(createMatrix() as any, [origin[0], origin[1], origin[2] || 0]);
+
+    return mat4.multiply(createMatrix() as any, stack.offsetMatrix as any, translation);
+}
+
+export function updateElements(infos: ElementInfo[]) {
+    return infos.map(function registerElement(info) {
+        const id = info.id!;
+
+        const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
+        const attrs = info.attrs || {};
+
+        info.el = target;
+
+        for (const name in attrs) {
+            target.setAttribute(name, attrs[name]);
+        }
+        info.attrs = getScenaAttrs(target);
+        const children = info.children || [];
+
+        if (children.length) {
+            children.forEach(registerElement);
+        } else if (info.attrs!.contenteditable) {
+            if ("innerText" in info) {
+                (target as HTMLElement).innerText = info.innerText || "";
+            } else {
+                info.innerText = (target as HTMLElement).innerText || "";
+            }
+        } else if (!info.componentId) {
+            if ("innerHTML" in info) {
+                target.innerHTML = info.innerHTML || "";
+            } else {
+                info.innerHTML = target.innerHTML || "";
+            }
+        }
+        return { ...info };
+    });
 }

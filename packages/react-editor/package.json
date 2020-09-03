@@ -1,8 +1,11 @@
 {
-  "name": "demo",
+  "name": "@scena/react-editor",
   "version": "0.1.0",
-  "private": true,
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.umd.js",
+  "module": "./dist/esm/index.js",
   "devDependencies": {
+    "@daybrush/builder": "^0.1.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -14,12 +17,25 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "rollup": "^2.26.9",
     "typescript": "^3.7.5"
   },
-  "homepage": ".",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daybrush/scena.git"
+  },
+  "author": "Daybrush",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daybrush/scena/issues"
+  },
+  "homepage": "https://github.com/daybrush/scena#readme",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "rm -rf dist && rollup -c && npm run declaration",
+    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
+    "build:dist": "rm -rf dist && tsc -p tsconfig.build.json",
+    "build:app": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "gh-pages -d ./build --dest=./"
@@ -40,21 +56,24 @@
     ]
   },
   "dependencies": {
-    "@daybrush/drag": "^0.19.1",
-    "@daybrush/utils": "^0.10.5",
+    "@daybrush/drag": "^0.19.3",
+    "@daybrush/utils": "^1.0.0",
     "@egjs/component": "^2.1.2",
     "@egjs/list-differ": "^1.0.0",
-    "@scena/react-guides": "^0.9.0",
+    "@scena/react-guides": "^0.10.2",
     "@types/html2canvas": "0.0.35",
     "@types/react-color": "^3.0.4",
+    "css-to-mat": "^0.1.6",
     "framework-utils": "^0.3.4",
+    "gl-matrix": "^3.3.0",
     "html2canvas": "^1.0.0-rc.5",
-    "keycon": "^0.8.0",
-    "moveable-helper": "^0.2.0",
+    "keycon": "^1.0.0",
+    "moveable-helper": "^0.3.0-rc4",
     "react-color": "^2.18.1",
-    "react-infinite-viewer": "^0.6.0",
-    "react-moveable": "^0.21.6",
-    "react-selecto": "^1.5.2",
-    "scenejs": "^1.2.0"
+    "react-css-styled": "^0.2.1",
+    "react-infinite-viewer": "^0.6.1",
+    "react-moveable": "^0.22.0-rc10",
+    "react-selecto": "^1.6.0",
+    "scenejs": "^1.4.1"
   }
 }

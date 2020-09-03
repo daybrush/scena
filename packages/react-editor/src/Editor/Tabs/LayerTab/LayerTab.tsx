@@ -2,10 +2,10 @@ import * as React from "react";
 import Tab from "../Tab";
 import Folder, { FileInfo } from "../Folder/Folder";
 import File from "../Folder/File";
-import { ElementInfo } from "../../Viewport/Viewport";
 import Layer from "./Layer";
-import { getIds, isScenaFunction, isScenaElement } from "../../utils/utils";
+import { getIds, isScenaFunction } from "../../utils/utils";
 import { isString } from "@daybrush/utils";
+import { ElementInfo } from "../../types";
 
 export default class LayerTab extends Tab {
     public static id = "Layers";
@@ -57,10 +57,12 @@ export default class LayerTab extends Tab {
     private checkMove = (prevInfo: FileInfo<ElementInfo>) => {
         const jsx = prevInfo.value.jsx;
 
+        console.log(jsx);
         if (isScenaFunction(jsx)) {
             return false;
         }
-        return isScenaElement(jsx) && isString(jsx.type);
+
+        return isString(jsx) || isString(jsx.type);
     }
     private setSelectedTargets = () => {
         this.forceUpdate();
