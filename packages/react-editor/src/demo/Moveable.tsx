@@ -37,7 +37,6 @@ class App extends React.Component {
         </div>;
     }
     public componentDidMount() {
-        (window as any).a = this.editor.current!;
         this.editor.current!.appendJSXs([
             {
                 jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable</div>,

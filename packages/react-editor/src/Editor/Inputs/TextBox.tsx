@@ -3,12 +3,34 @@ import { getKey } from "keycon";
 import Input from "./Input";
 import { isUndefined, IObject } from "@daybrush/utils";
 import { prefix } from "../utils/utils";
+import styled from "react-css-styled";
 
+const TextElement = styled("input", `
+{
+    position: relative;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    display: block;
+    width: 100%;
+    height: 30px;
+    background: transparent;
+    color: var(--mainColor);
+    font-weight: bold;
+    background: none;
+    border: 0;
+    padding: 5px;
+    box-sizing: border-box;
+    background: var(--back1);
+    font-size: 12px;
+}
+`);
 export default class TextBox extends Input<{}, {}, HTMLInputElement> {
     protected inputAttributes: IObject<any> = {};
     public render() {
         return (
-            <input ref={this.input as any}
+            <TextElement ref={this.input}
                 className={prefix("input")}
                 {...this.inputAttributes}
                 {...this.props.inputProps}
@@ -18,10 +40,10 @@ export default class TextBox extends Input<{}, {}, HTMLInputElement> {
         );
     }
     public getValue(): any {
-        return this.input.current!.value;
+        return this.getElement().value;
     }
     public setValue(value: any) {
-        this.input.current!.value = `${isUndefined(value) ? "" : value}`;
+        this.getElement().value = `${isUndefined(value) ? "" : value}`;
     }
     protected onInput = (e: any) => {
         const ev = e.nativeEvent || e;
@@ -30,7 +52,7 @@ export default class TextBox extends Input<{}, {}, HTMLInputElement> {
             return;
         }
         // click (up / down)
-        this.props.onChange(this.input.current!.value);
+        this.props.onChange(this.getElement().value);
     }
 
     protected onKeyDown = (e: any) => {

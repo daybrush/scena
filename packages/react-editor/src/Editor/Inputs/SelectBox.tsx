@@ -2,7 +2,28 @@ import * as React from "react";
 import Input from "./Input";
 import { isUndefined, IObject } from "@daybrush/utils";
 import { prefix } from "../utils/utils";
+import styled from "react-css-styled";
 
+const SelectElement = styled("select", `
+{
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    display: block;
+    width: 100%;
+    height: 30px;
+    padding: 5px;
+    background: transparent;
+    color: var(--mainColor);
+    font-weight: bold;
+    background: var(--back1);
+    border: 0;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+`);
 export default class SelectBox extends Input<{
     options: string[]
 }, {}, HTMLSelectElement> {
@@ -10,20 +31,20 @@ export default class SelectBox extends Input<{
     public render() {
         const options = this.props.options || [];
         return (
-            <select ref={this.input as any}
+            <SelectElement ref={this.input}
                 className={prefix("select")}
                 {...this.inputAttributes}
                 {...this.props.inputProps}
                 onInput={this.onInput}>
                 {options.map(value => (<option key={value} value={value}>{value}</option>))}
-            </select>
+            </SelectElement>
         );
     }
     public getValue(): any {
-        return this.input.current!.value;
+        return this.getElement().value;
     }
     public setValue(value: any) {
-        this.input.current!.value = `${isUndefined(value) ? "" : value}`;
+        this.getElement().value = `${isUndefined(value) ? "" : value}`;
     }
     protected onInput = (e: any) => {
         const ev = e.nativeEvent || e;
@@ -32,6 +53,6 @@ export default class SelectBox extends Input<{
             return;
         }
         // click (up / down)
-        this.props.onChange(this.input.current!.value);
+        this.props.onChange(this.getValue());
     }
 }

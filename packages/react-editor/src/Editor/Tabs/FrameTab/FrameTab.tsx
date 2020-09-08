@@ -4,7 +4,6 @@ import { prefix } from "../../utils/utils";
 import Folder, { FileInfo } from "../Folder/Folder";
 import Property from "./Property";
 import File from "../Folder/File";
-import "./FrameTab.css";
 import { NameType } from "scenejs";
 
 export default class FrameTab extends Tab {

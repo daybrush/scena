@@ -2,7 +2,6 @@ import * as React from "react";
 import LabelBox from "../../Inputs/LabelBox";
 import TabInputBox from "../../Inputs/TabInputBox";
 import TextBox from "../../Inputs/TextBox";
-import "../Folder/Folder.css";
 import File from "../Folder/File";
 
 export default class Property extends File<{

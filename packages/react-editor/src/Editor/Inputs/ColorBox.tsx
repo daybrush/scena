@@ -4,7 +4,37 @@ import { IObject, } from "@daybrush/utils";
 import { prefix } from "../utils/utils";
 import ColorPicker from "./ColorPicker";
 import TextBox from "./TextBox";
-import "./ColorBox.css";
+import styled from "react-css-styled";
+
+const ColorBoxElement = styled("div", `
+.scena-color-input {
+    position: relative;
+}
+.scena-color-picker {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    transform: translateY(10px) translateZ(1px);
+    z-index: 10;
+}
+
+.scena-color-background {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    background: #4af;
+    border-radius: 5px;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 5px;
+}
+.scena-color-background+.scena-input {
+    display: inline-block;
+    vertical-align: top;
+    width: calc(100% - 40px);
+}
+
+`);
 
 export default class ColorBox extends Input<{}, {}, HTMLDivElement> {
     protected inputAttributes: IObject<any> = {};
@@ -16,7 +46,7 @@ export default class ColorBox extends Input<{}, {}, HTMLDivElement> {
     };
     public render() {
         return (
-            <div className={prefix("color-input")} ref={this.input} onBlur={this.onBlur}>
+            <ColorBoxElement className={prefix("color-input")} ref={this.input} onBlur={this.onBlur}>
                 <div className={prefix("color-background")} style={{
                     backgroundColor: this.state.color,
                 }} onClick={this.onClick}></div>
@@ -28,7 +58,7 @@ export default class ColorBox extends Input<{}, {}, HTMLDivElement> {
                     }}
                 ></TextBox>
                 {this.renderPicker()}
-            </div>
+            </ColorBoxElement>
         );
     }
     public renderPicker() {
@@ -69,7 +99,7 @@ export default class ColorBox extends Input<{}, {}, HTMLDivElement> {
     public onBlur = (e: any) => {
         const relatedTarget = e.nativeEvent.relatedTarget;
 
-        if (this.input.current!.contains(relatedTarget)) {
+        if (this.getElement().contains(relatedTarget)) {
             return;
         }
         this.setState({
@@ -86,6 +116,6 @@ export default class ColorBox extends Input<{}, {}, HTMLDivElement> {
         e.preventDefault();
     }
     private onClick = (e: any) => {
-        this.textInput.current!.input.current!.focus();
+        this.textInput.current!.getElement().focus();
     }
 }

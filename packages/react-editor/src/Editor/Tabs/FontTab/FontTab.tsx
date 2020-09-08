@@ -1,6 +1,5 @@
 import * as React from "react";
 import Tab from "../Tab";
-import "./FontTab.css";
 import { prefix } from "../../utils/utils";
 import TabInputBox from "../../Inputs/TabInputBox";
 import SelectBox from "../../Inputs/SelectBox";

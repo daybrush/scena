@@ -37,7 +37,7 @@ export default class KeyboardIcon extends Icon {
                     </li>
                 })}
             </ul>
-        </Popup>, this.editor.editorElement.current!);
+        </Popup>, this.editor.editorElement.current!.getElement());
     }
     public onClick = () => {
         this.setState({

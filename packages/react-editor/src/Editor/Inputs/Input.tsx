@@ -1,6 +1,6 @@
 import { IObject } from "@daybrush/utils";
 import * as React from "react";
-import "./Input.css";
+import { StyledElement } from "react-css-styled";
 
 export default class Input<T = {}, U = {}, I extends HTMLElement = HTMLElement> extends React.PureComponent<{
     value?: any;
@@ -8,9 +8,12 @@ export default class Input<T = {}, U = {}, I extends HTMLElement = HTMLElement> 
     inputProps?: IObject<any>,
     onChange: (v: any) => any,
 } & T, U> {
-    public input = React.createRef<I>();
+    public input = React.createRef<StyledElement<I>>();
     public getValue(): any {
         return;
+    }
+    public getElement() {
+        return this.input.current!.getElement();
     }
     public setValue(value: any) {
     }

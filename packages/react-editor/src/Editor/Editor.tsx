@@ -2,7 +2,7 @@ import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto, { Rect } from "react-selecto";
-import EditorElement from "";
+import styled, { StyledElement } from "react-css-styled";
 import Menu from "./Menu/Menu";
 import Viewport from "./Viewport/Viewport";
 import { getContentElement, prefix, getIds, checkImageLoaded, checkInput, getParnetScenaElement, getScenaAttrs, setMoveMatrix, getOffsetOriginMatrix } from "./utils/utils";
@@ -16,10 +16,14 @@ import KeyManager from "./KeyManager/KeyManager";
 import { ScenaEditorState, SavedScenaData, ScenaJSXElement, ElementInfo, MovedResult, MovedInfo, FrameInfo } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
-import { isMacintosh, DATA_SCENA_ELEMENT_ID } from "./consts";
+import { DATA_SCENA_ELEMENT_ID, EDITOR_CSS } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
 import { mat4 } from "gl-matrix";
+import { getAccurateAgent } from "@egjs/agent";
+
+
+const EditorElement = styled("div", EDITOR_CSS);
 
 function undoCreateElements({ infos, prevSelected }: IObject<any>, editor: Editor) {
     const res = editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
@@ -89,7 +93,7 @@ export default class Editor extends React.PureComponent<{
     public moveableManager = React.createRef<MoveableManager>();
     public viewport = React.createRef<Viewport>();
     public tabs = React.createRef<Tabs>();
-    public editorElement = React.createRef<HTMLDivElement>();
+    public editorElement = React.createRef<StyledElement<HTMLDivElement>>();
 
     public render() {
         const {
@@ -120,7 +124,7 @@ export default class Editor extends React.PureComponent<{
             unit = Math.floor(1 / zoom) * 50;
         }
         return (
-            <div className={prefix("editor")} ref={this.editorElement}>
+            <EditorElement className={prefix("editor")} ref={this.editorElement}>
                 <Tabs ref={tabs} editor={this}></Tabs>
                 <Menu ref={menu} editor={this} onSelect={this.onMenuChange} />
                 <div className={prefix("reset")} onClick={e => {
@@ -270,10 +274,10 @@ export default class Editor extends React.PureComponent<{
                         });
                     }}
                 ></Selecto>
-            </div>
+            </EditorElement>
         );
     }
-    public componentDidMount() {
+    public async componentDidMount() {
         const {
             infiniteViewer,
             memory,
@@ -283,6 +287,8 @@ export default class Editor extends React.PureComponent<{
         memory.set("color", "#333");
 
         requestAnimationFrame(() => {
+            this.verticalGuides.current!.resize();
+            this.horizontalGuides.current!.resize();
             infiniteViewer.current!.scrollCenter();
         });
         window.addEventListener("resize", this.onResize);
@@ -322,6 +328,9 @@ export default class Editor extends React.PureComponent<{
         this.keyManager.keyup(["backspace"], () => {
             this.removeElements(this.getSelectedTargets());
         }, "Delete");
+
+        const agent = await getAccurateAgent()!;
+        const isMacintosh = agent.os.name === "mac" || agent.os.name === "ios";
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "c"], () => { }, "Copy");
         // this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "shift", "c"], e => {

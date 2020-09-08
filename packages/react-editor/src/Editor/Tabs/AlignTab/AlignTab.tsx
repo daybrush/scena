@@ -1,7 +1,6 @@
 import * as React from "react";
 import Tab from "../Tab";
 import { prefix, getId } from "../../utils/utils";
-import "./AlignTab.css";
 import Align from "./Align";
 import MoveableGroup from "react-moveable/declaration/MoveableGroup";
 

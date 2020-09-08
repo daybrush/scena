@@ -1,6 +1,5 @@
 import * as React from "react";
 import { prefix, connectEditorProps } from "../utils/utils";
-import "./Popup.css";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import KeyManager from "../KeyManager/KeyManager";

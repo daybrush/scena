@@ -1,11 +1,94 @@
 import * as React from "react";
 import { prefix, between } from "../../utils/utils";
 import { IObject, isObject, isArray, findIndex, hasClass } from "@daybrush/utils";
-import "./Folder.css";
 import File from "./File";
 import KeyController from "keycon";
 import Dragger, { OnDrag, OnDragStart, OnDragEnd } from "@daybrush/drag";
+import styled, { StyledElement } from "react-css-styled";
 
+const FolderElement = styled("div", `
+.scena-fold-icon {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 10px;
+    height: 20px;
+}
+.scena-fold-icon:before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-top: 4px solid #fff;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+}
+.scena-fold-icon.scena-fold:before {
+    border-right: 0;
+    border-left: 4px solid #fff;
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+}
+{
+    position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    --file-padding: 10px;
+}
+.scena-folder .scena-properties {
+    margin-left: var(--file-padding);
+}
+.scena-file {
+    position: relative;
+    box-sizing: border-box;
+    padding: 2px;
+    display: inline-block;
+    vertical-align: top;
+    border-bottom: 1px solid var(--back1);
+    width: 100%;
+}
+.scena-file h3 {
+    color: white;
+    margin: 0;
+    padding: 7px 5px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+.scena-shadows {
+    position: absolute;
+    pointer-events: none;
+    transition: translateY(-50%);
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: none;
+}
+.scena-file.scena-selected {
+    background: var(--mainColor);
+}
+.scena-file:before {
+    position: absolute;
+    left: calc(var(--file-padding) * var(--pointer-depth));
+    width: 100%;
+    height: 2px;
+    background: #48f;
+    transform: translateY(-50%);
+}
+.scena-file.scena-bottom-pointer:before {
+    content: "";
+    top: 100%;
+}
+.scena-file.scena-top-pointer:before {
+    content: "";
+    top: 0%;
+}
+`);
 export interface FileInfo<T> {
     id: string;
     scope: string[],
@@ -52,7 +135,7 @@ export default class Folder<T = any> extends React.PureComponent<{
         getChildren: (value: any) => value,
     }
     public moveDragger!: Dragger;
-    public folderRef = React.createRef<HTMLDivElement>();
+    public folderRef = React.createRef<StyledElement<HTMLDivElement>>();
     public shadowRef = React.createRef<HTMLDivElement>();
     public state: {
         fold: boolean,
@@ -74,8 +157,8 @@ export default class Folder<T = any> extends React.PureComponent<{
         } = this.props;
 
         const fullId = scope.length ? getFullId!(scope[scope.length - 1], scope.slice(0, -1)) : "";
-        return <div className={prefix("folder")} ref={this.folderRef}>
-            {name && <div className={prefix("tab-input", "full", "file", this.isSelected(fullId) ? "selected" : "")}
+        return <FolderElement className={prefix("folder")} ref={this.folderRef}>
+            {name && <div className={prefix("file", this.isSelected(fullId) ? "selected" : "")}
                 data-file-key={fullId} onClick={this.onClick}>
                 <div className={prefix("fold-icon", this.state.fold ? "fold" : "")} onClick={this.onClickFold}></div>
                 <h3 >{name}</h3>
@@ -84,11 +167,11 @@ export default class Folder<T = any> extends React.PureComponent<{
                 {this.renderProperties()}
             </div>
             {this.renderShadows()}
-        </div>
+        </FolderElement>
     }
     public componentDidMount() {
         if (this.props.isMove) {
-            const folderElement = this.folderRef.current!;
+            const folderElement = this.folderRef.current!.getElement();
             this.moveDragger = new Dragger(folderElement, {
                 container: window,
                 checkInput: true,
@@ -208,7 +291,7 @@ export default class Folder<T = any> extends React.PureComponent<{
         if (hasClass(e.inputEvent.target, prefix("fold-icon"))) {
             return false;
         }
-        const folderElement = this.folderRef.current!;
+        const folderElement = this.folderRef.current!.getElement();
         const rect = folderElement.getBoundingClientRect();
         const datas = e.datas;
         const offsetX = e.clientX - rect.left;
@@ -224,7 +307,7 @@ export default class Folder<T = any> extends React.PureComponent<{
     }
 
     private onDrag = (e: OnDrag) => {
-        const folderElement = this.folderRef.current!;
+        const folderElement = this.folderRef.current!.getElement();
         const { clientX, clientY, datas } = e;
 
         this.clearPointers();
