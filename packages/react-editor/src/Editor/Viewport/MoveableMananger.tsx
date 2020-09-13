@@ -124,6 +124,7 @@ export default class MoveableManager extends React.PureComponent<{
             dimensionViewable={true}
             draggable={true}
             resizable={true}
+            pinchable={["rotatable"]}
             throttleResize={1}
             clippable={selectedMenu === "Crop"}
             passDragArea={selectedTargets.length > 1 || selectedMenu !== "Text"}

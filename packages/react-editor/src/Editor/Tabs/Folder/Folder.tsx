@@ -3,7 +3,7 @@ import { prefix, between } from "../../utils/utils";
 import { IObject, isObject, isArray, findIndex, hasClass } from "@daybrush/utils";
 import File from "./File";
 import KeyController from "keycon";
-import Dragger, { OnDrag, OnDragStart, OnDragEnd } from "@daybrush/drag";
+import Gesto, { OnDrag, OnDragStart, OnDragEnd } from "gesto";
 import styled, { StyledElement } from "react-css-styled";
 
 const FolderElement = styled("div", `
@@ -128,13 +128,13 @@ export default class Folder<T = any> extends React.PureComponent<{
         selected: [],
         onMove: () => { },
         checkMove: () => true,
-        onSelect: () => {},
+        onSelect: () => { },
         getFullId: (id: string, scope: string[]) => [...scope, id].join("///"),
         getId: (_: any, id: any, scope: string[]) => id,
         getName: (_: any, id: any) => id,
         getChildren: (value: any) => value,
     }
-    public moveDragger!: Dragger;
+    public moveGesto!: Gesto;
     public folderRef = React.createRef<StyledElement<HTMLDivElement>>();
     public shadowRef = React.createRef<HTMLDivElement>();
     public state: {
@@ -172,18 +172,17 @@ export default class Folder<T = any> extends React.PureComponent<{
     public componentDidMount() {
         if (this.props.isMove) {
             const folderElement = this.folderRef.current!.getElement();
-            this.moveDragger = new Dragger(folderElement, {
+            this.moveGesto = new Gesto(folderElement, {
                 container: window,
                 checkInput: true,
-                dragstart: this.onDragStart,
-                drag: this.onDrag,
-                dragend: this.onDragEnd,
-            });
+            }).on("dragStart", this.onDragStart)
+                .on("drag", this.onDrag)
+                .on("dragEnd", this.onDragEnd);
         }
     }
     public componentWillUnmount() {
-        if (this.moveDragger) {
-            this.moveDragger.unset();
+        if (this.moveGesto) {
+            this.moveGesto.unset();
         }
     }
     private renderProperties() {
@@ -289,6 +288,7 @@ export default class Folder<T = any> extends React.PureComponent<{
     }
     private onDragStart = (e: OnDragStart) => {
         if (hasClass(e.inputEvent.target, prefix("fold-icon"))) {
+            e.stop();
             return false;
         }
         const folderElement = this.folderRef.current!.getElement();
@@ -400,7 +400,7 @@ export default class Folder<T = any> extends React.PureComponent<{
 
             if (fileInfos.every(info => info.scope.every((v, i) => v === prevScope[i]))) {
                 distDepth = 0;
-            } else if(fileInfos.every(info => info.scope.every((v, i) => v === parentScope[i]))) {
+            } else if (fileInfos.every(info => info.scope.every((v, i) => v === parentScope[i]))) {
                 distDepth = 1;
             } else {
                 return;
