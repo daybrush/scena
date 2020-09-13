@@ -6,7 +6,7 @@ import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/ut
 import { Frame } from "scenejs";
 import { mat4 } from "gl-matrix";
 import { createMatrix } from "css-to-mat";
-import { getElementMatrixStack } from "react-moveable";
+import { getElementInfo } from "react-moveable";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -136,7 +136,7 @@ export function setMoveMatrix(frame: Frame, moveMatrix: mat4) {
 }
 
 export function getOffsetOriginMatrix(el: HTMLElement | SVGElement, container: HTMLElement) {
-    const stack = getElementMatrixStack(el, container);
+    const stack = getElementInfo(el, container);
     const origin = stack.targetOrigin;
     const translation = mat4.fromTranslation(createMatrix() as any, [origin[0], origin[1], origin[2] || 0]);
 
