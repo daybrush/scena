@@ -4,6 +4,7 @@ import { prefix } from "../../utils/utils";
 import TabInputBox from "../../Inputs/TabInputBox";
 import SelectBox from "../../Inputs/SelectBox";
 import TextBox from "../../Inputs/TextBox";
+import FontIcon from "../../Icons/FontIcon";
 
 const FONT_FAMILY_PROPS = {
     options: ["sans-serif"],
@@ -22,6 +23,7 @@ const TEXT_DECORATION_PROPS = {
 }
 export default class FontTab extends Tab {
     public static id = "Font";
+    public static icon = FontIcon;
     public title = "Font";
     public renderTab() {
         const [

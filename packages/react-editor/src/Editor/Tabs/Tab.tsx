@@ -2,18 +2,20 @@ import * as React from "react";
 import { prefix, connectEditorProps } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
+import Icon from "../Icons/Icon";
 
 @connectEditorProps
 export default abstract class Tab extends React.PureComponent<{
     editor: Editor,
 }> {
     public static id: string;
+    public static icon: typeof Icon;
     public abstract title: string;
     public abstract renderTab(): any;
     public eventList: Array<[string, any]> = [];
     public render() {
         return (
-            <div className={prefix("tab")}>
+            <div className={prefix("tab-popup")}>
                 <h2>{this.title}</h2>
                 {this.renderTab()}
             </div>

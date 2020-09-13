@@ -161,6 +161,7 @@ export default class Editor extends React.PureComponent<{
                 <InfiniteViewer ref={infiniteViewer}
                     className={prefix("viewer")}
                     usePinch={true}
+                    useForceWheel={true}
                     pinchThreshold={50}
                     zoom={zoom}
                     onDragStart={e => {
@@ -170,6 +171,7 @@ export default class Editor extends React.PureComponent<{
                         if (
                             target.nodeName === "A"
                             || moveableManager.current!.getMoveable().isMoveableElement(target)
+                            || moveableManager.current!.getMoveable().isDragging()
                             || selectedTargets.some(t => t === target || t.contains(target))
                         ) {
                             e.stop();
@@ -191,6 +193,9 @@ export default class Editor extends React.PureComponent<{
                         verticalGuides.current!.scrollGuides(e.scrollLeft);
                     }}
                     onPinch={e => {
+                        if (moveableManager.current!.getMoveable().isDragging()) {
+                            return;
+                        }
                         this.setState({
                             zoom: e.zoom,
                         });

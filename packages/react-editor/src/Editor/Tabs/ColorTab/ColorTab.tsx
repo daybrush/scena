@@ -3,10 +3,12 @@ import Tab from "../Tab";
 import { prefix } from "../../utils/utils";
 import ColorBox from "../../Inputs/ColorBox";
 import TabInputBox from "../../Inputs/TabInputBox";
+import ColorIcon from "../../Icons/ColorIcon";
 
 
 export default class ColorTab extends Tab {
     public static id = "Colors";
+    public static icon = ColorIcon;
     public title = "Colors";
 
     public renderTab() {

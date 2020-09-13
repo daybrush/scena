@@ -4,6 +4,7 @@ import { prefix } from "../utils/utils";
 import NumberBox from "../Inputs/NumberBox";
 import TabInputBox from "../Inputs/TabInputBox";
 import Anchor from "../Inputs/Anchor";
+import TransformIcon from "../Icons/TransformIcon";
 
 const inputProps = {
     step: 1,
@@ -11,6 +12,7 @@ const inputProps = {
 
 export default class TransformTab extends Tab {
     public static id = "Transform";
+    public static icon = TransformIcon;
     public title = "Transform";
     public xInput = React.createRef<TabInputBox>();
     public yInput = React.createRef<TabInputBox>();

@@ -3,6 +3,7 @@ import Tab from "../Tab";
 import { prefix, getId } from "../../utils/utils";
 import Align from "./Align";
 import MoveableGroup from "react-moveable/declaration/MoveableGroup";
+import AlignIcon from "../../Icons/AlignIcon";
 
 const TYPES = ["vertical", "horizontal"] as const;
 const DIRECTIONS = ["start", "center", "end"] as const;
@@ -29,6 +30,7 @@ function getDirectionPos(
 }
 export default class AlignTab extends Tab {
     public static id = "Align";
+    public static icon = AlignIcon;
     public title = "Align";
     public renderTab() {
         return <div className={prefix("align-tab")}>

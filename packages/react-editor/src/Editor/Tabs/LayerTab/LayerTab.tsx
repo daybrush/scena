@@ -6,9 +6,11 @@ import Layer from "./Layer";
 import { getIds, isScenaFunction } from "../../utils/utils";
 import { isString } from "@daybrush/utils";
 import { ElementInfo } from "../../types";
+import LayerIcon from "../../Icons/LayerIcon";
 
 export default class LayerTab extends Tab {
     public static id = "Layers";
+    public static icon = LayerIcon;
     public title = "Layers";
 
     public renderTab() {

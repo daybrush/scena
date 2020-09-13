@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import Icon from "./Icon";
+import Icon from "../Icons/Icon";
 import { prefix } from "../utils/utils";
 import Popup from "../Popup/Popup";
 

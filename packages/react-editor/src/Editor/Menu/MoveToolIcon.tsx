@@ -1,5 +1,5 @@
 import * as React from "react";
-import Icon from "./Icon";
+import Icon from "../Icons/Icon";
 
 export default class MoveToolIcon extends Icon {
     public static id = "MoveTool";

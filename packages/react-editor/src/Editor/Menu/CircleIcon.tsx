@@ -1,5 +1,5 @@
 import * as React from "react";
-import Icon from "./Icon";
+import Icon from "../Icons/Icon";
 import Memory from "../utils/Memory";
 
 export default class CircleIcon extends Icon {

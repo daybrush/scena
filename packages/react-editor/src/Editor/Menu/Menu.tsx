@@ -6,7 +6,7 @@ import CropIcon from "./CropIcon";
 import RectIcon from "./RectIcon";
 import OvalIcon from "./OvalIcon";
 import RoundRectIcon from "./RoundRectIcon";
-import Icon from "./Icon";
+import Icon from "../Icons/Icon";
 import Editor from "../Editor";
 import KeyboardIcon from "./KeyboardIcon";
 import styled from "react-css-styled";
@@ -52,7 +52,7 @@ svg, .scena-i {
     transition: all ease 0.2s;
 }
 
-.scena-menu .scena-selected {
+.scena-selected {
     background: var(--mainColor);
     border-color: var(--back1);
 }

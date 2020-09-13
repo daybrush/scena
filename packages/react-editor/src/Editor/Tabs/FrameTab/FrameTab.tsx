@@ -5,9 +5,11 @@ import Folder, { FileInfo } from "../Folder/Folder";
 import Property from "./Property";
 import File from "../Folder/File";
 import { NameType } from "scenejs";
+import FrameIcon from "../../Icons/FrameIcon";
 
 export default class FrameTab extends Tab {
     public static id = "Frame";
+    public static icon = FrameIcon;
     public title = "Frame";
     public state: {
         selected: string[],
