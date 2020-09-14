@@ -140,6 +140,9 @@ export default class MoveableManager extends React.PureComponent<{
             horizontalGuidelines={horizontalGuidelines}
             elementGuidelines={elementGuidelines}
             clipArea={true}
+            clipVerticalGuidelines={[0, "50%", "100%"]}
+            clipHorizontalGuidelines={[0, "50%", "100%"]}
+            clipTargetBounds={true}
 
             onBeforeRenderStart={moveableData.onBeforeRenderStart}
             onBeforeRenderGroupStart={moveableData.onBeforeRenderGroupStart}
@@ -240,7 +243,7 @@ export default class MoveableManager extends React.PureComponent<{
 
         return <Moveable
             ref={this.moveable}
-            rotatable={true}
+            // rotatable={true}
             target={target}
             origin={false}
             onRotateStart={moveableData.onRotateStart}
