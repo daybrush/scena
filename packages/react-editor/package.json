@@ -1,6 +1,6 @@
 {
   "name": "@scena/react-editor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "types": "./declaration/index.d.ts",
   "main": "./dist/editor.cjs.js",
   "module": "./dist/editor.esm.js",
@@ -60,7 +60,7 @@
     "@egjs/agent": "^2.2.1",
     "@egjs/component": "^2.1.2",
     "@egjs/list-differ": "^1.0.0",
-    "@scena/react-guides": "^0.10.4",
+    "@scena/react-guides": "^0.10.5",
     "@types/html2canvas": "0.0.35",
     "@types/react-color": "^3.0.4",
     "css-to-mat": "^0.1.6",
@@ -73,7 +73,7 @@
     "react-color": "^2.18.1",
     "react-css-styled": "^1.0.0",
     "react-infinite-viewer": "^0.9.2",
-    "react-moveable": "^0.22.5",
+    "react-moveable": "^0.22.6",
     "react-selecto": "^1.6.4",
     "scenejs": "^1.4.1"
   }

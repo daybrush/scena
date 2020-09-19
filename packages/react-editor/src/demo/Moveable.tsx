@@ -27,7 +27,7 @@ class App extends React.Component {
         return <div className="app">
             <Editor
                 ref={this.editor}
-                debug={true}
+                debug={false}
             />
             <div className="bottom">
                 <a href="https://github.com/daybrush/moveable" target="_blank">Download</a>
@@ -37,6 +37,7 @@ class App extends React.Component {
         </div>;
     }
     public componentDidMount() {
+        // (window as any).a = this;
         this.editor.current!.appendJSXs([
             {
                 jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable</div>,
