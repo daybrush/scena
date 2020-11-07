@@ -16,8 +16,8 @@
 |[**Scene.js**](https://github.com/daybrush/scenejs)|[**Moveable**](https://github.com/daybrush/moveable)|[**Selecto**](https://github.com/daybrush/selecto)|
 |<a href="https://github.com/daybrush/infinite-viewer" target="_blank"><img src ="https://daybrush.com/infinite-viewer/images/logo.png" width="250" alt="scenejs-timeline" /></a>|<a href="https://github.com/daybrush/guides" target="_blank"><img src ="https://daybrush.com/guides/images/guides.png" width="250" alt="Guides" /></a>|<a href="https://github.com/daybrush/scenejs-timeline" target="_blank"><img src ="https://daybrush.com/scenejs-timeline/images/logo.png" width="250" alt="scenejs-timeline" /></a>|
 |[**InfiniteViewer**](https://github.com/daybrush/infinite-viewer)|[**Guides**](https://github.com/daybrush/guides)|[**Scene.js<br/>Timeline**](https://github.com/daybrush/scenejs-timeline)|
-|<a href="https://github.com/daybrush/ruler" target="_blank"><img src ="https://daybrush.com/ruler/images/ruler.png" width="250" alt="Ruler" /></a>|<a href="https://github.com/daybrush/gesto" target="_blank"><img src ="https://daybrush.com/gesto/images/logo.png" width="250" alt="Gesto" /></a>|
-|[**Ruler**](https://github.com/daybrush/ruler)|[**Gesto**](https://github.com/daybrush/gesto)|
+|<a href="https://github.com/daybrush/ruler" target="_blank"><img src ="https://daybrush.com/ruler/images/ruler.png" width="250" alt="Ruler" /></a>|<a href="https://github.com/daybrush/gesto" target="_blank"><img src ="https://daybrush.com/gesto/images/logo.png" width="250" alt="Gesto" /></a>|<a href="https://github.com/daybrush/overlap-area" target="_blank"><img src ="https://raw.githubusercontent.com/daybrush/overlap-area/master/demo/images/logo.png" width="250" alt="Overlap-Area" /></a>|
+|[**Ruler**](https://github.com/daybrush/ruler)|[**Gesto**](https://github.com/daybrush/gesto)|[**OverlapArea**](https://github.com/daybrush/overlap-area)|
 
 
 
@@ -34,6 +34,7 @@
 |[**Gesto**](https://github.com/daybrush/gesto)|[![](https://img.shields.io/npm/v/gesto.svg?style=flat-square&color=007acc&label=version)](https://npmjs.com/package/gesto)|You can set up drag, pinch events in any browser.|
 |[**InfiniteViewer**](https://github.com/daybrush/infinite-viewer)|![](https://img.shields.io/npm/v/infinite-viewer.svg?style=flat-square&color=007acc&label=version)|Infinite Viewer is Document Viewer Component with infinite scrolling|
 |[**CSS Styled**](https://github.com/daybrush/css-styled)|![](https://img.shields.io/npm/v/css-styled.svg?style=flat-square&color=007acc&label=version)|This component is a lightweight, simple line style component.
+|[**Overlap Area**](https://github.com/daybrush/overlap-area)|![](https://img.shields.io/npm/v/overlap-area.svg?style=flat-square&color=007acc&label=version)|Find the Overlap Area.
 
 
 * [**@daybrush/utils**](https://github.com/daybrush/utils): Use utils functions
@@ -41,7 +42,6 @@
 * [**framework-utils**](https://github.com/daybrush/framework-utils): Use Framework utils.
 * [**moveable-helper**](https://github.com/daybrush/moveable-helper): Helper to use moveable easily
 ## External Components
-* [**@egjs/component**](https://github.com/naver/egjs-component): Event Emitter
 * [**@egjs/agent**](https://github.com/naver/egjs-agent): Extracts browser and operating system information from the user agent string or user agent object(userAgentData).
 * [**@egjs/list-differ**](https://github.com/naver/egjs-list-differ): A module that checks the diff when values are added, removed, or changed in an array.
 * [**gl-matrix**](https://github.com/toji/gl-matrix): Use mat4 functions.
