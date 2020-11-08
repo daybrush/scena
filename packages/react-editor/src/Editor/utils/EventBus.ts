@@ -1,7 +1,7 @@
-import Component from "@egjs/component";
+import EventEmitter from "@scena/event-emitter";
 import { IObject } from "@daybrush/utils";
 
-class EventBus extends Component {
+class EventBus extends EventEmitter {
     private eventMap: IObject<number> = {};
     requestTrigger(name: string, params: IObject<any> = {}) {
         const eventMap = this.eventMap;

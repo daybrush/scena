@@ -4,9 +4,8 @@ import { EDITOR_PROPERTIES } from "../consts";
 import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo } from "../types";
 import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
-import { mat4 } from "gl-matrix";
-import { createMatrix } from "css-to-mat";
 import { getElementInfo } from "react-moveable";
+import { fromTranslation, matrix3d } from "@scena/matrix";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -113,7 +112,7 @@ export function isScenaFunctionElement(value: any): value is ScenaFunctionJSXEle
     return isScenaElement(value) && isFunction(value.type);
 }
 
-export function setMoveMatrix(frame: Frame, moveMatrix: mat4) {
+export function setMoveMatrix(frame: Frame, moveMatrix: number[]) {
     const transformOrders = [...(frame.getOrders(["transform"]) || [])];
 
     if (`${transformOrders[0]}`.indexOf("matrix3d") > -1) {
@@ -122,7 +121,7 @@ export function setMoveMatrix(frame: Frame, moveMatrix: mat4) {
             ? matrix3d
             : splitComma(matrix3d).map(v => parseFloat(v));
 
-        frame.set("transform", transformOrders[0], mat4.multiply([] as any, moveMatrix, prevMatrix as any));
+        frame.set("transform", transformOrders[0], matrix3d(moveMatrix, prevMatrix));
     } else if (frame.has("transform", "matrix3d")) {
         let num = 1;
         while (frame.has("transform", `matrix3d${++num}`)) { }
@@ -138,9 +137,9 @@ export function setMoveMatrix(frame: Frame, moveMatrix: mat4) {
 export function getOffsetOriginMatrix(el: HTMLElement | SVGElement, container: HTMLElement) {
     const stack = getElementInfo(el, container);
     const origin = stack.targetOrigin;
-    const translation = mat4.fromTranslation(createMatrix() as any, [origin[0], origin[1], origin[2] || 0]);
+    const translation = fromTranslation([origin[0], origin[1], origin[2] || 0], 4);
 
-    return mat4.multiply(createMatrix() as any, stack.offsetMatrix as any, translation);
+    return matrix3d(stack.offsetMatrix as any, translation);
 }
 
 export function updateElements(infos: ElementInfo[]) {

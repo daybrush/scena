@@ -8,7 +8,6 @@ import Editor from "./Editor";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import * as React from "react";
-import { mat4 } from "gl-matrix";
 
 export interface ScenaEditorState {
     selectedTargets: Array<SVGElement | HTMLElement>;
@@ -84,7 +83,7 @@ export interface MovedInfo {
     info: ElementInfo;
     parentInfo: ElementInfo;
     prevInfo?: ElementInfo;
-    moveMatrix?: mat4;
+    moveMatrix?: number[];
 }
 export interface MovedResult {
     prevInfos: MovedInfo[];
@@ -99,7 +98,7 @@ export interface ElementInfo {
     name: string;
     frame?: IObject<any>;
     frameOrder?: IObject<any>;
-    moveMatrix?: mat4;
+    moveMatrix?: number[];
 
     scopeId?: string;
     children?: ElementInfo[];

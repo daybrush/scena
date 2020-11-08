@@ -19,8 +19,9 @@ import Debugger from "./utils/Debugger";
 import { DATA_SCENA_ELEMENT_ID, EDITOR_CSS } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
-import { mat4 } from "gl-matrix";
 import { getAccurateAgent } from "@egjs/agent";
+import { invert, matrix3d,  } from "@scena/matrix";
+import { getElementInfo } from "react-moveable";
 
 
 const EditorElement = styled("div", EDITOR_CSS);
@@ -219,6 +220,7 @@ export default class Editor extends React.PureComponent<{
                 </InfiniteViewer>
                 <Selecto
                     ref={selecto}
+                    getElementRect={getElementInfo}
                     dragContainer={".scena-viewer"}
                     hitRate={0}
                     selectableTargets={[`.scena-viewport [${DATA_SCENA_ELEMENT_ID}]`]}
@@ -459,10 +461,11 @@ export default class Editor extends React.PureComponent<{
                 return;
             }
             const frame = data.getFrame(info.el!);
-            const nextMatrix = getOffsetOriginMatrix(info.el!, container);
-            mat4.invert(nextMatrix, nextMatrix);
+            let nextMatrix = getOffsetOriginMatrix(info.el!, container);
 
-            const moveMatrix = mat4.multiply(mat4.create(), nextMatrix, info.moveMatrix);
+            nextMatrix = invert(nextMatrix, 4);
+
+            const moveMatrix = matrix3d(nextMatrix, info.moveMatrix);
 
             setMoveMatrix(frame, moveMatrix);
             data.render(info.el!);
