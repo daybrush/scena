@@ -215,6 +215,7 @@ export default class Editor extends React.PureComponent<{
                             verticalGuidelines={verticalSnapGuides}
                             horizontalGuidelines={horizontalSnapGuides}
                             editor={this}
+                            zoom={zoom}
                         ></MoveableManager>
                     </Viewport>
                 </InfiniteViewer>
@@ -648,6 +649,7 @@ export default class Editor extends React.PureComponent<{
         });
     }
     private selectEndMaker(rect: Rect) {
+        const zoom = this.state.zoom;
         const infiniteViewer = this.infiniteViewer.current!;
         const selectIcon = this.menu.current!.getSelected();
         const width = rect.width;
@@ -657,18 +659,17 @@ export default class Editor extends React.PureComponent<{
             return false;
         }
         const maker = selectIcon.maker(this.memory);
-        const scrollTop = -infiniteViewer.getScrollTop() + 30;
-        const scrollLeft = -infiniteViewer.getScrollLeft() + 75;
+        const scrollTop = -infiniteViewer.getScrollTop() * zoom + 30;
+        const scrollLeft = -infiniteViewer.getScrollLeft() * zoom + 75;
         const top = rect.top - scrollTop;
         const left = rect.left - scrollLeft;
 
-
         const style = {
-            top: `${top}px`,
-            left: `${left}px`,
+            top: `${top / zoom}px`,
+            left: `${left / zoom}px`,
             position: "absolute",
-            width: `${width}px`,
-            height: `${height}px`,
+            width: `${width / zoom}px`,
+            height: `${height / zoom}px`,
             ...maker.style,
         } as any;
         this.appendJSX({

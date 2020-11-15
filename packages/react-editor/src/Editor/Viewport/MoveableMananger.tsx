@@ -68,13 +68,15 @@ const DimensionViewable = {
     },
     events: {},
     render(moveable: MoveableManagerInterface) {
+        const zoom = moveable.props.zoom;
         const { left, top } = moveable.state;
 
         const rect = moveable.getRect();
 
         return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
             left: `${rect.left + rect.width / 2 - left}px`,
-            top: `${rect.top + rect.height + 20 - top}px`,
+            top: `${rect.top + rect.height  - top}px`,
+            transform: `translate(-50%, ${20 * zoom!}px) scale(${zoom})`,
         }}>
             {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
         </div>
@@ -87,6 +89,7 @@ export default class MoveableManager extends React.PureComponent<{
     selectedMenu: string,
     verticalGuidelines: number[],
     horizontalGuidelines: number[],
+    zoom: number,
 }> {
     public moveable = React.createRef<Moveable>();
     public getMoveable() {
@@ -99,6 +102,7 @@ export default class MoveableManager extends React.PureComponent<{
             horizontalGuidelines,
             selectedTargets,
             selectedMenu,
+            zoom,
         } = this.props;
         // const
 
@@ -125,6 +129,7 @@ export default class MoveableManager extends React.PureComponent<{
             draggable={true}
             resizable={true}
             pinchable={["rotatable"]}
+            zoom={1 / zoom}
             throttleResize={1}
             clippable={selectedMenu === "Crop"}
             passDragArea={selectedMenu === "Text"}

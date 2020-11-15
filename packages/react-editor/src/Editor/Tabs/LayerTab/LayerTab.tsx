@@ -59,7 +59,6 @@ export default class LayerTab extends Tab {
     private checkMove = (prevInfo: FileInfo<ElementInfo>) => {
         const jsx = prevInfo.value.jsx;
 
-        console.log(jsx);
         if (isScenaFunction(jsx)) {
             return false;
         }

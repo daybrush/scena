@@ -101,8 +101,8 @@ export const EDITOR_CSS = `
     font-size: 13px;
     white-space: nowrap;
     font-weight: bold;
-    transform: translate(-50%);
-    pointer-events: none;
+    will-change: transform;
+    transform: translate(-50%) translateZ(0px);
 }
 .scena-frame-tab {
     overflow: auto;

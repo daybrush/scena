@@ -116,10 +116,10 @@ export function setMoveMatrix(frame: Frame, moveMatrix: number[]) {
     const transformOrders = [...(frame.getOrders(["transform"]) || [])];
 
     if (`${transformOrders[0]}`.indexOf("matrix3d") > -1) {
-        const matrix3d = frame.get("transform", transformOrders[0]);
-        const prevMatrix = isArray(matrix3d)
-            ? matrix3d
-            : splitComma(matrix3d).map(v => parseFloat(v));
+        const matrix = frame.get("transform", transformOrders[0]);
+        const prevMatrix = isArray(matrix)
+            ? matrix
+            : splitComma(matrix).map(v => parseFloat(v));
 
         frame.set("transform", transformOrders[0], matrix3d(moveMatrix, prevMatrix));
     } else if (frame.has("transform", "matrix3d")) {
