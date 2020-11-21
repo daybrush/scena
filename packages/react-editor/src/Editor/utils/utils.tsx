@@ -7,7 +7,7 @@ import { Frame } from "scenejs";
 import { getElementInfo } from "react-moveable";
 import { fromTranslation, matrix3d } from "@scena/matrix";
 import React from "react";
-import { ConnectContext } from "../components/ConnectContext";
+import { connectContext, ConnectContext } from "../components/ConnectContext";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -22,38 +22,8 @@ export function getContentElement(el: HTMLElement): HTMLElement | null {
     return null;
 }
 
-export function connectEditorContext(Component: any) {
-    const prototype = Component.prototype;
+export const connectEditorContext = connectContext(EditorContext, EDITOR_PROPERTIES);
 
-    EDITOR_PROPERTIES.forEach(name => {
-        Object.defineProperty(prototype, name, {
-            get: function () {
-                return this.props.editor[name];
-            },
-        });
-    });
-
-    return React.forwardRef((props, ref) => {
-        return <ConnectContext context={EditorContext}>
-            <Component {...props} ref={ref}/>
-        </ConnectContext>;
-    });
-};
-export function connectEditorProps(component: any) {
-    const prototype = component.prototype;
-    Object.defineProperty(prototype, "editor", {
-        get: function () {
-            return this.props.editor;
-        },
-    });
-    EDITOR_PROPERTIES.forEach(name => {
-        Object.defineProperty(prototype, name, {
-            get: function () {
-                return this.props.editor[name];
-            },
-        });
-    })
-};
 export function between(val: number, min: number, max: number) {
     return Math.min(Math.max(min, val), max);
 }

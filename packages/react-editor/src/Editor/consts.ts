@@ -288,4 +288,4 @@ export const EDITOR_CSS = `
 }
 `;
 
-export const EditorContext = createContext<{ editor: Editor | null }>({ editor: null });
+export const EditorContext = createContext<Editor | null>(null);
