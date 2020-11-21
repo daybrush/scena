@@ -87,9 +87,7 @@ const TABS: Array<typeof Tab> = [
     TransformTab,
     FrameTab,
 ];
-export default class Tabs extends React.PureComponent<{
-    editor: Editor,
-}> {
+export default class Tabs extends React.PureComponent {
     public tabs = React.createRef<StyledElement>();
     public state = {
         selected: "",
@@ -100,7 +98,6 @@ export default class Tabs extends React.PureComponent<{
         </TabsElement>;
     }
     public renderTabs() {
-        const editor = this.props.editor;
         const selected = this.state.selected;
         return TABS.map(UserTab => {
             const id = UserTab.id;
@@ -108,9 +105,9 @@ export default class Tabs extends React.PureComponent<{
             const IconComponent = UserTab.icon;
             return <div key={id} className={prefix("tab", isSelected ? "selected" : "")}>
                 <div data-target-id={id} className={prefix("tab-icon")} onClick={this.onClick}>
-                    {IconComponent ? <IconComponent editor={editor} /> : <span>{id}</span>}
+                    {IconComponent ? <IconComponent /> : <span>{id}</span>}
                 </div>
-                {isSelected && <UserTab editor={editor} />}
+                {isSelected && <UserTab />}
             </div>;
             // return <UserTab moveable={moveable} />;
         });

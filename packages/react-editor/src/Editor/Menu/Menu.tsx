@@ -1,14 +1,14 @@
 import * as React from "react";
 import { prefix } from "../utils/utils";
-import MoveToolIcon from "./MoveToolIcon";
-import TextIcon from "./TextIcon";
-import CropIcon from "./CropIcon";
-import RectIcon from "./RectIcon";
-import OvalIcon from "./OvalIcon";
-import RoundRectIcon from "./RoundRectIcon";
 import Icon from "../Icons/Icon";
+import MoveToolIcon from "../Icons/MoveToolIcon";
+import TextIcon from "../Icons/TextIcon";
+import CropIcon from "../Icons/CropIcon";
+import RectIcon from "../Icons/RectIcon";
+import OvalIcon from "../Icons/OvalIcon";
+import RoundRectIcon from "../Icons/RoundRectIcon";
+import KeyboardIcon from "../Icons/KeyboardIcon";
 import Editor from "../Editor";
-import KeyboardIcon from "./KeyboardIcon";
 import styled from "react-css-styled";
 
 const MenuElement = styled("div", `
@@ -152,7 +152,6 @@ const MENUS: Array<typeof Icon> = [
     OvalIcon,
 ];
 export default class Menu extends React.PureComponent<{
-    editor: Editor,
     onSelect: (id: string) => any
 }> {
     public state = {
@@ -164,7 +163,7 @@ export default class Menu extends React.PureComponent<{
             <MenuElement className={prefix("menu")}>
                 {this.renderMenus()}
                 <div className={prefix("menu-bottom")}>
-                    <KeyboardIcon editor={this.props.editor} />
+                    <KeyboardIcon />
                 </div>
             </MenuElement>
         );
@@ -172,14 +171,13 @@ export default class Menu extends React.PureComponent<{
     public renderMenus() {
         const selected = this.state.selected;
         const menuRefs = this.menuRefs;
-        const editor = this.props.editor;
 
         return MENUS.map((MenuClass, i) => {
             const id = MenuClass.id;
             if (!menuRefs[i]) {
                 menuRefs[i] = React.createRef();
             }
-            return <MenuClass ref={menuRefs[i]} key={id} editor={editor} selected={selected === id} onSelect={this.select} />;
+            return <MenuClass ref={menuRefs[i]} key={id} selected={selected === id} onSelect={this.select} />;
         });
     }
     public select = (id: string) => {

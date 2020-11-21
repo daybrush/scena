@@ -1,12 +1,11 @@
 import * as React from "react";
-import { prefix, connectEditorProps } from "../utils/utils";
+import { prefix, connectEditorContext } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import KeyManager from "../KeyManager/KeyManager";
 
-@connectEditorProps
+@connectEditorContext
 export default class Popup extends React.PureComponent<{
-    editor: Editor,
     onClose: () => any,
 }> {
     public overlayElement = React.createRef<HTMLDivElement>();

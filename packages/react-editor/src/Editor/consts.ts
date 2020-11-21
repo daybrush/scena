@@ -2,8 +2,16 @@ import { createContext } from "react";
 import Editor from "./Editor";
 
 export const EDITOR_PROPERTIES = [
-    "memory", "eventBus", "keyManager", "moveableData",
-    "moveableManager", "historyManager", "console",
+    "memory",
+    "eventBus",
+    "keyManager",
+    "moveableData",
+    "moveableManager",
+    "historyManager",
+    "console",
+    "getViewport",
+    "getSelecto",
+    "selectMenu",
 ] as const;
 export const PREFIX = "scena-";
 export const DATA_SCENA_ELEMENT_ID = "data-scena-element-id";

@@ -1,13 +1,11 @@
 import * as React from "react";
-import { prefix, connectEditorProps } from "../utils/utils";
+import { prefix, connectEditorContext } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import Icon from "../Icons/Icon";
 
-@connectEditorProps
-export default abstract class Tab extends React.PureComponent<{
-    editor: Editor,
-}> {
+@connectEditorContext
+export default abstract class Tab extends React.PureComponent {
     public static id: string;
     public static icon: typeof Icon;
     public abstract title: string;
@@ -35,4 +33,4 @@ export default abstract class Tab extends React.PureComponent<{
         });
     }
 }
-export default interface Tab extends React.PureComponent<{ editor: Editor }>, EditorInterface {};
+export default interface Tab extends EditorInterface {};

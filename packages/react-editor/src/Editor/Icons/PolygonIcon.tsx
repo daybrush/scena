@@ -1,5 +1,5 @@
 import * as React from "react";
-import Icon from "../Icons/Icon";
+import Icon from "./Icon";
 
 export default class PolygonIcon extends Icon {
     public static id = "Polygon";

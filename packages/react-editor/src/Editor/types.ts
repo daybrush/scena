@@ -8,6 +8,7 @@ import Editor from "./Editor";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import * as React from "react";
+import { EDITOR_PROPERTIES } from "./consts";
 
 export interface ScenaEditorState {
     selectedTargets: Array<SVGElement | HTMLElement>;
@@ -25,16 +26,9 @@ export interface TagAppendInfo {
 }
 
 
-export interface EditorInterface {
-    editor: Editor;
-    memory: Memory;
-    eventBus: EventBus;
-    moveableData: MoveableData;
-    keyManager: KeyManager;
-    historyManager: HistoryManager;
-    console: Debugger;
-    moveableManager: React.RefObject<MoveableManager>;
-}
+export type EditorInterface = {
+    [key in (typeof EDITOR_PROPERTIES)[number]]: Editor[key];
+};
 
 export interface Clipboard {
     write(items: ClipboardItem[]): Promise<void>;

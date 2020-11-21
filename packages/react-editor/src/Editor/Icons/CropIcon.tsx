@@ -1,5 +1,5 @@
 import * as React from "react";
-import Icon from "../Icons/Icon";
+import Icon from "./Icon";
 import { splitBracket } from "@daybrush/utils";
 import OvalIcon from "./OvalIcon";
 import RectIcon from "./RectIcon";

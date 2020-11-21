@@ -16,7 +16,7 @@ import KeyManager from "./KeyManager/KeyManager";
 import { ScenaEditorState, SavedScenaData, ScenaJSXElement, ElementInfo, MovedResult, MovedInfo, FrameInfo } from "./types";
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
-import { DATA_SCENA_ELEMENT_ID, EDITOR_CSS } from "./consts";
+import { DATA_SCENA_ELEMENT_ID, EditorContext, EDITOR_CSS } from "./consts";
 import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
 import { getAccurateAgent } from "@egjs/agent";
@@ -97,6 +97,11 @@ export default class Editor extends React.PureComponent<{
     public editorElement = React.createRef<StyledElement<HTMLDivElement>>();
 
     public render() {
+        return <EditorContext.Provider value={this}>
+            {this.renderChildren()}
+        </EditorContext.Provider>;
+    }
+    public renderChildren() {
         const {
             horizontalGuides,
             verticalGuides,
@@ -126,8 +131,8 @@ export default class Editor extends React.PureComponent<{
         }
         return (
             <EditorElement className={prefix("editor")} ref={this.editorElement}>
-                <Tabs ref={tabs} editor={this}></Tabs>
-                <Menu ref={menu} editor={this} onSelect={this.onMenuChange} />
+                <Tabs ref={tabs}></Tabs>
+                <Menu ref={menu} onSelect={this.onMenuChange} />
                 <div className={prefix("reset")} onClick={e => {
                     infiniteViewer.current!.scrollCenter();
                 }}></div>
@@ -214,7 +219,6 @@ export default class Editor extends React.PureComponent<{
                             selectedMenu={selectedMenu}
                             verticalGuidelines={verticalSnapGuides}
                             horizontalGuidelines={horizontalSnapGuides}
-                            editor={this}
                             zoom={zoom}
                         ></MoveableManager>
                     </Viewport>
@@ -384,6 +388,12 @@ export default class Editor extends React.PureComponent<{
                 resolve();
             });
         });
+    }
+    public getSelecto() {
+        return this.selecto.current!;
+    }
+    public getViewport() {
+        return this.viewport.current!;
     }
     public getSelectedTargets() {
         return this.state.selectedTargets;
@@ -621,9 +631,6 @@ export default class Editor extends React.PureComponent<{
                 children: info.children!.map(saveTarget),
             };
         });
-    }
-    public getViewport() {
-        return this.viewport.current!;
     }
     public getViewportInfos() {
         return this.getViewport().getViewportInfos();

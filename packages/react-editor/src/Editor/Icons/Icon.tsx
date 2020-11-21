@@ -1,9 +1,9 @@
 import * as React from "react";
-import { prefix, connectEditorProps } from "../utils/utils";
+import { connectEditorContext, prefix } from "../utils/utils";
 import { IObject, camelize } from "@daybrush/utils";
 import Memory from "../utils/Memory";
-import Editor from "../Editor";
 import { EditorInterface } from "../types";
+import Editor from "../index.umd";
 
 
 export interface Maker {
@@ -12,9 +12,8 @@ export interface Maker {
     style: IObject<any>,
 }
 
-@connectEditorProps
+@connectEditorContext
 export default abstract class Icon extends React.PureComponent<{
-    editor: Editor,
     selected?: boolean,
     onSelect?: (id: string) => any;
 }> {
@@ -56,7 +55,7 @@ export default abstract class Icon extends React.PureComponent<{
         return <div key={id} className={prefix("icon", "sub-icon", isSelect ? "selected" : "")} onClick={() => {
             this.onSubSelect!(id);
         }}>
-            <IconClass editor={this.props.editor} selected={false} />
+            <IconClass selected={false} />
             <div className={prefix("sub-icon-label")}>
                 {camelize(` ${id}`)}
             </div>
@@ -97,6 +96,7 @@ export default abstract class Icon extends React.PureComponent<{
     }
     public onSubSelect(id: string) { }
     public componentDidMount() {
+        this.context;
         const keys = this.keys;
         if (keys.length) {
             this.keyManager.keydown(keys, e => {
@@ -109,4 +109,6 @@ export default abstract class Icon extends React.PureComponent<{
     }
 }
 
-export default interface Icon extends EditorInterface {}
+export default interface Icon extends EditorInterface {
+    context: Editor;
+}

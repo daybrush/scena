@@ -1,6 +1,6 @@
 import * as React from "react";
 import Moveable, { MoveableManagerInterface } from "react-moveable";
-import { getContentElement, connectEditorProps, getId } from "../utils/utils";
+import { getContentElement, connectEditorContext, getId } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import { IObject } from "@daybrush/utils";
@@ -82,9 +82,8 @@ const DimensionViewable = {
         </div>
     }
 }
-@connectEditorProps
+@connectEditorContext
 export default class MoveableManager extends React.PureComponent<{
-    editor: Editor,
     selectedTargets: Array<HTMLElement | SVGElement>;
     selectedMenu: string,
     verticalGuidelines: number[],
@@ -97,7 +96,6 @@ export default class MoveableManager extends React.PureComponent<{
     }
     public render() {
         const {
-            editor,
             verticalGuidelines,
             horizontalGuidelines,
             selectedTargets,
@@ -109,17 +107,12 @@ export default class MoveableManager extends React.PureComponent<{
         if (!selectedTargets.length) {
             return this.renderViewportMoveable();
         }
-        const {
-            moveableData,
-            keyManager,
-            eventBus,
-            selecto,
-            memory,
-        } = editor;
+        const moveableData = this.moveableData;
+        const memory = this.memory;
         const elementGuidelines = [...moveableData.getTargets()].filter(el => {
             return selectedTargets.indexOf(el) === -1;
         });
-        const isShift = keyManager.shiftKey;
+        const isShift = this.keyManager.shiftKey;
 
         return <Moveable<DimensionViewableProps>
             ables={[DimensionViewable]}
@@ -184,7 +177,7 @@ export default class MoveableManager extends React.PureComponent<{
             onClick={e => {
                 const target = e.inputTarget as any;
                 if (e.isDouble && target.isContentEditable) {
-                    editor.selectMenu("Text");
+                    this.selectMenu("Text");
                     const el = getContentElement(target);
 
                     if (el) {
@@ -193,17 +186,17 @@ export default class MoveableManager extends React.PureComponent<{
                 }
             }}
             onClickGroup={e => {
-                selecto.current!.clickTarget(e.inputEvent, e.inputTarget);
+                this.getSelecto().clickTarget(e.inputEvent, e.inputTarget);
             }}
             onRenderStart={e => {
                 e.datas.prevData = moveableData.getFrame(e.target).get();
             }}
             onRender={e => {
                 e.datas.isRender = true;
-                eventBus.requestTrigger("render");
+                this.eventBus.requestTrigger("render");
             }}
             onRenderEnd={e => {
-                eventBus.requestTrigger("render");
+                this.eventBus.requestTrigger("render");
 
                 if (!e.datas.isRender) {
                     return;
@@ -218,11 +211,11 @@ export default class MoveableManager extends React.PureComponent<{
                 e.datas.prevDatas = e.targets.map(target => moveableData.getFrame(target).get());
             }}
             onRenderGroup={e => {
-                eventBus.requestTrigger("renderGroup", e);
+                this.eventBus.requestTrigger("renderGroup", e);
                 e.datas.isRender = true;
             }}
             onRenderGroupEnd={e => {
-                eventBus.requestTrigger("renderGroup", e);
+                this.eventBus.requestTrigger("renderGroup", e);
 
                 if (!e.datas.isRender) {
                     return;
@@ -243,7 +236,7 @@ export default class MoveableManager extends React.PureComponent<{
     }
     public renderViewportMoveable() {
         const moveableData = this.moveableData;
-        const viewport = this.editor.getViewport();
+        const viewport = this.getViewport();
         const target = viewport ? viewport.viewportRef.current! : null;
 
         return <Moveable

@@ -25,7 +25,7 @@ export function connectContext(context: React.Context<any>, properties: readonly
     return function (Component: any) {
         const prototype = Component.prototype;
 
-        Component.context = context;
+        Component.contextType = context;
 
         properties.forEach(name => {
             Object.defineProperty(prototype, name, {
