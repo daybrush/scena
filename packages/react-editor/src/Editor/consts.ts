@@ -1,4 +1,10 @@
-export const EDITOR_PROPERTIES = ["memory", "eventBus", "keyManager", "moveableData", "moveableManager", "historyManager", "console"];
+import { createContext } from "react";
+import Editor from "./Editor";
+
+export const EDITOR_PROPERTIES = [
+    "memory", "eventBus", "keyManager", "moveableData",
+    "moveableManager", "historyManager", "console",
+] as const;
 export const PREFIX = "scena-";
 export const DATA_SCENA_ELEMENT_ID = "data-scena-element-id";
 export const DATA_SCENA_ELEMENT = "data-scena-element";
@@ -281,3 +287,5 @@ export const EDITOR_CSS = `
     margin-top: 2px;
 }
 `;
+
+export const EditorContext = createContext<{ editor: Editor | null }>({ editor: null });

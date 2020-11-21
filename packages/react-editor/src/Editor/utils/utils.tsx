@@ -1,11 +1,13 @@
 import { prefixNames } from "framework-utils";
-import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
+import { PREFIX, DATA_SCENA_ELEMENT_ID, EditorContext } from "../consts";
 import { EDITOR_PROPERTIES } from "../consts";
 import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo } from "../types";
 import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
 import { getElementInfo } from "react-moveable";
 import { fromTranslation, matrix3d } from "@scena/matrix";
+import React from "react";
+import { ConnectContext } from "../components/ConnectContext";
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -20,6 +22,23 @@ export function getContentElement(el: HTMLElement): HTMLElement | null {
     return null;
 }
 
+export function connectEditorContext(Component: any) {
+    const prototype = Component.prototype;
+
+    EDITOR_PROPERTIES.forEach(name => {
+        Object.defineProperty(prototype, name, {
+            get: function () {
+                return this.props.editor[name];
+            },
+        });
+    });
+
+    return React.forwardRef((props, ref) => {
+        return <ConnectContext context={EditorContext}>
+            <Component {...props} ref={ref}/>
+        </ConnectContext>;
+    });
+};
 export function connectEditorProps(component: any) {
     const prototype = component.prototype;
     Object.defineProperty(prototype, "editor", {
