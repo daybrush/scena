@@ -8,7 +8,6 @@ import RectIcon from "../Icons/RectIcon";
 import OvalIcon from "../Icons/OvalIcon";
 import RoundRectIcon from "../Icons/RoundRectIcon";
 import KeyboardIcon from "../Icons/KeyboardIcon";
-import Editor from "../Editor";
 import styled from "react-css-styled";
 
 const MenuElement = styled("div", `

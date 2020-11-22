@@ -1,8 +1,9 @@
 import * as React from "react";
-import { prefix, connectEditorContext } from "../utils/utils";
+import { prefix } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import Icon from "../Icons/Icon";
+import { connectEditorContext } from "../decorators/ConnectEditorContext";
 
 @connectEditorContext
 export default abstract class Tab extends React.PureComponent {
@@ -33,4 +34,6 @@ export default abstract class Tab extends React.PureComponent {
         });
     }
 }
-export default interface Tab extends EditorInterface {};
+export default interface Tab extends EditorInterface {
+    context: Editor;
+};

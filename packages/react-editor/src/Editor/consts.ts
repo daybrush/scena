@@ -11,7 +11,10 @@ export const EDITOR_PROPERTIES = [
     "console",
     "getViewport",
     "getSelecto",
+    "getEditorElement",
+    "getSelectedTargets",
     "selectMenu",
+    "getSelectedFrames",
 ] as const;
 export const PREFIX = "scena-";
 export const DATA_SCENA_ELEMENT_ID = "data-scena-element-id";

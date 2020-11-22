@@ -1,8 +1,8 @@
 import * as React from "react";
-import { prefix, connectEditorContext } from "../utils/utils";
-import Editor from "../Editor";
+import { prefix } from "../utils/utils";
 import { EditorInterface } from "../types";
 import KeyManager from "../KeyManager/KeyManager";
+import { connectEditorContext } from "../decorators/ConnectEditorContext";
 
 @connectEditorContext
 export default class Popup extends React.PureComponent<{

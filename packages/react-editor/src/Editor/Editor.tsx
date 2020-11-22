@@ -272,6 +272,7 @@ export default class Editor extends React.PureComponent<{
                         infiniteViewer.current!.scrollBy(direction[0] * 10, direction[1] * 10);
                     }}
                     onSelectEnd={({ isDragStart, selected, inputEvent, rect }) => {
+                        console.log(selected);
                         if (isDragStart) {
                             inputEvent.preventDefault();
                         }
@@ -389,14 +390,23 @@ export default class Editor extends React.PureComponent<{
             });
         });
     }
-    public getSelecto() {
+    public getSelecto = () => {
         return this.selecto.current!;
     }
-    public getViewport() {
+    public getViewport = () => {
         return this.viewport.current!;
     }
-    public getSelectedTargets() {
+    public getEditorElement = () => {
+        return this.editorElement.current!.getElement();
+    }
+    public getMoveable = () => {
+        return this.moveableManager.current!.getMoveable();
+    }
+    public getSelectedTargets = () => {
         return this.state.selectedTargets;
+    }
+    public getSelectedFrames = () => {
+        return this.moveableData.getSelectedFrames();
     }
     public setSelectedTargets(targets: Array<HTMLElement | SVGElement>, isRestore?: boolean) {
         targets = targets.filter(target => {
@@ -449,49 +459,9 @@ export default class Editor extends React.PureComponent<{
             return this.appendComplete(added, isRestore);
         });
     }
-    public appendComplete(infos: ElementInfo[], isRestore?: boolean) {
-        !isRestore && this.historyManager.addAction("createElements", {
-            infos,
-            prevSelected: getIds(this.getSelectedTargets()),
-        });
-        const data = this.moveableData;
-        const container = this.getViewport().viewportRef.current!;
-        const targets = infos.map(function registerFrame(info) {
-            const frame = data.createFrame(info.el!, info.frame);
 
-            if (info.frameOrder) {
-                frame.setOrderObject(info.frameOrder);
-            }
-            data.render(info.el!);
-
-            info.children!.forEach(registerFrame);
-            return info.el!;
-        }).filter(el => el);
-        infos.forEach(info => {
-            if (!info.moveMatrix) {
-                return;
-            }
-            const frame = data.getFrame(info.el!);
-            let nextMatrix = getOffsetOriginMatrix(info.el!, container);
-
-            nextMatrix = invert(nextMatrix, 4);
-
-            const moveMatrix = matrix3d(nextMatrix, info.moveMatrix);
-
-            setMoveMatrix(frame, moveMatrix);
-            data.render(info.el!);
-        });
-        return Promise.all(targets.map(target => checkImageLoaded(target))).then(() => {
-            this.setSelectedTargets(targets, true);
-
-            return targets;
-        });
-    }
     public removeByIds(ids: string[], isRestore?: boolean) {
         return this.removeElements(this.getViewport().getElements(ids), isRestore);
-    }
-    public getMoveable() {
-        return this.moveableManager.current!.getMoveable();
     }
     public removeFrames(targets: Array<HTMLElement | SVGElement>) {
         const frameMap: IObject<any> = {};
@@ -584,7 +554,7 @@ export default class Editor extends React.PureComponent<{
         }
         this.eventBus.requestTrigger("render");
     }
-    public selectMenu(menu: string) {
+    public selectMenu = (menu: string) => {
         this.menu.current!.select(menu);
     }
     public loadDatas(datas: SavedScenaData[]) {
@@ -762,6 +732,44 @@ export default class Editor extends React.PureComponent<{
         const frameMap = this.removeFrames(targets);
         this.getViewport().moveOutside(targets[0]).then(result => this.moveComplete(result, frameMap));
 
+    }
+    private appendComplete(infos: ElementInfo[], isRestore?: boolean) {
+        !isRestore && this.historyManager.addAction("createElements", {
+            infos,
+            prevSelected: getIds(this.getSelectedTargets()),
+        });
+        const data = this.moveableData;
+        const container = this.getViewport().viewportRef.current!;
+        const targets = infos.map(function registerFrame(info) {
+            const frame = data.createFrame(info.el!, info.frame);
+
+            if (info.frameOrder) {
+                frame.setOrderObject(info.frameOrder);
+            }
+            data.render(info.el!);
+
+            info.children!.forEach(registerFrame);
+            return info.el!;
+        }).filter(el => el);
+        infos.forEach(info => {
+            if (!info.moveMatrix) {
+                return;
+            }
+            const frame = data.getFrame(info.el!);
+            let nextMatrix = getOffsetOriginMatrix(info.el!, container);
+
+            nextMatrix = invert(nextMatrix, 4);
+
+            const moveMatrix = matrix3d(nextMatrix, info.moveMatrix);
+
+            setMoveMatrix(frame, moveMatrix);
+            data.render(info.el!);
+        });
+        return Promise.all(targets.map(target => checkImageLoaded(target))).then(() => {
+            this.setSelectedTargets(targets, true);
+
+            return targets;
+        });
     }
     private moveComplete(result: MovedResult, frameMap: IObject<any>, isRestore?: boolean) {
         this.console.log("Move", result);

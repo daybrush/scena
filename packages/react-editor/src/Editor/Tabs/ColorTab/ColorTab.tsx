@@ -12,7 +12,7 @@ export default class ColorTab extends Tab {
     public title = "Colors";
 
     public renderTab() {
-        const frames = this.moveableData.getSelectedFrames();
+        const frames = this.getSelectedFrames();
         let backgroundColor = this.memory.get("background-color");
         let color = this.memory.get("color");
 
@@ -45,11 +45,11 @@ export default class ColorTab extends Tab {
     }
     public onChangeBackgroundColor = (v: string) => {
         this.memory.set("background-color", v);
-        this.editor.setProperty(["background-color"], v);
+        this.context.setProperty(["background-color"], v);
     }
     public onChangeTextColor = (v: string) => {
         this.memory.set("color", v);
-        this.editor.setProperty(["color"], v);
+        this.context.setProperty(["color"], v);
     }
     private onRender = () => {
         this.forceUpdate();

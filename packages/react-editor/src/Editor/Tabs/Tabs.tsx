@@ -7,7 +7,6 @@ import AlignTab from "./AlignTab/AlignTab";
 import LayerTab from "./LayerTab/LayerTab";
 import CurrentTab from "./ColorTab/ColorTab";
 import FontTab from "./FontTab/FontTab";
-import Editor from "../Editor";
 import styled, { StyledElement } from "react-css-styled";
 
 const TabsElement = styled("div", `

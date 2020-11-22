@@ -28,8 +28,7 @@ export default class ClipboardManager {
         document.execCommand("paste");
     }
     public copyImage() {
-        const moveableData = this.editor.moveableData;
-        const targets = moveableData.getSelectedTargets();
+        const targets = this.editor.getSelectedTargets();
         const moveable = this.editor.getMoveable();
         const length = targets.length;
         const moveables = length > 1 ? (moveable.moveable as MoveableGroup).moveables : [];
@@ -81,8 +80,7 @@ export default class ClipboardManager {
         e.preventDefault();
 
         const clipboardData = (e as any).clipboardData as DataTransfer;
-        const moveableData = this.editor.moveableData;
-        const targets = moveableData.getSelectedTargets();
+        const targets = this.editor.getSelectedTargets();
         const SavedScenaData = this.editor.saveTargets(targets);
 
         this.editor.console.log("copy scena data", SavedScenaData);

@@ -1,9 +1,10 @@
 import * as React from "react";
-import { connectEditorContext, prefix } from "../utils/utils";
+import { prefix } from "../utils/utils";
 import { IObject, camelize } from "@daybrush/utils";
 import Memory from "../utils/Memory";
 import { EditorInterface } from "../types";
 import Editor from "../index.umd";
+import { connectEditorContext } from "../decorators/ConnectEditorContext";
 
 
 export interface Maker {
@@ -96,7 +97,6 @@ export default abstract class Icon extends React.PureComponent<{
     }
     public onSubSelect(id: string) { }
     public componentDidMount() {
-        this.context;
         const keys = this.keys;
         if (keys.length) {
             this.keyManager.keydown(keys, e => {

@@ -28,7 +28,7 @@ export default class KeyboardIcon extends Icon {
         );
     }
     public renderPopup() {
-        return ReactDOM.createPortal(<Popup editor={this.editor} onClose={this.onClose}>
+        return ReactDOM.createPortal(<Popup onClose={this.onClose}>
             <h2>Shortcuts</h2>
             <ul className={prefix("key-list")}>
                 {this.keyManager.keylist.map(([keys, description]) => {
@@ -37,7 +37,7 @@ export default class KeyboardIcon extends Icon {
                     </li>
                 })}
             </ul>
-        </Popup>, this.editor.editorElement.current!.getElement());
+        </Popup>, this.getEditorElement());
     }
     public onClick = () => {
         this.setState({

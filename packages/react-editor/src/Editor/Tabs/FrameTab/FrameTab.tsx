@@ -21,7 +21,7 @@ export default class FrameTab extends Tab {
             selected,
         } = this.state;
 
-        const frame = this.moveableData.getSelectedFrames()[0];
+        const frame = this.getSelectedFrames()[0];
 
         if (!frame) {
             return;
@@ -49,7 +49,7 @@ export default class FrameTab extends Tab {
         this.addEvent("setSelectedTargets", this.setTargets as any);
     }
     private renderProperty = ({ name, fullId, scope }: File["props"]) => {
-        const frame = this.moveableData.getSelectedFrames()[0];
+        const frame = this.getSelectedFrames()[0];
 
         return <Property name={name} fullId={fullId} scope={scope} value={frame.get(...fullId.split("///"))} onChange={this.onChange}></Property>;
     }
@@ -60,7 +60,7 @@ export default class FrameTab extends Tab {
     }
     private onMove = (selectedInfos: Array<FileInfo<any>>, parentInfo?: FileInfo<any>, prevInfo?: FileInfo<any>) => {
         const parentScope = parentInfo ? [...parentInfo.scope, parentInfo.id] : [];
-        const frames = this.moveableData.getSelectedFrames();
+        const frames = this.getSelectedFrames();
         const frame = frames[0];
         const orders = (frame.getOrders(parentScope) || []).slice();
 
@@ -81,15 +81,15 @@ export default class FrameTab extends Tab {
         } else {
             orders.splice(0, 0, selectedProperty);
         }
-        this.editor.setOrders(parentScope, orders, true);
+        this.context.setOrders(parentScope, orders, true);
     }
     private onChange = (scope: string[], value: any) => {
-        const frames = this.moveableData.getSelectedFrames();
+        const frames = this.getSelectedFrames();
 
         if (!frames.length) {
             return;
         }
-        this.editor.setProperty(scope, value, true);
+        this.context.setProperty(scope, value, true);
     }
     private onRender = () => {
         this.forceUpdate();

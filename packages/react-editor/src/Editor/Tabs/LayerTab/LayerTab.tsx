@@ -14,8 +14,8 @@ export default class LayerTab extends Tab {
     public title = "Layers";
 
     public renderTab() {
-        const infos = this.editor.getViewportInfos();
-        const selected = getIds(this.moveableData.getSelectedTargets());
+        const infos = this.context.getViewportInfos();
+        const selected = getIds(this.getSelectedTargets());
 
         return <Folder<ElementInfo>
             scope={[]}
@@ -45,10 +45,10 @@ export default class LayerTab extends Tab {
         });
     }
     private onMove = (selectedInfos: Array<FileInfo<ElementInfo>>, parentInfo?: FileInfo<ElementInfo>, prevInfo?: FileInfo<ElementInfo>) => {
-        const editor = this.editor;
+        const editor = this.context;
         const viewport = editor.getViewport();
 
-        this.editor.moves(selectedInfos.map((info, i) => ({
+        editor.moves(selectedInfos.map((info, i) => ({
             info: info.value,
             parentInfo: viewport.getInfo(parentInfo ? parentInfo.fullId : "viewport"),
             prevInfo: i === 0

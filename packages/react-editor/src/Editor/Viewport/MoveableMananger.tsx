@@ -1,10 +1,11 @@
 import * as React from "react";
 import Moveable, { MoveableManagerInterface } from "react-moveable";
-import { getContentElement, connectEditorContext, getId } from "../utils/utils";
+import { getContentElement, getId } from "../utils/utils";
 import Editor from "../Editor";
 import { EditorInterface } from "../types";
 import { IObject } from "@daybrush/utils";
 import { diff } from "@egjs/list-differ";
+import { connectEditorContext } from "../decorators/ConnectEditorContext";
 
 function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, orders: any, editor: Editor) {
     const el = editor.viewport.current!.getElement(id);
@@ -176,6 +177,7 @@ export default class MoveableManager extends React.PureComponent<{
 
             onClick={e => {
                 const target = e.inputTarget as any;
+
                 if (e.isDouble && target.isContentEditable) {
                     this.selectMenu("Text");
                     const el = getContentElement(target);
@@ -183,6 +185,8 @@ export default class MoveableManager extends React.PureComponent<{
                     if (el) {
                         el.focus();
                     }
+                } else {
+                    this.getSelecto().clickTarget(e.inputEvent, e.inputTarget);
                 }
             }}
             onClickGroup={e => {

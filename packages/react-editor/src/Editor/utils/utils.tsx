@@ -1,13 +1,12 @@
 import { prefixNames } from "framework-utils";
-import { PREFIX, DATA_SCENA_ELEMENT_ID, EditorContext } from "../consts";
-import { EDITOR_PROPERTIES } from "../consts";
+import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo } from "../types";
 import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
 import { getElementInfo } from "react-moveable";
 import { fromTranslation, matrix3d } from "@scena/matrix";
 import React from "react";
-import { connectContext, ConnectContext } from "../components/ConnectContext";
+
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
@@ -21,8 +20,6 @@ export function getContentElement(el: HTMLElement): HTMLElement | null {
     }
     return null;
 }
-
-export const connectEditorContext = connectContext(EditorContext, EDITOR_PROPERTIES);
 
 export function between(val: number, min: number, max: number) {
     return Math.min(Math.max(min, val), max);

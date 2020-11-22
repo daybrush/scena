@@ -20,7 +20,7 @@ export default class CropIcon extends Icon {
         );
     }
     public renderSubIcons() {
-        const frame = this.moveableData.getSelectedFrames()[0];
+        const frame = this.getSelectedFrames()[0];
         let cropType = this.memory.get("crop") || "inset";
 
         if (frame) {
