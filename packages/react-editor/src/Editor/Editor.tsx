@@ -464,7 +464,10 @@ export default class Editor extends React.PureComponent<{
         return this.removeElements(this.getViewport().getElements(ids), isRestore);
     }
     public removeFrames(targets: Array<HTMLElement | SVGElement>) {
-        const frameMap: IObject<any> = {};
+        const frameMap: IObject<{
+            frame: IObject<any>;
+            frameOrder: IObject<any>;
+        }> = {};
         const moveableData = this.moveableData;
         const viewport = this.getViewport();
 
@@ -473,7 +476,7 @@ export default class Editor extends React.PureComponent<{
             const frame = moveableData.getFrame(target);
             frameMap[info.id!] = {
                 frame: frame.get(),
-                order: frame.getOrderObject(),
+                frameOrder: frame.getOrderObject(),
             };
             moveableData.removeFrame(target);
 
@@ -527,7 +530,7 @@ export default class Editor extends React.PureComponent<{
                     return {
                         ...info,
                         children: info.children!.map(removeTarget),
-                        frame: frameMap[info.id!] || info.frame,
+                        ...(frameMap[info.id!] || {}),
                     };
                 }),
             });

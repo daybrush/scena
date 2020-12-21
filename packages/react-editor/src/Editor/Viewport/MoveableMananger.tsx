@@ -6,6 +6,8 @@ import { EditorInterface } from "../types";
 import { IObject } from "@daybrush/utils";
 import { diff } from "@egjs/list-differ";
 import { connectEditorContext } from "../decorators/ConnectEditorContext";
+import { DimensionViewableProps, DimensionViewable } from "./ables/DimensionViewable";
+import { DelteButtonViewable, DelteButtonViewableProps } from "./ables/DeleteButtonViewable";
 
 function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, orders: any, editor: Editor) {
     const el = editor.viewport.current!.getElement(id);
@@ -59,30 +61,6 @@ function redoRenders({ infos }: IObject<any>, editor: Editor) {
     editor.eventBus.trigger("render");
 }
 
-export interface DimensionViewableProps {
-    dimensionViewable?: boolean;
-}
-const DimensionViewable = {
-    name: "dimensionViewable",
-    props: {
-        dimensionViewable: Boolean,
-    },
-    events: {},
-    render(moveable: MoveableManagerInterface) {
-        const zoom = moveable.props.zoom;
-        const { left, top } = moveable.state;
-
-        const rect = moveable.getRect();
-
-        return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
-            left: `${rect.left + rect.width / 2 - left}px`,
-            top: `${rect.top + rect.height  - top}px`,
-            transform: `translate(-50%, ${20 * zoom!}px) scale(${zoom})`,
-        }}>
-            {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
-        </div>
-    }
-}
 @connectEditorContext
 export default class MoveableManager extends React.PureComponent<{
     selectedTargets: Array<HTMLElement | SVGElement>;
@@ -110,16 +88,19 @@ export default class MoveableManager extends React.PureComponent<{
         }
         const moveableData = this.moveableData;
         const memory = this.memory;
-        const elementGuidelines = [...moveableData.getTargets()].filter(el => {
-            return selectedTargets.indexOf(el) === -1;
-        });
+        const elementGuidelines = [document.querySelector(".scena-viewport")]; //[...moveableData.getTargets()].filter(el => {
+        //     return selectedTargets.indexOf(el) === -1;
+        // });
+
+        console.log(verticalGuidelines, horizontalGuidelines);
         const isShift = this.keyManager.shiftKey;
 
-        return <Moveable<DimensionViewableProps>
-            ables={[DimensionViewable]}
+        return <Moveable<DimensionViewableProps & DelteButtonViewableProps>
+            ables={[DimensionViewable, DelteButtonViewable]}
             ref={this.moveable}
             targets={selectedTargets}
             dimensionViewable={true}
+            deleteButtonViewable={true}
             draggable={true}
             resizable={true}
             pinchable={["rotatable"]}
@@ -137,7 +118,7 @@ export default class MoveableManager extends React.PureComponent<{
             roundable={true}
             verticalGuidelines={verticalGuidelines}
             horizontalGuidelines={horizontalGuidelines}
-            elementGuidelines={elementGuidelines}
+            elementGuidelines={elementGuidelines as any}
             clipArea={true}
             clipVerticalGuidelines={[0, "50%", "100%"]}
             clipHorizontalGuidelines={[0, "50%", "100%"]}
