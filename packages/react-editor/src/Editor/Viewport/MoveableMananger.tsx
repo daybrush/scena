@@ -88,11 +88,10 @@ export default class MoveableManager extends React.PureComponent<{
         }
         const moveableData = this.moveableData;
         const memory = this.memory;
-        const elementGuidelines = [document.querySelector(".scena-viewport")]; //[...moveableData.getTargets()].filter(el => {
-        //     return selectedTargets.indexOf(el) === -1;
-        // });
+        const elementGuidelines = [document.querySelector(".scena-viewport"), ...moveableData.getTargets()].filter(el => {
+            return selectedTargets.indexOf(el as any) === -1;
+        });
 
-        console.log(verticalGuidelines, horizontalGuidelines);
         const isShift = this.keyManager.shiftKey;
 
         return <Moveable<DimensionViewableProps & DelteButtonViewableProps>
@@ -115,6 +114,7 @@ export default class MoveableManager extends React.PureComponent<{
             snappable={true}
             snapCenter={true}
             snapGap={false}
+            isDisplayInnerSnapDigit={true}
             roundable={true}
             verticalGuidelines={verticalGuidelines}
             horizontalGuidelines={horizontalGuidelines}

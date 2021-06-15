@@ -62,8 +62,17 @@ export const EDITOR_CSS = `
     position: relative;
     width: 100%;
     height: 100%;
-    border: 1px solid #eee;
     box-sizing: border-box;
+}
+.scena-viewport:before {
+    content: "";
+    position: absolute;
+    border: 1px solid #eee;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
 .scena-guides {

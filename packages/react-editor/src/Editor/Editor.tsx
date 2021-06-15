@@ -122,8 +122,8 @@ export default class Editor extends React.PureComponent<{
             width,
             height,
         } = this.props;
-        const horizontalSnapGuides = [0, height, height / 2, ...state.horizontalGuides];
-        const verticalSnapGuides = [0, width, width / 2, ...state.verticalGuides];
+        const horizontalSnapGuides = state.horizontalGuides;
+        const verticalSnapGuides = state.verticalGuides;
         let unit = 50;
 
         if (zoom < 0.8) {
@@ -272,7 +272,6 @@ export default class Editor extends React.PureComponent<{
                         infiniteViewer.current!.scrollBy(direction[0] * 10, direction[1] * 10);
                     }}
                     onSelectEnd={({ isDragStart, selected, inputEvent, rect }) => {
-                        console.log(selected);
                         if (isDragStart) {
                             inputEvent.preventDefault();
                         }
@@ -384,7 +383,7 @@ export default class Editor extends React.PureComponent<{
         window.removeEventListener("resize", this.onResize);
     }
     public promiseState(state: Partial<ScenaEditorState>) {
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
             this.setState(state, () => {
                 resolve();
             });
