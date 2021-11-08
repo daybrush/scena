@@ -340,7 +340,11 @@ export default class Editor extends React.PureComponent<{
         this.keyManager.keyup(["backspace"], () => {
             this.removeElements(this.getSelectedTargets());
         }, "Delete");
-
+        // alias delete=backspace
+        this.keyManager.keyup(["delete"], () => {
+            this.removeElements(this.getSelectedTargets());
+        }, "Delete");
+        
         const agent = await getAccurateAgent()!;
         const isMacintosh = agent.os.name === "mac" || agent.os.name === "ios";
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
