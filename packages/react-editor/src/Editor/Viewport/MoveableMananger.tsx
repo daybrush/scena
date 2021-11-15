@@ -112,7 +112,8 @@ export default class MoveableManager extends React.PureComponent<{
             keepRatio={selectedTargets.length > 1 ? true : isShift}
             rotatable={true}
             snappable={true}
-            snapCenter={true}
+            snapDirections={{ top: true, left: true, right: true, center: true, middle: true }}
+            elementSnapDirections={{ top: true, left: true, right: true, center: true, middle: true }}
             snapGap={false}
             isDisplayInnerSnapDigit={true}
             roundable={true}
