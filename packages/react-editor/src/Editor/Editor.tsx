@@ -170,6 +170,7 @@ export default class Editor extends React.PureComponent<{
                     useForceWheel={true}
                     pinchThreshold={50}
                     zoom={zoom}
+                    wheelScale={0.0001}
                     onDragStart={e => {
                         const target = e.inputEvent.target;
                         this.checkBlur();
