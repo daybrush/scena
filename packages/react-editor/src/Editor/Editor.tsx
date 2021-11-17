@@ -169,6 +169,7 @@ export default class Editor extends React.PureComponent<{
                     usePinch={true}
                     useForceWheel={true}
                     pinchThreshold={50}
+                    maxPinchWheel={3}
                     zoom={zoom}
                     onDragStart={e => {
                         const target = e.inputEvent.target;
