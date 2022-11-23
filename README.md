@@ -2,8 +2,8 @@
 
 <h2 align="middle">Scena Studio</h2>
 <p align="middle"><a href="https://www.npmjs.com/package/scena" target="_blank"><img src="https://img.shields.io/npm/v/scena.svg?style=flat-square&color=007acc&label=version" alt="npm version" /></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square"/> <a href="https://github.com/daybrush/scena/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scena.svg?style=flat-square&label=license&color=08CE5D"/></a>
- <a href="https://github.com/daybrush/scena/tree/master/packages/react-scenejs-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=React&style=flat-square&color=61dafb"></a>
- <a href="https://github.com/daybrush/scena/tree/master/packages/preact-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=Preact&style=flat-square&color=673ab8"></a>
+ <a href="https://github.com/daybrush/scena/tree/master/packages/react-editor/README.md" target="_blank"><img alt="React" src="https://img.shields.io/static/v1.svg?label=&message=React&style=flat-square&color=61dafb"></a>
+
 </p>
 
 <p align="middle"><strong>Scena</strong> is a Editor project that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
