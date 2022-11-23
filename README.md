@@ -1,4 +1,4 @@
-<p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/scena/master/demo/images/editor.png" width="100%" style="max-width: 800px"/></p>
+<p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/scena/master/demo/images/logo.png" width="100%" style="max-width: 256px"/></p>
 
 <h2 align="middle">Scena Studio</h2>
 <p align="middle"><a href="https://www.npmjs.com/package/scena" target="_blank"><img src="https://img.shields.io/npm/v/scena.svg?style=flat-square&color=007acc&label=version" alt="npm version" /></a> <img src="https://img.shields.io/badge/language-typescript-blue.svg?style=flat-square"/> <a href="https://github.com/daybrush/scena/blob/master/LICENSE" target="_blank"><img src="https://img.shields.io/github/license/daybrush/scena.svg?style=flat-square&label=license&color=08CE5D"/></a>
@@ -8,8 +8,11 @@
 
 <p align="middle"><strong>Scena</strong> is a Editor project that represents the timeline of <a href="https://github.com/daybrush/scenejs"><strong>Scene.js</strong></a><br/>You can control time, properties, and items.</p>
 
+<p align="middle" ><img src="https://raw.githubusercontent.com/daybrush/scena/master/demo/images/editor.png" width="100%" style="max-width: 800px"/></p>
 
-### Related Projects
+<h3 align="middle">(Test Image)</h3>
+
+### Scena Components
 ||||
 |:---:|:---:|:---:|
 |<a href="https://github.com/daybrush/scenejs" target="_blank"><img src="https://daybrush.com/scenejs/images/clapperboard.png" width="250" alt="scenejs" /></a>|<a href="https://github.com/daybrush/moveable" target="_blank"><img src ="https://daybrush.com/moveable/images/256x256.png" width="250" alt="Moveable" /></a>|<a href="https://github.com/daybrush/selecto" target="_blank"><img src ="https://daybrush.com/selecto/images/256x256.png" width="250" alt="Selecto" /></a>|
@@ -52,11 +55,20 @@ Please give a ⭐️ if this project helped you!
 
 ## 👏 Contributing
 
-If you have any questions or requests or want to contribute to `scenejs-editor` or other packages, please write the [issue](https://github.com/daybrush/scena/issues) or give me a Pull Request freely.
+If you have any questions or requests or want to contribute to `scena` or other packages, please write the [issue](https://github.com/daybrush/scena/issues) or give me a Pull Request freely.
 
 ## 🐞 Bug Report
 
 If you find a bug, please report to us opening a new [Issue](https://github.com/daybrush/scena/issues) on GitHub.
+
+
+
+## Sponsors
+<p align="center">
+	<a href="https://daybrush.com/sponsors/sponsors.svg">
+		<img src="https://daybrush.com/sponsors/sponsors.svg"/>
+	</a>
+</p>
 
 
 ## 📝 License
