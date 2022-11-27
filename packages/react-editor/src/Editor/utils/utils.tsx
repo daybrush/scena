@@ -41,7 +41,7 @@ export function checkImageLoaded(el: HTMLElement | SVGElement): Promise<any> {
     if (el.tagName.toLowerCase() !== "img") {
         return Promise.all([].slice.call(el.querySelectorAll("img")).map(el => checkImageLoaded(el)));
     }
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
         if ((el as HTMLImageElement).complete) {
             resolve();
         } else {

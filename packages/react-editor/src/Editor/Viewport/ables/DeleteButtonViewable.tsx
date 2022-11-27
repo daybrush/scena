@@ -3,10 +3,10 @@ import { MoveableManagerInterface, Renderer } from "react-moveable";
 import { EditorContext } from "../../consts";
 import Editor from "../../Editor";
 
-export interface DelteButtonViewableProps {
+export interface DeleteButtonViewableProps {
     deleteButtonViewable?: boolean;
 }
-export const DelteButtonViewable = {
+export const DeleteButtonViewable = {
     name: "deleteButtonViewable",
     props: {
         deleteButtonViewable: Boolean,

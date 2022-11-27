@@ -11,14 +11,14 @@
     "@testing-library/user-event": "^7.2.1",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.47",
-    "@types/react": "^16.9.38",
-    "@types/react-dom": "^16.9.8",
+    "@types/react": "^17",
+    "@types/react-dom": "^17",
     "gh-pages": "^3.1.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
+    "react": "^17",
+    "react-dom": "^17",
+    "react-scripts": "^4",
     "rollup": "^2.26.9",
-    "typescript": "^3.7.5"
+    "typescript": "^4.5.0 <4.6.0"
   },
   "repository": {
     "type": "git",

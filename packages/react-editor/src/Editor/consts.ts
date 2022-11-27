@@ -37,8 +37,7 @@ export const EDITOR_CSS = `
     --back6: #666;
     transform-style: preserve-3d;
 
-    --menu: 45px;
-
+    --menu-size: 45px;
     --tabs: 40px;
     --tab: 200px;
 }
@@ -49,10 +48,10 @@ export const EDITOR_CSS = `
 
 .scena-viewer {
     position: absolute !important;
-    left: calc(30px + var(--menu));
-    top: 30px;
-    width: calc(100% - 30px - var(--menu) - var(--tabs));
-    height: calc(100% - 30px);
+    left: 30px;
+    top: calc(30px + var(--menu-size));
+    width: calc(100% - 30px - var(--tabs));
+    height: calc(100% - 30px - var(--menu-size));
 }
 
 .scena-viewport-container {
@@ -75,23 +74,22 @@ export const EDITOR_CSS = `
     pointer-events: none;
 }
 
-.scena-guides {
+.scena-manager {
     position: absolute !important;
-    top: 0;
+    top: var(--menu-size);
     left: 0;
     transform: translateZ(1px);
 }
 
-.scena-guides.scena-horizontal {
-    left: calc(var(--menu) + 30px);
-    width: calc(100% - 30px - var(--menu) - var(--tabs));
+.scena-manager.scena-horizontal {
+    left: 30px;
+    width: calc(100% - 30px - var(--tabs));
     height: 30px !important;
 }
 
-.scena-guides.scena-vertical {
-    top: 30px;
-    left: var(--menu);
-    height: calc(100% - 30px);
+.scena-manager.scena-vertical {
+    top: calc(30px + var(--menu-size));
+    height: calc(100% - 30px - var(--menu-size));
     width: 30px !important;
 }
 
@@ -105,8 +103,8 @@ export const EDITOR_CSS = `
     border-bottom: 1px solid var(--back4);
     box-sizing: border-box;
     cursor: pointer;
-    left: var(--menu);
-    top: 0px;
+    left: 0;
+    top: var(--menu-size);
 }
 
 .scena-overlay {

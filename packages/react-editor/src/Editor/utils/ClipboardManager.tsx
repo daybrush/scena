@@ -2,7 +2,7 @@ import * as React from "react";
 import { ClipboardItem, SavedScenaData } from "../types";
 import Editor from "../Editor";
 import { checkInput } from "./utils";
-import html2canvas from "html2canvas";
+// import html2canvas from "html2canvas";
 import { TYPE_SCENA_LAYERS } from "../consts";
 import MoveableGroup from "react-moveable/declaration/MoveableGroup";
 
@@ -33,35 +33,35 @@ export default class ClipboardManager {
         const length = targets.length;
         const moveables = length > 1 ? (moveable.moveable as MoveableGroup).moveables : [];
 
-        return new Promise(resolve => {
-            Promise.all(targets.map(target => html2canvas(target as HTMLElement))).then(images => {
-                let imageCanvas: HTMLCanvasElement;
-                if (length > 1) {
-                    const parentRect = moveable.getRect();
-                    const canvas = document.createElement("canvas");
-                    canvas.width = parentRect.width;
-                    canvas.height = parentRect.height;
-                    const context = canvas.getContext("2d")!;
-                    const rects = moveables.map(m => m.getRect());
+        // return new Promise(resolve => {
+        //     Promise.all(targets.map(target => html2canvas(target as HTMLElement))).then(images => {
+        //         let imageCanvas: HTMLCanvasElement;
+        //         if (length > 1) {
+        //             const parentRect = moveable.getRect();
+        //             const canvas = document.createElement("canvas");
+        //             canvas.width = parentRect.width;
+        //             canvas.height = parentRect.height;
+        //             const context = canvas.getContext("2d")!;
+        //             const rects = moveables.map(m => m.getRect());
 
-                    rects.forEach((rect, i) => {
-                        context.drawImage(images[i], rect.left - parentRect.left, rect.top - parentRect.top);
-                    });
+        //             rects.forEach((rect, i) => {
+        //                 context.drawImage(images[i], rect.left - parentRect.left, rect.top - parentRect.top);
+        //             });
 
-                    imageCanvas = canvas;
-                } else {
-                    imageCanvas = images[0];
-                }
-                imageCanvas.toBlob(blob => {
-                    (navigator.clipboard as any).write([
-                        new (window as any).ClipboardItem({
-                            "image/png": blob,
-                        }),
-                    ]);
-                    resolve();
-                });
-            });
-        });
+        //             imageCanvas = canvas;
+        //         } else {
+        //             imageCanvas = images[0];
+        //         }
+        //         imageCanvas.toBlob(blob => {
+        //             (navigator.clipboard as any).write([
+        //                 new (window as any).ClipboardItem({
+        //                     "image/png": blob,
+        //                 }),
+        //             ]);
+        //             resolve();
+        //         });
+        //     });
+        // });
     }
     private onCut = (e: any) => {
         const copied = this.onCopy(e);

@@ -14,7 +14,8 @@ const TabsElement = styled("div", `
     position: absolute;
     right: 0;
     width: 40px;
-    height: 100%;
+    top: var(--menu-size);
+    bottom: 0;
     background: var(--back2);
     z-index: 10;
     transform: translateZ(10px);

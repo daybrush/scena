@@ -53,7 +53,7 @@ export default abstract class Icon extends React.PureComponent<{
         return [];
     }
     public renderSubIcon(IconClass: typeof Icon, id: string, isSelect: boolean) {
-        return <div key={id} className={prefix("icon", "sub-icon", isSelect ? "selected" : "")} onClick={() => {
+        return <div key={id} className={prefix("sub-icon", isSelect ? "selected" : "")} onClick={() => {
             this.onSubSelect!(id);
         }}>
             <IconClass selected={false} />

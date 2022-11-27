@@ -20,7 +20,7 @@ import { DATA_SCENA_ELEMENT_ID, EditorContext, EDITOR_CSS } from "./consts";
 // import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
 import { getAccurateAgent } from "@egjs/agent";
-import { invert, matrix3d,  } from "@scena/matrix";
+import { invert, matrix3d, } from "@scena/matrix";
 import { getElementInfo } from "react-moveable";
 
 
@@ -136,8 +136,9 @@ export default class Editor extends React.PureComponent<{
                 <div className={prefix("reset")} onClick={e => {
                     infiniteViewer.current!.scrollCenter();
                 }}></div>
-                <Guides ref={horizontalGuides}
-                    type="horizontal" className={prefix("guides", "horizontal")} style={{}}
+                <Guides
+                    ref={horizontalGuides}
+                    type="horizontal"
                     snapThreshold={5}
                     snaps={horizontalSnapGuides}
                     displayDragPos={true}
@@ -150,8 +151,9 @@ export default class Editor extends React.PureComponent<{
                         });
                     }}
                 ></Guides>
-                <Guides ref={verticalGuides}
-                    type="vertical" className={prefix("guides", "vertical")} style={{}}
+                <Guides
+                    ref={verticalGuides}
+                    type="vertical"
                     snapThreshold={5}
                     snaps={verticalSnapGuides}
                     displayDragPos={true}
@@ -164,13 +166,15 @@ export default class Editor extends React.PureComponent<{
                         });
                     }}
                 ></Guides>
-                <InfiniteViewer ref={infiniteViewer}
+                <InfiniteViewer
+                    ref={infiniteViewer}
                     className={prefix("viewer")}
                     usePinch={true}
+                    useAutoZoom={true}
+                    useWheelScroll={true}
                     useForceWheel={true}
                     pinchThreshold={50}
                     maxPinchWheel={3}
-                    zoom={zoom}
                     onDragStart={e => {
                         const target = e.inputEvent.target;
                         this.checkBlur();

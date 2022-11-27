@@ -7,7 +7,7 @@ import { IObject } from "@daybrush/utils";
 import { diff } from "@egjs/list-differ";
 import { connectEditorContext } from "../decorators/ConnectEditorContext";
 import { DimensionViewableProps, DimensionViewable } from "./ables/DimensionViewable";
-import { DelteButtonViewable, DelteButtonViewableProps } from "./ables/DeleteButtonViewable";
+import { DeleteButtonViewable, DeleteButtonViewableProps } from "./ables/DeleteButtonViewable";
 
 function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, orders: any, editor: Editor) {
     const el = editor.viewport.current!.getElement(id);
@@ -94,12 +94,12 @@ export default class MoveableManager extends React.PureComponent<{
 
         const isShift = this.keyManager.shiftKey;
 
-        return <Moveable<DimensionViewableProps & DelteButtonViewableProps>
-            ables={[DimensionViewable, DelteButtonViewable]}
+        return <Moveable<DimensionViewableProps & DeleteButtonViewableProps>
+            ables={[DimensionViewable, DeleteButtonViewable]}
             ref={this.moveable}
             targets={selectedTargets}
             dimensionViewable={true}
-            deleteButtonViewable={true}
+            deleteButtonViewable={false}
             draggable={true}
             resizable={true}
             pinchable={["rotatable"]}
@@ -116,7 +116,11 @@ export default class MoveableManager extends React.PureComponent<{
             elementSnapDirections={{ top: true, left: true, right: true, center: true, middle: true }}
             snapGap={false}
             isDisplayInnerSnapDigit={true}
-            roundable={true}
+            roundable={false}
+            isDisplayShadowRoundControls={true}
+            roundPadding={10}
+            roundClickable={true}
+
             verticalGuidelines={verticalGuidelines}
             horizontalGuidelines={horizontalGuidelines}
             elementGuidelines={elementGuidelines as any}
@@ -124,39 +128,7 @@ export default class MoveableManager extends React.PureComponent<{
             clipVerticalGuidelines={[0, "50%", "100%"]}
             clipHorizontalGuidelines={[0, "50%", "100%"]}
             clipTargetBounds={true}
-
-            onBeforeRenderStart={moveableData.onBeforeRenderStart}
-            onBeforeRenderGroupStart={moveableData.onBeforeRenderGroupStart}
-            onDragStart={moveableData.onDragStart}
-            onDrag={moveableData.onDrag}
-            onDragGroupStart={moveableData.onDragGroupStart}
-            onDragGroup={moveableData.onDragGroup}
-
-            onScaleStart={moveableData.onScaleStart}
-            onScale={moveableData.onScale}
-            onScaleGroupStart={moveableData.onScaleGroupStart}
-            onScaleGroup={moveableData.onScaleGroup}
-
-            onResizeStart={moveableData.onResizeStart}
-            onResize={moveableData.onResize}
-            onResizeGroupStart={moveableData.onResizeGroupStart}
-            onResizeGroup={moveableData.onResizeGroup}
-
-            onRotateStart={moveableData.onRotateStart}
-            onRotate={moveableData.onRotate}
-            onRotateGroupStart={moveableData.onRotateGroupStart}
-            onRotateGroup={moveableData.onRotateGroup}
-
             defaultClipPath={memory.get("crop") || "inset"}
-            onClip={moveableData.onClip}
-
-            onDragOriginStart={moveableData.onDragOriginStart}
-            onDragOrigin={e => {
-                moveableData.onDragOrigin(e);
-            }}
-
-            onRound={moveableData.onRound}
-
             onClick={e => {
                 const target = e.inputTarget as any;
 
@@ -179,6 +151,7 @@ export default class MoveableManager extends React.PureComponent<{
             }}
             onRender={e => {
                 e.datas.isRender = true;
+                e.target.style.cssText += e.cssText;
                 this.eventBus.requestTrigger("render");
             }}
             onRenderEnd={e => {
@@ -197,8 +170,12 @@ export default class MoveableManager extends React.PureComponent<{
                 e.datas.prevDatas = e.targets.map(target => moveableData.getFrame(target).get());
             }}
             onRenderGroup={e => {
-                this.eventBus.requestTrigger("renderGroup", e);
                 e.datas.isRender = true;
+
+                e.events.forEach(ev => {
+                    ev.target.style.cssText += ev.cssText;
+                });
+                this.eventBus.requestTrigger("renderGroup", e);
             }}
             onRenderGroupEnd={e => {
                 this.eventBus.requestTrigger("renderGroup", e);

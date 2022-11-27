@@ -14,23 +14,26 @@ const MenuElement = styled("div", `
 {
     position: absolute;
     top: 0;
-    width: var(--menu);
-    height: 100%;
+    left: 0;
+    width: 100%;
+    height: var(--menu-size);
     background: var(--back2);
     box-sizing: border-box;
-    padding: 15px 7px 0px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    font-size: 0;
+    z-index: 10;
+    transform: translateZ(1px);
 }
 
 .scena-menu-bottom {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 15px 7px 0px;
-    width: 100%;
+    top: 0;
+    right: 0;
+    padding: 7px 7px 0px;
+    height: 100%;
     box-sizing: border-box;
 }
 
@@ -40,20 +43,20 @@ svg, .scena-i {
 
 .scena-icon {
     position: relative;
-    display: block;
+    display: inline-block;
+    width: var(--menu-size);
+    height: var(--menu-size);
     font-size: 0;
-    padding: 3px;
+    padding: 10px;
     box-sizing: border-box;
     cursor: pointer;
     border: 1px solid transparent;
-    margin-bottom: 5px;
-    border-radius: 3px;
+    border-radius: 0px;
     transition: all ease 0.2s;
 }
 
 .scena-selected {
     background: var(--mainColor);
-    border-color: var(--back1);
 }
 
 .scena-icon.scena-selected>svg path,
@@ -76,7 +79,7 @@ svg, .scena-i {
 .scena-extends-container {
     position: absolute;
     left: 110%;
-    top: -30px;
+    top: 50%;
     background: var(--back2);
     /* width: 200px;
     height: 200px; */
@@ -86,8 +89,17 @@ svg, .scena-i {
     box-shadow: 1px 1px 2px var(--back1);
     display: none;
 }
-
 .scena-sub-icon {
+    display: block;
+    position: relative;
+    font-size: 0;
+    padding: 3px;
+    box-sizing: border-box;
+    cursor: pointer;
+    border: 1px solid transparent;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: all ease 0.2s;
     white-space: nowrap;
     padding: 0px 7px;
     margin: 7px 10px;
@@ -100,6 +112,7 @@ svg, .scena-i {
     width: 25px;
     height: 25px;
     margin: 0;
+    padding: 2px;
 }
 
 .scena-sub-icon-label {
