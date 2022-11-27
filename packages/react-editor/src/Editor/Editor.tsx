@@ -17,7 +17,7 @@ import { ScenaEditorState, SavedScenaData, ScenaJSXElement, ElementInfo, MovedRe
 import HistoryManager from "./utils/HistoryManager";
 import Debugger from "./utils/Debugger";
 import { DATA_SCENA_ELEMENT_ID, EditorContext, EDITOR_CSS } from "./consts";
-import ClipboardManager from "./utils/ClipboardManager";
+// import ClipboardManager from "./utils/ClipboardManager";
 import { NameType } from "scenejs";
 import { getAccurateAgent } from "@egjs/agent";
 import { invert, matrix3d,  } from "@scena/matrix";
@@ -84,7 +84,7 @@ export default class Editor extends React.PureComponent<{
     public memory = new Memory();
     public moveableData = new MoveableData(this.memory);
     public keyManager = new KeyManager(this.console);
-    public clipboardManager = new ClipboardManager(this);
+    // public clipboardManager = new ClipboardManager(this);
 
     public horizontalGuides = React.createRef<Guides>();
     public verticalGuides = React.createRef<Guides>();
@@ -345,7 +345,7 @@ export default class Editor extends React.PureComponent<{
         this.keyManager.keyup(["delete"], () => {
             this.removeElements(this.getSelectedTargets());
         }, "Delete");
-        
+
         const agent = await getAccurateAgent()!;
         const isMacintosh = agent.os.name === "mac" || agent.os.name === "ios";
         this.keyManager.keydown([isMacintosh ? "meta" : "ctrl", "x"], () => { }, "Cut");
@@ -384,7 +384,7 @@ export default class Editor extends React.PureComponent<{
         this.memory.clear();
         this.moveableData.clear();
         this.keyManager.destroy();
-        this.clipboardManager.destroy();
+        // this.clipboardManager.destroy();
         window.removeEventListener("resize", this.onResize);
     }
     public promiseState(state: Partial<ScenaEditorState>) {

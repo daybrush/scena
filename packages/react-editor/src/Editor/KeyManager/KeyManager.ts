@@ -11,6 +11,7 @@ function check(e: any) {
     }
     return true;
 }
+
 export default class KeyManager {
     constructor(private console: Debugger) { }
     public keycon = new KeyController();
