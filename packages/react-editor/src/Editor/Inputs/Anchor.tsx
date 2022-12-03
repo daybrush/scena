@@ -16,7 +16,7 @@ const AnchorElement = styled("div", `
     position: relative;
     width: 30px;
     height: 30px;
-    background: var(--back1);
+    background: var(--scena-editor-color-back1);
 }
 .scena-anchor-control {
     position: absolute;
@@ -32,7 +32,7 @@ const AnchorElement = styled("div", `
     content: "";
     position: relative;
     display: block;
-    background: var(--back5);
+    background: var(--scena-editor-color-back5);
     width: 100%;
     height: 100%;
 }

@@ -22,7 +22,7 @@ const ColorBoxElement = styled("div", `
     position: relative;
     width: 30px;
     height: 30px;
-    background: #4af;
+    background: var(--scena-editor-color-main);
     border-radius: 5px;
     display: inline-block;
     vertical-align: top;

@@ -15,9 +15,9 @@ const SelectElement = styled("select", `
     height: 30px;
     padding: 5px;
     background: transparent;
-    color: var(--mainColor);
+    color: var(--scena-editor-color-main);
     font-weight: bold;
-    background: var(--back1);
+    background: var(--scena-editor-color-back1);
     border: 0;
     box-sizing: border-box;
     text-align: center;

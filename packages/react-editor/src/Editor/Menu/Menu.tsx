@@ -16,8 +16,8 @@ const MenuElement = styled("div", `
     top: 0;
     left: 0;
     width: 100%;
-    height: var(--menu-size);
-    background: var(--back2);
+    height: var(--scena-editor-size-menu);
+    background: var(--scena-editor-color-back2);
     box-sizing: border-box;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -44,8 +44,8 @@ svg, .scena-i {
 .scena-icon {
     position: relative;
     display: inline-block;
-    width: var(--menu-size);
-    height: var(--menu-size);
+    width: var(--scena-editor-size-menu);
+    height: var(--scena-editor-size-menu);
     font-size: 0;
     padding: 10px;
     box-sizing: border-box;
@@ -56,7 +56,7 @@ svg, .scena-i {
 }
 
 .scena-selected {
-    background: var(--mainColor);
+    background: var(--scena-editor-color-main);
 }
 
 .scena-icon.scena-selected>svg path,
@@ -80,13 +80,13 @@ svg, .scena-i {
     position: absolute;
     left: 110%;
     top: 50%;
-    background: var(--back2);
+    background: var(--scena-editor-color-back2);
     /* width: 200px;
     height: 200px; */
     border-radius: 5px;
     z-index: 1;
     transform: translate(10px) translateZ(2px);
-    box-shadow: 1px 1px 2px var(--back1);
+    box-shadow: 1px 1px 2px var(--scena-editor-color-back1);
     display: none;
 }
 .scena-sub-icon {
@@ -143,14 +143,14 @@ svg, .scena-i {
     display: inline-block;
     width: 2px;
     height: 2px;
-    background: var(--back2);
+    background: var(--scena-editor-color-back2);
     margin: 1px;
 }
 .scena-space {
     display: inline-block;
     width: 12px;
     height: 2px;
-    background: var(--back2);
+    background: var(--scena-editor-color-back2);
     margin: 1px;
     border-radius: 1px;
 }

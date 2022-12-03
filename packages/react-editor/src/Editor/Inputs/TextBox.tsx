@@ -16,13 +16,13 @@ const TextElement = styled("input", `
     width: 100%;
     height: 30px;
     background: transparent;
-    color: var(--mainColor);
+    color: var(--scena-editor-color-main);
     font-weight: bold;
     background: none;
     border: 0;
     padding: 5px;
     box-sizing: border-box;
-    background: var(--back1);
+    background: var(--scena-editor-color-back1);
     font-size: 12px;
 }
 `);

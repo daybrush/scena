@@ -47,7 +47,7 @@ const FolderElement = styled("div", `
     padding: 2px;
     display: inline-block;
     vertical-align: top;
-    border-bottom: 1px solid var(--back1);
+    border-bottom: 1px solid var(--scena-editor-color-back1);
     width: 100%;
 }
 .scena-file h3 {
@@ -70,7 +70,7 @@ const FolderElement = styled("div", `
     display: none;
 }
 .scena-file.scena-selected {
-    background: var(--mainColor);
+    background: var(--scena-editor-color-main);
 }
 .scena-file:before {
     position: absolute;

@@ -58,8 +58,9 @@
     "@daybrush/utils": "^1.4.0",
     "@egjs/agent": "^2.2.1",
     "@egjs/list-differ": "^1.0.0",
+    "@moveable/helper": "^0.0.3",
     "@scena/matrix": "^1.1.0",
-    "@scena/react-guides": "^0.19.1",
+    "@scena/react-guides": "^0.19.3",
     "@types/react-color": "^3.0.4",
     "css-to-mat": "^1.0.3",
     "framework-utils": "^1.1.0",
@@ -69,8 +70,8 @@
     "moveable-helper": "^0.4.0",
     "react-color": "^2.18.1",
     "react-css-styled": "^1.0.4",
-    "react-infinite-viewer": "^0.18.0",
-    "react-moveable": "^0.42.1",
+    "react-infinite-viewer": "^0.19.1",
+    "react-moveable": "^0.44.0",
     "react-selecto": "^1.20.2",
     "scenejs": "^1.6.0"
   }

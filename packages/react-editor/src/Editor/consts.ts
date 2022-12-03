@@ -28,16 +28,17 @@ export const EDITOR_CSS = `
     width: 100%;
     height: 100%;
     font-family: sans-serif;
-    --mainColor: #4af;
-    --back1: #1a1a1a;
-    --back2: #2a2a2a;
-    --back3: #333;
-    --back4: #444;
-    --back5: #555;
-    --back6: #666;
+    --scena-editor-color-main: #4af;
+    --scena-editor-color-back1: #1a1a1a;
+    --scena-editor-color-back2: #2a2a2a;
+    --scena-editor-color-back3: #333;
+    --scena-editor-color-back4: #444;
+    --scena-editor-color-back5: #555;
+    --scena-editor-color-back6: #666;
     transform-style: preserve-3d;
 
-    --menu-size: 45px;
+    --scena-editor-size-menu: 45px;
+    --scena-editor-size-guides: 30px;
     --tabs: 40px;
     --tab: 200px;
 }
@@ -48,10 +49,10 @@ export const EDITOR_CSS = `
 
 .scena-viewer {
     position: absolute !important;
-    left: 30px;
-    top: calc(30px + var(--menu-size));
-    width: calc(100% - 30px - var(--tabs));
-    height: calc(100% - 30px - var(--menu-size));
+    left: var(--scena-editor-size-guides);
+    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-menu));
+    width: calc(100% - var(--scena-editor-size-guides) - var(--tabs));
+    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-menu));
 }
 
 .scena-viewport-container {
@@ -74,37 +75,37 @@ export const EDITOR_CSS = `
     pointer-events: none;
 }
 
-.scena-manager {
+.scena-guides-manager {
     position: absolute !important;
-    top: var(--menu-size);
+    top: var(--scena-editor-size-menu);
     left: 0;
     transform: translateZ(1px);
 }
 
-.scena-manager.scena-horizontal {
-    left: 30px;
-    width: calc(100% - 30px - var(--tabs));
-    height: 30px !important;
+.scena-guides-manager.scena-guides-horizontal {
+    left: var(--scena-editor-size-guides);
+    width: calc(100% - var(--scena-editor-size-guides) - var(--tabs));
+    height: var(--scena-editor-size-guides) !important;
 }
 
-.scena-manager.scena-vertical {
-    top: calc(30px + var(--menu-size));
-    height: calc(100% - 30px - var(--menu-size));
-    width: 30px !important;
+.scena-guides-manager.scena-guides-vertical {
+    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-menu));
+    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-menu));
+    width: var(--scena-editor-size-guides) !important;
 }
 
 .scena-reset {
     position: absolute !important;
-    background: var(--back3);
-    width: 30px;
-    height: 30px;
+    background: var(--scena-editor-color-back3);
+    width: var(--scena-editor-size-guides);
+    height: var(--scena-editor-size-guides);
     z-index: 1;
-    border-right: 1px solid var(--back4);
-    border-bottom: 1px solid var(--back4);
+    border-right: 1px solid var(--scena-editor-color-back4);
+    border-bottom: 1px solid var(--scena-editor-color-back4);
     box-sizing: border-box;
     cursor: pointer;
     left: 0;
-    top: var(--menu-size);
+    top: var(--scena-editor-size-menu);
 }
 
 .scena-overlay {
@@ -118,7 +119,7 @@ export const EDITOR_CSS = `
 }
 .moveable-dimension {
     position: absolute;
-    background: var(--mainColor);
+    background: var(--scena-editor-color-main);
     border-radius: 2px;
     padding: 1px 3px;
     color: white;
@@ -157,7 +158,7 @@ export const EDITOR_CSS = `
     top: 50%;
     transform: translate(-50%, -50%);
     font-size: 14px;
-    background: var(--back3);
+    background: var(--scena-editor-color-back3);
     box-sizing: border-box;
     color: #fff;
 }
@@ -200,12 +201,12 @@ export const EDITOR_CSS = `
 }
 .scena-popup li {
     padding: 4px 10px;
-    border-bottom: 1px solid var(--back2);
+    border-bottom: 1px solid var(--scena-editor-color-back2);
     font-weight: bold;;
 }
 .scena-popup li:hover {
     background: #fff;
-    color: var(--back2);
+    color: var(--scena-editor-color-back2);
 }
 .scena-popup p {
     position: relative;
@@ -244,7 +245,7 @@ export const EDITOR_CSS = `
     position: absolute;
     left: 50%;
     top: 50%;
-    background: var(--back6);
+    background: var(--scena-editor-color-back6);
     transform: translate(-50%, -50%);
 }
 .scena-align-vertical .scena-align-line {

@@ -14,9 +14,9 @@ const TabsElement = styled("div", `
     position: absolute;
     right: 0;
     width: 40px;
-    top: var(--menu-size);
+    top: var(--scena-editor-size-menu);
     bottom: 0;
-    background: var(--back2);
+    background: var(--scena-editor-color-back2);
     z-index: 10;
     transform: translateZ(10px);
     box-sizing: border-box;
@@ -50,7 +50,7 @@ const TabsElement = styled("div", `
 }
 
 .scena-tab.scena-selected .scena-tab-icon {
-    background: var(--mainColor);
+    background: var(--scena-editor-color-main);
 }
 
 .scena-tab-popup {
@@ -60,8 +60,8 @@ const TabsElement = styled("div", `
     transform: translate(-5px);
     width: var(--tab);
     padding: 0px 10px 10px;
-    background: var(--back2);
-    border-bottom: 1px solid var(--back1);
+    background: var(--scena-editor-color-back2);
+    border-bottom: 1px solid var(--scena-editor-color-back1);
     text-align: left;
 }
 
