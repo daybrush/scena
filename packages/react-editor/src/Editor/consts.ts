@@ -51,6 +51,10 @@ export const EDITOR_CSS = `
     height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-menu));
 }
 
+.scena-viewer-move {
+    cursor: grab;
+}
+
 .scena-viewport-container {
     position: relative;
 }

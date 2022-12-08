@@ -83,7 +83,7 @@ export interface ScenaElementLayer {
     scope: string[];
     jsx: React.ReactElement<any, any>;
     item: SceneItem;
-    ref: React.MutableRefObject<HTMLElement | null>;
+    ref: React.MutableRefObject<SVGElement | HTMLElement | null>;
 }
 export interface ElementInfo {
     jsx: ScenaJSXType;

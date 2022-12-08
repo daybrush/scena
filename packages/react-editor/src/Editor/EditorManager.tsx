@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import { GroupManager } from "@moveable/helper";
@@ -6,10 +5,11 @@ import Guides from "@scena/react-guides";
 import Selecto from "react-selecto";
 import styled, { StyledElement } from "react-css-styled";
 import Moveable, { MoveableTargetGroupsType } from "react-moveable";
+import { deepFlat } from "@daybrush/utils";
 
 // import Menu from "./Menu/Menu";
 import Viewport, { ViewportInstnace } from "./Viewport/Viewport";
-import { prefix, checkInput, getParnetScenaElement } from "./utils/utils";
+import { prefix, checkInput, getParnetScenaElement, isArrayEquals, keyChecker } from "./utils/utils";
 
 import LayerManager from "./managers/LayerManager";
 import KeyManager from "./managers/KeyManager";
@@ -21,22 +21,23 @@ import { EDITOR_CSS } from "./consts";
 // import ClipboardManager from "./utils/ClipboardManager";
 
 
-import { useStoreStateSetPromise, useStoreValue } from "./Store/Store";
+import { useStoreRoot, useStoreStateSetPromise, useStoreValue } from "./Store/Store";
 import {
     $actionManager, $layerManager, $editor, $groupManager,
     $historyManager, $horizontalGuides, $infiniteViewer,
     $keyManager, $layers, $memoryManager, $moveable,
     $selectedTargets, $selecto, $verticalGuides,
 } from "./stores/stores";
+import { $meta, $shift, $space } from "./stores/keys";
 
 
 import { GuidesManager } from "./components/GuidesManager";
 import { InfiniteViewerManager } from "./components/InfiniteViewerManager";
 import { SelectoManager } from "./components/SelectoManager";
 import { MoveableManager } from "./components/MoveableManager";
-import { deepFlat } from "@daybrush/utils";
 import { ScenaElementLayer } from "./types";
 import { SceneItem } from "scenejs";
+
 
 
 const EditorElement = styled("div", EDITOR_CSS);
@@ -96,13 +97,14 @@ export interface EditorManagerInstance {
 }
 
 export default function EditorManager2() {
+    const root = useStoreRoot();
     const editorRef = React.useRef<EditorManagerInstance>();
 
     const historyManager = React.useMemo(() => new HistoryManager(editorRef), []);
     const actionManager = React.useMemo(() => new ActionManager(), []);
     const memoryManager = React.useMemo(() => new MemoryManager(), []);
     const layerManager = React.useMemo(() => new LayerManager(), []);
-    const keyManager = React.useMemo(() => new KeyManager(actionManager), []);
+    const keyManager = React.useMemo(() => new KeyManager(root, actionManager), []);
     const groupManager = React.useMemo(() => new GroupManager([]), []);
 
 
@@ -138,26 +140,35 @@ export default function EditorManager2() {
             id: "1",
             scope: [],
             jsx: <div style={{
-                position: "relative",
+                position: "absolute",
                 border: "1px solid #333",
                 width: "100px",
                 height: "100px",
             }}></div>,
             item: new SceneItem(),
             ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-        }
+        },
+        {
+            id: "2",
+            scope: [],
+            jsx: <div style={{
+                position: "absolute",
+                border: "1px solid #f55",
+                top: "100px",
+                left: "100px",
+                width: "100px",
+                height: "100px",
+            }}></div>,
+            item: new SceneItem(),
+            ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+        },
     ], []);
 
     layerManager.setLayers(layers);
 
     useStoreValue($layers, layers);
 
-    React.useEffect(() => {
-        console.log(layers);
-    }, []);
-
-
-
+    const selectedTargetsStore = useStoreValue($selectedTargets);
     const setSelectedTargetsPromise = useStoreStateSetPromise($selectedTargets);
     const onBlur = React.useCallback((e: any) => {
         const target = e.target as HTMLElement | SVGElement;
@@ -190,7 +201,13 @@ export default function EditorManager2() {
     }, []);
 
     const setSelectedTargets = React.useCallback((targets: MoveableTargetGroupsType, isRestore?: boolean) => {
-        // const prevTargets = selectedTargetsStore.value;
+        const prevTargets = selectedTargetsStore.value;
+
+
+
+        if (isArrayEquals(prevTargets, targets)) {
+            return Promise.resolve(false);
+        }
 
         return setSelectedTargetsPromise(targets).then(complete => {
             if (!complete) {
@@ -228,6 +245,11 @@ export default function EditorManager2() {
 
 
     React.useEffect(() => {
+        // register key
+        keyManager.toggleState(["shift"], $shift, keyChecker);
+        keyManager.toggleState(["space"], $space, keyChecker);
+        keyManager.toggleState(["meta"], $meta, keyChecker);
+        // register default events
         const onResize = () => {
             horizontalGuidesRef.current!.resize();
             verticalGuidesRef.current!.resize();
@@ -238,13 +260,13 @@ export default function EditorManager2() {
         });
 
         window.addEventListener("resize", onResize);
-
-
         return () => {
+            keyManager.destroy();
             cancelAnimationFrame(startId);
             window.removeEventListener("resize", onResize);
         };
-    })
+    }, []);
+
     return React.useMemo(() => <EditorElement className={prefix("editor")} ref={editorElementRef}>
         {/* <Tabs ref={tabsRef} /> */}
         {/* <Menu ref={menuRef} onSelect/> */}

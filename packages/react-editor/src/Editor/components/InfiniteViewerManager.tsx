@@ -2,6 +2,7 @@ import { deepFlat } from "@daybrush/utils";
 import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "../Store/Store";
+import { $space } from "../stores/keys";
 import {
     $actionManager, $horizontalGuides, $moveable,
     $selectedTargets, $selecto, $verticalGuides, $zoom,
@@ -17,18 +18,19 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
     const horizontalGuidesRef = useStoreStateValue($horizontalGuides);
     const verticalGuidesRef = useStoreStateValue($verticalGuides);
     const actionManager = useStoreStateValue($actionManager);
-
     const selectedTargetsStore = useStoreValue($selectedTargets);
 
+    const isSpace = useStoreStateValue($space);
     const setZoom = useStoreStateSetValue($zoom);
 
     return <InfiniteViewer
         ref={ref}
-        className={prefix("viewer")}
+        className={prefix("viewer", isSpace ? "viewer-move" : "")}
         usePinch={true}
         useAutoZoom={true}
         useWheelScroll={true}
         useForceWheel={true}
+        useMouseDrag={isSpace}
         pinchThreshold={50}
         maxPinchWheel={3}
         onDragStart={e => {
@@ -71,4 +73,8 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
             setZoom(e.zoom);
         }}
     >{props.children}</InfiniteViewer>;
-})
+});
+
+InfiniteViewerManager.displayName = "InfiniteViewerManager";
+
+

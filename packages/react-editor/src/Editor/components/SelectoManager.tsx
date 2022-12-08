@@ -1,12 +1,15 @@
 import { deepFlat } from "@daybrush/utils";
 import { TargetGroupsType } from "@moveable/helper";
 import * as React from "react";
-import { useKeycon } from "react-keycon";
 import { getElementInfo } from "react-moveable";
 import Selecto from "react-selecto";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
 import { useStoreStateValue, useStoreValue } from "../Store/Store";
-import { $actionManager, $editor, $groupManager, $infiniteViewer, $layers, $moveable, $selectedMenu, $selectedTargets } from "../stores/stores";
+import { $meta, $shift, $space } from "../stores/keys";
+import {
+    $actionManager, $editor, $groupManager, $infiniteViewer,
+    $layerManager, $layers, $moveable, $selectedMenu, $selectedTargets,
+} from "../stores/stores";
 import { getContentElement } from "../utils/utils";
 
 export interface SelectoManagerProps {
@@ -14,14 +17,17 @@ export interface SelectoManagerProps {
 }
 
 export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((props, ref) => {
-    const { isKeydown: isCommand } = useKeycon({ keys: "meta" });
-    const { isKeydown: isShift } = useKeycon({ keys: "shift" });
+    const spaceStore = useStoreValue($space);
+    const metaStore = useStoreValue($meta);
+    const shiftStore = useStoreValue($shift);
+
     const layers = useStoreStateValue($layers);
     const selectedTargetsStore = useStoreValue($selectedTargets);
 
 
     const selectedMenu = useStoreStateValue($selectedMenu);
     const actionManager = useStoreStateValue($actionManager);
+    const layerManager = useStoreStateValue($layerManager);
     const groupManager = useStoreStateValue($groupManager);
 
     const editorRef = useStoreStateValue($editor);
@@ -51,6 +57,10 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             },
         }}
         onDragStart={e => {
+            if (spaceStore.value) {
+                e.stop();
+                return;
+            }
             const inputEvent = e.inputEvent;
             const target = inputEvent.target;
 
@@ -96,13 +106,14 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
                     moveable.dragStart(inputEvent);
                 });
             }
-
             let nextTargets: TargetGroupsType = targets;
+
+            groupManager.set([], layerManager.getElements());
             if (isDragStart || isClick) {
-                if (isCommand) {
+                if (metaStore.value) {
                     nextTargets = groupManager.selectSingleTargets(targets, added, removed);
                 } else {
-                    nextTargets = groupManager.selectCompletedTargets(targets, added, removed, isShift);
+                    nextTargets = groupManager.selectCompletedTargets(targets, added, removed, shiftStore.value);
                 }
             } else {
                 nextTargets = groupManager.selectSameDepthTargets(targets, added, removed);
@@ -110,4 +121,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             editorRef.current!.setSelectedTargets(nextTargets);
         }}
     />;
-})
+});
+
+
+SelectoManager.displayName = "SelectoManager";

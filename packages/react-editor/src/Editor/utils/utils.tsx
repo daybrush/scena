@@ -2,7 +2,10 @@ import React from "react";
 import { KeyControllerEvent } from "keycon";
 import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
-import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo, ScenaElementLayer } from "../types";
+import {
+    ScenaFunctionComponent, ScenaProps, ScenaComponent,
+    ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo,
+} from "../types";
 import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
 import { getElementInfo } from "react-moveable";
@@ -49,6 +52,11 @@ export function inputChecker(e: KeyControllerEvent) {
     }
     return true;
 }
+export function keyChecker(e: KeyControllerEvent) {
+    if (inputChecker(e)) {
+        e.inputEvent.preventDefault();
+    }
+}
 
 export function checkImageLoaded(el: HTMLElement | SVGElement): Promise<any> {
     if (el.tagName.toLowerCase() !== "img") {
@@ -62,7 +70,7 @@ export function checkImageLoaded(el: HTMLElement | SVGElement): Promise<any> {
                 resolve();
 
                 el.removeEventListener("load", loaded);
-            })
+            });
         }
     });
 }
@@ -77,7 +85,10 @@ export function getParnetScenaElement(el: HTMLElement | SVGElement): HTMLElement
     return getParnetScenaElement(el.parentElement as HTMLElement | SVGElement);
 }
 
-export function makeScenaFunctionComponent<T = IObject<any>>(id: string, component: (props: ScenaProps & T) => React.ReactElement<any, any>): ScenaFunctionComponent<T> {
+export function makeScenaFunctionComponent<T = IObject<any>>(
+    id: string,
+    component: (props: ScenaProps & T) => React.ReactElement<any, any>,
+): ScenaFunctionComponent<T> {
     (component as ScenaFunctionComponent<T>).scenaComponentId = id;
 
     return component as ScenaFunctionComponent<T>;
@@ -123,7 +134,7 @@ export function setMoveMatrix(frame: Frame, moveMatrix: number[]) {
         frame.set("transform", transformOrders[0], matrix3d(moveMatrix, prevMatrix));
     } else if (frame.has("transform", "matrix3d")) {
         let num = 1;
-        while (frame.has("transform", `matrix3d${++num}`)) { }
+        while (frame.has("transform", `matrix3d${++num}`)) {}
 
         frame.set("transform", `matrix3d${num}`, [...moveMatrix]);
         frame.setOrders(["transform"], [`matrix3d${num}`, ...transformOrders]);
@@ -176,6 +187,6 @@ export function updateElements(infos: ElementInfo[]) {
 }
 
 
-export function getLayerByElement(layers: ScenaElementLayer[], element: HTMLElement | SVGElement) {
-    return layers.find(layer => layer.ref.current === element);
+export function isArrayEquals(arr1: any[], arr2: any[]) {
+    return arr1.length === arr2.length && arr1.every((el, i) => el === arr2[i]);
 }

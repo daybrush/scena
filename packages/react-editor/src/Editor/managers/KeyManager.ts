@@ -1,13 +1,15 @@
 import KeyController from "keycon";
+import { StoreRootValue, StoreState } from "../Store/Store";
 import Debugger from "../utils/Debugger";
 import { inputChecker } from "../utils/utils";
 import ActionManager from "./ActionManager";
+
 
 export default class KeyManager {
     public keycon = new KeyController();
     public keylist: Array<[string[], string]> = [];
     public isEnable = true;
-    constructor(private _actionManager: ActionManager) {
+    constructor(private _root: StoreRootValue, private _actionManager: ActionManager) {
 
     }
     public enable() {
@@ -15,6 +17,19 @@ export default class KeyManager {
     }
     public disable() {
         this.isEnable = false;
+    }
+    public toggleState(keys: string[], state: StoreState<boolean>, callback: (e: any) => any) {
+        const root = this._root;
+
+        this.keydown(keys, e => {
+            callback(e);
+            root.set(state, true);
+        }, `key toggle down`);
+
+        this.keyup(keys, e => {
+            callback(e);
+            root.set(state, false);
+        }, `key toggle up`);
     }
     public actionDown(keys: string[], actionName: string) {
         this.keycon.keydown(keys, this.addCallback("keydown", keys, e => {

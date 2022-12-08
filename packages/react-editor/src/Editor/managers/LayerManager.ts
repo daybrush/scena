@@ -1,10 +1,5 @@
 import { find } from "@daybrush/utils";
-import MoveableHelper from "moveable-helper";
-import { OnRender } from "react-moveable";
-import { Frame, NameType } from "scenejs";
 import { ScenaElementLayer } from "../types";
-import { getId } from "../utils/utils";
-import MemoryManager from "./MemoryManager";
 
 export default class LayerManager {
     private _layers: ScenaElementLayer[] = [];
@@ -12,11 +7,20 @@ export default class LayerManager {
     public setLayers(layers: ScenaElementLayer[]) {
         this._layers = layers;
     }
+    public getLayers() {
+        return this._layers;
+    }
+    public getRefs() {
+        return this._layers.map(layer => layer.ref);
+    }
+    public getElements() {
+        return this.getRefs().map(ref => ref.current).filter(Boolean) as Array<HTMLElement | SVGElement>;
+    }
     public getLayerByElement(element: HTMLElement | SVGElement) {
         return find(this._layers, layer => layer.ref.current === element);
     }
     public getCSSByElement(element: HTMLElement | SVGElement): Record<string, any> {
-        return this._getFrame(this.getLayerByElement(element)!, 0).get();
+        return this.getFrame(this.getLayerByElement(element)!, 0).get();
     }
     public setCSS(layer: ScenaElementLayer, cssObject: string | Record<string, any>) {
         layer.item.set(0, cssObject);
@@ -27,10 +31,10 @@ export default class LayerManager {
         if (!layer) {
             return;
         }
-        this.setCSS(layer, cssObject)
+        this.setCSS(layer, cssObject);
     }
 
-    private _getFrame(layer: ScenaElementLayer, time: number) {
+    public getFrame(layer: ScenaElementLayer, time = 0) {
         const item = layer.item;
 
         if (!item.hasFrame(time)) {

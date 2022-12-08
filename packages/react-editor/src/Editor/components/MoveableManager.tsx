@@ -1,16 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import Moveable, { ElementGuidelineValueOption, MoveableRefType } from "react-moveable";
-import { getContentElement, getId, getLayerByElement, inputChecker } from "../utils/utils";
-import { IObject } from "@daybrush/utils";
-import { diff } from "@egjs/list-differ";
+import { getContentElement, getId } from "../utils/utils";
+import { IObject, isObject } from "@daybrush/utils";
 import { DimensionViewable } from "./ables/DimensionViewable";
 import { DeleteButtonViewable } from "./ables/DeleteButtonViewable";
-import { useKeycon } from "react-keycon";
 import { useStoreState, useStoreStateValue } from "../Store/Store";
-import { $actionManager, $layerManager, $editor, $groupManager, $historyManager, $horizontalGuidelines, $infiniteViewer, $layers, $memoryManager, $selectedMenu, $selectedTargets, $selecto, $verticalGuidelines, $zoom, $selectableTargets } from "../stores/stores";
+import {
+    $actionManager, $layerManager, $editor, $groupManager,
+    $historyManager, $horizontalGuidelines, $infiniteViewer,
+    $layers, $memoryManager, $selectedMenu, $selectedTargets,
+    $selecto, $verticalGuidelines, $zoom,
+} from "../stores/stores";
 import { EditorManagerInstance } from "../EditorManager";
+import { $shift } from "../stores/keys";
 
-function restoreRender(id: string, state: IObject<any>, prevState: IObject<any>, orders: any, editor: EditorManagerInstance) {
+function restoreRender(
+    id: string,
+    state: IObject<any>,
+    prevState: IObject<any>,
+    orders: any,
+    editor: EditorManagerInstance,
+) {
     // const el = editor.viewportRef.current!.getElement(id);
 
     // if (!el) {
@@ -67,12 +78,7 @@ function redoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
 export interface ScenaMoveableMangerProps { }
 
 export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerProps>((props, ref) => {
-    const {
-        isKeydown: isShift,
-    } = useKeycon({
-        checker: inputChecker,
-        keys: "shift",
-    });
+    const isShift = useStoreStateValue($shift);
     const [selectedMenu, setSelectedMenu] = useStoreState($selectedMenu);
 
     const verticalGuidelines = useStoreStateValue($verticalGuidelines);
@@ -97,7 +103,10 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         ".scena-viewport",
         ...layers.map(layer => layer.ref),
     ].filter(el => {
-        return selectedTargets.indexOf(el as any) === -1;
+        if (isObject(el) && el.current) {
+            return selectedTargets.indexOf(el.current) === -1;
+        }
+        return true;
     });
 
     React.useEffect(() => {
@@ -128,8 +137,8 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         }}
         rotatable={true}
         snappable={true}
-        snapDirections={{ top: true, left: true, right: true, center: true, middle: true }}
-        elementSnapDirections={{ top: true, left: true, right: true, center: true, middle: true }}
+        snapDirections={{ top: true, left: true, right: true, center: true, middle: true, bottom: true }}
+        elementSnapDirections={{ top: true, left: true, right: true, center: true, middle: true, bottom: true }}
         snapGap={false}
         isDisplayInnerSnapDigit={true}
         roundable={false}
@@ -183,7 +192,6 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             selectoRef.current!.clickTarget(e.inputEvent, e.moveableTarget);
         }}
         onRenderStart={e => {
-            console.log(layerManager);
             e.datas.prevData = layerManager.getCSSByElement(e.target);
         }}
         onRender={e => {
@@ -198,7 +206,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             if (!e.datas.isRender) {
                 return;
             }
-            const layer = getLayerByElement(layers, e.target);
+            const layer = layerManager.getLayerByElement(e.target);
 
             if (!layer) {
                 return;
@@ -207,7 +215,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             historyManager.addHistory("render", {
                 layer,
                 prev: e.datas.prevData,
-                next: layer.item.get(0),
+                next: layerManager.getFrame(layer).get(),
             });
         }}
         onRenderGroupStart={e => {
@@ -233,9 +241,9 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 const layer = layerManager.getLayerByElement(target)!;
 
                 return {
-                    id: getId(target),
+                    layer,
                     prev: prevDatas[i],
-                    next: layer.item.getFrame(0).get(0,)
+                    next: layerManager.getFrame(layer).get(),
                 };
             });
 
@@ -245,3 +253,6 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         }}
     ></Moveable>;
 });
+
+
+MoveableManager.displayName = "MoveableManager";
