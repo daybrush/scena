@@ -1,16 +1,18 @@
+import React from "react";
+import { KeyControllerEvent } from "keycon";
 import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
-import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo } from "../types";
+import { ScenaFunctionComponent, ScenaProps, ScenaComponent, ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo, ScenaElementLayer } from "../types";
 import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
 import { getElementInfo } from "react-moveable";
 import { fromTranslation, matrix3d } from "@scena/matrix";
-import React from "react";
 
 
 export function prefix(...classNames: string[]) {
     return prefixNames(PREFIX, ...classNames);
 }
+
 export function getContentElement(el: HTMLElement): HTMLElement | null {
     if (el.contentEditable === "inherit") {
         return getContentElement(el.parentElement!);
@@ -37,6 +39,17 @@ export function checkInput(target: HTMLElement | SVGElement) {
 
     return (target as HTMLElement).isContentEditable || tagName === "input" || tagName === "textarea";
 }
+
+export function inputChecker(e: KeyControllerEvent) {
+    const inputEvent = e.inputEvent;
+    const target = inputEvent.target as HTMLElement;
+
+    if (!target || checkInput(target)) {
+        return false;
+    }
+    return true;
+}
+
 export function checkImageLoaded(el: HTMLElement | SVGElement): Promise<any> {
     if (el.tagName.toLowerCase() !== "img") {
         return Promise.all([].slice.call(el.querySelectorAll("img")).map(el => checkImageLoaded(el)));
@@ -160,4 +173,9 @@ export function updateElements(infos: ElementInfo[]) {
         }
         return { ...info };
     });
+}
+
+
+export function getLayerByElement(layers: ScenaElementLayer[], element: HTMLElement | SVGElement) {
+    return layers.find(layer => layer.ref.current === element);
 }

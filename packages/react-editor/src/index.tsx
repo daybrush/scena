@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './demo/Scena';
@@ -6,9 +6,10 @@ import App from './demo/Moveable';
 // import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
-    <App />
-  ,
-  document.getElementById('root')
+    <StrictMode>
+        <App />
+    </StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

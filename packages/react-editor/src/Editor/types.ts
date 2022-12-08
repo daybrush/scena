@@ -1,7 +1,8 @@
 import { IObject } from "@daybrush/utils";
-import Editor from "./Editor";
+import Editor from "./EditorManager";
 import * as React from "react";
 import { EDITOR_PROPERTIES } from "./consts";
+import { SceneItem } from "scenejs";
 
 export interface ScenaEditorState {
     selectedTargets: Array<SVGElement | HTMLElement>;
@@ -18,10 +19,6 @@ export interface TagAppendInfo {
     frame: IObject<any>;
 }
 
-
-export type EditorInterface = {
-    [key in (typeof EDITOR_PROPERTIES)[number]]: Editor[key];
-};
 
 export interface Clipboard {
     write(items: ClipboardItem[]): Promise<void>;
@@ -79,6 +76,14 @@ export interface MovedResult {
 export interface FrameInfo {
     frame: IObject<any>;
     order: IObject<any>;
+}
+
+export interface ScenaElementLayer {
+    id: string;
+    scope: string[];
+    jsx: React.ReactElement<any, any>;
+    item: SceneItem;
+    ref: React.MutableRefObject<HTMLElement | null>;
 }
 export interface ElementInfo {
     jsx: ScenaJSXType;

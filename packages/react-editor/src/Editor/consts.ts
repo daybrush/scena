@@ -1,6 +1,3 @@
-import { createContext } from "react";
-import Editor from "./Editor";
-
 export const EDITOR_PROPERTIES = [
     "memory",
     "eventBus",
@@ -8,7 +5,6 @@ export const EDITOR_PROPERTIES = [
     "moveableData",
     "moveableManager",
     "historyManager",
-    "console",
     "getViewport",
     "getSelecto",
     "getEditorElement",
@@ -72,6 +68,7 @@ export const EDITOR_CSS = `
     left: 0;
     width: 100%;
     height: 100%;
+    box-sizing: border-box;
     pointer-events: none;
 }
 
@@ -306,5 +303,3 @@ export const EDITOR_CSS = `
     margin-top: 2px;
 }
 `;
-
-export const EditorContext = createContext<Editor | null>(null);

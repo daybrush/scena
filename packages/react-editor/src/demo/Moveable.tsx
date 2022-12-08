@@ -22,12 +22,12 @@ const Badge = makeScenaFunctionComponent("Badge", function Badge(props: ScenaPro
 });
 
 class App extends React.Component {
-    public editor = React.createRef<Editor>();
+    // public editor = React.createRef<Editor>();
     public render() {
         return <div className="app">
             <Editor
-                ref={this.editor}
-                debug={false}
+                // ref={this.editor}
+                // debug={false}
             />
             <div className="bottom">
                 <a href="https://github.com/daybrush/moveable" target="_blank">Download</a>
@@ -38,52 +38,52 @@ class App extends React.Component {
     }
     public componentDidMount() {
         // (window as any).a = this;
-        this.editor.current!.appendJSXs([
-            {
-                jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable</div>,
-                name: "(Logo)",
-                frame: {
-                    position: "absolute",
-                    left: "50%",
-                    top: "30%",
-                    width: "250px",
-                    height: "200px",
-                    "font-size": "40px",
-                    "transform": "translate(-125px, -100px)",
-                    display: "flex",
-                    "justify-content": "center",
-                    "flex-direction": "column",
-                    "text-align": "center",
-                    "font-weight": 100,
-                },
-            },
-            {
-                jsx: <Badge />,
-                name: "(Badges)",
-                frame: {
-                    position: "absolute",
-                    left: "0%",
-                    top: "50%",
-                    width: "100%",
-                    "text-align": "center",
-                },
-            },
-            {
-                jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
-                name: "(Description)",
-                frame: {
-                    position: "absolute",
-                    left: "0%",
-                    top: "65%",
-                    width: "100%",
-                    "font-size": "14px",
-                    "text-align": "center",
-                    "font-weight": "normal",
-                },
-            },
-        ], true).then(targets => {
-            this.editor.current!.setSelectedTargets([targets[0]], true);
-        });
+        // this.editor.current!.appendJSXs([
+        //     {
+        //         jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable</div>,
+        //         name: "(Logo)",
+        //         frame: {
+        //             position: "absolute",
+        //             left: "50%",
+        //             top: "30%",
+        //             width: "250px",
+        //             height: "200px",
+        //             "font-size": "40px",
+        //             "transform": "translate(-125px, -100px)",
+        //             display: "flex",
+        //             "justify-content": "center",
+        //             "flex-direction": "column",
+        //             "text-align": "center",
+        //             "font-weight": 100,
+        //         },
+        //     },
+        //     {
+        //         jsx: <Badge />,
+        //         name: "(Badges)",
+        //         frame: {
+        //             position: "absolute",
+        //             left: "0%",
+        //             top: "50%",
+        //             width: "100%",
+        //             "text-align": "center",
+        //         },
+        //     },
+        //     {
+        //         jsx: <div className="moveable" contentEditable="true" suppressContentEditableWarning={true}>Moveable is Draggable! Resizable! Scalable! Rotatable! Warpable! Pinchable</div>,
+        //         name: "(Description)",
+        //         frame: {
+        //             position: "absolute",
+        //             left: "0%",
+        //             top: "65%",
+        //             width: "100%",
+        //             "font-size": "14px",
+        //             "text-align": "center",
+        //             "font-weight": "normal",
+        //         },
+        //     },
+        // ], true).then(targets => {
+        //     this.editor.current!.setSelectedTargets([targets[0]], true);
+        // });
     }
 }
 

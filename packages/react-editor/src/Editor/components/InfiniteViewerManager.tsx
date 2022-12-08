@@ -1,0 +1,74 @@
+import { deepFlat } from "@daybrush/utils";
+import * as React from "react";
+import InfiniteViewer from "react-infinite-viewer";
+import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "../Store/Store";
+import {
+    $actionManager, $horizontalGuides, $moveable,
+    $selectedTargets, $selecto, $verticalGuides, $zoom,
+} from "../stores/stores";
+import { prefix } from "../utils/utils";
+
+export interface InfiniteViewerManagerProps {
+    children: React.ReactNode;
+}
+export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteViewerManagerProps>((props, ref) => {
+    const selectoRef = useStoreStateValue($selecto);
+    const moveableRef = useStoreStateValue($moveable);
+    const horizontalGuidesRef = useStoreStateValue($horizontalGuides);
+    const verticalGuidesRef = useStoreStateValue($verticalGuides);
+    const actionManager = useStoreStateValue($actionManager);
+
+    const selectedTargetsStore = useStoreValue($selectedTargets);
+
+    const setZoom = useStoreStateSetValue($zoom);
+
+    return <InfiniteViewer
+        ref={ref}
+        className={prefix("viewer")}
+        usePinch={true}
+        useAutoZoom={true}
+        useWheelScroll={true}
+        useForceWheel={true}
+        pinchThreshold={50}
+        maxPinchWheel={3}
+        onDragStart={e => {
+            const target = e.inputEvent.target;
+            const flatted = deepFlat(selectedTargetsStore.value);
+
+            actionManager.trigger("blur");
+
+            if (
+                target.nodeName === "A"
+                || moveableRef.current!.isMoveableElement(target)
+                || moveableRef.current!.isDragging()
+                || flatted.some(t => t === target || t.contains(target))
+            ) {
+                e.stop();
+            }
+        }}
+        onDragEnd={e => {
+            if (!e.isDrag) {
+                selectoRef.current!.clickTarget(e.inputEvent);
+            }
+        }}
+        onAbortPinch={e => {
+            selectoRef.current!.triggerDragStart(e.inputEvent);
+        }}
+        onScroll={e => {
+            const horizontalGuides = horizontalGuidesRef.current!;
+            const verticalGuides = verticalGuidesRef.current!;
+
+            horizontalGuides.scroll(e.scrollLeft);
+            horizontalGuides.scrollGuides(e.scrollTop);
+
+            verticalGuides.scroll(e.scrollTop);
+            verticalGuides.scrollGuides(e.scrollLeft);
+        }}
+        onPinch={e => {
+            if (moveableRef.current!.isDragging()) {
+                return;
+            }
+            setZoom(e.zoom);
+        }}
+    >{props.children}</InfiniteViewer>;
+})
