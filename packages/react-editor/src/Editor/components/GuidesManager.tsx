@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import Guides from "@scena/react-guides";
 import * as React from "react";
 import { useStoreState, useStoreStateValue } from "../Store/Store";
@@ -29,7 +28,7 @@ export const GuidesManager = React.forwardRef<Guides, GuidesManagerProps>((props
         ref={ref}
         type={type}
         snapThreshold={5}
-        snaps={guidelines}
+        snaps={[0, ...guidelines]}
         displayDragPos={true}
         dragPosFormat={dragPosFormat}
         zoom={zoom}
@@ -39,3 +38,6 @@ export const GuidesManager = React.forwardRef<Guides, GuidesManagerProps>((props
         }, [])}
     ></Guides>;
 });
+
+
+GuidesManager.displayName = "GuidesManager";

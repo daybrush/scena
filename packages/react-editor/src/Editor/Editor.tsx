@@ -6,5 +6,5 @@ import { StoreRoot } from "./Store/Store";
 export default function Editor() {
     return <StoreRoot>
         <EditorManager />
-    </StoreRoot>
+    </StoreRoot>;
 }

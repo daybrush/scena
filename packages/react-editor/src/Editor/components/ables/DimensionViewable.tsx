@@ -20,6 +20,6 @@ export const DimensionViewable = {
             transform: `translate(-50%, ${20 * zoom!}px) scale(${zoom})`,
         }}>
             {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
-        </div>
-    }
+        </div>;
+    },
 } as const;

@@ -1,19 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
-import Moveable, { ElementGuidelineValueOption, MoveableRefType } from "react-moveable";
+import Moveable, { ElementGuidelineValueOption, MoveableRefType, SnapDirections } from "react-moveable";
 import { getContentElement, getId } from "../utils/utils";
 import { IObject, isObject } from "@daybrush/utils";
 import { DimensionViewable } from "./ables/DimensionViewable";
 import { DeleteButtonViewable } from "./ables/DeleteButtonViewable";
-import { useStoreState, useStoreStateValue } from "../Store/Store";
+import { useStoreState, useStoreStateValue, useStoreValue } from "../Store/Store";
 import {
-    $actionManager, $layerManager, $editor, $groupManager,
+    $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuidelines, $infiniteViewer,
-    $layers, $memoryManager, $selectedMenu, $selectedTargets,
-    $selecto, $verticalGuidelines, $zoom,
+    $layers, $memoryManager, $selectedTool, $selectedTargets,
+    $selecto, $verticalGuidelines, $zoom, $pointer,
 } from "../stores/stores";
 import { EditorManagerInstance } from "../EditorManager";
-import { $shift } from "../stores/keys";
+import { $alt, $meta, $shift } from "../stores/keys";
+
+const CROSS_DIRECTIONS = ["nw", "ne", "se", "sw"];
+
+const SNAP_DIRECTIONS: SnapDirections = {
+    top: true, left: true,
+    right: true, center: true,
+    middle: true, bottom: true,
+};
 
 function restoreRender(
     id: string,
@@ -79,7 +87,12 @@ export interface ScenaMoveableMangerProps { }
 
 export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerProps>((props, ref) => {
     const isShift = useStoreStateValue($shift);
-    const [selectedMenu, setSelectedMenu] = useStoreState($selectedMenu);
+    // const isMeta = useStoreStateValue($meta);
+    const altStore = useStoreValue($alt);
+
+
+    const [selectedTool, setSelectedTool] = useStoreState($selectedTool);
+    const pointer = useStoreStateValue($pointer);
 
     const verticalGuidelines = useStoreStateValue($verticalGuidelines);
     const horizontalGuidelines = useStoreStateValue($horizontalGuidelines);
@@ -92,7 +105,6 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
     const selectoRef = useStoreStateValue($selecto);
     const editorRef = useStoreStateValue($editor);
 
-    const groupManager = useStoreStateValue($groupManager);
     const actionManager = useStoreStateValue($actionManager);
     const historyManager = useStoreStateValue($historyManager);
     const layerManager = useStoreStateValue($layerManager);
@@ -123,22 +135,28 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             deleteButtonViewable: false,
         }}
         draggable={true}
-        resizable={true}
+        useAccuratePosition={true}
+        // rotationPosition={"none"}
+        rotateAroundControls={true}
         pinchable={["rotatable"]}
         zoom={1 / zoom}
+        edge={true}
         throttleResize={1}
-        clippable={selectedMenu === "Crop"}
-        passDragArea={selectedMenu === "Text"}
-        checkInput={selectedMenu === "Text"}
+        clippable={selectedTool === "crop"}
+        passDragArea={selectedTool === "text"}
+        checkInput={selectedTool === "text"}
         throttleDragRotate={isShift ? 45 : 0}
+        throttleRotate={isShift ? 15 : 0}
         keepRatio={isShift}
+        resizable={pointer === "move"}
+        scalable={pointer === "transform"}
+        rotatable={true}
         groupableProps={{
             keepRatio: true,
         }}
-        rotatable={true}
         snappable={true}
-        snapDirections={{ top: true, left: true, right: true, center: true, middle: true, bottom: true }}
-        elementSnapDirections={{ top: true, left: true, right: true, center: true, middle: true, bottom: true }}
+        snapDirections={SNAP_DIRECTIONS}
+        elementSnapDirections={SNAP_DIRECTIONS}
         snapGap={false}
         isDisplayInnerSnapDigit={true}
         roundable={false}
@@ -165,11 +183,15 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 current.getScrollTop({ absolute: true }),
             ];
         }}
+
+        onBeforeResize={(e) => {
+            e.setFixedDirection(altStore.value ? [0, 0] : e.startFixedDirection);
+        }}
         onClick={e => {
             const target = e.inputTarget as any;
 
             if (e.isDouble && target.isContentEditable) {
-                setSelectedMenu("Text");
+                setSelectedTool("text");
                 const el = getContentElement(target);
 
                 if (el) {
@@ -185,7 +207,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 return;
             }
             if (e.isDouble) {
-                const nextTargets = groupManager.selectNextChild(selectedTargets, e.moveableTarget);
+                const nextTargets = layerManager.selectNextChild(selectedTargets, e.moveableTarget);
                 editorRef.current!.setSelectedTargets(nextTargets);
                 return;
             }

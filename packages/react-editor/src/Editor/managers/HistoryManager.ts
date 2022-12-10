@@ -11,12 +11,12 @@ export default class HistoryManager {
     private undoStack: HistoryAction[] = [];
     private redoStack: HistoryAction[] = [];
     private types: IObject<{ redo: RestoreCallback, undo: RestoreCallback }> = {};
-    constructor(private _editorRef: React.MutableRefObject<EditorManagerInstance | undefined>) {}
+    constructor(private _editorRef: React.MutableRefObject<EditorManagerInstance | undefined>) { }
     public registerType(type: string, undo: RestoreCallback, redo: RestoreCallback) {
         this.types[type] = { undo, redo };
     }
     public addHistory(type: string, props: IObject<any>) {
-        Debugger.log(`Add History:`, type, props);
+        Debugger.groupLog("history", `Add:`, type, props);
         this.undoStack.push({
             type,
             props,
@@ -30,7 +30,7 @@ export default class HistoryManager {
         if (!undoAction) {
             return;
         }
-        Debugger.log(`Undo History: ${undoAction.type}`, undoAction.props);
+        Debugger.groupLog("history", `Undo: ${undoAction.type}`, undoAction.props);
         this.types[undoAction.type].undo(undoAction.props, editor);
         this.redoStack.push(undoAction);
     }
@@ -41,7 +41,7 @@ export default class HistoryManager {
         if (!redoAction) {
             return;
         }
-        Debugger.log(`Redo History: ${redoAction.type}`, redoAction.props);
+        Debugger.groupLog("history", `Redo: ${redoAction.type}`, redoAction.props);
         this.types[redoAction.type].redo(redoAction.props, editor);
         this.undoStack.push(redoAction);
     }

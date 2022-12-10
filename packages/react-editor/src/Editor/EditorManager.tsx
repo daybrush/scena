@@ -1,14 +1,13 @@
 import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
-import { GroupManager } from "@moveable/helper";
 import Guides from "@scena/react-guides";
 import Selecto from "react-selecto";
 import styled, { StyledElement } from "react-css-styled";
 import Moveable, { MoveableTargetGroupsType } from "react-moveable";
 import { deepFlat } from "@daybrush/utils";
 
-// import Menu from "./Menu/Menu";
-import Viewport, { ViewportInstnace } from "./Viewport/Viewport";
+// import ToolBar from "./ToolBar/ToolBar";
+import Viewport, { ViewportInstnace } from "./components/Viewport";
 import { prefix, checkInput, getParnetScenaElement, isArrayEquals, keyChecker } from "./utils/utils";
 
 import LayerManager from "./managers/LayerManager";
@@ -23,12 +22,12 @@ import { EDITOR_CSS } from "./consts";
 
 import { useStoreRoot, useStoreStateSetPromise, useStoreValue } from "./Store/Store";
 import {
-    $actionManager, $layerManager, $editor, $groupManager,
+    $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuides, $infiniteViewer,
     $keyManager, $layers, $memoryManager, $moveable,
     $selectedTargets, $selecto, $verticalGuides,
 } from "./stores/stores";
-import { $meta, $shift, $space } from "./stores/keys";
+import { $alt, $meta, $shift, $space } from "./stores/keys";
 
 
 import { GuidesManager } from "./components/GuidesManager";
@@ -37,6 +36,9 @@ import { SelectoManager } from "./components/SelectoManager";
 import { MoveableManager } from "./components/MoveableManager";
 import { ScenaElementLayer } from "./types";
 import { SceneItem } from "scenejs";
+import ToolBar from "./uis/ToolBar";
+import MenuList from "./uis/Menu";
+import { Tabs } from "./uis/Tabs";
 
 
 
@@ -86,9 +88,8 @@ export interface EditorManagerInstance {
     memoryManager: MemoryManager;
     layerManager: LayerManager;
     keyManager: KeyManager;
-    groupManager: GroupManager;
 
-    // menuRef: React.MutableRefObject<Menu | null>;
+    // menuRef: React.MutableRefObject<ToolBar | null>;
     moveableRef: React.MutableRefObject<Moveable | null>;
     selectoRef: React.MutableRefObject<Selecto | null>;
     viewportRef: React.MutableRefObject<ViewportInstnace | null>;
@@ -105,7 +106,6 @@ export default function EditorManager2() {
     const memoryManager = React.useMemo(() => new MemoryManager(), []);
     const layerManager = React.useMemo(() => new LayerManager(), []);
     const keyManager = React.useMemo(() => new KeyManager(root, actionManager), []);
-    const groupManager = React.useMemo(() => new GroupManager([]), []);
 
 
     const horizontalGuidesRef = React.useRef<Guides>(null);
@@ -113,7 +113,7 @@ export default function EditorManager2() {
     const infiniteViewerRef = React.useRef<InfiniteViewer>(null);
     const moveableRef = React.useRef<Moveable>(null);
     const selectoRef = React.useRef<Selecto>(null);
-    // const menuRef = React.useRef<Menu>(null);
+    // const menuRef = React.useRef<ToolBar>(null);
     const viewportRef = React.useRef<ViewportInstnace>(null);
     // const tabsRef = React.useRef<Tabs>(null);
     const editorElementRef = React.useRef<StyledElement<HTMLDivElement>>(null);
@@ -125,7 +125,6 @@ export default function EditorManager2() {
     useStoreValue($memoryManager, memoryManager);
     useStoreValue($layerManager, layerManager);
     useStoreValue($keyManager, keyManager);
-    useStoreValue($groupManager, groupManager);
 
     // declare global ui component
     useStoreValue($moveable, moveableRef);
@@ -150,7 +149,7 @@ export default function EditorManager2() {
         },
         {
             id: "2",
-            scope: [],
+            scope: ["g"],
             jsx: <div style={{
                 position: "absolute",
                 border: "1px solid #f55",
@@ -162,11 +161,27 @@ export default function EditorManager2() {
             item: new SceneItem(),
             ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
         },
+        {
+            id: "3",
+            scope: ["g"],
+            jsx: <div style={{
+                position: "absolute",
+                border: "1px solid #f55",
+                top: "150px",
+                left: "150px",
+                width: "100px",
+                height: "100px",
+            }}></div>,
+            item: new SceneItem(),
+            ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+        },
     ], []);
 
-    layerManager.setLayers(layers);
-
     useStoreValue($layers, layers);
+
+    React.useEffect(() => {
+        layerManager.setLayers(layers);
+    }, []);
 
     const selectedTargetsStore = useStoreValue($selectedTargets);
     const setSelectedTargetsPromise = useStoreStateSetPromise($selectedTargets);
@@ -234,7 +249,6 @@ export default function EditorManager2() {
             memoryManager,
             layerManager,
             keyManager,
-            groupManager,
             moveableRef,
             selectoRef,
             viewportRef,
@@ -245,10 +259,33 @@ export default function EditorManager2() {
 
 
     React.useEffect(() => {
+        actionManager.on("select.all", () => {
+            const layers = root.get($layers);
+            const targets = layerManager.selectSameDepthTargets(
+                [],
+                layers.map(layer => layer.ref.current!),
+                [],
+            );
+
+            setSelectedTargets(targets);
+        });
         // register key
         keyManager.toggleState(["shift"], $shift, keyChecker);
         keyManager.toggleState(["space"], $space, keyChecker);
         keyManager.toggleState(["meta"], $meta, keyChecker);
+        keyManager.toggleState(["alt"], $alt, keyChecker);
+
+        // action down
+        keyManager.actionDown(["left"], "move.left");
+        keyManager.actionDown(["right"], "move.right");
+        keyManager.actionDown(["up"], "move.up");
+        keyManager.actionDown(["down"], "move.down");
+        keyManager.actionDown(["meta", "a"], "select.all");
+
+        // action up
+        keyManager.actionUp(["delete"], "remove.targets");
+        keyManager.actionUp(["backspace"], "remove.targets");
+
         // register default events
         const onResize = () => {
             horizontalGuidesRef.current!.resize();
@@ -261,6 +298,7 @@ export default function EditorManager2() {
 
         window.addEventListener("resize", onResize);
         return () => {
+            actionManager.off();
             keyManager.destroy();
             cancelAnimationFrame(startId);
             window.removeEventListener("resize", onResize);
@@ -269,7 +307,9 @@ export default function EditorManager2() {
 
     return React.useMemo(() => <EditorElement className={prefix("editor")} ref={editorElementRef}>
         {/* <Tabs ref={tabsRef} /> */}
-        {/* <Menu ref={menuRef} onSelect/> */}
+        <ToolBar />
+        <MenuList />
+        <Tabs />
         <div className={prefix("reset")} onClick={() => {
             infiniteViewerRef.current!.scrollCenter({ duration: 500, absolute: true });
         }}></div>
@@ -303,7 +343,7 @@ export default function EditorManager2() {
 //         horizontalGuides: [],
 //         verticalGuides: [],
 //         zoom: 1,
-//         selectedMenu: "MoveTool",
+//         selectedToolBar: "MoveTool",
 //     };
 //     public historyManager = new HistoryManager(this);
 //     public actionManager = new ActionManager();
@@ -317,7 +357,7 @@ export default function EditorManager2() {
 //     public infiniteViewer = React.createRef<InfiniteViewer>();
 //     public moveableManager = React.createRef<Moveable>();
 //     public selecto = React.createRef<Selecto>();
-//     public menu = React.createRef<Menu>();
+//     public menu = React.createRef<ToolBar>();
 //     public viewport = React.createRef<Viewport>();
 //     public tabs = React.createRef<Tabs>();
 //     public editorElement = React.createRef<StyledElement<HTMLDivElement>>();
@@ -337,7 +377,7 @@ export default function EditorManager2() {
 //             state,
 //         } = this;
 //         const {
-//             selectedMenu,
+//             selectedToolBar,
 //             selectedTargets,
 //             zoom,
 //         } = state;
@@ -351,7 +391,7 @@ export default function EditorManager2() {
 //         return (
 //             <EditorElement className={prefix("editor")} ref={this.editorElement}>
 //                 <Tabs ref={tabs}></Tabs>
-//                 <Menu ref={menu} onSelect={this.onMenuChange} />
+//                 <ToolBar ref={menu} onSelect={this.onToolBarChange} />
 //                 <div className={prefix("reset")} onClick={e => {
 //                     infiniteViewer.current!.scrollCenter();
 //                 }}></div>
@@ -410,7 +450,7 @@ export default function EditorManager2() {
 //                         <MoveableManager
 //                             ref={moveableManager}
 //                             selectedTargets={selectedTargets}
-//                             selectedMenu={selectedMenu}
+//                             selectedToolBar={selectedToolBar}
 //                             verticalGuidelines={verticalSnapGuides}
 //                             horizontalGuidelines={horizontalSnapGuides}
 //                             zoom={zoom}
@@ -444,7 +484,7 @@ export default function EditorManager2() {
 //                         const target = inputEvent.target;
 
 //                         this.checkBlur();
-//                         if (selectedMenu === "Text" && target.isContentEditable) {
+//                         if (selectedToolBar === "Text" && target.isContentEditable) {
 //                             const contentElement = getContentElement(target);
 
 //                             if (contentElement && contentElement.hasAttribute(DATA_SCENA_ELEMENT_ID)) {
@@ -759,7 +799,7 @@ export default function EditorManager2() {
 //         }
 //         this.actionManager.requestTrigger("render");
 //     }
-//     public selectMenu = (menu: string) => {
+//     public selectToolBar = (menu: string) => {
 //         this.menu.current!.select(menu);
 //     }
 //     public loadDatas(datas: SavedScenaData[]) {
@@ -825,9 +865,9 @@ export default function EditorManager2() {
 //     }
 
 
-//     private onMenuChange = (id: string) => {
+//     private onToolBarChange = (id: string) => {
 //         this.setState({
-//             selectedMenu: id,
+//             selectedToolBar: id,
 //         });
 //     }
 //     private selectEndMaker(rect: Rect) {

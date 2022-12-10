@@ -13,9 +13,12 @@ export const EDITOR_PROPERTIES = [
     "getSelectedFrames",
 ] as const;
 export const PREFIX = "scena-";
+export const SCENA_LAYER_SEPARATOR = "//__$__//";
 export const DATA_SCENA_ELEMENT_ID = "data-scena-element-id";
 export const DATA_SCENA_ELEMENT = "data-scena-element";
+
 export const TYPE_SCENA_LAYERS = "application/x-scena-layers";
+
 export const EDITOR_CSS = `
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,600&display=swap");
 
@@ -33,9 +36,8 @@ export const EDITOR_CSS = `
     --scena-editor-color-back6: #666;
     transform-style: preserve-3d;
 
-    --scena-editor-size-menu: 45px;
+    --scena-editor-size-tools: 45px;
     --scena-editor-size-guides: 30px;
-    --tabs: 40px;
     --tab: 200px;
 }
 
@@ -46,13 +48,9 @@ export const EDITOR_CSS = `
 .scena-viewer {
     position: absolute !important;
     left: var(--scena-editor-size-guides);
-    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-menu));
-    width: calc(100% - var(--scena-editor-size-guides) - var(--tabs));
-    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-menu));
-}
-
-.scena-viewer-move {
-    cursor: grab;
+    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-tools));
+    width: calc(100% - var(--scena-editor-size-guides));
+    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tools));
 }
 
 .scena-viewport-container {
@@ -76,22 +74,33 @@ export const EDITOR_CSS = `
     pointer-events: none;
 }
 
+
+.scena-viewer-move {
+    cursor: grab;
+}
+
+.scena-viewer-move .scena-viewport {
+    pointer-events: none;
+}
+
+
+
 .scena-guides-manager {
     position: absolute !important;
-    top: var(--scena-editor-size-menu);
+    top: var(--scena-editor-size-tools);
     left: 0;
     transform: translateZ(1px);
 }
 
 .scena-guides-manager.scena-guides-horizontal {
     left: var(--scena-editor-size-guides);
-    width: calc(100% - var(--scena-editor-size-guides) - var(--tabs));
+    width: calc(100% - var(--scena-editor-size-guides));
     height: var(--scena-editor-size-guides) !important;
 }
 
 .scena-guides-manager.scena-guides-vertical {
-    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-menu));
-    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-menu));
+    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-tools));
+    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tools));
     width: var(--scena-editor-size-guides) !important;
 }
 
@@ -106,7 +115,7 @@ export const EDITOR_CSS = `
     box-sizing: border-box;
     cursor: pointer;
     left: 0;
-    top: var(--scena-editor-size-menu);
+    top: var(--scena-editor-size-tools);
 }
 
 .scena-overlay {

@@ -29,15 +29,15 @@ export const $clipboardManager = atom<ClipboardManager | null>(null);
 export const $keyManager = atom<KeyManager | null>(null);
 export const $memoryManager = atom<MemoryManager | null>(null);
 export const $actionManager = atom<ActionManager | null>(null);
-export const $groupManager = atom<GroupManager | null>(null);
 
 export const $horizontalGuidelines = atom<number[]>([]);
 export const $verticalGuidelines = atom<number[]>([]);
 export const $selectedTargets = atom<MoveableTargetGroupsType>([]);
-export const $selectableTargets = atom<Array<HTMLElement | SVGElement>>([]);
 export const $layers = atom<ScenaElementLayer[]>([]);
 export const $zoom = atom<number>(1);
-export const $selectedMenu = atom<string>("pointer");
+export const $selectedTool = atom<string>("pointer");
+export const $pointer = atom<string>("move");
+export const $rect = atom<string>("rect");
 
 export const $editor = atom<MutableRefObject<EditorManagerInstance | undefined> | null>(null);
 export const $selecto = atom<MutableRefObject<Selecto | null> | null>(null);

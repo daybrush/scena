@@ -1,16 +1,6 @@
 import { IObject } from "@daybrush/utils";
-import Editor from "./EditorManager";
 import * as React from "react";
-import { EDITOR_PROPERTIES } from "./consts";
 import { SceneItem } from "scenejs";
-
-export interface ScenaEditorState {
-    selectedTargets: Array<SVGElement | HTMLElement>;
-    horizontalGuides: number[];
-    verticalGuides: number[];
-    selectedMenu: string;
-    zoom: number;
-}
 
 export interface TagAppendInfo {
     tag: any;
@@ -23,6 +13,7 @@ export interface TagAppendInfo {
 export interface Clipboard {
     write(items: ClipboardItem[]): Promise<void>;
 }
+
 export interface ClipboardItem {
     types: string[];
     getType(type: string): Promise<Blob>;
@@ -47,7 +38,9 @@ export interface ScenaProps {
     scneaHTML?: string;
 }
 
-export type ScenaFunctionComponent<T> = ((props: T & ScenaProps) => React.ReactElement<any, any>) & { scenaComponentId: string };
+export type ScenaFunctionComponent<T>
+    = ((props: T & ScenaProps) => React.ReactElement<any, any>)
+    & { scenaComponentId: string };
 export type ScenaComponent = React.JSXElementConstructor<ScenaProps> & { scenaComponentId: string };
 export type ScenaJSXElement
     = React.ReactElement<any, string>

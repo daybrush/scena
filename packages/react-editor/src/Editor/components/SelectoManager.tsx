@@ -7,8 +7,8 @@ import { DATA_SCENA_ELEMENT_ID } from "../consts";
 import { useStoreStateValue, useStoreValue } from "../Store/Store";
 import { $meta, $shift, $space } from "../stores/keys";
 import {
-    $actionManager, $editor, $groupManager, $infiniteViewer,
-    $layerManager, $layers, $moveable, $selectedMenu, $selectedTargets,
+    $actionManager, $editor, $infiniteViewer,
+    $layerManager, $layers, $moveable, $selectedTool, $selectedTargets,
 } from "../stores/stores";
 import { getContentElement } from "../utils/utils";
 
@@ -25,10 +25,9 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
     const selectedTargetsStore = useStoreValue($selectedTargets);
 
 
-    const selectedMenu = useStoreStateValue($selectedMenu);
+    const selectedTool = useStoreStateValue($selectedTool);
     const actionManager = useStoreStateValue($actionManager);
     const layerManager = useStoreStateValue($layerManager);
-    const groupManager = useStoreStateValue($groupManager);
 
     const editorRef = useStoreStateValue($editor);
     const moveableRef = useStoreStateValue($moveable);
@@ -70,7 +69,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
 
             const flatted = deepFlat(selectedTargetsStore.value);
 
-            if (selectedMenu === "Text" && target.isContentEditable) {
+            if (selectedTool === "Text" && target.isContentEditable) {
                 const contentElement = getContentElement(target);
 
                 if (contentElement && contentElement.hasAttribute(DATA_SCENA_ELEMENT_ID)) {
@@ -108,15 +107,14 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             }
             let nextTargets: TargetGroupsType = targets;
 
-            groupManager.set([], layerManager.getElements());
             if (isDragStart || isClick) {
                 if (metaStore.value) {
-                    nextTargets = groupManager.selectSingleTargets(targets, added, removed);
+                    nextTargets = layerManager.selectSingleTargets(targets, added, removed);
                 } else {
-                    nextTargets = groupManager.selectCompletedTargets(targets, added, removed, shiftStore.value);
+                    nextTargets = layerManager.selectCompletedTargets(targets, added, removed, shiftStore.value);
                 }
             } else {
-                nextTargets = groupManager.selectSameDepthTargets(targets, added, removed);
+                nextTargets = layerManager.selectSameDepthTargets(targets, added, removed);
             }
             editorRef.current!.setSelectedTargets(nextTargets);
         }}

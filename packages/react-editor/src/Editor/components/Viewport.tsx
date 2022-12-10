@@ -1,9 +1,8 @@
 import * as React from "react";
-import { IObject, isString, isArray, isNumber } from "@daybrush/utils";
-import { prefix, getId, getScenaAttrs, isScenaFunction, isScenaElement, isScenaFunctionElement, getOffsetOriginMatrix, updateElements } from "../utils/utils";
+import { IObject } from "@daybrush/utils";
+import { prefix } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
-import { ScenaJSXElement, ScenaComponent, ElementInfo, AddedInfo, RemovedInfo, MovedResult, ScenaElementLayer } from "../types";
-import { useStoreState, useStoreStateValue } from "../Store/Store";
+import { useStoreStateValue } from "../Store/Store";
 import { $layers } from "../stores/stores";
 
 export interface ViewportProps {
@@ -23,6 +22,9 @@ const Viewport = React.forwardRef<ViewportInstnace, ViewportProps>((props, ref) 
     } = props;
     const layers = useStoreStateValue($layers);
 
+    React.useImperativeHandle(ref, () => {
+        return {};
+    }, []);
 
     return <div className={prefix("viewport-container")} onBlur={onBlur} style={style}>
         {children}
@@ -39,6 +41,9 @@ const Viewport = React.forwardRef<ViewportInstnace, ViewportProps>((props, ref) 
         </div>
     </div>;
 });
+
+
+Viewport.displayName = "Viewport";
 
 export default Viewport;
 

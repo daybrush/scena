@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-hooks/rules-of-hooks */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import EventEmitter from "@scena/event-emitter";
 
@@ -15,10 +13,14 @@ export interface StoreValue<T> {
     subscribe(callback: () => void): void;
     unsubscribe(callback?: () => void): void;
 }
+
 export interface StoreState<T> {
     id: number;
     defaultValue: T;
 }
+
+export type StoreStateType<T extends StoreState<any>> = T extends StoreState<infer U> ? U : never;
+
 export const StoreRootContext = React.createContext<StoreRootValue | null>(null);
 
 let id = 0;
@@ -145,7 +147,7 @@ export function StoreRoot(props: { children?: React.ReactNode }) {
                 const storeValue = getStoreValue(rootValue, state);
 
                 return storeValue.update(value);
-            }
+            },
         };
 
         return rootValue;
