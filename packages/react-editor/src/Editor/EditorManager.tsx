@@ -94,6 +94,7 @@ export interface EditorManagerInstance {
     selectoRef: React.MutableRefObject<Selecto | null>;
     viewportRef: React.MutableRefObject<ViewportInstnace | null>;
 
+    setLayers(layers: ScenaElementLayer[]): Promise<boolean>;
     setSelectedTargets(targets: MoveableTargetGroupsType, isRestore?: boolean): Promise<boolean>;
 }
 
@@ -134,56 +135,63 @@ export default function EditorManager2() {
     useStoreValue($verticalGuides, verticalGuidesRef);
     useStoreValue($editor, editorRef);
 
-    const layers: ScenaElementLayer[] = React.useMemo(() => [
-        {
-            id: "1",
-            scope: [],
-            jsx: <div style={{
-                position: "absolute",
-                border: "1px solid #333",
-                width: "100px",
-                height: "100px",
-            }}></div>,
-            item: new SceneItem(),
-            ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-        },
-        {
-            id: "2",
-            scope: ["g"],
-            jsx: <div style={{
-                position: "absolute",
-                border: "1px solid #f55",
-                top: "100px",
-                left: "100px",
-                width: "100px",
-                height: "100px",
-            }}></div>,
-            item: new SceneItem(),
-            ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-        },
-        {
-            id: "3",
-            scope: ["g"],
-            jsx: <div style={{
-                position: "absolute",
-                border: "1px solid #f55",
-                top: "150px",
-                left: "150px",
-                width: "100px",
-                height: "100px",
-            }}></div>,
-            item: new SceneItem(),
-            ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-        },
-    ], []);
+    const layers: ScenaElementLayer[] = React.useMemo(() => {
+        const layers = [
+            {
+                id: "1",
+                scope: [],
+                jsx: <div style={{
+                    position: "absolute",
+                    border: "1px solid #333",
+                    width: "100px",
+                    height: "100px",
+                }}></div>,
+                item: new SceneItem(),
+                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+            },
+            {
+                id: "2",
+                scope: ["g"],
+                jsx: <div style={{
+                    position: "absolute",
+                    border: "1px solid #f55",
+                    top: "100px",
+                    left: "100px",
+                    width: "100px",
+                    height: "100px",
+                }}></div>,
+                item: new SceneItem(),
+                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+            },
+            {
+                id: "3",
+                scope: ["g"],
+                jsx: <div style={{
+                    position: "absolute",
+                    border: "1px solid #f55",
+                    top: "150px",
+                    left: "150px",
+                    width: "100px",
+                    height: "100px",
+                }}></div>,
+                item: new SceneItem(),
+                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+            },
+        ];
+        layerManager.setLayers(layers);
+
+        return layers;
+    }, []);
 
     useStoreValue($layers, layers);
 
     React.useEffect(() => {
-        layerManager.setLayers(layers);
+        layerManager.calculateLayers();
     }, []);
 
+    const setLayersPromise = useStoreStateSetPromise($layers);
     const selectedTargetsStore = useStoreValue($selectedTargets);
+
     const setSelectedTargetsPromise = useStoreStateSetPromise($selectedTargets);
     const onBlur = React.useCallback((e: any) => {
         const target = e.target as HTMLElement | SVGElement;
@@ -214,11 +222,19 @@ export default function EditorManager2() {
         // });
         // info.innerText = nextText;
     }, []);
+    const setLayers = React.useCallback((layers: ScenaElementLayer[]) => {
+        return setLayersPromise(layers).then(complete => {
+            if (!complete) {
+                return false;
+            }
 
+            layerManager.setLayers(layers);
+            layerManager.calculateLayers();
+            return true;
+        });
+    }, []);
     const setSelectedTargets = React.useCallback((targets: MoveableTargetGroupsType, isRestore?: boolean) => {
         const prevTargets = selectedTargetsStore.value;
-
-
 
         if (isArrayEquals(prevTargets, targets)) {
             return Promise.resolve(false);
@@ -253,13 +269,15 @@ export default function EditorManager2() {
             selectoRef,
             viewportRef,
             // menuRef,
+            setLayers,
             setSelectedTargets,
         };
     }, []);
 
 
     React.useEffect(() => {
-        actionManager.on("select.all", () => {
+        actionManager.on("select.all", e => {
+            e.inputEvent?.preventDefault();
             const layers = root.get($layers);
             const targets = layerManager.selectSameDepthTargets(
                 [],

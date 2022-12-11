@@ -16,7 +16,7 @@ import { EditorManagerInstance } from "../EditorManager";
 
 // import Menu from "../Menu/Menu";
 
-import { atom } from "../Store/Store";
+import { atom, compute } from "../Store/Store";
 import { ScenaElementLayer } from "../types";
 
 

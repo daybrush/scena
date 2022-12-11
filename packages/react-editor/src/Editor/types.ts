@@ -50,49 +50,23 @@ export type ScenaJSXType = ScenaJSXElement | string | ScenaComponent;
 
 
 
-export interface AddedInfo {
-    added: ElementInfo[];
-}
-export interface RemovedInfo {
-    removed: ElementInfo[];
-}
-export interface MovedInfo {
-    info: ElementInfo;
-    parentInfo: ElementInfo;
-    prevInfo?: ElementInfo;
-    moveMatrix?: number[];
-}
-export interface MovedResult {
-    prevInfos: MovedInfo[];
-    nextInfos: MovedInfo[];
-}
 export interface FrameInfo {
     frame: IObject<any>;
     order: IObject<any>;
 }
 
 export interface ScenaElementLayer {
+    type?: "layer";
     id: string;
     scope: string[];
     jsx: React.ReactElement<any, any>;
     item: SceneItem;
     ref: React.MutableRefObject<SVGElement | HTMLElement | null>;
 }
-export interface ElementInfo {
-    jsx: ScenaJSXType;
-    name: string;
-    frame?: IObject<any>;
-    frameOrder?: IObject<any>;
-    moveMatrix?: number[];
 
-    scopeId?: string;
-    children?: ElementInfo[];
-    attrs?: IObject<any>;
-    componentId?: string;
-    jsxId?: string;
-    el?: HTMLElement | null;
-    id?: string;
-    index?: number;
-    innerText?: string;
-    innerHTML?: string;
+export interface ScenaElementLayerGroup {
+    type: "group";
+    id: string;
+    scope: string[];
+    children: Array<ScenaElementLayerGroup | ScenaElementLayer>;
 }

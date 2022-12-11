@@ -34,7 +34,7 @@ export default class KeyManager {
     public actionDown(keys: string[], actionName: string) {
         this.keycon.keydown(keys, this.addCallback("keydown", keys, e => {
             this._actionManager.trigger(actionName, {
-                inputEvent: e,
+                inputEvent: e.inputEvent,
             });
         }, `action down: ${actionName}`));
     }

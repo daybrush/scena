@@ -1,18 +1,23 @@
 import { find } from "@daybrush/utils";
 import { GroupManager, TargetGroupsType } from "@moveable/helper";
 import { SCENA_LAYER_SEPARATOR } from "../consts";
-import { ScenaElementLayer } from "../types";
+import { useStoreStateValue } from "../Store/Store";
+import { $layers } from "../stores/stores";
+import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 
 export default class LayerManager extends GroupManager {
-    private _layers: ScenaElementLayer[] = [];
-
-    constructor() {
+    constructor(private _layers: ScenaElementLayer[] = []) {
         super([], []);
-    }
 
+    }
+    public use() {
+        return useStoreStateValue($layers);
+    }
+    public getLayer() {
+        return this._layers;
+    }
     public setLayers(layers: ScenaElementLayer[]) {
         this._layers = layers;
-        this.calculateLayers();
     }
     public calculateLayers() {
         const layers = this._layers;
@@ -36,8 +41,51 @@ export default class LayerManager extends GroupManager {
             map[scope.join(SCENA_LAYER_SEPARATOR)].push(layer.ref.current!);
         });
 
-        console.log(map[""], groupLayers.map(layer => layer.ref.current!));
         this.set(map[""], layers.map(layer => layer.ref.current!));
+    }
+    public findChildren(parentScope: string[] = []): Array<ScenaElementLayerGroup | ScenaElementLayer> {
+        const length = parentScope.length;
+        const layers = this._layers;
+        const childrenLayers = layers.filter(({ scope }) => {
+            return parentScope.every((path, i) => path === scope[i]);
+        });
+
+        let children = childrenLayers.map(layer => {
+            const scope = layer.scope;
+            const childLength = scope.length;
+
+            if (length < childLength) {
+                const group: ScenaElementLayerGroup = {
+                    type: "group",
+                    id: scope[length],
+                    scope: scope.slice(0, length),
+                    children: [],
+                };
+                return group;
+            } else {
+                return layer;
+            }
+        });
+
+
+        children = children.filter((child, i, arr) => {
+            if (child.type === "group") {
+                const id = child.id;
+
+                return !arr.find((nextChild, j) => j < i && nextChild.type === "group" && nextChild.id === id);
+            }
+            return true;
+        });
+
+        children.forEach(child => {
+            if (child.type === "group") {
+                const childScope = [...child.scope, child.id];
+
+                child.children = this.findChildren(childScope);
+            }
+        });
+
+        return children;
     }
     public getLayers() {
         return this._layers;

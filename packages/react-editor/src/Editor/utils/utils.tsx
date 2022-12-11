@@ -4,7 +4,7 @@ import { prefixNames } from "framework-utils";
 import { PREFIX, DATA_SCENA_ELEMENT_ID } from "../consts";
 import {
     ScenaFunctionComponent, ScenaProps, ScenaComponent,
-    ScenaJSXElement, ScenaFunctionJSXElement, ElementInfo,
+    ScenaJSXElement, ScenaFunctionJSXElement, ScenaElementLayerGroup, ScenaElementLayer,
 } from "../types";
 import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
 import { Frame } from "scenejs";
@@ -152,41 +152,23 @@ export function getOffsetOriginMatrix(el: HTMLElement | SVGElement, container: H
     return matrix3d(stack.offsetMatrix as any, translation);
 }
 
-export function updateElements(infos: ElementInfo[]) {
-    return infos.map(function registerElement(info) {
-        const id = info.id!;
 
-        const target = document.querySelector<HTMLElement>(`[${DATA_SCENA_ELEMENT_ID}="${id}"]`)!;
-        const attrs = info.attrs || {};
+export function flattenLayerGroup(group: ScenaElementLayerGroup): ScenaElementLayer[] {
+    const layers: ScenaElementLayer[] = [];
 
-        info.el = target;
-
-        for (const name in attrs) {
-            target.setAttribute(name, attrs[name]);
+    group.children.forEach(child => {
+        if (child.type === "group") {
+            layers.push(...flattenLayerGroup(child));
+        } else {
+            layers.push(child);
         }
-        info.attrs = getScenaAttrs(target);
-        const children = info.children || [];
-
-        if (children.length) {
-            children.forEach(registerElement);
-        } else if (info.attrs!.contenteditable) {
-            if ("innerText" in info) {
-                (target as HTMLElement).innerText = info.innerText || "";
-            } else {
-                info.innerText = (target as HTMLElement).innerText || "";
-            }
-        } else if (!info.componentId) {
-            if ("innerHTML" in info) {
-                target.innerHTML = info.innerHTML || "";
-            } else {
-                info.innerHTML = target.innerHTML || "";
-            }
-        }
-        return { ...info };
     });
+    return layers;
 }
-
-
 export function isArrayEquals(arr1: any[], arr2: any[]) {
     return arr1.length === arr2.length && arr1.every((el, i) => el === arr2[i]);
+}
+
+export function isArrayContains(arr1: any[], arr2: any[]) {
+    return arr1.every((el, i) => el === arr2[i]);
 }

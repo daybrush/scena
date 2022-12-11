@@ -14,9 +14,13 @@ export interface StoreValue<T> {
     unsubscribe(callback?: () => void): void;
 }
 
+export type StoreCompute = <T>(state: StoreState<T>) => T;
+
+
 export interface StoreState<T> {
     id: number;
     defaultValue: T;
+    compute?(e: { get: StoreCompute }): T;
 }
 
 export type StoreStateType<T extends StoreState<any>> = T extends StoreState<infer U> ? U : never;
@@ -70,6 +74,14 @@ export function atom<T>(defaultValue: T) {
     return value;
 }
 
+export function compute<T>(callback: (e: { get: StoreCompute }) => T) {
+    const value: StoreState<T> = {
+        id: ++id,
+        defaultValue: null as any,
+        compute: callback,
+    };
+    return value;
+}
 
 export function useStoreRoot() {
     return useContext(StoreRootContext)!;

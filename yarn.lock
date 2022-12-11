@@ -1334,7 +1334,17 @@
   dependencies:
     prototype-minify "^1.0.0"
 
-"@daybrush/utils@1.6.0", "@daybrush/utils@^0.11.0", "@daybrush/utils@^1.0.0", "@daybrush/utils@^1.1.1", "@daybrush/utils@^1.10.0", "@daybrush/utils@^1.3.1", "@daybrush/utils@^1.4.0", "@daybrush/utils@^1.6.0", "@daybrush/utils@^1.7.1", "@daybrush/utils@^1.9.1":
+"@daybrush/utils@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.6.0.tgz#0dfd2c360764f63380df4ec0d44e176c69f7bbc3"
+  integrity sha512-9MjMoOLl1U+l8lXByN3BbLZXf+mktoLyeb6t78Jz2WZ7LRldK0FNg8oW//9giO2hHCUyxS7LX6jS1hToGIfRWA==
+
+"@daybrush/utils@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-0.11.0.tgz#3fd113fcedaab29d8c80773ca5f4d32551bdc9d8"
+  integrity sha512-PnrY1NDjXqXKASoREcjHokQt0WWHiUBClMJ0l9APx42QkeOCQ5nXB7k4VdmkaU23BndeSmNNYJDNL6eEsRitaA==
+
+"@daybrush/utils@^1.0.0", "@daybrush/utils@^1.1.1", "@daybrush/utils@^1.10.0", "@daybrush/utils@^1.3.1", "@daybrush/utils@^1.4.0", "@daybrush/utils@^1.6.0", "@daybrush/utils@^1.7.1", "@daybrush/utils@^1.9.1":
   version "1.10.0"
   resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.0.tgz#2a2235269b960b7ffaf05ca2e75379ea1fb58204"
   integrity sha512-IDT0DWAGcjxb2+WMr8pHrVTkHVKdilBumX1SubXJUlowN4rMSLphwDxvMNfv+vQOrdCPXSoPVZ3mhfrHsQ9Xow==
@@ -2664,6 +2674,17 @@
   dependencies:
     "@daybrush/utils" "^1.4.0"
 
+"@scena/react-folder@^0.5.1":
+  version "0.5.1"
+  resolved "https://registry.npmjs.org/@scena/react-folder/-/react-folder-0.5.1.tgz#f9f3c05149c5ad1609bf6243f07274f38b61d590"
+  integrity sha512-0ik0OQCPumV8o2MXmKxrTomcG4hm8gyXa7A5zhB4qXcYKFrA/kDWQcSdLeruBTQKbIoiDDCIM4JzNQXvJvr9bA==
+  dependencies:
+    "@daybrush/utils" "^1.4.0"
+    framework-utils "^1.0.0"
+    gesto "^1.3.0"
+    keycon "^1.1.2"
+    react-css-styled "^1.0.0"
+
 "@scena/react-guides@^0.19.4":
   version "0.19.4"
   resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.19.4.tgz#fdaa350f57492f5df1e17abbceec8fcf403d5f22"
@@ -3151,10 +3172,19 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react@*", "@types/react@^16.9.17", "@types/react@^17":
+"@types/react@*":
   version "16.14.34"
   resolved "https://registry.npmjs.org/@types/react/-/react-16.14.34.tgz#d129324ffda312044e1c47aab18696e4ed493282"
   integrity sha512-b99nWeGGReLh6aKBppghVqp93dFJtgtDOzc8NXM6hewD8PQ2zZG5kBLgbx+VJr7Q7WBMjHxaIl3dwpwwPIUgyA==
+  dependencies:
+    "@types/prop-types" "*"
+    "@types/scheduler" "*"
+    csstype "^3.0.2"
+
+"@types/react@^17":
+  version "17.0.52"
+  resolved "https://registry.npmjs.org/@types/react/-/react-17.0.52.tgz#10d8b907b5c563ac014a541f289ae8eaa9bf2e9b"
+  integrity sha512-vwk8QqVODi0VaZZpDXQCmEmiOuyjEFPY7Ttaw5vjM112LOq37yz1CDJGrRJwA1fYEq4Iitd5rnjd1yWAc/bT+A==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -6718,7 +6748,7 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
-framework-utils@^1.1.0:
+framework-utils@^1.0.0, framework-utils@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/framework-utils/-/framework-utils-1.1.0.tgz#a3b528bce838dfd623148847dc92371b09d0da2d"
   integrity sha512-KAfqli5PwpFJ8o3psRNs8svpMGyCSAe8nmGcjQ0zZBWN2H6dZDnq+ABp3N3hdUmFeMrLtjOCTXD4yplUJIWceg==
@@ -6846,7 +6876,7 @@ gensync@^1.0.0-beta.2:
   resolved "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
 
-gesto@^1.13.0, gesto@^1.13.1, gesto@^1.13.4, gesto@^1.14.0:
+gesto@^1.13.0, gesto@^1.13.1, gesto@^1.13.4, gesto@^1.14.0, gesto@^1.3.0:
   version "1.14.0"
   resolved "https://registry.npmjs.org/gesto/-/gesto-1.14.0.tgz#cb50213f80bf5a1ce5af1dd2bba7c3bb5338dfbc"
   integrity sha512-b89RyxAQb65t0HVJHPWi1+Ren66QoMaXpV5do3k7LRJAwunESYlJr520/4pNrMQGUkqopLMZjEceUE2uBqcgeQ==
@@ -8797,20 +8827,20 @@ keycode@^2.2.0:
   resolved "https://registry.npmjs.org/keycode/-/keycode-2.2.1.tgz#09c23b2be0611d26117ea2501c2c391a01f39eff"
   integrity sha512-Rdgz9Hl9Iv4QKi8b0OlCRQEzp4AgVxyCtz5S/+VIHezDmrDhkp2N2TqBWOLz0/gbeREXOOiI9/4b8BY9uw2vFg==
 
-keycon@^1.2.0:
-  version "1.3.2"
-  resolved "https://registry.npmjs.org/keycon/-/keycon-1.3.2.tgz#4def6e13ee450b22d3d6a8eaf7215dda8ecbde97"
-  integrity sha512-rNdi3Izqkp4r2P+f55Nrk8uCdEFS+eiMoUVNuIJOQ/qsTM0xuMvk3sv5E41pjfrClCGlC+T72MpXf6O+k9UXuA==
+keycon@^1.1.2, keycon@^1.4.0, keycon@~1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npmjs.org/keycon/-/keycon-1.4.0.tgz#bf2a633f3c3b659ea564045938cff33e584cebd5"
+  integrity sha512-p1NAIxiRMH3jYfTeXRs2uWbVJ1WpEjpi8ktzUyBJsX7/wn2qu2VRXktneBLNtKNxJmlUYxRi9gOJt1DuthXR7A==
   dependencies:
     "@cfcs/core" "^0.0.6"
     "@daybrush/utils" "^1.7.1"
     "@scena/event-emitter" "^1.0.2"
     keycode "^2.2.0"
 
-keycon@^1.4.0, keycon@~1.4.0:
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/keycon/-/keycon-1.4.0.tgz#bf2a633f3c3b659ea564045938cff33e584cebd5"
-  integrity sha512-p1NAIxiRMH3jYfTeXRs2uWbVJ1WpEjpi8ktzUyBJsX7/wn2qu2VRXktneBLNtKNxJmlUYxRi9gOJt1DuthXR7A==
+keycon@^1.2.0:
+  version "1.3.2"
+  resolved "https://registry.npmjs.org/keycon/-/keycon-1.3.2.tgz#4def6e13ee450b22d3d6a8eaf7215dda8ecbde97"
+  integrity sha512-rNdi3Izqkp4r2P+f55Nrk8uCdEFS+eiMoUVNuIJOQ/qsTM0xuMvk3sv5E41pjfrClCGlC+T72MpXf6O+k9UXuA==
   dependencies:
     "@cfcs/core" "^0.0.6"
     "@daybrush/utils" "^1.7.1"
@@ -11379,17 +11409,7 @@ react-color@^2.18.1:
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
 
-react-compat-css-styled@^1.0.9:
-  version "1.0.9"
-  resolved "https://registry.npmjs.org/react-compat-css-styled/-/react-compat-css-styled-1.0.9.tgz#70ed3ed8d8000fe01cb5ce15ee7723a094165db1"
-  integrity sha512-YpUgTpXU1wR58aPQJVGAWq6QeEFWkafV0qq4Y8KRUwpQJLbJF2GYu5ZQ/kafHGvN3dqQX2e340NlNZ+zbZZv2w==
-  dependencies:
-    "@daybrush/utils" "^1.0.0"
-    css-styled "^1.0.0"
-    framework-utils "^1.1.0"
-    react-css-styled "~1.0.4"
-
-react-css-styled@^1.0.2, react-css-styled@^1.0.4, react-css-styled@~1.0.4:
+react-css-styled@^1.0.0, react-css-styled@^1.0.2, react-css-styled@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.0.4.tgz#236ce398232dc152084bbf20540df1c971534174"
   integrity sha512-nRske1bAKOCaf7Gf3o76tKQFIYggaW1qH4rutBlitH5lYnRPA7WoAYKrcxqdUPZd00oASg3SvFZSh3Mc1Wvj3w==

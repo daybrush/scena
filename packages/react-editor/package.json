@@ -60,6 +60,7 @@
     "@egjs/list-differ": "^1.0.0",
     "@moveable/helper": "^0.0.3",
     "@scena/matrix": "^1.1.0",
+    "@scena/react-folder": "^0.5.1",
     "@scena/react-guides": "^0.19.4",
     "@types/react-color": "^3.0.4",
     "css-to-mat": "^1.0.3",
