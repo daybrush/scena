@@ -12,7 +12,6 @@ import {
     TransformIcon,
     RoundRectIcon,
     OvalIcon,
-    CircleIcon,
 } from "./icons";
 import { $openMenu, MenuItem } from "./Menu";
 
@@ -31,6 +30,8 @@ const ToolBarElement = styled("div", `
     user-select: none;
     z-index: 10;
     transform: translateZ(1px);
+    display: flex;
+    justify-content: center;
 }
 .scena-menu-bottom {
     position: absolute;
@@ -54,6 +55,11 @@ svg, .scena-i {
     border-radius: 0px;
     transition: all ease 0.2s;
     vertical-align: top;
+}
+.scena-icon.scena-menu-main {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 .scena-icon-inner {
     position: relative;
@@ -88,6 +94,7 @@ svg, .scena-i {
 
 interface Tool {
     name: string;
+    className?: string;
     title?: string;
     icon: (props: { selected?: boolean }) => JSX.Element;
     isExtends?: boolean;
@@ -148,6 +155,7 @@ const TOOLS: Tool[] = [
     {
         name: "",
         icon: ScenaIcon,
+        className: "menu-main",
     },
     {
         name: "pointer",
@@ -218,13 +226,16 @@ const ToolBar = () => {
     const [selectedTool, setSelectedTool] = useStoreState($selectedTool);
 
     return <ToolBarElement className={prefix("menu")}>
-        {TOOLS.map(({ name, icon: Icon, isExtends }) => {
+        {TOOLS.map(({ className, name, icon: Icon, isExtends }) => {
             const selected = name === selectedTool;
-            return <div key={name} className={prefix("icon", selected ? "selected" : "")} onClick={() => {
-                if (name) {
-                    setSelectedTool(name);
-                }
-            }}>
+            return <div
+                key={name}
+                className={prefix("icon", selected ? "selected" : "", className || "")}
+                onClick={() => {
+                    if (name) {
+                        setSelectedTool(name);
+                    }
+                }}>
                 {isExtends ? <Icon selected={selected} /> : <ToolIcon icon={() => <Icon />} selected={selected} />}
                 {isExtends && <div className={prefix("extends-icon")} />}
             </div>;

@@ -94,3 +94,24 @@ export function CheckedIcon() {
             fill="#fff" strokeLinejoin="round" strokeWidth="10" stroke="#fff"></path>
     </svg>;
 }
+
+export function FolderIcon() {
+    return <svg viewBox="0 0 80 80">
+        <path
+            d="M 10,20 L 30,20 L 40,26 L70, 26, L 70,60 L 10,60 L 10,20 Z"
+            fill="#fff" strokeLinejoin="round" strokeWidth="10" stroke="#fff"></path>
+    </svg>;
+}
+
+export function LayerIcon() {
+    return <svg viewBox="0 0 80 80">
+        <path d="M40,20 L70,40 L40,60 L10,40 L40,20Z" stroke="#fff" fill="#fff" strokeWidth="3" style={{
+            // fill: "rgba(255, 255, 255, 0.5)",
+            transform: "translateY(-7px)",
+        }}></path>
+        <path d="M40,20 L70,40 L40,60 L10,40 L40,20Z" stroke="#fff" fill="#fff" strokeWidth="3" style={{
+            // fill: "rgba(255, 255, 255, 0.5)",
+            transform: "translateY(7px)",
+        }}></path>
+    </svg>;
+}

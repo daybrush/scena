@@ -55,9 +55,13 @@ export interface FrameInfo {
     order: IObject<any>;
 }
 
+export type ScenaTargetGroupsType
+    = Array<React.MutableRefObject<HTMLElement | SVGElement | null> | ScenaTargetGroupsType>;
+
 export interface ScenaElementLayer {
     type?: "layer";
     id: string;
+    title: string;
     scope: string[];
     jsx: React.ReactElement<any, any>;
     item: SceneItem;
@@ -67,6 +71,7 @@ export interface ScenaElementLayer {
 export interface ScenaElementLayerGroup {
     type: "group";
     id: string;
+    title: string;
     scope: string[];
     children: Array<ScenaElementLayerGroup | ScenaElementLayer>;
 }

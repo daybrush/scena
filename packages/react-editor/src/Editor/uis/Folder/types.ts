@@ -73,6 +73,7 @@ export interface FolderProps<T> {
     guidelineColor?: string;
     iconColor?: string;
 
+    urlProperty?: (id: string, scope: any[], value: T, index: any) => string;
     nameProperty?:
     | (keyof T & string)
     | ((value: T, index: any, scope: any[]) => any);
@@ -87,7 +88,7 @@ export interface FolderProps<T> {
     dragCondtion?: (e: OnDragStart) => boolean;
     checkMove?: (e: MoveInfo<T>) => boolean;
     onMove?: (e: OnMove<T>) => any;
-    onSelect?: (e: OnSelect) => any;
+    onSelect?: (e: OnSelect<T>) => any;
     onFold?: (e: OnFold) => any;
     isChild?: boolean;
 }
@@ -106,18 +107,21 @@ export interface MoveInfo<T> {
 }
 
 export interface OnMove<T> extends MoveInfo<T> {
+    flattenInfos: Array<FileInfo<T>>;
     flattenPrevInfo: FileInfo<T> | null | undefined;
     children: T[];
     childrenInfos: Array<FileInfo<T>>;
     selected: string[];
     selectedInfos: Array<FileInfo<T>>;
+    nextFolded: string[];
 }
 
-export interface OnSelect {
+export interface OnSelect<T> {
     path: string[];
     pathUrl: string;
     isSelected: boolean;
     selected: string[];
+    selectedInfos: Array<FileInfo<T>>;
 }
 
 export interface OnFold {

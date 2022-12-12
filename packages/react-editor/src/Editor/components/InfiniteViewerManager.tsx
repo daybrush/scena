@@ -5,7 +5,7 @@ import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "../Sto
 import { $space } from "../stores/keys";
 import {
     $actionManager, $horizontalGuides, $moveable,
-    $selectedTargets, $selecto, $verticalGuides, $zoom,
+    $selectedTargetList, $selecto, $verticalGuides, $zoom,
 } from "../stores/stores";
 import { prefix } from "../utils/utils";
 
@@ -18,7 +18,7 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
     const horizontalGuidesRef = useStoreStateValue($horizontalGuides);
     const verticalGuidesRef = useStoreStateValue($verticalGuides);
     const actionManager = useStoreStateValue($actionManager);
-    const selectedTargetsStore = useStoreValue($selectedTargets);
+    const selectedTargetListStore = useStoreValue($selectedTargetList);
 
     const isSpace = useStoreStateValue($space);
     const setZoom = useStoreStateSetValue($zoom);
@@ -35,7 +35,7 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
         maxPinchWheel={3}
         onDragStart={e => {
             const target = e.inputEvent.target;
-            const flatted = deepFlat(selectedTargetsStore.value);
+            const flatted = selectedTargetListStore.value?.flatten();
 
             actionManager.trigger("blur");
 

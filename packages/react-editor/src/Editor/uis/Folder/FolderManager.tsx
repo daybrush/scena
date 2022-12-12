@@ -1,7 +1,6 @@
 /* eslint-disable prefer-const */
 import * as React from "react";
 import {
-    findParentFileInfo,
     getChildren,
     getId,
     getName,
@@ -134,6 +133,7 @@ export default class FolderManager<T extends {} = any>
         checkMove: () => true,
         onSelect: () => { },
         gap: 15,
+        urlProperty: (id: string) => id,
         pathProperty: (id: string, scope: string[]) => [...scope, id],
         idProperty: (_: any, index: number) => index,
         nameProperty: (_: any, index: number) => index,
@@ -297,17 +297,24 @@ export default class FolderManager<T extends {} = any>
     }
     private onDragStart = (e: OnDragStart) => {
         const clickedFile: HTMLElement = getCurrentFile(e.inputEvent.target);
+        const datas = e.datas;
 
         if (hasClass(e.inputEvent.target, prefix("fold-icon"))) {
             e.stop();
             this.onClickFold(clickedFile);
             return false;
         }
+        const fileInfos = this.flatChildren();
+
+        datas.fileMap = this.flatMap(fileInfos);
+        datas.fileInfos = fileInfos;
+
+
         const folderElement = this.folderRef.current!.getElement();
 
         if (!this.props.isMove) {
             if (clickedFile) {
-                this.onClickFile({ currentTarget: clickedFile });
+                this.onClickFile({ currentTarget: clickedFile, datas });
             }
             e.stop();
             return false;
@@ -319,7 +326,6 @@ export default class FolderManager<T extends {} = any>
             return false;
         }
         const rect = folderElement.getBoundingClientRect();
-        const datas = e.datas;
         const offsetX = e.clientX - rect.left;
         // const offsetY = e.clientY - rect.top;
 
@@ -330,11 +336,6 @@ export default class FolderManager<T extends {} = any>
         e.inputEvent.preventDefault();
         e.inputEvent.stopPropagation();
 
-        const fileInfos = this.flatChildren();
-
-        datas.fileMap = this.flatMap(fileInfos);
-        datas.fileInfos = fileInfos;
-
 
         const selected = this.props.selected!;
 
@@ -343,7 +344,7 @@ export default class FolderManager<T extends {} = any>
             selected.indexOf(clickedFile.getAttribute("data-file-path")!) === -1
         ) {
             datas.clickedFile = clickedFile;
-            this.onClickFile({ currentTarget: clickedFile });
+            this.onClickFile({ currentTarget: clickedFile, datas });
             return;
         }
     };
@@ -458,6 +459,8 @@ export default class FolderManager<T extends {} = any>
                     depth: nextDepth + 1,
                     parentInfo: prevInfo,
                 });
+
+
             } else if (prevDepth < nextDepth) {
                 depthRange = [
                     nextDepth,
@@ -470,28 +473,28 @@ export default class FolderManager<T extends {} = any>
                 });
             } else if (prevDepth > nextDepth) {
                 const prevPath = prevInfo.path;
-                // last child(prev) => next other group (target)
+                // last child(prev) => next other group or target
                 depthRange = [
                     nextDepth,
                     prevDepth + 1,
                 ];
                 for (let depth = depthRange[0]; depth <= depthRange[1]; ++depth) {
-                    const movePath = prevPath.slice(0, depth);
+                    const movePath = prevPath.slice(0, depth + 1);
                     const movePathUrl = movePath.join(pathSeperator);
-                    const children = fileInfos.filter(info => {
-                        return info.parentPathUrl === movePathUrl;
+                    const parentPathUrl = prevPath.slice(0, depth).join(pathSeperator);
+                    const prevFileInfo = fileInfos.find(info => {
+                        return info.pathUrl === movePathUrl;
                     });
 
                     moveInfos.push({
                         depth,
-                        parentInfo: fileMap[movePathUrl],
-                        prevInfo: children[children.length - 1],
+                        parentInfo: fileMap[parentPathUrl],
+                        prevInfo: depth > prevDepth ? null : prevFileInfo,
                     });
                 }
             }
         }
         const selectedPaths = selected.map(selectedUrl => selectedUrl.split(pathSeperator!));
-        // const selectedLength = selected.length;
 
         moveInfos = moveInfos.filter(({ prevInfo, parentInfo }) => {
             const info = prevInfo || parentInfo;
@@ -554,22 +557,19 @@ export default class FolderManager<T extends {} = any>
             const currentTarget = getCurrentFile(e.inputEvent.target);
 
             if (currentTarget) {
-                this.onClickFile({ currentTarget });
+                this.onClickFile({ currentTarget, datas });
             }
             return;
         }
-        const { onMove, selected } = this.props;
+        const { onMove, selected, pathSeperator, folded } = this.props;
         const fileInfos: Array<FileInfo<T>> = datas.fileInfos;
         const targetInfo: FileInfo<T> = datas.targetInfo;
         const moveInfo: MoveInfo<T> = datas.moveInfo;
-        const depth = datas.guidelineDepth;
-        const isTop = datas.isTop;
-        const fileMap = datas.fileMap;
+        const fileMap: Record<string, FileInfo<T>> = datas.fileMap;
         const selectedInfos: Array<FileInfo<T>> = selected!.map(id => fileMap[id]);
 
         if (targetInfo) {
             let prevInfo = moveInfo.prevInfo;
-            let flattenPrevInfo = prevInfo || moveInfo.parentInfo;
             let childrenInfos = this.getChildrenFileInfos(moveInfo.parentInfo);
 
             if (prevInfo) {
@@ -587,6 +587,8 @@ export default class FolderManager<T extends {} = any>
                     }
                 }
             }
+            let flattenPrevInfo = datas.prevInfo;
+
             if (flattenPrevInfo) {
                 const prevPathUrl = flattenPrevInfo.pathUrl;
                 let index = findIndex(fileInfos, info => info.pathUrl === prevPathUrl);
@@ -596,7 +598,7 @@ export default class FolderManager<T extends {} = any>
                         flattenPrevInfo = null;
                     } else {
                         flattenPrevInfo = fileInfos[index];
-                        console.log(selectedInfos, flattenPrevInfo);
+
                         if (selectedInfos.every(({ path }) => !isArrayContains(path, flattenPrevInfo!.path))) {
                             break;
                         }
@@ -614,15 +616,31 @@ export default class FolderManager<T extends {} = any>
                 0,
                 ...selectedInfos,
             );
+            const parentPath = moveInfo.parentInfo?.path ?? [];
+
+            const nextFolded = folded!.map(pathUrl => {
+                const fileInfo = fileMap[pathUrl];
+
+                if (selected!.indexOf(pathUrl) === -1) {
+                    return pathUrl;
+                }
+
+                return [...parentPath, fileInfo.id].join(pathSeperator);
+            }).filter(Boolean) as string[];
+
 
             onMove!({
                 ...moveInfo,
+                prevInfo,
                 children: childrenInfos.map(info => info.value),
                 childrenInfos,
+                flattenInfos: fileInfos,
                 flattenPrevInfo,
                 selected: selected!,
                 selectedInfos,
-                prevInfo,
+                nextFolded,
+
+
             });
         }
 
@@ -645,12 +663,16 @@ export default class FolderManager<T extends {} = any>
         el.style.cssText = `display: block;`
             + `transform: translate(${e.clientX - rect.left - datas.offsetX}px, ${e.clientY - rect.top}px) translateY(-50%)`;
     }
-    private onClickFile = ({ currentTarget }: any) => {
+    private onClickFile = ({ currentTarget, datas }: any) => {
         const pathUrl = currentTarget.getAttribute("data-file-path")!;
-        const { multiselect, onSelect, selected, pathSeperator } = this.props;
+        const {
+            multiselect, onSelect,
+            selected, pathSeperator,
+        } = this.props;
 
         let isSelected = false;
         let nextSelected: string[];
+
         if (multiselect) {
             nextSelected = (selected || []).slice();
             const index = nextSelected.indexOf(pathUrl);
@@ -674,51 +696,29 @@ export default class FolderManager<T extends {} = any>
             .map((info) => info.pathUrl)
             .filter((flatPath) => nextSelected.indexOf(flatPath) > -1);
 
+        let selectedPaths = nextSelected.map(pathUrl => pathUrl.split(pathSeperator!));
+
+        selectedPaths = selectedPaths.filter((path, i) => {
+            return selectedPaths.every((path2, j) => {
+                return i === j || !isArrayContains(path2, path);
+            });
+        });
+
+        nextSelected = selectedPaths.map(path => path.join(pathSeperator!));
+
+        const fileMap = datas.fileMap;
+        const selectedInfos: Array<FileInfo<T>> = nextSelected.map((id) => fileMap[id]);
+
         if (!isEqualArray(selected!, nextSelected)) {
             onSelect!({
                 pathUrl,
                 path: pathUrl.split(pathSeperator!),
                 isSelected,
                 selected: nextSelected,
+                selectedInfos,
             });
         }
     };
-    private getNextChildrenDepth(targetInfo?: FileInfo<T>): number {
-        if (!targetInfo) {
-            return 0;
-        }
-        const childrenProperty = this.props.childrenProperty;
-        const parentFileInfo = targetInfo.parentFileInfo;
-
-        if (parentFileInfo) {
-            const children = getChildren(
-                childrenProperty,
-                parentFileInfo.value,
-                parentFileInfo.scope
-            );
-
-            if (children && children.length === targetInfo.index + 1) {
-                return this.getNextChildrenDepth(parentFileInfo);
-            }
-        }
-        return targetInfo.depth;
-    }
-    private contains(
-        paths: string[],
-        path: string,
-        fileMap = this.flatMap()
-    ): boolean {
-        const info = fileMap[path];
-        const parentPathUrl = info.parentPathUrl;
-
-        if (!parentPathUrl) {
-            return false;
-        }
-        if (paths.indexOf(parentPathUrl) > -1) {
-            return true;
-        }
-        return this.contains(paths, parentPathUrl, fileMap);
-    }
     private flatMap(children = this.flatChildren()) {
         const objMap: IObject<FileInfo<T>> = {};
 

@@ -1,18 +1,16 @@
 
 
 import * as React from "react";
-import Folder, { FileProps } from "../Folder";
+import Folder, { FileInfo, FileProps } from "../Folder";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../../types";
 import { useStoreStateValue } from "../../Store/Store";
-import { $editor, $layerManager } from "../../stores/stores";
+import { $editor, $layerManager, $selectedTargetList } from "../../stores/stores";
 import { flattenLayerGroup, isArrayContains, prefix } from "../../utils/utils";
 import styled from "react-css-styled";
 import { SCENA_LAYER_SEPARATOR } from "../../consts";
-
-
-function Layer({ name, scope }: FileProps) {
-    return <div className={prefix("layer")}>{name}</div>;
-}
+import { FolderIcon, LayerIcon } from "../icons";
+import { GroupChild, toTargetList } from "../../GroupManager";
+import LayerManager from "../../managers/LayerManager";
 
 const LayersElement = styled("div", `
 .scena-folder-file {
@@ -34,16 +32,64 @@ const LayersElement = styled("div", `
     box-sizing: border-box;
 }
 .scena-layer {
-
+    display: flex;
+    align-contents: center;
+}
+.scena-layer-icon {
+    width: 16px;
+    padding: 2px;
+    box-sizing: border-box;
+    margin-right: 5px;
 }
 `);
+
+
+
+function Layer({ name, value }: FileProps<ScenaElementLayer | ScenaElementLayerGroup>) {
+    let iconJsx: JSX.Element | null = <LayerIcon />;
+
+    if (value.type === "group") {
+        iconJsx = <FolderIcon />;
+    }
+    return <div className={prefix("layer")}>
+        <div className={prefix("layer-icon")}>{iconJsx}</div>
+        {name}
+    </div>;
+}
+
+function convertInfosToTargetList(
+    layerManager: LayerManager,
+    infos: Array<FileInfo<ScenaElementLayer | ScenaElementLayerGroup>>,
+) {
+    return toTargetList(infos.map(info => {
+        if (info.value.type === "group") {
+            return layerManager.findArrayChildById(info.id);
+        } else {
+            return layerManager.toSingleChild(info.value.ref.current!);
+        }
+    }).filter(Boolean) as GroupChild[]);
+}
+
+
 export default function LayersTab() {
     const editorRef = useStoreStateValue($editor);
     const layerManager = useStoreStateValue($layerManager);
     const [folded, setFolded] = React.useState<string[]>([]);
-    const [selected, setSelected] = React.useState<string[]>([]);
     const children = layerManager.findChildren();
     const layers = layerManager.use();
+    const selectedTargetList = useStoreStateValue($selectedTargetList);
+    const selected = selectedTargetList?.raw().map(child => {
+        if (child.type !== "single") {
+            const originalChild = layerManager.findArrayChildById(child.id)!;
+
+            return [...originalChild.scope, originalChild.id].join(SCENA_LAYER_SEPARATOR);
+        }
+        const layer = layerManager.getLayerByElement(child.value);
+
+        if (layer) {
+            return [...layer.scope, layer.id].join(SCENA_LAYER_SEPARATOR);
+        }
+    }).filter(Boolean) as string[] ?? [];
 
     return <LayersElement>
         <Folder<ScenaElementLayer | ScenaElementLayerGroup>
@@ -54,7 +100,7 @@ export default function LayersTab() {
             folded={folded}
             isMove={true}
             isMoveChildren={true}
-            nameProperty="id"
+            nameProperty="title"
             idProperty="id"
             isPadding={true}
             pathSeperator={SCENA_LAYER_SEPARATOR}
@@ -76,8 +122,7 @@ export default function LayersTab() {
             onMove={e => {
                 const selectedInfos = e.selectedInfos;
                 const scope = e.parentInfo?.path || [];
-                const prevLayerGroup = e.flattenPrevInfo?.value;
-
+                const flattenPrevInfo = e.flattenPrevInfo;
 
                 const nextLayers = layers.filter(layer => {
                     const layerPath = [...layer.scope, layer.id];
@@ -104,33 +149,43 @@ export default function LayersTab() {
                         selectedLayers.push(value);
                     }
                 });
-
                 let prevIndex = 0;
 
-                if (prevLayerGroup) {
-                    if (prevLayerGroup.type === "group") {
-                        const prevScope = prevLayerGroup.scope;
+                if (flattenPrevInfo) {
+                    const flattenInfos = e.flattenInfos;
 
-                        prevIndex = nextLayers.findIndex(layer => isArrayContains(prevScope, layer.scope));
+                    let lastIndex = flattenInfos.findIndex(info => {
+                        return info.id === flattenPrevInfo.id;
+                    });
 
-                    } else {
-                        prevIndex = nextLayers.indexOf(prevLayerGroup) + 1;
+                    for (;lastIndex >= 0; --lastIndex) {
+                        const info = flattenInfos[lastIndex];
+                        const value = info.value;
+
+                        if (value.type === "group") {
+                            continue;
+                        } else {
+                            prevIndex = nextLayers.findIndex(layer => layer.id === value.id) + 1;
+                            break;
+                        }
                     }
                 }
 
                 nextLayers.splice(prevIndex, 0, ...selectedLayers);
 
-                editorRef.current!.setLayers(nextLayers).then(() => {
-                    const nextSelected = selectedInfos.map(info => {
-                        const infoPath = info.path;
 
-                        return [...scope, infoPath[infoPath.length - 1]].join(SCENA_LAYER_SEPARATOR);
-                    });
-                    setSelected(nextSelected);
-                });
+                editorRef.current!.changeLayers(nextLayers);
+                setFolded(e.nextFolded);
+
+                editorRef.current!.setSelectedTargetList(
+                    convertInfosToTargetList(layerManager, selectedInfos)
+                );
             }}
             onSelect={e => {
-                setSelected(e.selected);
+
+                editorRef.current!.setSelectedTargetList(
+                    convertInfosToTargetList(layerManager, e.selectedInfos),
+                );
             }}
             onFold={e => {
                 setFolded(e.folded);

@@ -8,7 +8,7 @@ import { deepFlat } from "@daybrush/utils";
 
 // import ToolBar from "./ToolBar/ToolBar";
 import Viewport, { ViewportInstnace } from "./components/Viewport";
-import { prefix, checkInput, getParnetScenaElement, isArrayEquals, keyChecker } from "./utils/utils";
+import { prefix, checkInput, getParnetScenaElement, isArrayEquals, keyChecker, isDeepArrayEquals } from "./utils/utils";
 
 import LayerManager from "./managers/LayerManager";
 import KeyManager from "./managers/KeyManager";
@@ -25,7 +25,7 @@ import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuides, $infiniteViewer,
     $keyManager, $layers, $memoryManager, $moveable,
-    $selectedTargets, $selecto, $verticalGuides,
+    $selectedTargetList, $selecto, $verticalGuides,
 } from "./stores/stores";
 import { $alt, $meta, $shift, $space } from "./stores/keys";
 
@@ -34,11 +34,12 @@ import { GuidesManager } from "./components/GuidesManager";
 import { InfiniteViewerManager } from "./components/InfiniteViewerManager";
 import { SelectoManager } from "./components/SelectoManager";
 import { MoveableManager } from "./components/MoveableManager";
-import { ScenaElementLayer } from "./types";
+import { ScenaElementLayer, ScenaElementLayerGroup } from "./types";
 import { SceneItem } from "scenejs";
 import ToolBar from "./uis/ToolBar";
 import MenuList from "./uis/Menu";
 import { Tabs } from "./uis/Tabs";
+import { TargetList } from "./GroupManager";
 
 
 
@@ -94,8 +95,9 @@ export interface EditorManagerInstance {
     selectoRef: React.MutableRefObject<Selecto | null>;
     viewportRef: React.MutableRefObject<ViewportInstnace | null>;
 
+    changeLayers(layers: ScenaElementLayer[]): Promise<boolean>;
     setLayers(layers: ScenaElementLayer[]): Promise<boolean>;
-    setSelectedTargets(targets: MoveableTargetGroupsType, isRestore?: boolean): Promise<boolean>;
+    setSelectedTargetList(targetList: TargetList | null, isRestore?: boolean): Promise<boolean>;
 }
 
 export default function EditorManager2() {
@@ -136,9 +138,10 @@ export default function EditorManager2() {
     useStoreValue($editor, editorRef);
 
     const layers: ScenaElementLayer[] = React.useMemo(() => {
-        const layers = [
+        const layers: ScenaElementLayer[] = [
             {
                 id: "1",
+                title: "Layer 1",
                 scope: [],
                 jsx: <div style={{
                     position: "absolute",
@@ -151,6 +154,7 @@ export default function EditorManager2() {
             },
             {
                 id: "2",
+                title: "Layer 2",
                 scope: ["g"],
                 jsx: <div style={{
                     position: "absolute",
@@ -165,6 +169,7 @@ export default function EditorManager2() {
             },
             {
                 id: "3",
+                title: "Layer 3",
                 scope: ["g"],
                 jsx: <div style={{
                     position: "absolute",
@@ -177,8 +182,39 @@ export default function EditorManager2() {
                 item: new SceneItem(),
                 ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
             },
+            {
+                id: "4",
+                title: "Layer 4",
+                scope: ["b"],
+                jsx: <div style={{
+                    position: "absolute",
+                    border: "1px solid #f55",
+                    top: "150px",
+                    left: "300px",
+                    width: "200px",
+                    height: "200px",
+                }}></div>,
+                item: new SceneItem(),
+                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+            },
         ];
-        layerManager.setLayers(layers);
+        const groups: ScenaElementLayerGroup[] = [
+            {
+                type: "group",
+                id: "g",
+                title: "Group 1",
+                scope: [],
+                children: [],
+            },
+            {
+                type: "group",
+                id: "b",
+                title: "Group 2",
+                scope: [],
+                children: [],
+            },
+        ];
+        layerManager.setLayers(layers, groups);
 
         return layers;
     }, []);
@@ -190,9 +226,8 @@ export default function EditorManager2() {
     }, []);
 
     const setLayersPromise = useStoreStateSetPromise($layers);
-    const selectedTargetsStore = useStoreValue($selectedTargets);
-
-    const setSelectedTargetsPromise = useStoreStateSetPromise($selectedTargets);
+    const selectedTargetListStore = useStoreValue($selectedTargetList);
+    const setSelectedTargetListPromise = useStoreStateSetPromise($selectedTargetList);
     const onBlur = React.useCallback((e: any) => {
         const target = e.target as HTMLElement | SVGElement;
 
@@ -222,25 +257,26 @@ export default function EditorManager2() {
         // });
         // info.innerText = nextText;
     }, []);
-    const setLayers = React.useCallback((layers: ScenaElementLayer[]) => {
-        return setLayersPromise(layers).then(complete => {
-            if (!complete) {
-                return false;
-            }
-
-            layerManager.setLayers(layers);
-            layerManager.calculateLayers();
-            return true;
-        });
+    const changeLayers = React.useCallback((layers: ScenaElementLayer[]) => {
+        layerManager.setLayers(layers);
+        layerManager.calculateLayers();
+        return setLayersPromise(layers);
     }, []);
-    const setSelectedTargets = React.useCallback((targets: MoveableTargetGroupsType, isRestore?: boolean) => {
-        const prevTargets = selectedTargetsStore.value;
+    const setLayers = React.useCallback((layers: ScenaElementLayer[]) => {
+        layerManager.setLayers(layers);
+        return setLayersPromise(layers);
+    }, []);
+    const setSelectedTargetList = React.useCallback((nextTargetList: TargetList | null, isRestore?: boolean) => {
+        const prevTargetList = selectedTargetListStore.value;
+        const nextTargets = nextTargetList?.targets() || [];
 
-        if (isArrayEquals(prevTargets, targets)) {
+        if (isDeepArrayEquals(prevTargetList?.targets() || [], nextTargets)) {
             return Promise.resolve(false);
         }
 
-        return setSelectedTargetsPromise(targets).then(complete => {
+        const nextFlattenTargets = deepFlat(nextTargets);
+
+        return setSelectedTargetListPromise(nextTargetList).then(complete => {
             if (!complete) {
                 return false;
             }
@@ -252,7 +288,7 @@ export default function EditorManager2() {
                 //     historyManager.addHistory("selectTargets", { prevs, nexts });
                 // }
             }
-            selectoRef.current!.setSelectedTargets(deepFlat(targets));
+            selectoRef.current!.setSelectedTargets(nextFlattenTargets);
             actionManager.trigger("setSelectedTargets");
             return true;
         });
@@ -269,8 +305,9 @@ export default function EditorManager2() {
             selectoRef,
             viewportRef,
             // menuRef,
+            changeLayers,
             setLayers,
-            setSelectedTargets,
+            setSelectedTargetList,
         };
     }, []);
 
@@ -279,13 +316,13 @@ export default function EditorManager2() {
         actionManager.on("select.all", e => {
             e.inputEvent?.preventDefault();
             const layers = root.get($layers);
-            const targets = layerManager.selectSameDepthTargets(
+            const childs = layerManager.selectSameDepthChilds(
                 [],
                 layers.map(layer => layer.ref.current!),
                 [],
             );
 
-            setSelectedTargets(targets);
+            setSelectedTargetList(childs);
         });
         // register key
         keyManager.toggleState(["shift"], $shift, keyChecker);

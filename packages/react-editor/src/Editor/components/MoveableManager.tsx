@@ -2,14 +2,14 @@
 import * as React from "react";
 import Moveable, { ElementGuidelineValueOption, MoveableRefType, SnapDirections } from "react-moveable";
 import { getContentElement, getId } from "../utils/utils";
-import { IObject, isObject } from "@daybrush/utils";
+import { deepFlat, IObject, isObject } from "@daybrush/utils";
 import { DimensionViewable } from "./ables/DimensionViewable";
 import { DeleteButtonViewable } from "./ables/DeleteButtonViewable";
 import { useStoreState, useStoreStateValue, useStoreValue } from "../Store/Store";
 import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuidelines, $infiniteViewer,
-    $layers, $memoryManager, $selectedTool, $selectedTargets,
+    $layers, $memoryManager, $selectedTool, $selectedTargetList,
     $selecto, $verticalGuidelines, $zoom, $pointer,
 } from "../stores/stores";
 import { EditorManagerInstance } from "../EditorManager";
@@ -99,7 +99,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
     const zoom = useStoreStateValue($zoom);
 
     const layers = useStoreStateValue($layers);
-    const selectedTargets = useStoreStateValue($selectedTargets);
+    const selectedTargetList = useStoreStateValue($selectedTargetList);
 
     const infiniteViewerRef = useStoreStateValue($infiniteViewer);
     const selectoRef = useStoreStateValue($selecto);
@@ -111,12 +111,16 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
     const memoryManager = useStoreStateValue($memoryManager);
 
 
+
+    const selectedTargets = selectedTargetList?.targets() ?? [];
+    const flattenSelectedTargets = deepFlat(selectedTargets);
+
     const elementGuidelines: Array<ElementGuidelineValueOption | MoveableRefType<Element>> = [
         ".scena-viewport",
         ...layers.map(layer => layer.ref),
     ].filter(el => {
         if (isObject(el) && el.current) {
-            return selectedTargets.indexOf(el.current) === -1;
+            return flattenSelectedTargets.indexOf(el.current) === -1;
         }
         return true;
     });
@@ -153,6 +157,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         rotatable={true}
         groupableProps={{
             keepRatio: true,
+            clippable: false,
         }}
         snappable={true}
         snapDirections={SNAP_DIRECTIONS}
@@ -203,12 +208,12 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         }}
         onClickGroup={e => {
             if (!e.moveableTarget) {
-                editorRef.current!.setSelectedTargets([]);
+                editorRef.current!.setSelectedTargetList(null);
                 return;
             }
             if (e.isDouble) {
-                const nextTargets = layerManager.selectNextChild(selectedTargets, e.moveableTarget);
-                editorRef.current!.setSelectedTargets(nextTargets);
+                const nextChilds = layerManager.selectSubChilds(selectedTargets, e.moveableTarget);
+                editorRef.current!.setSelectedTargetList(nextChilds);
                 return;
             }
             selectoRef.current!.clickTarget(e.inputEvent, e.moveableTarget);

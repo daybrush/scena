@@ -1,16 +1,13 @@
-import { deepFlat } from "@daybrush/utils";
-import { TargetGroupsType } from "@moveable/helper";
 import * as React from "react";
 import { getElementInfo } from "react-moveable";
 import Selecto from "react-selecto";
-import { DATA_SCENA_ELEMENT_ID } from "../consts";
+import { TargetList } from "../GroupManager";
 import { useStoreStateValue, useStoreValue } from "../Store/Store";
 import { $meta, $shift, $space } from "../stores/keys";
 import {
     $actionManager, $editor, $infiniteViewer,
-    $layerManager, $layers, $moveable, $selectedTool, $selectedTargets,
+    $layerManager, $layers, $moveable, $selectedTool, $selectedTargetList,
 } from "../stores/stores";
-import { getContentElement } from "../utils/utils";
 
 export interface SelectoManagerProps {
 
@@ -22,7 +19,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
     const shiftStore = useStoreValue($shift);
 
     const layers = useStoreStateValue($layers);
-    const selectedTargetsStore = useStoreValue($selectedTargets);
+    const selectedTargetListStore = useStoreValue($selectedTargetList);
 
 
     const selectedTool = useStoreStateValue($selectedTool);
@@ -66,17 +63,17 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             // check blur
             actionManager.trigger("blur");
 
+            const flatted = selectedTargetListStore.value?.flatten() ?? [];
 
-            const flatted = deepFlat(selectedTargetsStore.value);
+            // if (selectedTool === "Text" && target.isContentEditable) {
+            //     const contentElement = getContentElement(target);
 
-            if (selectedTool === "Text" && target.isContentEditable) {
-                const contentElement = getContentElement(target);
+            //     if (contentElement && contentElement.hasAttribute(DATA_SCENA_ELEMENT_ID)) {
+            //         e.stop();
+            //         editorRef.current!.setSelectedTargets([contentElement]);
+            //     }
+            // }
 
-                if (contentElement && contentElement.hasAttribute(DATA_SCENA_ELEMENT_ID)) {
-                    e.stop();
-                    editorRef.current!.setSelectedTargets([contentElement]);
-                }
-            }
             if (
                 (inputEvent.type === "touchstart" && e.isTrusted)
                 || moveableRef.current!.isMoveableElement(target)
@@ -96,7 +93,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             inputEvent,
         }) => {
             const moveable = moveableRef.current!;
-            const targets = selectedTargetsStore.value;
+            const targetList = selectedTargetListStore.value;
 
             if (isDragStart) {
                 inputEvent.preventDefault();
@@ -105,18 +102,19 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
                     moveable.dragStart(inputEvent);
                 });
             }
-            let nextTargets: TargetGroupsType = targets;
+            const targets = targetList?.targets() ?? [];
+            let nextTargetList!: TargetList;
 
             if (isDragStart || isClick) {
                 if (metaStore.value) {
-                    nextTargets = layerManager.selectSingleTargets(targets, added, removed);
+                    nextTargetList = layerManager.selectSingleChilds(targets, added, removed);
                 } else {
-                    nextTargets = layerManager.selectCompletedTargets(targets, added, removed, shiftStore.value);
+                    nextTargetList = layerManager.selectCompletedChilds(targets, added, removed, shiftStore.value);
                 }
             } else {
-                nextTargets = layerManager.selectSameDepthTargets(targets, added, removed);
+                nextTargetList = layerManager.selectSameDepthChilds(targets, added, removed);
             }
-            editorRef.current!.setSelectedTargets(nextTargets);
+            editorRef.current!.setSelectedTargetList(nextTargetList);
         }}
     />;
 });

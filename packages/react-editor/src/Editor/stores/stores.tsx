@@ -18,6 +18,7 @@ import { EditorManagerInstance } from "../EditorManager";
 
 import { atom, compute } from "../Store/Store";
 import { ScenaElementLayer } from "../types";
+import { TargetList } from "../GroupManager";
 
 
 
@@ -32,7 +33,7 @@ export const $actionManager = atom<ActionManager | null>(null);
 
 export const $horizontalGuidelines = atom<number[]>([]);
 export const $verticalGuidelines = atom<number[]>([]);
-export const $selectedTargets = atom<MoveableTargetGroupsType>([]);
+export const $selectedTargetList = atom<TargetList | null>(null);
 export const $layers = atom<ScenaElementLayer[]>([]);
 export const $zoom = atom<number>(1);
 export const $selectedTool = atom<string>("pointer");

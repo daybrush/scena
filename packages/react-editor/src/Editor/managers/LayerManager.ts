@@ -1,47 +1,89 @@
 import { find } from "@daybrush/utils";
-import { GroupManager, TargetGroupsType } from "@moveable/helper";
+import { GroupManager, TargetGroupsType, TargetGroupWithId } from "../GroupManager";
 import { SCENA_LAYER_SEPARATOR } from "../consts";
 import { useStoreStateValue } from "../Store/Store";
 import { $layers } from "../stores/stores";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 
 export default class LayerManager extends GroupManager {
-    constructor(private _layers: ScenaElementLayer[] = []) {
+    constructor(private _layers: ScenaElementLayer[] = [], private _groups: ScenaElementLayerGroup[] = []) {
         super([], []);
 
     }
     public use() {
         return useStoreStateValue($layers);
     }
-    public getLayer() {
-        return this._layers;
-    }
-    public setLayers(layers: ScenaElementLayer[]) {
+    public setLayers(layers: ScenaElementLayer[], groups: ScenaElementLayerGroup[] = this._groups) {
         this._layers = layers;
+        this._groups = groups;
     }
     public calculateLayers() {
         const layers = this._layers;
+        // const groups = this._groups;
         const groupLayers = this._layers.filter(layer => layer.scope.length);
-        const map: Record<string, TargetGroupsType> = {
-            "": [],
+        const map: Record<string, TargetGroupWithId> = {
+            "": {
+                groupId: "",
+                children: [],
+            },
         };
 
         groupLayers.forEach(layer => {
             const scope = layer.scope;
 
             scope.forEach((_, i) => {
+                const groupId = scope[i];
                 const parentPath = scope.slice(0, i).join(SCENA_LAYER_SEPARATOR);
                 const currentPath = scope.slice(0, i + 1).join(SCENA_LAYER_SEPARATOR);
 
                 if (!map[currentPath]) {
-                    map[currentPath] = [];
-                    map[parentPath].push(map[currentPath]);
+                    map[currentPath] = {
+                        groupId,
+                        children: [],
+                    };
+                    map[parentPath]!.children.push(map[currentPath]);
                 }
             });
-            map[scope.join(SCENA_LAYER_SEPARATOR)].push(layer.ref.current!);
+            map[scope.join(SCENA_LAYER_SEPARATOR)].children.push(layer.ref.current!);
         });
 
-        this.set(map[""], layers.map(layer => layer.ref.current!));
+        this.set(map[""].children, layers.map(layer => layer.ref.current!));
+    }
+    public selectCompletedChilds(
+        targets: TargetGroupsType,
+        added: (HTMLElement | SVGElement)[],
+        removed: (HTMLElement | SVGElement)[],
+        continueSelect?: boolean | undefined,
+    ) {
+        this.calculateLayers();
+
+        return super.selectCompletedChilds(targets, added, removed, continueSelect);
+    }
+    public selectSubChilds(
+        targets: TargetGroupsType,
+        target: HTMLElement | SVGElement,
+    ) {
+        this.calculateLayers();
+
+        return super.selectSubChilds(targets, target);
+    }
+    public selectSameDepthChilds(
+        targets: TargetGroupsType,
+        added: (HTMLElement | SVGElement)[],
+        removed: (HTMLElement | SVGElement)[],
+    ) {
+        this.calculateLayers();
+
+        return super.selectSameDepthChilds(targets, added, removed);
+    }
+    public selectSingleChilds(
+        targets: TargetGroupsType,
+        added: (HTMLElement | SVGElement)[],
+        removed: (HTMLElement | SVGElement)[],
+    ) {
+        this.calculateLayers();
+
+        return super.selectSingleChilds(targets, added, removed);
     }
     public findChildren(parentScope: string[] = []): Array<ScenaElementLayerGroup | ScenaElementLayer> {
         const length = parentScope.length;
@@ -55,11 +97,14 @@ export default class LayerManager extends GroupManager {
             const childLength = scope.length;
 
             if (length < childLength) {
+                const groupId = scope[length];
                 const group: ScenaElementLayerGroup = {
                     type: "group",
-                    id: scope[length],
-                    scope: scope.slice(0, length),
+                    title: "No Named",
+                    id: groupId,
                     children: [],
+                    ...this._groups.find(g => g.id === groupId),
+                    scope: scope.slice(0, length),
                 };
                 return group;
             } else {
