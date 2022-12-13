@@ -1,16 +1,9 @@
-
-
 import * as React from "react";
-import Folder, { FileProps } from "../Folder";
 import { useStoreStateValue } from "../../Store/Store";
-import { $editor, $historyManager, $layerManager, $selectedTargetList } from "../../stores/stores";
+import { $historyManager } from "../../stores/stores";
 import { prefix } from "../../utils/utils";
 import styled from "react-css-styled";
-import { SCENA_LAYER_SEPARATOR } from "../../consts";
-import { isObject } from "@daybrush/utils";
 import { useAction } from "../../hooks/useAction";
-import { Frame } from "scenejs";
-import { Text } from "./inputs/Text";
 
 const HistoryElement = styled("div", `
 {
@@ -28,7 +21,7 @@ const HistoryElement = styled("div", `
     padding: 0px 10px;
 }
 .scena-tab-history-selected {
-    background: var(--scena-editor-color-selected);
+    background: var(--scena-editor-color-selected2);
 }
 .scena-tab-history:not(.scena-tab-history-selected):hover:before {
     content: "";
@@ -37,7 +30,7 @@ const HistoryElement = styled("div", `
     top: 0;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--scena-editor-color-selected);
+    border: 1px solid var(--scena-editor-color-selected2);
     box-sizing: border-box;
 }
 `);
@@ -48,13 +41,16 @@ const HistoryElement = styled("div", `
 
 export default function HistoryTab() {
     const historyManager = useStoreStateValue($historyManager);
+    const currentHistory = historyManager.currentHistory;
 
     useAction("history.redo");
     useAction("history.undo");
     useAction("history.add");
 
-    const currentHistory = historyManager.currentHistory;
     return <HistoryElement>
+        <div
+            className={prefix("tab-history", !currentHistory ? "tab-history-selected" : "")}
+        >Initial History</div>
         {[
             ...historyManager.undoStack,
             ...historyManager.redoStack,

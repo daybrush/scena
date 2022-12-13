@@ -9,7 +9,7 @@ import { useStoreState, useStoreStateValue, useStoreValue } from "../Store/Store
 import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuidelines, $infiniteViewer,
-    $layers, $memoryManager, $selectedTool, $selectedTargetList,
+    $layers, $memoryManager, $selectedTool, $selectedLayers,
     $selecto, $verticalGuidelines, $zoom, $pointer,
 } from "../stores/stores";
 import { EditorManagerInstance } from "../EditorManager";
@@ -20,66 +20,6 @@ const SNAP_DIRECTIONS: SnapDirections = {
     right: true, center: true,
     middle: true, bottom: true,
 };
-
-function restoreRender(
-    id: string,
-    state: IObject<any>,
-    prevState: IObject<any>,
-    orders: any,
-    editor: EditorManagerInstance,
-) {
-    // const el = editor.viewportRef.current!.getElement(id);
-
-    // if (!el) {
-    //     console.error("No Element");
-    //     return false;
-    // }
-    // const dataManager = editor.dataManager;
-    // const frame = dataManager.getFrame(el);;
-
-    // frame.clear();
-    // frame.set(state);
-    // frame.setOrderObject(orders);
-
-    // const result = diff(Object.keys(prevState), Object.keys(state));
-    // const { removed, prevList } = result;
-
-    // removed.forEach(index => {
-    //     el.style.removeProperty(prevList[index]);
-    // });
-    // dataManager.render(el);
-    return true;
-}
-function undoRender({ id, prev, next, prevOrders }: IObject<any>, editor: EditorManagerInstance) {
-    if (!restoreRender(id, prev, next, prevOrders, editor)) {
-        return;
-    }
-    editor.moveableRef.current!.updateRect();
-    editor.actionManager.emit("render");
-}
-function redoRender({ id, prev, next, nextOrders }: IObject<any>, editor: EditorManagerInstance) {
-    if (!restoreRender(id, next, prev, nextOrders, editor)) {
-        return;
-    }
-    editor.moveableRef.current!.updateRect();
-    editor.actionManager.emit("render");
-}
-
-function undoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
-    infos.forEach(({ id, prev, next, prevOrders }: IObject<any>) => {
-        restoreRender(id, prev, next, prevOrders, editor);
-    });
-    editor.moveableRef.current!.updateRect();
-    editor.actionManager.emit("render");
-}
-
-function redoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
-    infos.forEach(({ id, next, prev, nextOrders }: IObject<any>) => {
-        restoreRender(id, next, prev, nextOrders, editor);
-    });
-    editor.moveableRef.current!.updateRect();
-    editor.actionManager.emit("render");
-}
 
 export interface ScenaMoveableMangerProps { }
 
@@ -97,7 +37,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
     const zoom = useStoreStateValue($zoom);
 
     const layers = useStoreStateValue($layers);
-    const selectedTargetList = useStoreStateValue($selectedTargetList);
+    const selectedLayers = useStoreStateValue($selectedLayers);
 
     const infiniteViewerRef = useStoreStateValue($infiniteViewer);
     const selectoRef = useStoreStateValue($selecto);
@@ -110,9 +50,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
 
 
 
-    const selectedTargets = selectedTargetList?.targets() ?? [];
-
-
+    const selectedTargets = layerManager.toTargetList(selectedLayers).targets();
     const flattenSelectedTargets = deepFlat(selectedTargets);
 
     const elementGuidelines: Array<ElementGuidelineValueOption | MoveableRefType<Element>> = [
@@ -124,13 +62,6 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         }
         return true;
     });
-
-    console.log(selectedTargets);
-
-    React.useEffect(() => {
-        historyManager.registerType("render", undoRender, redoRender, "render element");
-        historyManager.registerType("renders", undoRenders, redoRenders, "render elements");
-    }, [historyManager]);
 
     return <Moveable
         ables={[DimensionViewable, DeleteButtonViewable]}
@@ -210,13 +141,13 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         }}
         onClickGroup={e => {
             if (!e.moveableTarget) {
-                editorRef.current!.setSelectedTargetList(null);
+                editorRef.current!.setSelectedLayers([]);
                 return;
             }
             if (e.isDouble) {
                 const nextChilds = layerManager.selectSubChilds(selectedTargets, e.moveableTarget);
 
-                editorRef.current!.setSelectedTargetList(nextChilds);
+                editorRef.current!.setSelectedLayers(layerManager.toLayerGroups(nextChilds));
                 return;
             }
             selectoRef.current!.clickTarget(e.inputEvent, e.moveableTarget);
@@ -227,15 +158,15 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         onRender={e => {
             e.datas.isRender = true;
             e.target.style.cssText += e.cssText;
-            actionManager.requestTrigger("render.ing");
+            // actionManager.requestTrigger("render.ing");
             layerManager.setCSSByElement(e.target, e.cssText);
         }}
         onRenderEnd={e => {
-            actionManager.requestTrigger("render.end");
-
             if (!e.datas.isRender) {
                 return;
             }
+            actionManager.requestTrigger("render.end");
+
             const layer = layerManager.getLayerByElement(e.target);
 
             if (!layer) {
@@ -245,7 +176,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             historyManager.addHistory("render", {
                 layer,
                 prev: e.datas.prevData,
-                next: layerManager.getFrame(layer).get(),
+                next: layerManager.getFrame(layer).toCSSObject(),
             });
         }}
         onRenderGroupStart={e => {
@@ -258,14 +189,13 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 ev.target.style.cssText += ev.cssText;
                 layerManager.setCSSByElement(ev.target, ev.cssText);
             });
-            actionManager.requestTrigger("render.group.ing", e);
+            // actionManager.requestTrigger("render.group.ing", e);
         }}
         onRenderGroupEnd={e => {
-            actionManager.requestTrigger("render.group.end", e);
-
             if (!e.datas.isRender) {
                 return;
             }
+            actionManager.requestTrigger("render.group.end", e);
             const prevDatas = e.datas.prevDatas;
             const infos = e.targets.map((target, i) => {
                 const layer = layerManager.getLayerByElement(target)!;
@@ -273,11 +203,11 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 return {
                     layer,
                     prev: prevDatas[i],
-                    next: layerManager.getFrame(layer).get(),
+                    next: layerManager.getFrame(layer).toCSSObject(),
                 };
             });
 
-            historyManager.addHistory("renders", {
+            historyManager.addHistory("renderGroup", {
                 infos,
             });
         }}

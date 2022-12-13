@@ -1,5 +1,6 @@
-import EventEmitter from "@scena/event-emitter";
+import EventEmitter, { TargetParam } from "@scena/event-emitter";
 import { IObject } from "@daybrush/utils";
+import Debugger from "../utils/Debugger";
 
 interface ActionEvent {
     inputEvent?: Event;
@@ -14,7 +15,11 @@ export default class ActionManager extends EventEmitter<ActionEvents> {
         cancelAnimationFrame(eventMap[name] || 0);
 
         eventMap[name] = requestAnimationFrame(() => {
-            this.emit(name, params);
+            this.act(name, params);
         });
+    }
+    public act(actionName: string, param: ActionEvent = {}) {
+        Debugger.groupLog("action", `Act: ${actionName}`);
+        return this.emit(actionName, param);
     }
 }

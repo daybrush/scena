@@ -33,14 +33,14 @@ export default class KeyManager {
     }
     public actionDown(keys: string[], actionName: string) {
         this.keycon.keydown(keys, this.addCallback("keydown", keys, e => {
-            this._actionManager.emit(actionName, {
+            this._actionManager.act(actionName, {
                 inputEvent: e.inputEvent,
             });
         }, `action down: ${actionName}`));
     }
     public actionUp(keys: string[], actionName: string) {
         this.keycon.keyup(keys, this.addCallback("keyup", keys, e => {
-            this._actionManager.emit(actionName, {
+            this._actionManager.act(actionName, {
                 inputEvent: e,
             });
         }, `action up: ${actionName}`));

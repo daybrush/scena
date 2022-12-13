@@ -3,7 +3,7 @@
 import * as React from "react";
 import Folder, { FileProps } from "../Folder";
 import { useStoreStateValue } from "../../Store/Store";
-import { $editor, $layerManager, $selectedTargetList } from "../../stores/stores";
+import { $editor, $layerManager, $selectedLayers } from "../../stores/stores";
 import { prefix } from "../../utils/utils";
 import styled from "react-css-styled";
 import { SCENA_LAYER_SEPARATOR } from "../../consts";
@@ -74,13 +74,12 @@ export default function FrameTab() {
     const editorRef = useStoreStateValue($editor);
     const layerManager = useStoreStateValue($layerManager);
     const [folded, setFolded] = React.useState<string[]>([]);
-    const selectedTargetList = useStoreStateValue($selectedTargetList);
-    const selected = selectedTargetList?.flatten().map(element => {
-        const layer = layerManager.getLayerByElement(element);
-        const frame = layerManager.getFrame(layer!, 0);
+    const selectedLayers = useStoreStateValue($selectedLayers);
+    const selected = layerManager.toFlatten(selectedLayers).map(layer => {
+        const frame = layerManager.getFrame(layer);
 
         return frame;
-    }).filter(Boolean) ?? [];
+    }).filter(Boolean) as Frame[] ?? [];
 
     useAction("render.group.end");
     useAction("render.end");

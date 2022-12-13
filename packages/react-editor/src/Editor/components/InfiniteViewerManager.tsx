@@ -1,11 +1,10 @@
-import { deepFlat } from "@daybrush/utils";
 import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "../Store/Store";
 import { $space } from "../stores/keys";
 import {
-    $actionManager, $horizontalGuides, $moveable,
-    $selectedTargetList, $selecto, $verticalGuides, $zoom,
+    $actionManager, $horizontalGuides, $layerManager, $moveable,
+    $selectedLayers, $selecto, $verticalGuides, $zoom,
 } from "../stores/stores";
 import { prefix } from "../utils/utils";
 
@@ -18,7 +17,8 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
     const horizontalGuidesRef = useStoreStateValue($horizontalGuides);
     const verticalGuidesRef = useStoreStateValue($verticalGuides);
     const actionManager = useStoreStateValue($actionManager);
-    const selectedTargetListStore = useStoreValue($selectedTargetList);
+    const layerManager = useStoreStateValue($layerManager);
+    const selectedLayersStore = useStoreValue($selectedLayers);
 
     const isSpace = useStoreStateValue($space);
     const setZoom = useStoreStateSetValue($zoom);
@@ -35,9 +35,9 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
         maxPinchWheel={3}
         onDragStart={e => {
             const target = e.inputEvent.target;
-            const flatted = selectedTargetListStore.value?.flatten();
+            const flatted = layerManager.toFlattenElement(selectedLayersStore.value);
 
-            actionManager.emit("blur");
+            actionManager.act("blur");
 
             if (
                 target.nodeName === "A"

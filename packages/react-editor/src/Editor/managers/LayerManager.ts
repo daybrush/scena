@@ -1,14 +1,17 @@
 import { find } from "@daybrush/utils";
-import { GroupManager, TargetGroupsType, TargetGroupWithId } from "../GroupManager";
-import { SCENA_LAYER_SEPARATOR } from "../consts";
+import { GroupChild } from "@moveable/helper";
+import { GroupManager, TargetGroupsType, TargetGroupWithId, TargetList, toTargetList } from "../GroupManager";
 import { useStoreStateValue } from "../Store/Store";
 import { $layers } from "../stores/stores";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 
+
 export default class LayerManager extends GroupManager {
-    private _groupMap: Record<string, TargetGroupWithId> = {};
+    private _targetGroupMap: Record<string, TargetGroupWithId> = {};
     private _layers: ScenaElementLayer[] = [];
     private _groups: ScenaElementLayerGroup[] = [];
+    private _groupMap: Record<string, ScenaElementLayerGroup> = {};
+
     constructor(layers: ScenaElementLayer[] = [], groups: ScenaElementLayerGroup[] = []) {
         super([], []);
 
@@ -21,7 +24,7 @@ export default class LayerManager extends GroupManager {
         this._layers = layers;
 
         const groupLayers = this._layers.filter(layer => layer.scope.length);
-        const prevGroupMap: Record<string, ScenaElementLayerGroup> = {};
+        const groupMap: Record<string, ScenaElementLayerGroup> = {};
         const map: Record<string, TargetGroupWithId> = {
             "": {
                 groupId: "",
@@ -30,7 +33,8 @@ export default class LayerManager extends GroupManager {
         };
 
         groups.forEach(group => {
-            prevGroupMap[group.id] = group;
+            groupMap[group.id] = group;
+            group.children = [];
         });
 
         groupLayers.forEach(layer => {
@@ -46,31 +50,36 @@ export default class LayerManager extends GroupManager {
                         children: [],
                     };
                     map[parentId]!.children.push(map[groupId]);
-
-                    if (!prevGroupMap[parentId]) {
-                        // new group
-                        groups.push({
-                            type: "group",
-                            id: groupId,
-                            title: "New Group",
-                            scope: [],
-                            children: [],
-                        });
-                    }
+                }
+                // parentId
+                if (!groupMap[groupId]) {
+                    // new group
+                    const group: ScenaElementLayerGroup = {
+                        type: "group",
+                        id: groupId,
+                        title: "New Group",
+                        scope: [],
+                        children: [],
+                    };
+                    groups.push(group);
+                    groupMap[groupId] = group;
+                    groupMap[parentId]?.children.push(group);
                 }
             });
             map[scope[scope.length - 1] || ""].children.push(layer.ref);
+            groupMap[scope[scope.length - 1] || ""]?.children.push(layer);
         });
 
         this._groups = groups.filter(group => {
             return map[group.id];
         });
 
-        this._groupMap = map;
+        this._targetGroupMap = map;
+        this._groupMap = groupMap;
     }
     public calculateLayers() {
         this.set(
-            this._groupMap[""].children,
+            this._targetGroupMap[""].children,
             this._layers.map(layer => layer.ref.current!),
         );
     }
@@ -170,7 +179,7 @@ export default class LayerManager extends GroupManager {
         return find(this._layers, layer => layer.ref.current === element);
     }
     public getCSSByElement(element: HTMLElement | SVGElement): Record<string, any> {
-        return this.getFrame(this.getLayerByElement(element)!, 0).get();
+        return this.getFrame(this.getLayerByElement(element)!, 0).toCSSObject();
     }
     public setCSS(layer: ScenaElementLayer, cssObject: string | Record<string, any>) {
         layer.item.set(0, cssObject);
@@ -191,5 +200,40 @@ export default class LayerManager extends GroupManager {
             item.newFrame(time);
         }
         return item.getFrame(0);
+    }
+    public toLayerGroups(targetList: TargetList) {
+        const childs = targetList.raw();
+        const self = this;
+        return childs.map(function toLayerGroups(child) {
+            if (child.type === "single") {
+                return self.getLayerByElement(child.value)!;
+            } else {
+                return self._groupMap[child.id]!;
+            }
+        });
+    }
+
+    public toFlatten(layerGroups: Array<ScenaElementLayer | ScenaElementLayerGroup>): ScenaElementLayer[] {
+        const result: ScenaElementLayer[] = [];
+
+        layerGroups.forEach(layerGroup => {
+            if (layerGroup.type === "group") {
+                result.push(...this.toFlatten(layerGroup.children));
+            } else {
+                result.push(layerGroup);
+            }
+        });
+        return result;
+    }
+    public toFlattenElement(layerGroups: Array<ScenaElementLayer | ScenaElementLayerGroup>) {
+        return this.toFlatten(layerGroups).map(layer => layer.ref.current!);
+    }
+    public toTargetList(layerGroups: Array<ScenaElementLayer | ScenaElementLayerGroup>) {
+        return toTargetList(layerGroups.map(layerGroup => {
+            if (layerGroup.type === "group") {
+                return this.findArrayChildById(layerGroup.id)!;
+            }
+            return this.map.get(layerGroup.ref.current!)!;
+        }).filter(Boolean));
     }
 }

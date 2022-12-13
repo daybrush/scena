@@ -16,16 +16,17 @@ import { EditorManagerInstance } from "../EditorManager";
 
 // import Menu from "../Menu/Menu";
 
-import { atom, compute } from "../Store/Store";
-import { ScenaElementLayer } from "../types";
+import { atom } from "../Store/Store";
+import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 import { TargetList } from "../GroupManager";
+import { Histories } from "../managers/histories/histories";
 
 
 
 
 
 export const $layerManager = atom<LayerManager | null>(null);
-export const $historyManager = atom<HistoryManager | null>(null);
+export const $historyManager = atom<HistoryManager<Histories> | null>(null);
 export const $clipboardManager = atom<ClipboardManager | null>(null);
 export const $keyManager = atom<KeyManager | null>(null);
 export const $memoryManager = atom<MemoryManager | null>(null);
@@ -33,7 +34,7 @@ export const $actionManager = atom<ActionManager | null>(null);
 
 export const $horizontalGuidelines = atom<number[]>([]);
 export const $verticalGuidelines = atom<number[]>([]);
-export const $selectedTargetList = atom<TargetList | null>(null);
+export const $selectedLayers = atom<Array<ScenaElementLayer | ScenaElementLayerGroup>>([]);
 export const $layers = atom<ScenaElementLayer[]>([]);
 export const $zoom = atom<number>(1);
 export const $selectedTool = atom<string>("pointer");

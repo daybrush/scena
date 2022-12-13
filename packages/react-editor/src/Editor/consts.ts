@@ -29,6 +29,7 @@ export const EDITOR_CSS = `
     font-family: sans-serif;
     --scena-editor-color-main: #4af;
     --scena-editor-color-selected: #5bf;
+    --scena-editor-color-selected2: #55bbffaa;
     --scena-editor-color-back1: #1a1a1a;
     --scena-editor-color-back2: #2a2a2a;
     --scena-editor-color-back3: #333;

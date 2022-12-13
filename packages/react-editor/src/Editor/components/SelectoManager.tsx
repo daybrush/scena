@@ -6,7 +6,7 @@ import { useStoreStateValue, useStoreValue } from "../Store/Store";
 import { $meta, $shift, $space } from "../stores/keys";
 import {
     $actionManager, $editor, $infiniteViewer,
-    $layerManager, $layers, $moveable, $selectedTool, $selectedTargetList,
+    $layerManager, $layers, $moveable, $selectedTool, $selectedLayers,
 } from "../stores/stores";
 
 export interface SelectoManagerProps {
@@ -19,7 +19,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
     const shiftStore = useStoreValue($shift);
 
     const layers = useStoreStateValue($layers);
-    const selectedTargetListStore = useStoreValue($selectedTargetList);
+    const selectedLayersStore = useStoreValue($selectedLayers);
 
 
     const selectedTool = useStoreStateValue($selectedTool);
@@ -61,9 +61,9 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             const target = inputEvent.target;
 
             // check blur
-            actionManager.emit("blur");
+            actionManager.act("blur");
 
-            const flatted = selectedTargetListStore.value?.flatten() ?? [];
+            const flatted = layerManager.toFlattenElement(selectedLayersStore.value);
 
             // if (selectedTool === "Text" && target.isContentEditable) {
             //     const contentElement = getContentElement(target);
@@ -93,7 +93,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             inputEvent,
         }) => {
             const moveable = moveableRef.current!;
-            const targetList = selectedTargetListStore.value;
+            const selectedLayers = selectedLayersStore.value;
 
             if (isDragStart) {
                 inputEvent.preventDefault();
@@ -102,7 +102,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
                     moveable.dragStart(inputEvent);
                 });
             }
-            const targets = targetList?.targets() ?? [];
+            const targets = layerManager.toTargetList(selectedLayers).targets();
             let nextTargetList!: TargetList;
 
             if (isDragStart || isClick) {
@@ -114,7 +114,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             } else {
                 nextTargetList = layerManager.selectSameDepthChilds(targets, added, removed);
             }
-            editorRef.current!.setSelectedTargetList(nextTargetList);
+            editorRef.current!.setSelectedLayers(layerManager.toLayerGroups(nextTargetList));
         }}
     />;
 });

@@ -4,7 +4,7 @@ import * as React from "react";
 import Folder, { FileInfo, FileProps } from "../Folder";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../../types";
 import { useStoreStateValue } from "../../Store/Store";
-import { $editor, $layerManager, $selectedTargetList } from "../../stores/stores";
+import { $editor, $layerManager, $selectedLayers } from "../../stores/stores";
 import { flattenLayerGroup, isArrayContains, prefix } from "../../utils/utils";
 import styled from "react-css-styled";
 import { SCENA_LAYER_SEPARATOR } from "../../consts";
@@ -77,18 +77,9 @@ export default function LayersTab() {
     const [folded, setFolded] = React.useState<string[]>([]);
     const children = layerManager.findChildren();
     const layers = layerManager.use();
-    const selectedTargetList = useStoreStateValue($selectedTargetList);
-    const selected = selectedTargetList?.raw().map(child => {
-        if (child.type !== "single") {
-            const originalChild = layerManager.findArrayChildById(child.id)!;
-
-            return [...originalChild.scope, originalChild.id].join(SCENA_LAYER_SEPARATOR);
-        }
-        const layer = layerManager.getLayerByElement(child.value);
-
-        if (layer) {
-            return [...layer.scope, layer.id].join(SCENA_LAYER_SEPARATOR);
-        }
+    const selectedLayers = useStoreStateValue($selectedLayers);
+    const selected = selectedLayers.map(layer => {
+        return [...layer.scope, layer.id].join(SCENA_LAYER_SEPARATOR);
     }).filter(Boolean) as string[] ?? [];
 
     return <LayersElement>
@@ -177,14 +168,14 @@ export default function LayersTab() {
                 editorRef.current!.changeLayers(nextLayers);
                 setFolded(e.nextFolded);
 
-                editorRef.current!.setSelectedTargetList(
-                    convertInfosToTargetList(layerManager, selectedInfos)
+                editorRef.current!.setSelectedLayers(
+                    selectedInfos.map(info => info.value),
                 );
             }}
             onSelect={e => {
 
-                editorRef.current!.setSelectedTargetList(
-                    convertInfosToTargetList(layerManager, e.selectedInfos),
+                editorRef.current!.setSelectedLayers(
+                    e.selectedInfos.map(info => info.value),
                 );
             }}
             onFold={e => {

@@ -4,11 +4,10 @@ import Guides from "@scena/react-guides";
 import Selecto from "react-selecto";
 import styled, { StyledElement } from "react-css-styled";
 import Moveable from "react-moveable";
-import { deepFlat } from "@daybrush/utils";
 
 // import ToolBar from "./ToolBar/ToolBar";
 import Viewport, { ViewportInstnace } from "./components/Viewport";
-import { prefix, checkInput, getParnetScenaElement, keyChecker, isDeepArrayEquals } from "./utils/utils";
+import { prefix, checkInput, getParnetScenaElement, keyChecker, isArrayEquals } from "./utils/utils";
 
 import LayerManager from "./managers/LayerManager";
 import KeyManager from "./managers/KeyManager";
@@ -17,15 +16,13 @@ import ActionManager from "./managers/ActionManager";
 import MemoryManager from "./managers/MemoryManager";
 
 import { EDITOR_CSS } from "./consts";
-// import ClipboardManager from "./utils/ClipboardManager";
-
 
 import { useStoreRoot, useStoreStateSetPromise, useStoreValue } from "./Store/Store";
 import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuides, $infiniteViewer,
     $keyManager, $layers, $memoryManager, $moveable,
-    $selectedTargetList, $selecto, $verticalGuides,
+    $selectedLayers, $selecto, $verticalGuides,
 } from "./stores/stores";
 import { $alt, $meta, $shift, $space } from "./stores/keys";
 
@@ -39,48 +36,12 @@ import { SceneItem } from "scenejs";
 import ToolBar from "./uis/ToolBar";
 import MenuList from "./uis/Menu";
 import { Tabs } from "./uis/Tabs";
-import { TargetList } from "./GroupManager";
+import { Histories, registerHistoryTypes } from "./managers/histories/histories";
 
 
 
 const EditorElement = styled("div", EDITOR_CSS);
 
-// function undoCreateElements({ infos, prevSelected }: Record<string, any>, editor: EditorManagerInstance) {
-//     const res = editor.removeByIds(infos.map((info: ElementInfo) => info.id), true);
-
-//     if (prevSelected) {
-//         res.then(() => {
-//             editor.setSelectedTargets(editor.viewportRef.current!.getElements(prevSelected), true);
-//         })
-//     }
-// }
-// function restoreElements({ infos }: Record<string, any>, editor: EditorManagerInstance) {
-//     editor.appendJSXs(infos.map((info: ElementInfo) => ({
-//         ...info,
-//     })), true);
-// }
-// function undoSelectTargets({ prevs, nexts }: Record<string, any>, editor: EditorManagerInstance) {
-//     editor.setSelectedTargets(editor.viewportRef.current!.getElements(prevs), true);
-// }
-// function redoSelectTargets({ prevs, nexts }: Record<string, any>, editor: EditorManagerInstance) {
-//     editor.setSelectedTargets(editor.viewportRef.current!.getElements(nexts), true);
-// }
-// function undoChangeText({ prev, next, id }: Record<string, any>, editor: EditorManagerInstance) {
-//     const info = editor.viewportRef.current!.getInfo(id)!;
-//     info.innerText = prev;
-//     info.el!.innerText = prev;
-// }
-// function redoChangeText({ prev, next, id }: Record<string, any>, editor: EditorManagerInstance) {
-//     const info = editor.viewportRef.current!.getInfo(id)!;
-//     info.innerText = next;
-//     info.el!.innerText = next;
-// }
-// function undoMove({ prevInfos }: MovedResult, editor: EditorManagerInstance) {
-//     editor.moves(prevInfos, true);
-// }
-// function redoMove({ nextInfos }: MovedResult, editor: EditorManagerInstance) {
-//     editor.moves(nextInfos, true);
-// }
 
 
 export interface EditorManagerInstance {
@@ -97,14 +58,17 @@ export interface EditorManagerInstance {
 
     changeLayers(layers: ScenaElementLayer[]): Promise<boolean>;
     setLayers(layers: ScenaElementLayer[]): Promise<boolean>;
-    setSelectedTargetList(targetList: TargetList | null, isRestore?: boolean): Promise<boolean>;
+    setSelectedLayers(
+        layerGroups: Array<ScenaElementLayer | ScenaElementLayerGroup>,
+        isRestore?: boolean,
+    ): Promise<boolean>;
 }
 
 export default function EditorManager2() {
     const root = useStoreRoot();
     const editorRef = React.useRef<EditorManagerInstance>();
 
-    const historyManager = React.useMemo(() => new HistoryManager(editorRef), []);
+    const historyManager = React.useMemo(() => new HistoryManager<Histories>(editorRef), []);
     const actionManager = React.useMemo(() => new ActionManager(), []);
     const memoryManager = React.useMemo(() => new MemoryManager(), []);
     const layerManager = React.useMemo(() => new LayerManager(), []);
@@ -226,8 +190,8 @@ export default function EditorManager2() {
     }, []);
 
     const setLayersPromise = useStoreStateSetPromise($layers);
-    const selectedTargetListStore = useStoreValue($selectedTargetList);
-    const setSelectedTargetListPromise = useStoreStateSetPromise($selectedTargetList);
+    const selectedLayersStore = useStoreValue($selectedLayers);
+    const setSelectedLayersPromise = useStoreStateSetPromise($selectedLayers);
     const onBlur = React.useCallback((e: any) => {
         const target = e.target as HTMLElement | SVGElement;
 
@@ -266,30 +230,28 @@ export default function EditorManager2() {
         layerManager.setLayers(layers);
         return setLayersPromise(layers);
     }, []);
-    const setSelectedTargetList = React.useCallback((nextTargetList: TargetList | null, isRestore?: boolean) => {
-        const prevTargetList = selectedTargetListStore.value;
-        const nextTargets = nextTargetList?.targets() || [];
+    const setSelectedLayers = React.useCallback((
+        nextLayers: Array<ScenaElementLayer | ScenaElementLayerGroup>,
+        isRestore?: boolean,
+    ) => {
+        const prevLayers = selectedLayersStore.value;
 
-        if (isDeepArrayEquals(prevTargetList?.targets() || [], nextTargets)) {
+        if (isArrayEquals(prevLayers, nextLayers)) {
             return Promise.resolve(false);
         }
 
-        const nextFlattenTargets = deepFlat(nextTargets);
-
-        return setSelectedTargetListPromise(nextTargetList).then(complete => {
+        return setSelectedLayersPromise(nextLayers).then(complete => {
             if (!complete) {
                 return false;
             }
             if (!isRestore) {
-                // const prevs = getIds(prevTargets);
-                // const nexts = getIds(selectedTargetsStore.value);
+                const prevs = prevLayers;
+                const nexts = nextLayers;
 
-                // if (prevs.length !== nexts.length || !prevs.every((prev, i) => nexts[i] === prev)) {
-                //     historyManager.addHistory("selectTargets", { prevs, nexts });
-                // }
+                historyManager.addHistory("selectTargets", { prevs, nexts });
             }
-            selectoRef.current!.setSelectedTargets(nextFlattenTargets);
-            actionManager.emit("setSelectedTargets");
+            selectoRef.current!.setSelectedTargets(layerManager.toFlattenElement(nextLayers));
+            actionManager.act("set.selected.layers");
             return true;
         });
     }, []);
@@ -307,7 +269,7 @@ export default function EditorManager2() {
             // menuRef,
             changeLayers,
             setLayers,
-            setSelectedTargetList,
+            setSelectedLayers,
         };
     }, []);
 
@@ -322,8 +284,17 @@ export default function EditorManager2() {
                 [],
             );
 
-            setSelectedTargetList(childs);
+            setSelectedLayers(layerManager.toLayerGroups(childs));
         });
+        actionManager.on("request.history.undo", e => {
+            e.inputEvent?.preventDefault();
+            historyManager.undo();
+        });
+        actionManager.on("request.history.redo", e => {
+            e.inputEvent?.preventDefault();
+            historyManager.redo();
+        });
+
         // register key
         keyManager.toggleState(["shift"], $shift, keyChecker);
         keyManager.toggleState(["space"], $space, keyChecker);
@@ -335,11 +306,16 @@ export default function EditorManager2() {
         keyManager.actionDown(["right"], "move.right");
         keyManager.actionDown(["up"], "move.up");
         keyManager.actionDown(["down"], "move.down");
+        // TODO: window key
         keyManager.actionDown(["meta", "a"], "select.all");
 
         // action up
         keyManager.actionUp(["delete"], "remove.targets");
         keyManager.actionUp(["backspace"], "remove.targets");
+
+
+        keyManager.actionDown(["meta", "z"], "request.history.undo");
+        keyManager.actionDown(["meta", "shift", "z"], "request.history.redo");
 
         // register default events
         const onResize = () => {
@@ -350,9 +326,12 @@ export default function EditorManager2() {
             onResize();
             infiniteViewerRef.current!.scrollCenter();
         });
-
+        registerHistoryTypes(historyManager);
         window.addEventListener("resize", onResize);
+
         return () => {
+            layerManager.set([], []);
+            historyManager.clear();
             actionManager.off();
             keyManager.destroy();
             cancelAnimationFrame(startId);
@@ -725,7 +704,7 @@ export default function EditorManager2() {
 //             }
 //             this.selecto.current!.setSelectedTargets(targets);
 //             this.layerManager.setSelectedTargets(targets);
-//             this.actionManager.emit("setSelectedTargets");
+//             this.actionManager.act("setSelectedTargets");
 //             return targets;
 //         });
 //     }
@@ -961,7 +940,7 @@ export default function EditorManager2() {
 //         this.moveableManager.current!.request("draggable", { deltaX, deltaY }, true);
 //     }
 //     private checkBlur() {
-//         this.actionManager.emit("blur");
+//         this.actionManager.act("blur");
 //     }
 //     private onResize = () => {
 //         this.horizontalGuides.current!.resize();
