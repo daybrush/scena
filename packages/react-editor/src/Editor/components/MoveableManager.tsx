@@ -15,8 +15,6 @@ import {
 import { EditorManagerInstance } from "../EditorManager";
 import { $alt, $meta, $shift } from "../stores/keys";
 
-const CROSS_DIRECTIONS = ["nw", "ne", "se", "sw"];
-
 const SNAP_DIRECTIONS: SnapDirections = {
     top: true, left: true,
     right: true, center: true,
@@ -57,14 +55,14 @@ function undoRender({ id, prev, next, prevOrders }: IObject<any>, editor: Editor
         return;
     }
     editor.moveableRef.current!.updateRect();
-    editor.actionManager.trigger("render");
+    editor.actionManager.emit("render");
 }
 function redoRender({ id, prev, next, nextOrders }: IObject<any>, editor: EditorManagerInstance) {
     if (!restoreRender(id, next, prev, nextOrders, editor)) {
         return;
     }
     editor.moveableRef.current!.updateRect();
-    editor.actionManager.trigger("render");
+    editor.actionManager.emit("render");
 }
 
 function undoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
@@ -72,7 +70,7 @@ function undoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
         restoreRender(id, prev, next, prevOrders, editor);
     });
     editor.moveableRef.current!.updateRect();
-    editor.actionManager.trigger("render");
+    editor.actionManager.emit("render");
 }
 
 function redoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
@@ -80,7 +78,7 @@ function redoRenders({ infos }: IObject<any>, editor: EditorManagerInstance) {
         restoreRender(id, next, prev, nextOrders, editor);
     });
     editor.moveableRef.current!.updateRect();
-    editor.actionManager.trigger("render");
+    editor.actionManager.emit("render");
 }
 
 export interface ScenaMoveableMangerProps { }
@@ -113,6 +111,8 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
 
 
     const selectedTargets = selectedTargetList?.targets() ?? [];
+
+
     const flattenSelectedTargets = deepFlat(selectedTargets);
 
     const elementGuidelines: Array<ElementGuidelineValueOption | MoveableRefType<Element>> = [
@@ -125,9 +125,11 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         return true;
     });
 
+    console.log(selectedTargets);
+
     React.useEffect(() => {
-        historyManager.registerType("render", undoRender, redoRender);
-        historyManager.registerType("renders", undoRenders, redoRenders);
+        historyManager.registerType("render", undoRender, redoRender, "render element");
+        historyManager.registerType("renders", undoRenders, redoRenders, "render elements");
     }, [historyManager]);
 
     return <Moveable
@@ -153,7 +155,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         throttleRotate={isShift ? 15 : 0}
         keepRatio={isShift}
         resizable={pointer === "move"}
-        scalable={pointer === "transform"}
+        scalable={pointer === "scale"}
         rotatable={true}
         groupableProps={{
             keepRatio: true,
@@ -213,6 +215,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             }
             if (e.isDouble) {
                 const nextChilds = layerManager.selectSubChilds(selectedTargets, e.moveableTarget);
+
                 editorRef.current!.setSelectedTargetList(nextChilds);
                 return;
             }
@@ -224,11 +227,11 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         onRender={e => {
             e.datas.isRender = true;
             e.target.style.cssText += e.cssText;
-            actionManager.requestTrigger("render");
+            actionManager.requestTrigger("render.ing");
             layerManager.setCSSByElement(e.target, e.cssText);
         }}
         onRenderEnd={e => {
-            actionManager.requestTrigger("render");
+            actionManager.requestTrigger("render.end");
 
             if (!e.datas.isRender) {
                 return;
@@ -255,10 +258,10 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 ev.target.style.cssText += ev.cssText;
                 layerManager.setCSSByElement(ev.target, ev.cssText);
             });
-            actionManager.requestTrigger("renderGroup", e);
+            actionManager.requestTrigger("render.group.ing", e);
         }}
         onRenderGroupEnd={e => {
-            actionManager.requestTrigger("renderGroup", e);
+            actionManager.requestTrigger("render.group.end", e);
 
             if (!e.datas.isRender) {
                 return;

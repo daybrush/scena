@@ -28,6 +28,7 @@ export const EDITOR_CSS = `
     height: 100%;
     font-family: sans-serif;
     --scena-editor-color-main: #4af;
+    --scena-editor-color-selected: #5bf;
     --scena-editor-color-back1: #1a1a1a;
     --scena-editor-color-back2: #2a2a2a;
     --scena-editor-color-back3: #333;
@@ -38,7 +39,7 @@ export const EDITOR_CSS = `
 
     --scena-editor-size-tools: 45px;
     --scena-editor-size-guides: 30px;
-    --tab: 200px;
+    --scena-editor-size-tabs: 250px;
 }
 
 [class*="scena-"] {
@@ -49,7 +50,7 @@ export const EDITOR_CSS = `
     position: absolute !important;
     left: var(--scena-editor-size-guides);
     top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-tools));
-    width: calc(100% - var(--scena-editor-size-guides));
+    width: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tabs));
     height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tools));
 }
 
@@ -235,84 +236,4 @@ export const EDITOR_CSS = `
     margin: 0px 5px;
 }
 
-.scena-align {
-    position: relative;
-    width: 25px;
-    height: 25px;
-    /* background: #f55; */
-    display: inline-block;
-    margin-right: 5px;
-}
-.scena-align:hover {
-    cursor: pointer;
-}
-.scena-align:hover * {
-    background: white;
-}
-.scena-align-line,
-.scena-align-element1,
-.scena-align-element2 {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    background: var(--scena-editor-color-back6);
-    transform: translate(-50%, -50%);
-}
-.scena-align-vertical .scena-align-line {
-    width: 1px;
-    height: 18px;
-}
-.scena-align-vertical .scena-align-element1 {
-    width: 10px;
-    height: 5px;
-    margin-top: -3.5px;
-}
-.scena-align-vertical .scena-align-element2 {
-    width: 14px;
-    height: 5px;
-    margin-top: 3.5px;
-}
-.scena-align-vertical.scena-align-start .scena-align-line {
-    margin-left: -7px;
-}
-.scena-align-vertical.scena-align-start .scena-align-element1 {
-    margin-left: -2px;
-}
-
-.scena-align-vertical.scena-align-end .scena-align-line {
-    margin-left: 7px;
-}
-.scena-align-vertical.scena-align-end .scena-align-element1 {
-    margin-left: 2px;
-}
-
-
-
-.scena-align-horizontal .scena-align-line {
-    height: 1px;
-    width: 18px;
-}
-.scena-align-horizontal .scena-align-element1 {
-    height: 10px;
-    width: 5px;
-    margin-left: -3.5px;
-}
-.scena-align-horizontal .scena-align-element2 {
-    height: 14px;
-    width: 5px;
-    margin-left: 3.5px;
-}
-.scena-align-horizontal.scena-align-start .scena-align-line {
-    margin-top: -7px;
-}
-.scena-align-horizontal.scena-align-start .scena-align-element1 {
-    margin-top: -2px;
-}
-
-.scena-align-horizontal.scena-align-end .scena-align-line {
-    margin-top: 7px;
-}
-.scena-align-horizontal.scena-align-end .scena-align-element1 {
-    margin-top: 2px;
-}
 `;

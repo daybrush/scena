@@ -107,8 +107,8 @@ const POINTER_MENU_ITEMS: MenuItem[] = [
         icon: MoveToolIcon,
     },
     {
-        name: "transform",
-        title: "Transform",
+        name: "scale",
+        title: "Scale",
         icon: TransformIcon,
     },
 ];

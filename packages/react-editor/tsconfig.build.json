@@ -5,7 +5,7 @@
         "module": "es2015",
         "target": "es5",
         "jsx": "react",
-        "noEmit": false
+        "noemit(": false
     },
     "include": [
         "./src/Editor/**/*.ts",

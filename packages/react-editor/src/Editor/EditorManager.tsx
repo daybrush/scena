@@ -3,12 +3,12 @@ import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto from "react-selecto";
 import styled, { StyledElement } from "react-css-styled";
-import Moveable, { MoveableTargetGroupsType } from "react-moveable";
+import Moveable from "react-moveable";
 import { deepFlat } from "@daybrush/utils";
 
 // import ToolBar from "./ToolBar/ToolBar";
 import Viewport, { ViewportInstnace } from "./components/Viewport";
-import { prefix, checkInput, getParnetScenaElement, isArrayEquals, keyChecker, isDeepArrayEquals } from "./utils/utils";
+import { prefix, checkInput, getParnetScenaElement, keyChecker, isDeepArrayEquals } from "./utils/utils";
 
 import LayerManager from "./managers/LayerManager";
 import KeyManager from "./managers/KeyManager";
@@ -289,7 +289,7 @@ export default function EditorManager2() {
                 // }
             }
             selectoRef.current!.setSelectedTargets(nextFlattenTargets);
-            actionManager.trigger("setSelectedTargets");
+            actionManager.emit("setSelectedTargets");
             return true;
         });
     }, []);
@@ -725,7 +725,7 @@ export default function EditorManager2() {
 //             }
 //             this.selecto.current!.setSelectedTargets(targets);
 //             this.layerManager.setSelectedTargets(targets);
-//             this.actionManager.trigger("setSelectedTargets");
+//             this.actionManager.emit("setSelectedTargets");
 //             return targets;
 //         });
 //     }
@@ -961,7 +961,7 @@ export default function EditorManager2() {
 //         this.moveableManager.current!.request("draggable", { deltaX, deltaY }, true);
 //     }
 //     private checkBlur() {
-//         this.actionManager.trigger("blur");
+//         this.actionManager.emit("blur");
 //     }
 //     private onResize = () => {
 //         this.horizontalGuides.current!.resize();

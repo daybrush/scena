@@ -61,7 +61,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             const target = inputEvent.target;
 
             // check blur
-            actionManager.trigger("blur");
+            actionManager.emit("blur");
 
             const flatted = selectedTargetListStore.value?.flatten() ?? [];
 

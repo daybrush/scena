@@ -18,7 +18,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "downlevelIteration": true,
-    "noEmit": true,
+    "noemit(": true,
     "jsx": "react-jsx",
     "noFallthroughCasesInSwitch": true
   },

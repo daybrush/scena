@@ -2,7 +2,7 @@
     "extends": "./tsconfig",
     "compilerOptions": {
         "allowJs": false,
-        "noEmit": false,
+        "noemit(": false,
         "isolatedModules": false,
         "removeComments": true,
         "declaration": true,

@@ -14,7 +14,7 @@ export default class ActionManager extends EventEmitter<ActionEvents> {
         cancelAnimationFrame(eventMap[name] || 0);
 
         eventMap[name] = requestAnimationFrame(() => {
-            this.trigger(name, params);
+            this.emit(name, params);
         });
     }
 }

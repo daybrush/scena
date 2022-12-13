@@ -6,21 +6,22 @@ import { $layers } from "../stores/stores";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 
 export default class LayerManager extends GroupManager {
-    constructor(private _layers: ScenaElementLayer[] = [], private _groups: ScenaElementLayerGroup[] = []) {
+    private _groupMap: Record<string, TargetGroupWithId> = {};
+    private _layers: ScenaElementLayer[] = [];
+    private _groups: ScenaElementLayerGroup[] = [];
+    constructor(layers: ScenaElementLayer[] = [], groups: ScenaElementLayerGroup[] = []) {
         super([], []);
 
+        this.setLayers(layers, groups);
     }
     public use() {
         return useStoreStateValue($layers);
     }
     public setLayers(layers: ScenaElementLayer[], groups: ScenaElementLayerGroup[] = this._groups) {
         this._layers = layers;
-        this._groups = groups;
-    }
-    public calculateLayers() {
-        const layers = this._layers;
-        // const groups = this._groups;
+
         const groupLayers = this._layers.filter(layer => layer.scope.length);
+        const prevGroupMap: Record<string, ScenaElementLayerGroup> = {};
         const map: Record<string, TargetGroupWithId> = {
             "": {
                 groupId: "",
@@ -28,26 +29,50 @@ export default class LayerManager extends GroupManager {
             },
         };
 
+        groups.forEach(group => {
+            prevGroupMap[group.id] = group;
+        });
+
         groupLayers.forEach(layer => {
             const scope = layer.scope;
 
             scope.forEach((_, i) => {
                 const groupId = scope[i];
-                const parentPath = scope.slice(0, i).join(SCENA_LAYER_SEPARATOR);
-                const currentPath = scope.slice(0, i + 1).join(SCENA_LAYER_SEPARATOR);
+                const parentId = scope[i - 1] || "";
 
-                if (!map[currentPath]) {
-                    map[currentPath] = {
+                if (!map[groupId]) {
+                    map[groupId] = {
                         groupId,
                         children: [],
                     };
-                    map[parentPath]!.children.push(map[currentPath]);
+                    map[parentId]!.children.push(map[groupId]);
+
+                    if (!prevGroupMap[parentId]) {
+                        // new group
+                        groups.push({
+                            type: "group",
+                            id: groupId,
+                            title: "New Group",
+                            scope: [],
+                            children: [],
+                        });
+                    }
                 }
             });
-            map[scope.join(SCENA_LAYER_SEPARATOR)].children.push(layer.ref.current!);
+            map[scope[scope.length - 1] || ""].children.push(layer.ref);
         });
 
-        this.set(map[""].children, layers.map(layer => layer.ref.current!));
+        this._groups = groups.filter(group => {
+            return map[group.id];
+        });
+
+        this._groupMap = map;
+    }
+    public calculateLayers() {
+        this.set(
+            this._groupMap[""].children,
+            this._layers.map(layer => layer.ref.current!),
+        );
     }
     public selectCompletedChilds(
         targets: TargetGroupsType,

@@ -28,11 +28,12 @@ function createGroupChildren(
 
             createGroupChildren(child, group);
         } else {
-            const single = new GroupSingleChild(parent, child);
+            const element = "current" in child ? child.current : child;
+            const single = new GroupSingleChild(parent, element!);
 
             single.depth = parent.depth + 1;
             value.push(single);
-            map.set(child, single);
+            map.set(element!, single);
         }
     });
 
@@ -107,7 +108,7 @@ export class GroupManager extends GroupArrayChild {
     }
     public selectSubChilds(targets: TargetGroupsType, target: HTMLElement | SVGElement) {
         const root = this;
-        const nextChild = root.findNextChild(target, targets);
+        const nextChild = root.findNextChild(target, targets, false);
         const targetChild = root.map.get(target);
 
         let nextChilds: GroupChild[] = [];

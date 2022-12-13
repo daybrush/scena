@@ -37,7 +37,7 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
             const target = e.inputEvent.target;
             const flatted = selectedTargetListStore.value?.flatten();
 
-            actionManager.trigger("blur");
+            actionManager.emit("blur");
 
             if (
                 target.nodeName === "A"

@@ -165,6 +165,12 @@ export function StoreRoot(props: { children?: React.ReactNode }) {
         return rootValue;
     }, []);
 
+    useEffect(() => {
+        return () => {
+            rootValue.map.clear();
+        };
+    }, []);
+
     return <StoreRootContext.Provider value={rootValue}>
         {props.children}
     </StoreRootContext.Provider>;

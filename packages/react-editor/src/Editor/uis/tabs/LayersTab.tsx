@@ -28,12 +28,12 @@ const LayersElement = styled("div", `
     top: 0;
     width: 100%;
     height: 100%;
-    border: 1px solid var(--folder-selected-color);
+    border: 1px solid var(--scena-editor-color-selected);
     box-sizing: border-box;
 }
 .scena-layer {
     display: flex;
-    align-contents: center;
+    align-content: center;
 }
 .scena-layer-icon {
     width: 16px;

@@ -118,6 +118,7 @@ export function isScenaFunction(value: any): value is ScenaComponent {
 export function isScenaElement(value: any): value is ScenaJSXElement {
     return isObject(value) && !isScenaFunction(value);
 }
+
 export function isScenaFunctionElement(value: any): value is ScenaFunctionJSXElement {
     return isScenaElement(value) && isFunction(value.type);
 }
