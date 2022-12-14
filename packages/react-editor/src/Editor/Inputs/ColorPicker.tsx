@@ -9,7 +9,7 @@ export default class ColorPicker extends Input {
     protected inputAttributes: IObject<any> = {};
     public state = {
         color: "rgba(255, 255, 255, 255)",
-    }
+    };
     public render() {
         const color = this.state.color;
 
@@ -37,10 +37,10 @@ export default class ColorPicker extends Input {
         this.setState({
             color: `rgba(${r}, ${g}, ${b}, ${a})`,
         });
-    }
+    };
     private onChangeComplete = (e: ColorResult) => {
         const { r, g, b, a } = e.rgb;
 
         this.props.onChange(`rgba(${r}, ${g}, ${b}, ${a})`);
-    }
+    };
 }

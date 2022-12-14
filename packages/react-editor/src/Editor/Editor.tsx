@@ -1,6 +1,6 @@
 import * as React from "react";
 import EditorManager from "./EditorManager";
-import { StoreRoot } from "./Store/Store";
+import { StoreRoot } from "@scena/react-store";
 
 
 export default function Editor() {

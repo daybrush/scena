@@ -17,7 +17,7 @@ import MemoryManager from "./managers/MemoryManager";
 
 import { EDITOR_CSS } from "./consts";
 
-import { useStoreRoot, useStoreStateSetPromise, useStoreValue } from "./Store/Store";
+import { useStoreRoot, useStoreStateSetPromise, useStoreValue } from "@scena/react-store";
 import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuides, $infiniteViewer,

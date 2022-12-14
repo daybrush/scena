@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import * as React from "react";
 import styled from "react-css-styled";
-import { atom, useStoreStateValue, useStoreValue } from "../Store/Store";
+import { atom, useStoreValue } from "@scena/react-store";
 import { prefix } from "../utils/utils";
 import { CheckedIcon } from "./icons";
 

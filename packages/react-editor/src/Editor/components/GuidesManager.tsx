@@ -1,6 +1,6 @@
 import Guides from "@scena/react-guides";
 import * as React from "react";
-import { useStoreState, useStoreStateValue } from "../Store/Store";
+import { useStoreState, useStoreStateValue } from "@scena/react-store";
 import { $horizontalGuidelines, $verticalGuidelines, $zoom } from "../stores/stores";
 
 

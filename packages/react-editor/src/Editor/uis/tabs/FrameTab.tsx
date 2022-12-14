@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Folder, { FileProps } from "../Folder";
-import { useStoreStateValue } from "../../Store/Store";
+import { useStoreStateValue } from "@scena/react-store";
 import { $editor, $layerManager, $selectedLayers } from "../../stores/stores";
 import { prefix } from "../../utils/utils";
 import styled from "react-css-styled";

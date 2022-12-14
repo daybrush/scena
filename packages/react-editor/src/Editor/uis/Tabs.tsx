@@ -2,6 +2,7 @@ import * as React from "react";
 import styled from "react-css-styled";
 import { prefix } from "../utils/utils";
 import AlignTab from "./tabs/AlignTab";
+import AppearanceTab from "./tabs/AppearanceTab";
 import FrameTab from "./tabs/FrameTab";
 import HistoryTab from "./tabs/HistoryTab";
 import LayersTab from "./tabs/LayersTab";
@@ -20,6 +21,7 @@ const TabsElement = styled("div", `
   border-top: 1px solid var(--scena-editor-color-back4);
   box-sizing: border-box;
   padding: 0px 5px;
+  overflow: auto;
 }
 .scena-tab {
     border-bottom: 1px solid var(--scena-editor-color-back4);
@@ -47,6 +49,11 @@ export function Tabs() {
         <div className={prefix("tab")}>
             <h2>Transform</h2>
             <TransformTab />
+        </div>
+
+        <div className={prefix("tab")}>
+            <h2>Appearance</h2>
+            <AppearanceTab />
         </div>
         <div className={prefix("tab")}>
             <h2>Layers</h2>

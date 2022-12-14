@@ -1,4 +1,4 @@
-import { atom } from "../Store/Store";
+import { atom } from "@scena/react-store";
 
 export const $shift = atom(false);
 export const $space = atom(false);

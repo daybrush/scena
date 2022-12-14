@@ -1,9 +1,10 @@
 import { MutableRefObject } from "react";
-import Moveable, { MoveableTargetGroupsType } from "react-moveable";
+import Moveable from "react-moveable";
 import Selecto from "react-selecto";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
-import { GroupManager } from "@moveable/helper";
+import { atom } from "@scena/react-store";
+
 
 import ClipboardManager from "../managers/ClipboardManager";
 import HistoryManager from "../managers/HistoryManager";
@@ -13,12 +14,7 @@ import MemoryManager from "../managers/MemoryManager";
 import ActionManager from "../managers/ActionManager";
 
 import { EditorManagerInstance } from "../EditorManager";
-
-// import Menu from "../Menu/Menu";
-
-import { atom } from "../Store/Store";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
-import { TargetList } from "../GroupManager";
 import { Histories } from "../managers/histories/histories";
 
 

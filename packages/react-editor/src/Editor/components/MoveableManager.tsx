@@ -5,7 +5,7 @@ import { getContentElement, getId } from "../utils/utils";
 import { deepFlat, IObject, isObject } from "@daybrush/utils";
 import { DimensionViewable } from "./ables/DimensionViewable";
 import { DeleteButtonViewable } from "./ables/DeleteButtonViewable";
-import { useStoreState, useStoreStateValue, useStoreValue } from "../Store/Store";
+import { useStoreState, useStoreStateValue, useStoreValue } from "@scena/react-store";
 import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuidelines, $infiniteViewer,

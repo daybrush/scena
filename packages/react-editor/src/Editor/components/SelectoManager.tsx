@@ -2,7 +2,7 @@ import * as React from "react";
 import { getElementInfo } from "react-moveable";
 import Selecto from "react-selecto";
 import { TargetList } from "../GroupManager";
-import { useStoreStateValue, useStoreValue } from "../Store/Store";
+import { useStoreStateValue, useStoreValue } from "@scena/react-store";
 import { $meta, $shift, $space } from "../stores/keys";
 import {
     $actionManager, $editor, $infiniteViewer,

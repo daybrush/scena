@@ -10,7 +10,7 @@
         "declarationDir": "declaration"
     },
     "include": [
-        "./src/Editor/**/*.ts",
-        "./src/Editor/**/*.tsx"
+        "./src/**/*.ts",
+        "./src/**/*.tsx"
       ]
 }

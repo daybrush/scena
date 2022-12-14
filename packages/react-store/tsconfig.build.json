@@ -8,7 +8,7 @@
         "noEmit": false
     },
     "include": [
-        "./src/Editor/**/*.ts",
-        "./src/Editor/**/*.tsx"
+        "./src/**/*.ts",
+        "./src/**/*.tsx"
       ]
 }

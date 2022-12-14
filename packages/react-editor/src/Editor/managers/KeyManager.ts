@@ -1,5 +1,5 @@
 import KeyController from "keycon";
-import { StoreRootValue, StoreState } from "../Store/Store";
+import { StoreRootValue, StoreState } from "@scena/react-store";
 import Debugger from "../utils/Debugger";
 import { inputChecker } from "../utils/utils";
 import ActionManager from "./ActionManager";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useStoreStateValue } from "../Store/Store";
+import { useStoreStateValue } from "@scena/react-store";
 import { $actionManager } from "../stores/stores";
 
 export function useAction(actionName: string) {

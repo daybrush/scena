@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import EventEmitter from "@scena/event-emitter";
 

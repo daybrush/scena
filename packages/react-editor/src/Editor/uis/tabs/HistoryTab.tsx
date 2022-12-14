@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useStoreStateValue } from "../../Store/Store";
+import { useStoreStateValue } from "@scena/react-store";
 import { $historyManager } from "../../stores/stores";
 import { prefix } from "../../utils/utils";
 import styled from "react-css-styled";

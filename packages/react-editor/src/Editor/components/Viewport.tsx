@@ -2,7 +2,7 @@ import * as React from "react";
 import { IObject } from "@daybrush/utils";
 import { prefix } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
-import { useStoreStateValue } from "../Store/Store";
+import { useStoreStateValue } from "@scena/react-store";
 import { $layers } from "../stores/stores";
 
 export interface ViewportProps {

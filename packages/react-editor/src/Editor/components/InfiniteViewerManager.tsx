@@ -1,6 +1,6 @@
 import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
-import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "../Store/Store";
+import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "@scena/react-store";
 import { $space } from "../stores/keys";
 import {
     $actionManager, $horizontalGuides, $layerManager, $moveable,

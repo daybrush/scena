@@ -3,7 +3,7 @@
 import * as React from "react";
 import Folder, { FileInfo, FileProps } from "../Folder";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../../types";
-import { useStoreStateValue } from "../../Store/Store";
+import { useStoreStateValue } from "@scena/react-store";
 import { $editor, $layerManager, $selectedLayers } from "../../stores/stores";
 import { flattenLayerGroup, isArrayContains, prefix } from "../../utils/utils";
 import styled from "react-css-styled";
