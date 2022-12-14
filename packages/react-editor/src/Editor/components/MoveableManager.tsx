@@ -51,17 +51,13 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
 
 
     const selectedTargets = layerManager.toTargetList(selectedLayers).targets();
-    const flattenSelectedTargets = deepFlat(selectedTargets);
 
+
+    const flattenSelectedLayers = layerManager.toFlatten(selectedLayers);
     const elementGuidelines: Array<ElementGuidelineValueOption | MoveableRefType<Element>> = [
         ".scena-viewport",
-        ...layers.map(layer => layer.ref),
-    ].filter(el => {
-        if (isObject(el) && el.current) {
-            return flattenSelectedTargets.indexOf(el.current) === -1;
-        }
-        return true;
-    });
+        ...layers.filter(layer => !flattenSelectedLayers.includes(layer)).map(layer => layer.ref),
+    ];
 
     return <Moveable
         ables={[DimensionViewable, DeleteButtonViewable]}
