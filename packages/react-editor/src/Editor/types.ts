@@ -74,4 +74,6 @@ export interface ScenaElementLayerGroup {
     title: string;
     scope: string[];
     children: Array<ScenaElementLayerGroup | ScenaElementLayer>;
+    opacity: number;
+    display: string;
 }

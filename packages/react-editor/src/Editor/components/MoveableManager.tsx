@@ -2,7 +2,6 @@
 import * as React from "react";
 import Moveable, { ElementGuidelineValueOption, MoveableRefType, SnapDirections } from "react-moveable";
 import { getContentElement, getId } from "../utils/utils";
-import { deepFlat, IObject, isObject } from "@daybrush/utils";
 import { DimensionViewable } from "./ables/DimensionViewable";
 import { DeleteButtonViewable } from "./ables/DeleteButtonViewable";
 import { useStoreState, useStoreStateValue, useStoreValue } from "@scena/react-store";
@@ -50,13 +49,13 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
 
 
 
-    const selectedTargets = layerManager.toTargetList(selectedLayers).targets();
-
-
+    const targetList = layerManager.toTargetList(selectedLayers);
+    const selectedTargets = targetList.displayed();
+    const visibleLayers = layerManager.filterDisplayedLayers(layers);
     const flattenSelectedLayers = layerManager.toFlatten(selectedLayers);
     const elementGuidelines: Array<ElementGuidelineValueOption | MoveableRefType<Element>> = [
         ".scena-viewport",
-        ...layers.filter(layer => !flattenSelectedLayers.includes(layer)).map(layer => layer.ref),
+        ...visibleLayers.filter(layer => !flattenSelectedLayers.includes(layer)).map(layer => layer.ref),
     ];
 
     return <Moveable
@@ -161,7 +160,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             if (!e.datas.isRender) {
                 return;
             }
-            actionManager.requestTrigger("render.end");
+            actionManager.requestAct("render.end");
 
             const layer = layerManager.getLayerByElement(e.target);
 
@@ -191,7 +190,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             if (!e.datas.isRender) {
                 return;
             }
-            actionManager.requestTrigger("render.group.end", e);
+            actionManager.requestAct("render.group.end", e);
             const prevDatas = e.datas.prevDatas;
             const infos = e.targets.map((target, i) => {
                 const layer = layerManager.getLayerByElement(target)!;

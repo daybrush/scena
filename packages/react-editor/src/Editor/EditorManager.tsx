@@ -9,7 +9,7 @@ import Moveable from "react-moveable";
 import Viewport, { ViewportInstnace } from "./components/Viewport";
 import { prefix, checkInput, getParnetScenaElement, keyChecker, isArrayEquals } from "./utils/utils";
 
-import LayerManager from "./managers/LayerManager";
+import LayerManager, { createGroup } from "./managers/LayerManager";
 import KeyManager from "./managers/KeyManager";
 import HistoryManager from "./managers/HistoryManager";
 import ActionManager from "./managers/ActionManager";
@@ -37,6 +37,7 @@ import ToolBar from "./uis/ToolBar";
 import MenuList from "./uis/Menu";
 import { Tabs } from "./uis/Tabs";
 import { Histories, registerHistoryTypes } from "./managers/histories/histories";
+import { readFiles } from "./managers/FileManager";
 
 
 
@@ -56,8 +57,8 @@ export interface EditorManagerInstance {
     selectoRef: React.MutableRefObject<Selecto | null>;
     viewportRef: React.MutableRefObject<ViewportInstnace | null>;
 
-    changeLayers(layers: ScenaElementLayer[]): Promise<boolean>;
-    setLayers(layers: ScenaElementLayer[]): Promise<boolean>;
+    changeLayers(layers: ScenaElementLayer[], groups?: ScenaElementLayerGroup): Promise<boolean>;
+    setLayers(layers: ScenaElementLayer[], groups?: ScenaElementLayerGroup): Promise<boolean>;
     setSelectedLayers(
         layerGroups: Array<ScenaElementLayer | ScenaElementLayerGroup>,
         isRestore?: boolean,
@@ -105,7 +106,7 @@ export default function EditorManager2() {
         const layers: ScenaElementLayer[] = [
             {
                 id: "1",
-                title: "Layer 1",
+                title: "",
                 scope: [],
                 jsx: <div style={{
                     position: "absolute",
@@ -118,7 +119,7 @@ export default function EditorManager2() {
             },
             {
                 id: "2",
-                title: "Layer 2",
+                title: "",
                 scope: ["g"],
                 jsx: <div style={{
                     position: "absolute",
@@ -133,7 +134,7 @@ export default function EditorManager2() {
             },
             {
                 id: "3",
-                title: "Layer 3",
+                title: "",
                 scope: ["g"],
                 jsx: <div style={{
                     position: "absolute",
@@ -148,7 +149,7 @@ export default function EditorManager2() {
             },
             {
                 id: "4",
-                title: "Layer 4",
+                title: "",
                 scope: ["b"],
                 jsx: <div style={{
                     position: "absolute",
@@ -163,20 +164,12 @@ export default function EditorManager2() {
             },
         ];
         const groups: ScenaElementLayerGroup[] = [
-            {
-                type: "group",
+            createGroup({
                 id: "g",
-                title: "Group 1",
-                scope: [],
-                children: [],
-            },
-            {
-                type: "group",
+            }),
+            createGroup({
                 id: "b",
-                title: "Group 2",
-                scope: [],
-                children: [],
-            },
+            }),
         ];
         layerManager.setLayers(layers, groups);
 
@@ -221,14 +214,18 @@ export default function EditorManager2() {
         // });
         // info.innerText = nextText;
     }, []);
-    const changeLayers = React.useCallback((layers: ScenaElementLayer[]) => {
-        layerManager.setLayers(layers);
+    const changeLayers = React.useCallback((layers: ScenaElementLayer[], groups = layerManager.groups) => {
+        layerManager.setLayers(layers, groups);
         layerManager.calculateLayers();
         return setLayersPromise(layers);
     }, []);
-    const setLayers = React.useCallback((layers: ScenaElementLayer[]) => {
-        layerManager.setLayers(layers);
-        return setLayersPromise(layers);
+
+    const setLayers = React.useCallback((layers: ScenaElementLayer[], groups = layerManager.groups) => {
+        layerManager.setLayers(layers, groups);
+        return setLayersPromise(layers).then(complete => {
+            layerManager.calculateLayers();
+            return complete;
+        });
     }, []);
     const setSelectedLayers = React.useCallback((
         nextLayers: Array<ScenaElementLayer | ScenaElementLayerGroup>,
@@ -244,13 +241,16 @@ export default function EditorManager2() {
             if (!complete) {
                 return false;
             }
+            layerManager.calculateLayers();
+
             if (!isRestore) {
                 const prevs = prevLayers;
                 const nexts = nextLayers;
 
                 historyManager.addHistory("selectTargets", { prevs, nexts });
             }
-            selectoRef.current!.setSelectedTargets(layerManager.toFlattenElement(nextLayers));
+
+            selectoRef.current!.setSelectedTargets(layerManager.toTargetList(nextLayers).flatten());
             actionManager.act("set.selected.layers");
             return true;
         });
@@ -339,7 +339,30 @@ export default function EditorManager2() {
         };
     }, []);
 
-    return React.useMemo(() => <EditorElement className={prefix("editor")} ref={editorElementRef}>
+    return React.useMemo(() => <EditorElement
+        ref={editorElementRef}
+        className={prefix("editor")}
+        onDragOver={(e: DragEvent) => {
+            e.preventDefault();
+        }}
+        onDrop={(e: DragEvent) => {
+            e.preventDefault();
+            const files = e.dataTransfer?.files;
+
+            readFiles(files).then(result => {
+
+                if (result.layers) {
+                    setLayers([
+                        ...layerManager.layers,
+                        ...result.layers,
+                    ], [
+                        ...layerManager.groups,
+                        ...result.groups!,
+                    ]);
+                }
+            });
+        }}
+    >
         {/* <Tabs ref={tabsRef} /> */}
         <ToolBar />
         <MenuList />

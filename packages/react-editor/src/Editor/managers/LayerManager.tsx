@@ -1,14 +1,57 @@
-import { find } from "@daybrush/utils";
-import { GroupManager, TargetGroupsType, TargetGroupWithId, TargetList, toTargetList } from "../GroupManager";
+import * as React from "react";
+import { deepFlat, find } from "@daybrush/utils";
+import {
+    GroupArrayChild, GroupManager, GroupSingleChild,
+    TargetGroupsType, TargetGroupWithId, TargetList, toTargetList,
+} from "@moveable/helper";
 import { useStoreStateValue } from "@scena/react-store";
+import { Frame, SceneItem } from "scenejs";
 import { $layers } from "../stores/stores";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 
 
+let id = 0;
+
+export interface TargetListWithDispayed extends TargetList {
+    displayed(): TargetGroupsType;
+    flattenDisplayed(): Array<HTMLElement | SVGElement>;
+}
+export function getNextId() {
+    return `scena-id-${++id}`;
+}
+
+export function createLayer(
+    layerInfo: Partial<ScenaElementLayer> = {},
+): ScenaElementLayer {
+    return {
+        id: layerInfo.id || getNextId(),
+        title: "",
+        scope: [],
+        item: new SceneItem(),
+        jsx: layerInfo.jsx || <div></div>,
+        ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+        ...layerInfo,
+    };
+}
+export function createGroup(
+    groupInfo: Partial<ScenaElementLayerGroup> = {},
+): ScenaElementLayerGroup {
+    return {
+        type: "group",
+        id: groupInfo.id ? groupInfo.id : getNextId(),
+        title: "",
+        scope: [],
+        children: [],
+        opacity: 1,
+        display: "block",
+        ...groupInfo,
+    };
+}
 export default class LayerManager extends GroupManager {
+    public groups: ScenaElementLayerGroup[] = [];
+    public layers: ScenaElementLayer[] = [];
+
     private _targetGroupMap: Record<string, TargetGroupWithId> = {};
-    private _layers: ScenaElementLayer[] = [];
-    private _groups: ScenaElementLayerGroup[] = [];
     private _groupMap: Record<string, ScenaElementLayerGroup> = {};
 
     constructor(layers: ScenaElementLayer[] = [], groups: ScenaElementLayerGroup[] = []) {
@@ -19,11 +62,13 @@ export default class LayerManager extends GroupManager {
     public use() {
         return useStoreStateValue($layers);
     }
-    public setLayers(layers: ScenaElementLayer[], groups: ScenaElementLayerGroup[] = this._groups) {
-        this._layers = layers;
+    public setLayers(layers: ScenaElementLayer[], groups: ScenaElementLayerGroup[] = this.groups) {
+        this.layers = layers;
 
-        const groupLayers = this._layers.filter(layer => layer.scope.length);
+        const groupLayers = this.layers.filter(layer => layer.scope.length);
         const groupMap: Record<string, ScenaElementLayerGroup> = {};
+        const nextGroups: ScenaElementLayerGroup[] = [];
+        const prevGroupMap: Record<string, ScenaElementLayerGroup> = {};
         const map: Record<string, TargetGroupWithId> = {
             "": {
                 groupId: "",
@@ -32,8 +77,7 @@ export default class LayerManager extends GroupManager {
         };
 
         groups.forEach(group => {
-            groupMap[group.id] = group;
-            group.children = [];
+            prevGroupMap[group.id] = group;
         });
 
         groupLayers.forEach(layer => {
@@ -53,14 +97,11 @@ export default class LayerManager extends GroupManager {
                 // parentId
                 if (!groupMap[groupId]) {
                     // new group
-                    const group: ScenaElementLayerGroup = {
-                        type: "group",
+                    const group = prevGroupMap[groupId] || createGroup({
                         id: groupId,
-                        title: "New Group",
-                        scope: [],
-                        children: [],
-                    };
-                    groups.push(group);
+                    });
+                    group.children = [];
+                    nextGroups.push(group);
                     groupMap[groupId] = group;
                     groupMap[parentId]?.children.push(group);
                 }
@@ -69,7 +110,7 @@ export default class LayerManager extends GroupManager {
             groupMap[scope[scope.length - 1] || ""]?.children.push(layer);
         });
 
-        this._groups = groups.filter(group => {
+        this.groups = nextGroups.filter(group => {
             return map[group.id];
         });
 
@@ -79,8 +120,79 @@ export default class LayerManager extends GroupManager {
     public calculateLayers() {
         this.set(
             this._targetGroupMap[""].children,
-            this._layers.map(layer => layer.ref.current!),
+            this.layers.map(layer => layer.ref.current!),
         );
+    }
+    public compositeStyle(layer: ScenaElementLayer | ScenaElementLayerGroup) {
+        const isGroup = layer.type === "group";
+        const layerFrame = isGroup ? null : this.getFrame(layer);
+        const scope = layer.scope;
+        const groupMap = this._groupMap;
+        let display = isGroup ? layer.display : layerFrame?.get("display") || "block";
+        let opacity = isGroup ? layer.opacity :layerFrame?.get("opacity") ?? 1;
+        let composited = false;
+
+        function composite() {
+            if (!composited) {
+                return;
+            }
+            composited = true;
+            [...scope].reverse().forEach(groupId => {
+                const group = groupMap[groupId];
+
+                if (!group) {
+                    return;
+                }
+
+                if (group.display === "none") {
+                    display = "none";
+                }
+                opacity *= group.opacity;
+            });
+        }
+
+        return {
+            get opacity() {
+                composite();
+                return opacity;
+            },
+            get display() {
+                if (display === "none") {
+                    return display;
+                }
+                composite();
+                return display;
+            },
+        };
+    }
+    public compositeFrame(layer: ScenaElementLayer | ScenaElementLayerGroup) {
+        const isGroup = layer.type === "group";
+        const layerFrame = isGroup ? null : this.getFrame(layer);
+        const nextFrame = isGroup ? new Frame() : layerFrame!.clone();
+        const scope = layer.scope;
+        const groupMap = this._groupMap;
+        let display = layerFrame?.get("display") || "block";
+        let opacity = layerFrame?.get("opacity") ?? 1;
+
+        [...scope].reverse().forEach(groupId => {
+            const group = groupMap[groupId];
+
+            if (!group) {
+                return;
+            }
+
+            if (group.display === "none") {
+                display = "none";
+            }
+            opacity *= group.opacity;
+        });
+
+        nextFrame.set({
+            opacity,
+            display,
+        });
+
+        return nextFrame;
     }
     public selectCompletedChilds(
         targets: TargetGroupsType,
@@ -120,7 +232,7 @@ export default class LayerManager extends GroupManager {
     }
     public findChildren(parentScope: string[] = []): Array<ScenaElementLayerGroup | ScenaElementLayer> {
         const length = parentScope.length;
-        const layers = this._layers;
+        const layers = this.layers;
         const childrenLayers = layers.filter(({ scope }) => {
             return parentScope.every((path, i) => path === scope[i]);
         });
@@ -131,14 +243,13 @@ export default class LayerManager extends GroupManager {
 
             if (length < childLength) {
                 const groupId = scope[length];
-                const group: ScenaElementLayerGroup = {
-                    type: "group",
-                    title: "No Named",
+                const group = createGroup({
                     id: groupId,
-                    children: [],
-                    ...this._groups.find(g => g.id === groupId),
+                    ...this.groups.find(g => g.id === groupId),
                     scope: scope.slice(0, length),
-                };
+                });
+
+
                 return group;
             } else {
                 return layer;
@@ -165,17 +276,14 @@ export default class LayerManager extends GroupManager {
 
         return children;
     }
-    public getLayers() {
-        return this._layers;
-    }
     public getRefs() {
-        return this._layers.map(layer => layer.ref);
+        return this.layers.map(layer => layer.ref);
     }
     public getElements() {
         return this.getRefs().map(ref => ref.current).filter(Boolean) as Array<HTMLElement | SVGElement>;
     }
     public getLayerByElement(element: HTMLElement | SVGElement) {
-        return find(this._layers, layer => layer.ref.current === element);
+        return find(this.layers, layer => layer.ref.current === element);
     }
     public getCSSByElement(element: HTMLElement | SVGElement): Record<string, any> {
         return this.getFrame(this.getLayerByElement(element)!, 0).toCSSObject();
@@ -203,6 +311,7 @@ export default class LayerManager extends GroupManager {
     public toLayerGroups(targetList: TargetList) {
         const childs = targetList.raw();
         const self = this;
+
         return childs.map(function toLayerGroups(child) {
             if (child.type === "single") {
                 return self.getLayerByElement(child.value)!;
@@ -228,11 +337,44 @@ export default class LayerManager extends GroupManager {
         return this.toFlatten(layerGroups).map(layer => layer.ref.current!);
     }
     public toTargetList(layerGroups: Array<ScenaElementLayer | ScenaElementLayerGroup>) {
-        return toTargetList(layerGroups.map(layerGroup => {
+        const childs = layerGroups.map(layerGroup => {
             if (layerGroup.type === "group") {
                 return this.findArrayChildById(layerGroup.id)!;
             }
             return this.map.get(layerGroup.ref.current!)!;
-        }).filter(Boolean));
+        }).filter(Boolean);
+
+        const result = toTargetList(childs) as TargetListWithDispayed;
+
+        result.displayed = () => {
+            return this.filterDisplayedTargets(result.raw());
+        };
+        result.flattenDisplayed = () => {
+            return deepFlat(result.displayed());
+        };
+
+        return result;
+    }
+    public filterDisplayedLayers<T extends ScenaElementLayer | ScenaElementLayerGroup>(
+        layerGroups: T[]
+    ): T[] {
+        return layerGroups.filter(layerGroup => {
+            return this.compositeStyle(layerGroup).display !== "none";
+        });
+    }
+    public filterDisplayedTargets(childs: Array<GroupArrayChild | GroupSingleChild>): TargetGroupsType {
+        return childs.map(child => {
+            if (child.type === "single") {
+                const layer = this.getLayerByElement(child.value)!;
+
+                return layer && this.compositeStyle(layer).display !== "none" ? child.value : null;
+            } else {
+                const group = this._groupMap[child.id];
+
+                return group && this.compositeStyle(group).display !== "none"
+                    ? this.filterDisplayedTargets(child.value)
+                    : null;
+            }
+        }).filter(Boolean) as TargetGroupsType;
     }
 }

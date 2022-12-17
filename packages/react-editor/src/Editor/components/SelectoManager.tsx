@@ -1,7 +1,7 @@
 import * as React from "react";
 import { getElementInfo } from "react-moveable";
 import Selecto from "react-selecto";
-import { TargetList } from "../GroupManager";
+import { TargetList } from "@moveable/helper";
 import { useStoreStateValue, useStoreValue } from "@scena/react-store";
 import { $meta, $shift, $space } from "../stores/keys";
 import {
@@ -114,6 +114,7 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             } else {
                 nextTargetList = layerManager.selectSameDepthChilds(targets, added, removed);
             }
+
             editorRef.current!.setSelectedLayers(layerManager.toLayerGroups(nextTargetList));
         }}
     />;

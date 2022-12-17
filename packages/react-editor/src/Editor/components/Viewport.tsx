@@ -3,7 +3,8 @@ import { IObject } from "@daybrush/utils";
 import { prefix } from "../utils/utils";
 import { DATA_SCENA_ELEMENT_ID } from "../consts";
 import { useStoreStateValue } from "@scena/react-store";
-import { $layers } from "../stores/stores";
+import { $layerManager, $layers } from "../stores/stores";
+import { ScenaElementLayer } from "../types";
 
 export interface ViewportProps {
     style: Record<string, any>;
@@ -14,6 +15,26 @@ export interface ViewportInstnace {
 
 }
 
+export interface ScenaLayerElementProps {
+    layer: ScenaElementLayer;
+}
+export function ScenaLayerElement(props: ScenaLayerElementProps) {
+    const layerManager = useStoreStateValue($layerManager);
+    const layer = props.layer;
+    const jsx = layer.jsx;
+    const jsxProps: IObject<any> = {
+        key: layer.id,
+        ref: layer.ref,
+    };
+
+    React.useEffect(() => {
+        const element = layer.ref.current!;
+
+        element.style.cssText += layerManager.compositeFrame(layer).toCSSText();
+    }, [layer.id]);
+
+    return React.cloneElement(jsx, { ...jsx.props, ...jsxProps });
+}
 const Viewport = React.forwardRef<ViewportInstnace, ViewportProps>((props, ref) => {
     const {
         onBlur,
@@ -30,13 +51,7 @@ const Viewport = React.forwardRef<ViewportInstnace, ViewportProps>((props, ref) 
         {children}
         <div className={prefix("viewport")} {...{ [DATA_SCENA_ELEMENT_ID]: "viewport" }}>
             {layers.map(layer => {
-                const jsx = layer.jsx;
-                const props: IObject<any> = {
-                    key: layer.id,
-                    ref: layer.ref,
-                };
-
-                return React.cloneElement(jsx, { ...jsx.props, ...props });
+                return <ScenaLayerElement key={layer.id} layer={layer} />;
             })}
         </div>
     </div>;

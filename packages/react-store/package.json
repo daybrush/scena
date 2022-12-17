@@ -1,9 +1,14 @@
 {
   "name": "@scena/react-store",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "types": "./declaration/index.d.ts",
   "main": "./dist/store.cjs.js",
   "module": "./dist/store.esm.js",
+  "files": [
+    "./*",
+    "dist/*",
+    "declaration/*"
+  ],
   "devDependencies": {
     "@daybrush/builder": "^0.1.2",
     "@testing-library/jest-dom": "^4.2.4",
