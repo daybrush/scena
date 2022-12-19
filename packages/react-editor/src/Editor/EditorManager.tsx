@@ -102,6 +102,7 @@ export default function EditorManager2() {
     useStoreValue($verticalGuides, verticalGuidesRef);
     useStoreValue($editor, editorRef);
 
+    const layerStore = useStoreValue($layers);
     const layers: ScenaElementLayer[] = React.useMemo(() => {
         const layers: ScenaElementLayer[] = [
             {
@@ -173,10 +174,10 @@ export default function EditorManager2() {
         ];
         layerManager.setLayers(layers, groups);
 
+
+        layerStore.value = layers;
         return layers;
     }, []);
-
-    useStoreValue($layers, layers);
 
     React.useEffect(() => {
         layerManager.calculateLayers();
@@ -278,6 +279,7 @@ export default function EditorManager2() {
         actionManager.on("select.all", e => {
             e.inputEvent?.preventDefault();
             const layers = root.get($layers);
+
             const childs = layerManager.selectSameDepthChilds(
                 [],
                 layers.map(layer => layer.ref.current!),

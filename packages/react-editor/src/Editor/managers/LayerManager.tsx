@@ -25,12 +25,12 @@ export function createLayer(
 ): ScenaElementLayer {
     return {
         id: layerInfo.id || getNextId(),
-        title: "",
         scope: [],
         item: new SceneItem(),
         jsx: layerInfo.jsx || <div></div>,
         ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
         ...layerInfo,
+        title: layerInfo.title || "",
     };
 }
 export function createGroup(
@@ -39,12 +39,12 @@ export function createGroup(
     return {
         type: "group",
         id: groupInfo.id ? groupInfo.id : getNextId(),
-        title: "",
         scope: [],
         children: [],
         opacity: 1,
         display: "block",
         ...groupInfo,
+        title: groupInfo.title || "",
     };
 }
 export default class LayerManager extends GroupManager {
