@@ -6,7 +6,7 @@ import styled, { StyledElement } from "react-css-styled";
 import Moveable from "react-moveable";
 
 // import ToolBar from "./ToolBar/ToolBar";
-import Viewport, { ViewportInstnace } from "./components/Viewport";
+import Viewport, { ViewportInstnace } from "./editorComponents/Viewport";
 import { prefix, checkInput, getParnetScenaElement, keyChecker, isArrayEquals } from "./utils/utils";
 
 import LayerManager, { createGroup } from "./managers/LayerManager";
@@ -22,15 +22,15 @@ import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuides, $infiniteViewer,
     $keyManager, $layers, $memoryManager, $moveable,
-    $selectedLayers, $selecto, $verticalGuides,
+    $selectedLayers, $selecto, $verticalGuides, $zoom,
 } from "./stores/stores";
 import { $alt, $meta, $shift, $space } from "./stores/keys";
 
 
-import { GuidesManager } from "./components/GuidesManager";
-import { InfiniteViewerManager } from "./components/InfiniteViewerManager";
-import { SelectoManager } from "./components/SelectoManager";
-import { MoveableManager } from "./components/MoveableManager";
+import { GuidesManager } from "./editorComponents/GuidesManager";
+import { InfiniteViewerManager } from "./editorComponents/InfiniteViewerManager";
+import { SelectoManager } from "./editorComponents/SelectoManager";
+import { MoveableManager } from "./editorComponents/MoveableManager";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "./types";
 import { SceneItem } from "scenejs";
 import ToolBar from "./uis/ToolBar";
@@ -102,6 +102,7 @@ export default function EditorManager2() {
     useStoreValue($verticalGuides, verticalGuidesRef);
     useStoreValue($editor, editorRef);
 
+    const zoomStore = useStoreValue($zoom);
     const layerStore = useStoreValue($layers);
     const layers: ScenaElementLayer[] = React.useMemo(() => {
         const layers: ScenaElementLayer[] = [
@@ -349,10 +350,17 @@ export default function EditorManager2() {
         }}
         onDrop={(e: DragEvent) => {
             e.preventDefault();
-            const files = e.dataTransfer?.files;
 
-            readFiles(files).then(result => {
-
+            const infiniteViewer = infiniteViewerRef.current!;
+            const viewportElement = infiniteViewer.getViewport();
+            const { left, top } = viewportElement.getBoundingClientRect();
+            const zoom = zoomStore.value;
+            const { clientX, clientY } = e;
+            const offsetPosition = [
+                (clientX - left) / zoom,
+                (clientY - top) / zoom,
+            ];
+            readFiles(e, offsetPosition).then(result => {
                 if (result.layers) {
                     setLayers([
                         ...layerManager.layers,

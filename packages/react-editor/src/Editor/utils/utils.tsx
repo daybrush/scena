@@ -6,7 +6,7 @@ import {
     ScenaFunctionComponent, ScenaProps, ScenaComponent,
     ScenaJSXElement, ScenaFunctionJSXElement, ScenaElementLayerGroup, ScenaElementLayer,
 } from "../types";
-import { IObject, splitComma, isArray, isFunction, isObject } from "@daybrush/utils";
+import { IObject, splitComma, isArray, isFunction, isObject, splitUnit } from "@daybrush/utils";
 import { Frame } from "scenejs";
 import { getElementInfo } from "react-moveable";
 import { fromTranslation, matrix3d } from "@scena/matrix";
@@ -187,4 +187,9 @@ export function isDeepArrayEquals(arr1: any[], arr2: any[]): boolean {
 
 export function isArrayContains(arr1: any[], arr2: any[]) {
     return arr1.every((el, i) => el === arr2[i]);
+}
+
+
+export function getPureValue(value?: string | number | null) {
+    return splitUnit(`${value || 0}`).value;
 }

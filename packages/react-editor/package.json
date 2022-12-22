@@ -31,7 +31,7 @@
   },
   "homepage": ".",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "rm -rf ./node_modules/.cache && react-scripts start",
     "build": "rm -rf dist && rollup -c && npm run declaration",
     "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json",
     "build:app": "react-scripts build",
