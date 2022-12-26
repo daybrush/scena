@@ -6,7 +6,7 @@ import HistoryManager from "../HistoryManager";
 interface RenderHistoryProps {
     layer: ScenaElementLayer;
     prev: any;
-    next: any,
+    next: any;
 }
 
 interface RenderGroupHistoryProps {
@@ -42,7 +42,7 @@ function restoreRender(
     removed.forEach(index => {
         el.style.removeProperty(prevList[index]);
     });
-    el.style.cssText += frame.toCSS();
+    el.style.cssText += frame.toCSSText();
     return true;
 }
 
@@ -66,7 +66,7 @@ function undoRenderGroup({ infos }: RenderGroupHistoryProps, editor: EditorManag
         restoreRender(layer, next, prev, editor);
     });
     editor.moveableRef.current!.updateRect();
-    editor.actionManager.act("render.group.end");
+    editor.actionManager.act("render.end");
 }
 
 function redoRenderGroup({ infos }: RenderGroupHistoryProps, editor: EditorManagerInstance) {
@@ -74,7 +74,7 @@ function redoRenderGroup({ infos }: RenderGroupHistoryProps, editor: EditorManag
         restoreRender(layer, prev, next, editor);
     });
     editor.moveableRef.current!.updateRect();
-    editor.actionManager.act("render.group.end");
+    editor.actionManager.act("render.end");
 }
 
 function undoSelectTargets({ prevs }: SelectHistoryProps, editor: EditorManagerInstance) {
@@ -122,13 +122,12 @@ function redoSelectTargets({ nexts }: SelectHistoryProps, editor: EditorManagerI
 
 
 export interface Histories {
-    render: RenderHistoryProps
-    renderGroup: RenderGroupHistoryProps;
+    // render: RenderHistoryProps
+    render: RenderGroupHistoryProps;
     selectTargets: SelectHistoryProps;
 }
 
 export function registerHistoryTypes(historyManager: HistoryManager) {
-    historyManager.registerType("render", undoRender, redoRender, "render element");
-    historyManager.registerType("renderGroup", undoRenderGroup, redoRenderGroup, "render group");
+    historyManager.registerType("render", undoRenderGroup, redoRenderGroup, "render elements");
     historyManager.registerType("selectTargets", undoSelectTargets, redoSelectTargets, "select targets");
 }

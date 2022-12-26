@@ -38,6 +38,7 @@ import MenuList from "./uis/Menu";
 import { Tabs } from "./uis/Tabs";
 import { Histories, registerHistoryTypes } from "./managers/histories/histories";
 import { readFiles } from "./managers/FileManager";
+import ColorPickerPortal from "./uis/ColorPickerPortal";
 
 
 
@@ -46,6 +47,7 @@ const EditorElement = styled("div", EDITOR_CSS);
 
 
 export interface EditorManagerInstance {
+    editorElementRef: React.MutableRefObject<StyledElement<HTMLDivElement> | null>;
     historyManager: HistoryManager;
     actionManager: ActionManager;
     memoryManager: MemoryManager;
@@ -260,6 +262,8 @@ export default function EditorManager2() {
 
     editorRef.current = React.useMemo<EditorManagerInstance>(() => {
         return {
+            editorElementRef,
+
             historyManager,
             actionManager,
             memoryManager,
@@ -277,6 +281,16 @@ export default function EditorManager2() {
 
 
     React.useEffect(() => {
+        const onUpdate = () => {
+            actionManager.act("get.rect", {
+                rect: moveableRef.current!.getRect(),
+            });
+        };
+        actionManager.on("render.end", onUpdate);
+        actionManager.on("changed.targets", onUpdate);
+        actionManager.on("update.rect", onUpdate);
+
+
         actionManager.on("select.all", e => {
             e.inputEvent?.preventDefault();
             const layers = root.get($layers);
@@ -373,10 +387,10 @@ export default function EditorManager2() {
             });
         }}
     >
-        {/* <Tabs ref={tabsRef} /> */}
         <ToolBar />
         <MenuList />
         <Tabs />
+        <ColorPickerPortal />
         <div className={prefix("reset")} onClick={() => {
             infiniteViewerRef.current!.scrollCenter({ duration: 500, absolute: true });
         }}></div>

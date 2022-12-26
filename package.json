@@ -6,7 +6,7 @@
     "scripts": {
         "start": "npm run start --prefix ./packages/react-editor",
         "build": "npm run build:app --prefix ./packages/react-editor",
-        "packages:update": "lerna-helper version && npm run update-type-consts",
+        "packages:update": "lerna-helper version",
         "update-type-consts": "node ./config/update-type-consts.js",
         "packages:build": "lerna run build",
         "packages:publish": "lerna-helper publish --commit 'chore: publish packages'",

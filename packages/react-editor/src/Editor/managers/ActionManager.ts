@@ -5,6 +5,7 @@ import Debugger from "../utils/Debugger";
 interface ActionEvent {
     inputEvent?: Event;
     stopLog(): void;
+    [key: string]: any;
 }
 interface ActionEvents {
     [key: string]: ActionEvent;
@@ -41,6 +42,7 @@ export default class ActionManager extends EventEmitter<ActionEvents> {
                 isStopLog = true;
             },
         });
+
         if (!isStopLog && this._registered[actionName]) {
             Debugger.groupLog("action", `Act: ${actionName}`);
         }

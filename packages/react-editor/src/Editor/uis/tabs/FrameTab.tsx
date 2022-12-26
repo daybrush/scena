@@ -81,7 +81,6 @@ export default function FrameTab() {
         return frame;
     }).filter(Boolean) as Frame[] ?? [];
 
-    useAction("render.group.end");
     useAction("render.end");
 
     const firstFrame = selected[0];

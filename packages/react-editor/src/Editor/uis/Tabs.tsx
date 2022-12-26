@@ -5,6 +5,7 @@ import AlignTab from "./tabs/AlignTab";
 import AppearanceTab from "./tabs/AppearanceTab";
 import FrameTab from "./tabs/FrameTab";
 import HistoryTab from "./tabs/HistoryTab";
+import ColorPickerPortal from "./ColorPickerPortal";
 import LayersTab from "./tabs/LayersTab";
 import TransformTab from "./tabs/TransformTab";
 

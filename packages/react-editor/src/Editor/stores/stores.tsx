@@ -16,6 +16,7 @@ import ActionManager from "../managers/ActionManager";
 import { EditorManagerInstance } from "../EditorManager";
 import { ScenaElementLayer, ScenaElementLayerGroup } from "../types";
 import { Histories } from "../managers/histories/histories";
+import { compute } from "@scena/react-store";
 
 
 
@@ -31,8 +32,15 @@ export const $actionManager = atom<ActionManager | null>(null);
 export const $horizontalGuidelines = atom<number[]>([]);
 export const $verticalGuidelines = atom<number[]>([]);
 export const $selectedLayers = atom<Array<ScenaElementLayer | ScenaElementLayerGroup>>([]);
+export const $selectedFlattenLayers = compute(({ get }) => {
+    const layerManager = get($layerManager)!;
+    const selectedLayers = get($selectedLayers)!;
+
+    return layerManager.toFlatten(selectedLayers);
+});
 export const $layers = atom<ScenaElementLayer[]>([]);
 export const $zoom = atom<number>(1);
+export const $groupOrigin = atom<string>("50% 50%");
 export const $selectedTool = atom<string>("pointer");
 export const $pointer = atom<string>("move");
 export const $rect = atom<string>("rect");

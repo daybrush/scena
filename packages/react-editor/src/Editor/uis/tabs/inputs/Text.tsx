@@ -1,5 +1,6 @@
+import { getKey } from "keycon";
 import * as React from "react";
-import styled from "react-css-styled";
+import styled, { StyledElement } from "react-css-styled";
 
 
 const TextElement = styled("input", `
@@ -23,8 +24,69 @@ const TextElement = styled("input", `
 `);
 
 export interface TextProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    onChangeValue?(value: string): void;
+}
 
+export interface TextInstance {
+    setValue(value: string): void;
+    getElement(): HTMLInputElement;
 }
-export function Text(props: TextProps) {
-    return <TextElement type="text" {...props} />;
-}
+export const Text = React.forwardRef<TextInstance, TextProps>((props, ref) => {
+    const styledRef = React.useRef<StyledElement<HTMLInputElement>>(null);
+    const prevValueRef = React.useRef<string>("0");
+
+    React.useImperativeHandle(ref, () => {
+        const element = styledRef.current!.getElement();
+        return {
+            setValue(value: string) {
+                prevValueRef.current = value;
+                element.value = value;
+            },
+            getElement() {
+                return element;
+            },
+        };
+    }, []);
+
+    const {
+        onChangeValue,
+        defaultValue,
+        ...childProps
+    } = props;
+
+    React.useEffect(() => {
+        const element = styledRef.current!.getElement();
+
+        prevValueRef.current = defaultValue as any;
+        element.value = defaultValue as any;
+    }, [defaultValue]);
+    return <TextElement
+        ref={styledRef}
+        type="text"
+        {...childProps}
+        defaultValue={defaultValue}
+        onKeyDown={(e: any) => {
+            e.stopPropagation();
+            (e.nativeEvent || e).stopPropagation();
+        }}
+        onKeyUp={(e: any) => {
+            const target = e.currentTarget as HTMLInputElement;
+            const value = target.value;
+
+            e.stopPropagation();
+            if (getKey(e.keyCode) === "enter" && prevValueRef.current !== value) {
+                props.onChangeValue?.(value);
+            }
+        }}
+        onBlur={(e: any) => {
+            const target = e.currentTarget as HTMLInputElement;
+            const value = target.value;
+
+            if (prevValueRef.current !== value) {
+                props.onChangeValue?.(value);
+            }
+        }} />;
+});
+
+
+Text.displayName = "Text";

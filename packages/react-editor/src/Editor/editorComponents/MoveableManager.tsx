@@ -9,7 +9,7 @@ import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuidelines, $infiniteViewer,
     $layers, $memoryManager, $selectedTool, $selectedLayers,
-    $selecto, $verticalGuidelines, $zoom, $pointer,
+    $selecto, $verticalGuidelines, $zoom, $pointer, $groupOrigin,
 } from "../stores/stores";
 import { EditorManagerInstance } from "../EditorManager";
 import { $alt, $meta, $shift } from "../stores/keys";
@@ -34,6 +34,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
     const verticalGuidelines = useStoreStateValue($verticalGuidelines);
     const horizontalGuidelines = useStoreStateValue($horizontalGuidelines);
     const zoom = useStoreStateValue($zoom);
+    const groupOrigin = useStoreStateValue($groupOrigin);
 
     const layers = useStoreStateValue($layers);
     const selectedLayers = useStoreStateValue($selectedLayers);
@@ -57,6 +58,8 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         ".scena-viewport",
         ...visibleLayers.filter(layer => !flattenSelectedLayers.includes(layer)).map(layer => layer.ref),
     ];
+
+    console.log(selectedLayers, selectedTargets);
 
     return <Moveable
         ables={[DimensionViewable, DeleteButtonViewable]}
@@ -83,6 +86,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         resizable={pointer === "move"}
         scalable={pointer === "scale"}
         rotatable={true}
+        defaultGroupOrigin={groupOrigin}
         groupableProps={{
             keepRatio: true,
             clippable: false,
@@ -116,7 +120,9 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 current.getScrollTop({ absolute: true }),
             ];
         }}
-
+        onChangeTargets={() => {
+            actionManager.act("changed.targets");
+        }}
         onBeforeResize={(e) => {
             e.setFixedDirection(altStore.value ? [0, 0] : e.startFixedDirection);
         }}
@@ -169,9 +175,13 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             }
 
             historyManager.addHistory("render", {
-                layer,
-                prev: e.datas.prevData,
-                next: layerManager.getFrame(layer).toCSSObject(),
+                infos: [
+                    {
+                        layer,
+                        prev: e.datas.prevData,
+                        next: layerManager.getFrame(layer).toCSSObject(),
+                    },
+                ],
             });
         }}
         onRenderGroupStart={e => {
@@ -190,7 +200,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             if (!e.datas.isRender) {
                 return;
             }
-            actionManager.requestAct("render.group.end", e);
+            actionManager.requestAct("render.end");
             const prevDatas = e.datas.prevDatas;
             const infos = e.targets.map((target, i) => {
                 const layer = layerManager.getLayerByElement(target)!;
@@ -202,7 +212,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 };
             });
 
-            historyManager.addHistory("renderGroup", {
+            historyManager.addHistory("render", {
                 infos,
             });
         }}
