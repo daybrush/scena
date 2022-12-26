@@ -11,6 +11,7 @@ export interface StoreRootValue {
 export interface StoreValue<T> {
     value: NonNullable<T>;
     update(value: T): boolean;
+    updateComputed(): void;
     subscribe(callback: () => void): void;
     unsubscribe(callback?: () => void): void;
 }
@@ -39,17 +40,50 @@ function getStoreValue(root: StoreRootValue, state: StoreState<any>, hooksDefaul
 
     if (!root.map.has(state)) {
         const emitter = new EventEmitter();
+        let cachedValue = hooksDefaultValue ?? (defaultValue == null ? defaultValue : clone(state.defaultValue));
+        let unsubscribes: Array<() => void> = [];
 
+        const update = (value: any) => {
+            if (value === cachedValue) {
+                return false;
+            }
+            cachedValue = value;
+            emitter.emit("update");
+            return true;
+        }
+        const updateComputed = () => {
+            if (state.compute) {
+                unsubscribes.forEach(unsubscribe => unsubscribe());
+                unsubscribes = [];
+                update(state.compute({ get }));
+            }
+        };
+        const get = (childState: StoreState<any>) => {
+            const store = getStoreValue(root, childState);
+            const onUpdate = () => {
+                updateComputed();
+            };
+
+            unsubscribes.push(() => {
+                store.unsubscribe(onUpdate);
+            });
+
+            store.subscribe(onUpdate);
+            return store.value;
+        };
+
+        if (state.compute) {
+            cachedValue = state.compute({ get });
+        }
         root.map.set(state, {
-            value: hooksDefaultValue ?? (defaultValue == null ? defaultValue : clone(state.defaultValue)),
-            update(value: any) {
-                if (value === this.value) {
-                    return false;
-                }
-                this.value = value;
-                emitter.emit("update");
-                return true;
+            get value() {
+                return cachedValue;
             },
+            set value(nextValue: any) {
+                cachedValue = nextValue;
+            },
+            updateComputed,
+            update,
             subscribe(callback: () =>void) {
                 emitter.on("update", callback);
             },

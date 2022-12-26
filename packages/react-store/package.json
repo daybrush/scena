@@ -1,6 +1,6 @@
 {
   "name": "@scena/react-store",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "types": "./declaration/index.d.ts",
   "main": "./dist/store.cjs.js",
   "module": "./dist/store.esm.js",
@@ -37,7 +37,7 @@
   "homepage": ".",
   "scripts": {
     "build": "rm -rf dist && rollup -c && npm run declaration",
-    "declaration": "rm -rf declaration && tsc -p tsconfig.declaration.json"
+    "declaration": "tsc -p tsconfig.declaration.json"
   },
   "eslintConfig": {
     "extends": "react-app"
