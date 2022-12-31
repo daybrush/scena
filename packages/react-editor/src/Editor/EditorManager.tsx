@@ -155,15 +155,18 @@ export default function EditorManager2() {
                 id: "4",
                 title: "",
                 scope: ["b"],
-                jsx: <div style={{
-                    position: "absolute",
-                    border: "1px solid #f55",
-                    top: "150px",
-                    left: "300px",
-                    width: "200px",
-                    height: "200px",
-                }}></div>,
-                item: new SceneItem(),
+                jsx: <div></div>,
+                item: new SceneItem({
+                    0: {
+                        "border-radius": "10px",
+                        position: "absolute",
+                        border: "1px solid #f55",
+                        top: "150px",
+                        left: "300px",
+                        width: "200px",
+                        height: "200px",
+                    },
+                }),
                 ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
             },
         ];
@@ -240,7 +243,6 @@ export default function EditorManager2() {
         if (isArrayEquals(prevLayers, nextLayers)) {
             return Promise.resolve(false);
         }
-
         return setSelectedLayersPromise(nextLayers).then(complete => {
             if (!complete) {
                 return false;

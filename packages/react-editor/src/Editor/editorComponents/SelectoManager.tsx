@@ -85,13 +85,18 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
         onScroll={({ direction }) => {
             infiniteViewerRef.current!.scrollBy(direction[0] * 10, direction[1] * 10);
         }}
-        onSelectEnd={({
-            isDragStart,
-            isClick,
-            added,
-            removed,
-            inputEvent,
-        }) => {
+        onDragEnd={e => {
+            e.inputEvent.__STOP__ = true;
+        }}
+        onSelectEnd={e => {
+            const {
+                isDragStart,
+                isClick,
+                added,
+                removed,
+                inputEvent,
+            } = e;
+
             const moveable = moveableRef.current!;
             const selectedLayers = selectedLayersStore.value;
 
@@ -114,7 +119,6 @@ export const SelectoManager = React.forwardRef<Selecto, SelectoManagerProps>((pr
             } else {
                 nextTargetList = layerManager.selectSameDepthChilds(targets, added, removed);
             }
-
             editorRef.current!.setSelectedLayers(layerManager.toLayerGroups(nextTargetList));
         }}
     />;

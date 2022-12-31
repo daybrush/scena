@@ -12,8 +12,8 @@ import { getElementInfo } from "react-moveable";
 import { fromTranslation, matrix3d } from "@scena/matrix";
 
 
-export function prefix(...classNames: string[]) {
-    return prefixNames(PREFIX, ...classNames);
+export function prefix(...classNames: Array<string | undefined | false>) {
+    return prefixNames(PREFIX, ...classNames as string[]);
 }
 
 export function getContentElement(el: HTMLElement): HTMLElement | null {

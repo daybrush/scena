@@ -1,6 +1,6 @@
 import { useStoreStateValue } from "@scena/react-store";
 import * as React from "react";
-import { ChromePicker, ColorResult } from "react-color";
+import { ChromePicker, ColorResult, RGBColor } from "react-color";
 import styled, { StyledElement } from "react-css-styled";
 import { createPortal } from "react-dom";
 import { $actionManager, $editor } from "../stores/stores";
@@ -11,6 +11,7 @@ const ColorPickerElement = styled("div", `
     right: var(--scena-editor-size-tabs);
     z-index: 10;
     transform: translateZ(100px);
+    user-select: none;
 }
 `);
 
@@ -19,7 +20,7 @@ export default function ColorPickerPortal() {
     const actionManager = useStoreStateValue($actionManager);
     const elementRef = React.useRef<StyledElement<HTMLDivElement>>(null);
     const [portal, setPortal] = React.useState<HTMLDivElement>();
-    const [color, setColor] = React.useState("#ffffff");
+    const [color, setColor] = React.useState<string | RGBColor>("#ffffff");
     const [id, setId] = React.useState("");
 
     React.useEffect(() => {
@@ -76,9 +77,13 @@ export default function ColorPickerPortal() {
             <ChromePicker
                 color={color}
                 onChange={e => {
+                    setColor(e.rgb);
+                }}
+                onChangeComplete={e => {
+                    const rgb = e.rgb;
                     actionManager.act("request.color.picker.change", {
                         id,
-                        color: e.hex,
+                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a ?? 1})`,
                     });
                 }}
             />

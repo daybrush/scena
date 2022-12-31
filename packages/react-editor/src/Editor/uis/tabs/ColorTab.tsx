@@ -14,39 +14,69 @@ import { Frame, rgbaToHexa, rgbaToHexWithOpacity } from "scenejs";
 import { useAction } from "../../hooks/useAction";
 import { hexToRGBA } from "@daybrush/utils";
 
-const AppearanceTabElement = styled("div", `
+const ColorTabElement = styled("div", `
 {
     color: #fff;
     font-size: 12px;
-    padding: 8px;
+    padding: 0px 5px;
     display: flex;
     align-content: center;
     align-items: stretch;
 }
 
 .scena-tab-grid {
+    flex: auto;
 }
 
 .scena-tab-grid-color {
+    position: relative;
     padding: 5px;
     width: 30px;
     height: 30px;
     box-sizing: border-box;
 }
-.scena-tab-grid-hex {
-    width: 70px;
-}
-.scena-tab-color {
+.scena-tab-grid-color:before {
+    position: absolute;
+    content: "";
     width: 20px;
     height: 20px;
+    top: 5px;
+    left: 5px;
+    z-index: 0;
     background: #fff;
+}
+.scena-tab-grid-color:after {
+    position: absolute;
+    content: "";
+    width: 20px;
+    height: 20px;
+    top: 5px;
+    left: 5px;
+    z-index: 0;
+    background:
+        linear-gradient(45deg, #aaa 25%, transparent 25%),
+        linear-gradient(-45deg, #aaa 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #aaa 75%),
+        linear-gradient(-45deg, transparent 75%, #aaa 75%);
+    background-size: 7px 7px;
+    background-position: 0 0, 0 3.5px, 3.5px -3.5px, -3.5px 0px;
+}
+.scena-tab-grid-hex {
+    width: 120px;
+}
+.scena-tab-color {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    z-index: 1;
 }
 .scena-tab-grid-hex input {
     width: 100%;
     letter-spacing: 1px;
 }
 .scena-tab-grid-opacity {
-    width: 65px;
+    width: 60px;
     white-space: nowrap;
 }
 .scena-tab-grid-opacity:after {
@@ -54,44 +84,52 @@ const AppearanceTabElement = styled("div", `
 }
 .scena-tab-grid-opacity input {
     display: inline-block;
-    width: 40px;
+    width: 55px;
 }
 `);
 
 
 
+export interface ColorTabProps {
+    id: string;
+    property?: string;
+    value?: string;
+    onChnage?: (color: string) => void;
+}
 
-export default function AppearanceTab() {
+export default function ColorTab(props: ColorTabProps) {
     useAction("render.end");
 
     const actionManager = useStoreStateValue($actionManager);
     const historyManager = useStoreStateValue($historyManager);
     const layerManager = useStoreStateValue($layerManager);
-    const selectedLayers = useStoreStateValue($selectedFlattenLayers);
     const selectedLayersStore = useStoreValue($selectedFlattenLayers);
 
 
-    console.log(selectedLayers);
-    const selected = selectedLayers.map(layer => {
-        const frame = layerManager.getFrame(layer);
+    let color = props.value || "transparent";
+    const property = props.property;
 
-        return frame;
-    }).filter(Boolean) as Frame[];
+    if (property) {
+        const selectedLayers = useStoreStateValue($selectedFlattenLayers);
+        const selected = selectedLayers.map(layer => {
+            const frame = layerManager.getFrame(layer);
 
+            return frame;
+        }).filter(Boolean) as Frame[];
 
-    let color = "transparent";
-    selected.some(frame => {
-        const selectedColor = frame.get("background-color");
+        selected.some(frame => {
+            const selectedColor = frame.get(property);
 
-        if (selectedColor) {
-            color = selectedColor;
-        }
-        return selectedColor;
-    });
+            if (selectedColor) {
+                color = selectedColor;
+            }
+            return selectedColor;
+        });
+    }
 
     React.useEffect(() => {
         actionManager.act("request.color.picker.refresh", {
-            id: "fill",
+            id: props.id,
             color,
         });
     }, [color]);
@@ -99,12 +137,17 @@ export default function AppearanceTab() {
 
     React.useEffect(() => {
         const onChange = (e: any) => {
-            if (e.id !== "fill") {
+            if (e.id !== props.id) {
                 return;
             }
             const selectedLayers = selectedLayersStore.value;
+            const color = e.color;
 
             if (!selectedLayers.length) {
+                return;
+            }
+            if (!property) {
+                props.onChnage?.(color);
                 return;
             }
             historyManager.addHistory("render", {
@@ -112,7 +155,7 @@ export default function AppearanceTab() {
                     const frame = layerManager.getFrame(layer);
                     const prev = frame.toCSSObject();
 
-                    frame.set("background-color", e.color);
+                    frame.set(props.id, e.color);
                     layer.ref.current!.style.cssText += frame.toCSSText();
                     return {
                         layer,
@@ -137,19 +180,19 @@ export default function AppearanceTab() {
     } = rgbaToHexWithOpacity(color);
 
 
-    return <AppearanceTabElement>
+    return <ColorTabElement>
         <div className={prefix("tab-grid", "tab-grid-color")} onClick={e => {
             const event = e.nativeEvent || e;
 
             (event as any).__STOP__COLOR_PICKER = true;
             actionManager.act("request.color.picker", {
-                id: "fill",
+                id: props.id,
                 top: e.clientY,
                 color,
             });
         }}>
             <div className={prefix("tab-color")} style={{
-                backgroundColor: hex || "transparent",
+                backgroundColor: color || "transparent",
             }}></div>
         </div>
         <div className={prefix("tab-grid", "tab-grid-hex")}>
@@ -159,5 +202,5 @@ export default function AppearanceTab() {
             <Text defaultValue={opacity * 100} type="number" />
         </div>
 
-    </AppearanceTabElement>;
+    </ColorTabElement>;
 }

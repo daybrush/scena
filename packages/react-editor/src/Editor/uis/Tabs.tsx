@@ -2,12 +2,13 @@ import * as React from "react";
 import styled from "react-css-styled";
 import { prefix } from "../utils/utils";
 import AlignTab from "./tabs/AlignTab";
-import AppearanceTab from "./tabs/AppearanceTab";
+import ColorTab from "./tabs/ColorTab";
 import FrameTab from "./tabs/FrameTab";
 import HistoryTab from "./tabs/HistoryTab";
 import ColorPickerPortal from "./ColorPickerPortal";
 import LayersTab from "./tabs/LayersTab";
 import TransformTab from "./tabs/TransformTab";
+import BorderTab from "./tabs/BorderTab";
 
 const TabsElement = styled("div", `
 {
@@ -51,10 +52,14 @@ export function Tabs() {
             <h2>Transform</h2>
             <TransformTab />
         </div>
-
         <div className={prefix("tab")}>
-            <h2>Appearance</h2>
-            <AppearanceTab />
+            <h2>Fill</h2>
+            <ColorTab id="background-color" property="background-color"/>
+        </div>
+        <div className={prefix("tab")}>
+            <h2>Stroke</h2>
+            <BorderTab />
+            <ColorTab id="border-color" />
         </div>
         <div className={prefix("tab")}>
             <h2>Layers</h2>

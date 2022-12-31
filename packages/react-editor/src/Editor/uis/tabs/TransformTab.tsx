@@ -30,6 +30,7 @@ const TransformTabElement = styled("div", `
 .scena-tab-label {
     line-height: 30px;
     padding: 0px 8px;
+    cursor: ew-resize;
 }
 .scena-tab-anchor {
     display: flex;

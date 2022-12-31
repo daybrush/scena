@@ -11,6 +11,7 @@ export interface StoreRootValue {
 export interface StoreValue<T> {
     value: NonNullable<T>;
     update(value: T): boolean;
+    isUpdate(value: T): boolean;
     updateComputed(): void;
     subscribe(callback: () => void): void;
     unsubscribe(callback?: () => void): void;
@@ -43,8 +44,11 @@ function getStoreValue(root: StoreRootValue, state: StoreState<any>, hooksDefaul
         let cachedValue = hooksDefaultValue ?? (defaultValue == null ? defaultValue : clone(state.defaultValue));
         let unsubscribes: Array<() => void> = [];
 
+        const isUpdate = (value: any) => {
+            return value !== cachedValue;
+        }
         const update = (value: any) => {
-            if (value === cachedValue) {
+            if (!isUpdate(value)) {
                 return false;
             }
             cachedValue = value;
@@ -84,6 +88,7 @@ function getStoreValue(root: StoreRootValue, state: StoreState<any>, hooksDefaul
             },
             updateComputed,
             update,
+            isUpdate,
             subscribe(callback: () =>void) {
                 emitter.on("update", callback);
             },
@@ -153,9 +158,10 @@ export function useStoreStateSetPromise<T>(state: StoreState<T>): (value: T) => 
     }, [value]);
 
     return useCallback((value: T) => {
-        if (storeValue.update(value)) {
+        if (storeValue.isUpdate(value)) {
             return new Promise(resolve => {
                 queue.push(resolve);
+                storeValue.update(value);
             });
         }
         return Promise.resolve(false);

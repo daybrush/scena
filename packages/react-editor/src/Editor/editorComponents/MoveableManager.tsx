@@ -59,8 +59,6 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         ...visibleLayers.filter(layer => !flattenSelectedLayers.includes(layer)).map(layer => layer.ref),
     ];
 
-    console.log(selectedLayers, selectedTargets);
-
     return <Moveable
         ables={[DimensionViewable, DeleteButtonViewable]}
         ref={ref}
@@ -127,6 +125,9 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             e.setFixedDirection(altStore.value ? [0, 0] : e.startFixedDirection);
         }}
         onClick={e => {
+            if (e.inputEvent.__STOP__) {
+                return;
+            }
             const target = e.inputTarget as any;
 
             if (e.isDouble && target.isContentEditable) {
