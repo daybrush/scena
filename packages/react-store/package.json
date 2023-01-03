@@ -1,6 +1,6 @@
 {
   "name": "@scena/react-store",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "types": "./declaration/index.d.ts",
   "main": "./dist/store.cjs.js",
   "module": "./dist/store.esm.js",

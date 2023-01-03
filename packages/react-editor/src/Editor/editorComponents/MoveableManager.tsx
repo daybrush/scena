@@ -125,9 +125,6 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
             e.setFixedDirection(altStore.value ? [0, 0] : e.startFixedDirection);
         }}
         onClick={e => {
-            if (e.inputEvent.__STOP__) {
-                return;
-            }
             const target = e.inputTarget as any;
 
             if (e.isDouble && target.isContentEditable) {
@@ -137,7 +134,7 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
                 if (el) {
                     el.focus();
                 }
-            } else {
+            } else if (e.isTrusted) {
                 selectoRef.current!.clickTarget(e.inputEvent, e.inputTarget);
             }
         }}
@@ -151,8 +148,9 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
 
                 editorRef.current!.setSelectedLayers(layerManager.toLayerGroups(nextChilds));
                 return;
+            } else if (e.isTrusted) {
+                selectoRef.current!.clickTarget(e.inputEvent, e.moveableTarget);
             }
-            selectoRef.current!.clickTarget(e.inputEvent, e.moveableTarget);
         }}
         onRenderStart={e => {
             e.datas.prevData = layerManager.getCSSByElement(e.target);
