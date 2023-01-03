@@ -1332,10 +1332,25 @@
     npmlog "6.0.2"
     sync-exec "^0.6.2"
 
-"@daybrush/utils@1.6.0", "@daybrush/utils@^0.11.0", "@daybrush/utils@^1.0.0", "@daybrush/utils@^1.1.1", "@daybrush/utils@^1.10.0", "@daybrush/utils@^1.10.2", "@daybrush/utils@^1.3.1", "@daybrush/utils@^1.4.0", "@daybrush/utils@^1.6.0", "@daybrush/utils@^1.7.1", "@daybrush/utils@^1.9.1":
+"@daybrush/utils@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.6.0.tgz#0dfd2c360764f63380df4ec0d44e176c69f7bbc3"
+  integrity sha512-9MjMoOLl1U+l8lXByN3BbLZXf+mktoLyeb6t78Jz2WZ7LRldK0FNg8oW//9giO2hHCUyxS7LX6jS1hToGIfRWA==
+
+"@daybrush/utils@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-0.11.0.tgz#3fd113fcedaab29d8c80773ca5f4d32551bdc9d8"
+  integrity sha512-PnrY1NDjXqXKASoREcjHokQt0WWHiUBClMJ0l9APx42QkeOCQ5nXB7k4VdmkaU23BndeSmNNYJDNL6eEsRitaA==
+
+"@daybrush/utils@^1.0.0", "@daybrush/utils@^1.1.1", "@daybrush/utils@^1.10.0", "@daybrush/utils@^1.3.1", "@daybrush/utils@^1.4.0", "@daybrush/utils@^1.6.0", "@daybrush/utils@^1.7.1", "@daybrush/utils@^1.9.1":
   version "1.10.0"
   resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.0.tgz#2a2235269b960b7ffaf05ca2e75379ea1fb58204"
   integrity sha512-IDT0DWAGcjxb2+WMr8pHrVTkHVKdilBumX1SubXJUlowN4rMSLphwDxvMNfv+vQOrdCPXSoPVZ3mhfrHsQ9Xow==
+
+"@daybrush/utils@^1.10.2":
+  version "1.10.2"
+  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.2.tgz#fb10bab437d1bb3d052fa49ca01f23c86a2ad1f1"
+  integrity sha512-fNMWeGUDokdIpebU8oIBUXkyGYITCwwodBfgx277p8d+kvI+k9wdFtKtdY4mvbWxhbAwuWprtVDq8My3KQ24Dg==
 
 "@egjs/agent@^2.2.1":
   version "2.4.3"
@@ -2382,10 +2397,10 @@
     npmlog "^4.1.2"
     write-file-atomic "^3.0.3"
 
-"@moveable/helper@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.npmjs.org/@moveable/helper/-/helper-0.1.0.tgz#2dde81e5a3384cac3f300ac09fa4a7240311257b"
-  integrity sha512-Doh9RU7Ro27Cinv96IqjZUtlazJOP5HbGVMrmK7R5+kTCf+H72yRyvPsaXd0J6wAkegRxkZ3AEx9WnzdpU3R3A==
+"@moveable/helper@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.npmjs.org/@moveable/helper/-/helper-0.1.2.tgz#9b982c829be1452e54ab48158a58872850ab5e73"
+  integrity sha512-uOqde5Gid1w92Ja845oCFdh1C7hP6r0VhOK4h2eAfUumr7W42SPa+oG3qcqKaWoOss4LooaJp85VYfoXcbFVQQ==
   dependencies:
     "@daybrush/utils" "^1.10.0"
 
@@ -3223,10 +3238,19 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react@*", "@types/react@^16.9.17", "@types/react@^17":
+"@types/react@*":
   version "16.14.34"
   resolved "https://registry.npmjs.org/@types/react/-/react-16.14.34.tgz#d129324ffda312044e1c47aab18696e4ed493282"
   integrity sha512-b99nWeGGReLh6aKBppghVqp93dFJtgtDOzc8NXM6hewD8PQ2zZG5kBLgbx+VJr7Q7WBMjHxaIl3dwpwwPIUgyA==
+  dependencies:
+    "@types/prop-types" "*"
+    "@types/scheduler" "*"
+    csstype "^3.0.2"
+
+"@types/react@^17":
+  version "17.0.52"
+  resolved "https://registry.npmjs.org/@types/react/-/react-17.0.52.tgz#10d8b907b5c563ac014a541f289ae8eaa9bf2e9b"
+  integrity sha512-vwk8QqVODi0VaZZpDXQCmEmiOuyjEFPY7Ttaw5vjM112LOq37yz1CDJGrRJwA1fYEq4Iitd5rnjd1yWAc/bT+A==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -6921,10 +6945,10 @@ gensync@^1.0.0-beta.2:
   resolved "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
 
-gesto@^1.13.0, gesto@^1.13.1, gesto@^1.13.4, gesto@^1.14.0, gesto@^1.3.0:
-  version "1.14.0"
-  resolved "https://registry.npmjs.org/gesto/-/gesto-1.14.0.tgz#cb50213f80bf5a1ce5af1dd2bba7c3bb5338dfbc"
-  integrity sha512-b89RyxAQb65t0HVJHPWi1+Ren66QoMaXpV5do3k7LRJAwunESYlJr520/4pNrMQGUkqopLMZjEceUE2uBqcgeQ==
+gesto@^1.13.0, gesto@^1.13.1, gesto@^1.13.4, gesto@^1.15.0, gesto@^1.3.0:
+  version "1.15.0"
+  resolved "https://registry.npmjs.org/gesto/-/gesto-1.15.0.tgz#b5f3cbe456ca2016de58bd050a019d339f06dc9c"
+  integrity sha512-al19XPu2TA0KrVTDXIVzFqC/cgZv5hGyLj4IYOf+6iKx7AWag3rvt96C8fP9RaLaptGWgFrhr7c+KVu2F2pEOw==
   dependencies:
     "@daybrush/utils" "^1.7.1"
     "@scena/event-emitter" "^1.0.2"
@@ -11456,17 +11480,7 @@ react-color@^2.19.3:
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
 
-react-compat-css-styled@^1.0.9:
-  version "1.0.9"
-  resolved "https://registry.npmjs.org/react-compat-css-styled/-/react-compat-css-styled-1.0.9.tgz#70ed3ed8d8000fe01cb5ce15ee7723a094165db1"
-  integrity sha512-YpUgTpXU1wR58aPQJVGAWq6QeEFWkafV0qq4Y8KRUwpQJLbJF2GYu5ZQ/kafHGvN3dqQX2e340NlNZ+zbZZv2w==
-  dependencies:
-    "@daybrush/utils" "^1.0.0"
-    css-styled "^1.0.0"
-    framework-utils "^1.1.0"
-    react-css-styled "~1.0.4"
-
-react-css-styled@^1.0.0, react-css-styled@^1.0.2, react-css-styled@^1.0.4, react-css-styled@~1.0.4:
+react-css-styled@^1.0.0, react-css-styled@^1.0.2, react-css-styled@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.0.4.tgz#236ce398232dc152084bbf20540df1c971534174"
   integrity sha512-nRske1bAKOCaf7Gf3o76tKQFIYggaW1qH4rutBlitH5lYnRPA7WoAYKrcxqdUPZd00oASg3SvFZSh3Mc1Wvj3w==
@@ -11548,10 +11562,10 @@ react-keycon@^0.3.0:
     "@cfcs/react" "^0.0.6"
     keycon "~1.4.0"
 
-react-moveable@^0.45.1:
-  version "0.45.1"
-  resolved "https://registry.npmjs.org/react-moveable/-/react-moveable-0.45.1.tgz#228155ba7d4d578200a1f5ebec28457228694cd4"
-  integrity sha512-3ktIdg7spM4hTJFMJFcUab5i5XCGUuNG/V7A0pZFHs8jAwAyVXHKnjhOKasgHmYF9Z4/3YAdA9u25cSlACZHjw==
+react-moveable@^0.46.0-beta.0:
+  version "0.46.0-beta.0"
+  resolved "https://registry.npmjs.org/react-moveable/-/react-moveable-0.46.0-beta.0.tgz#435abe66454bd8801ed644184639ca9cba88ee91"
+  integrity sha512-BofXWl7NT0LFJYcqm10+q7Tb2xk70KD+jvDbidxeAoMAyc0VaF1A0BK9x3TKWAgfUH1dbMEWBJRq3n4dSFoJzQ==
   dependencies:
     "@daybrush/utils" "^1.10.0"
     "@egjs/agent" "^2.2.1"
@@ -11562,7 +11576,7 @@ react-moveable@^0.45.1:
     "@scena/matrix" "^1.1.1"
     css-to-mat "^1.0.3"
     framework-utils "^1.1.0"
-    gesto "^1.14.0"
+    gesto "^1.15.0"
     overlap-area "^1.1.0"
     react-css-styled "^1.0.4"
 
