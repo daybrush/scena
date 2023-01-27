@@ -1332,25 +1332,10 @@
     npmlog "6.0.2"
     sync-exec "^0.6.2"
 
-"@daybrush/utils@1.6.0":
-  version "1.6.0"
-  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.6.0.tgz#0dfd2c360764f63380df4ec0d44e176c69f7bbc3"
-  integrity sha512-9MjMoOLl1U+l8lXByN3BbLZXf+mktoLyeb6t78Jz2WZ7LRldK0FNg8oW//9giO2hHCUyxS7LX6jS1hToGIfRWA==
-
-"@daybrush/utils@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-0.11.0.tgz#3fd113fcedaab29d8c80773ca5f4d32551bdc9d8"
-  integrity sha512-PnrY1NDjXqXKASoREcjHokQt0WWHiUBClMJ0l9APx42QkeOCQ5nXB7k4VdmkaU23BndeSmNNYJDNL6eEsRitaA==
-
-"@daybrush/utils@^1.0.0", "@daybrush/utils@^1.1.1", "@daybrush/utils@^1.10.0", "@daybrush/utils@^1.3.1", "@daybrush/utils@^1.4.0", "@daybrush/utils@^1.6.0", "@daybrush/utils@^1.7.1", "@daybrush/utils@^1.9.1":
+"@daybrush/utils@1.6.0", "@daybrush/utils@^0.11.0", "@daybrush/utils@^1.0.0", "@daybrush/utils@^1.1.1", "@daybrush/utils@^1.10.0", "@daybrush/utils@^1.10.2", "@daybrush/utils@^1.3.1", "@daybrush/utils@^1.4.0", "@daybrush/utils@^1.6.0", "@daybrush/utils@^1.7.1", "@daybrush/utils@^1.9.1":
   version "1.10.0"
   resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.0.tgz#2a2235269b960b7ffaf05ca2e75379ea1fb58204"
   integrity sha512-IDT0DWAGcjxb2+WMr8pHrVTkHVKdilBumX1SubXJUlowN4rMSLphwDxvMNfv+vQOrdCPXSoPVZ3mhfrHsQ9Xow==
-
-"@daybrush/utils@^1.10.2":
-  version "1.10.2"
-  resolved "https://registry.npmjs.org/@daybrush/utils/-/utils-1.10.2.tgz#fb10bab437d1bb3d052fa49ca01f23c86a2ad1f1"
-  integrity sha512-fNMWeGUDokdIpebU8oIBUXkyGYITCwwodBfgx277p8d+kvI+k9wdFtKtdY4mvbWxhbAwuWprtVDq8My3KQ24Dg==
 
 "@egjs/agent@^2.2.1":
   version "2.4.3"
@@ -2751,23 +2736,23 @@
     keycon "^1.1.2"
     react-css-styled "^1.0.0"
 
-"@scena/react-guides@^0.19.4":
-  version "0.19.4"
-  resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.19.4.tgz#fdaa350f57492f5df1e17abbceec8fcf403d5f22"
-  integrity sha512-+73iC1MFem+DpNAPKXAGqcNaWFIB41iHViE2okRa1Xu/7Q32CKfk19Vp9ogRFIGAuJLXsfD5MJcKnjgJJ6Y0kw==
+"@scena/react-guides@^0.20.1":
+  version "0.20.1"
+  resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.20.1.tgz#74f9b69b90775c491ad63bb53e57df26979016ca"
+  integrity sha512-Nvv1Zk3FaLi4ulqFqLFNOpTL5HofWaGAR9R8rhPoY8roe2e93TqP+UOLUZwk7m5ekuZlPFy0g/ncf7ip5FlUVA==
   dependencies:
     "@daybrush/utils" "^1.4.0"
     "@scena/dragscroll" "^1.3.0"
-    "@scena/react-ruler" "^0.12.2"
+    "@scena/react-ruler" "^0.14.2"
     css-to-mat "^1.0.3"
     framework-utils "^1.1.0"
     gesto "^1.13.4"
     react-css-styled "^1.0.2"
 
-"@scena/react-ruler@^0.12.2":
-  version "0.12.2"
-  resolved "https://registry.npmjs.org/@scena/react-ruler/-/react-ruler-0.12.2.tgz#4c0d8ce57b9865778195a44f8612489cee446ad9"
-  integrity sha512-5la/o0Qk5FoGczumcfCBHKjdTXBo5eLxlE/ayYgudIdkKFRw7eC4hGtZ2SsaM+X+urNJhCplwPY1jgJkk+PwAg==
+"@scena/react-ruler@^0.14.2":
+  version "0.14.2"
+  resolved "https://registry.npmjs.org/@scena/react-ruler/-/react-ruler-0.14.2.tgz#dccfd1cb68c820aef75f839259d63303803aee8f"
+  integrity sha512-69c7uu60zNMpJHBLniT3FK2CtaYEcIcs/yrZAy/uh+Zz6P9gs/Xo7sLdOf9tKf90MCOzdrJnqzqjLXlxpWYNCQ==
   dependencies:
     "@daybrush/utils" "^1.7.1"
     framework-utils "^1.1.0"
@@ -3238,19 +3223,10 @@
   dependencies:
     "@types/react" "^17"
 
-"@types/react@*":
-  version "16.14.34"
-  resolved "https://registry.npmjs.org/@types/react/-/react-16.14.34.tgz#d129324ffda312044e1c47aab18696e4ed493282"
-  integrity sha512-b99nWeGGReLh6aKBppghVqp93dFJtgtDOzc8NXM6hewD8PQ2zZG5kBLgbx+VJr7Q7WBMjHxaIl3dwpwwPIUgyA==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
-
-"@types/react@^17":
-  version "17.0.52"
-  resolved "https://registry.npmjs.org/@types/react/-/react-17.0.52.tgz#10d8b907b5c563ac014a541f289ae8eaa9bf2e9b"
-  integrity sha512-vwk8QqVODi0VaZZpDXQCmEmiOuyjEFPY7Ttaw5vjM112LOq37yz1CDJGrRJwA1fYEq4Iitd5rnjd1yWAc/bT+A==
+"@types/react@*", "@types/react@^16.9.17", "@types/react@^17":
+  version "16.14.35"
+  resolved "https://registry.npmjs.org/@types/react/-/react-16.14.35.tgz#9d3cf047d85aca8006c4776693124a5be90ee429"
+  integrity sha512-NUEiwmSS1XXtmBcsm1NyRRPYjoZF2YTE89/5QiLt5mlGffYK9FQqOKuOLuXNrjPQV04oQgaZG+Yq02ZfHoFyyg==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -7621,10 +7597,10 @@ infer-owner@^1.0.4:
   resolved "https://registry.npmjs.org/infer-owner/-/infer-owner-1.0.4.tgz#c4cefcaa8e51051c2a40ba2ce8a3d27295af9467"
   integrity sha512-IClj+Xz94+d7irH5qRyfJonOdfTzuDaifE6ZPWfx0N0+/ATZCbuTPq2prFl526urkQd90WyUKIh1DfBQ2hMz9A==
 
-infinite-viewer@~0.19.2:
-  version "0.19.2"
-  resolved "https://registry.npmjs.org/infinite-viewer/-/infinite-viewer-0.19.2.tgz#e29990527a54fbcd22b8bca7c2b5b83aea587117"
-  integrity sha512-rJto1EUQ3frntb/4rVb8CocsyfHl6g4LABK8ltCeaZG98Wq338yxPQK/EsQtd3YZzx+ONMAUQRpQU8pAVrNqgw==
+infinite-viewer@~0.20.0:
+  version "0.20.0"
+  resolved "https://registry.npmjs.org/infinite-viewer/-/infinite-viewer-0.20.0.tgz#74cf73a4ccbbbdb2b4cc111884c9bfd2d1671861"
+  integrity sha512-5DGwVkB20rWNQon1CyVikbXeXbZGP8YyzhhWhztfDVLZp2HH1rgTub7ym6U66V3HYiyaniCwLS1g9R6T6h3AdQ==
   dependencies:
     "@daybrush/utils" "^1.9.1"
     "@egjs/agent" "^2.2.1"
@@ -11480,7 +11456,17 @@ react-color@^2.19.3:
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
 
-react-css-styled@^1.0.0, react-css-styled@^1.0.2, react-css-styled@^1.0.4:
+react-compat-css-styled@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.npmjs.org/react-compat-css-styled/-/react-compat-css-styled-1.0.9.tgz#70ed3ed8d8000fe01cb5ce15ee7723a094165db1"
+  integrity sha512-YpUgTpXU1wR58aPQJVGAWq6QeEFWkafV0qq4Y8KRUwpQJLbJF2GYu5ZQ/kafHGvN3dqQX2e340NlNZ+zbZZv2w==
+  dependencies:
+    "@daybrush/utils" "^1.0.0"
+    css-styled "^1.0.0"
+    framework-utils "^1.1.0"
+    react-css-styled "~1.0.4"
+
+react-css-styled@^1.0.0, react-css-styled@^1.0.2, react-css-styled@^1.0.4, react-css-styled@~1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.0.4.tgz#236ce398232dc152084bbf20540df1c971534174"
   integrity sha512-nRske1bAKOCaf7Gf3o76tKQFIYggaW1qH4rutBlitH5lYnRPA7WoAYKrcxqdUPZd00oASg3SvFZSh3Mc1Wvj3w==
@@ -11532,12 +11518,12 @@ react-error-overlay@^6.0.11:
   resolved "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.11.tgz#92835de5841c5cf08ba00ddd2d677b6d17ff9adb"
   integrity sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==
 
-react-infinite-viewer@^0.19.2:
-  version "0.19.2"
-  resolved "https://registry.npmjs.org/react-infinite-viewer/-/react-infinite-viewer-0.19.2.tgz#19652450a2a83514fff00d29984889a2518f0b34"
-  integrity sha512-qeIl/hApLLbqDP1AMCLEAYY5R5psmJAgma8fXxZR7fHWA+BHI3zZibqQQVSVAT78mhF0dP1qSo3XeqnKabpYSQ==
+react-infinite-viewer@^0.20.0:
+  version "0.20.0"
+  resolved "https://registry.npmjs.org/react-infinite-viewer/-/react-infinite-viewer-0.20.0.tgz#de9486eae8af950cfd7c74561931345c34a4961f"
+  integrity sha512-Px1m7dLkvg9pxhvq8K0KrrYnex2OYSCEOIpykwd9bSlE5Dh+bgCw2zdHqBU/S8BDk1+z7c/iB2X9+3Y29pPHLA==
   dependencies:
-    infinite-viewer "~0.19.2"
+    infinite-viewer "~0.20.0"
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.8.4:
   version "16.13.1"
