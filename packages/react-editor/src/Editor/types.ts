@@ -35,7 +35,7 @@ export interface ScenaProps {
     scenaElementId?: string;
     scenaAttrs?: IObject<any>;
     scenaText?: string;
-    scneaHTML?: string;
+    scenaHTML?: string;
 }
 
 export type ScenaFunctionComponent<T>

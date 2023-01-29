@@ -2703,7 +2703,7 @@
   resolved "https://registry.npmjs.org/@rushstack/eslint-patch/-/eslint-patch-1.2.0.tgz#8be36a1f66f3265389e90b5f9c9962146758f728"
   integrity sha512-sXo/qW2/pAcmT43VoRKOJbDOfV3cYpq3szSVfIThQXNt+E4DfKj361vaAt3c88U5tPUxzEswam7GW48PJqtKAg==
 
-"@scena/dragscroll@^1.2.1", "@scena/dragscroll@^1.3.0":
+"@scena/dragscroll@^1.2.1", "@scena/dragscroll@^1.3.0", "@scena/dragscroll@^1.4.0":
   version "1.3.0"
   resolved "https://registry.npmjs.org/@scena/dragscroll/-/dragscroll-1.3.0.tgz#3a9f30a4153eeb2d25df22004ddf602db6d55583"
   integrity sha512-UlK/g9IX8fJ8+YczqfUT7WDjx/5KKQMU2/uZLYLXV8FWuzWS2WWpt2u1G6KCIF65380oCnCYOs7nOrYpedsOaQ==
@@ -2725,21 +2725,21 @@
   dependencies:
     "@daybrush/utils" "^1.4.0"
 
-"@scena/react-folder@^0.5.1":
-  version "0.5.1"
-  resolved "https://registry.npmjs.org/@scena/react-folder/-/react-folder-0.5.1.tgz#f9f3c05149c5ad1609bf6243f07274f38b61d590"
-  integrity sha512-0ik0OQCPumV8o2MXmKxrTomcG4hm8gyXa7A5zhB4qXcYKFrA/kDWQcSdLeruBTQKbIoiDDCIM4JzNQXvJvr9bA==
+"@scena/react-folder@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.npmjs.org/@scena/react-folder/-/react-folder-0.6.0.tgz#9075fd5e1e156ad3540f550db01ba76116610a8a"
+  integrity sha512-oTE8b7afjrdKIEKOYE3IMy6F/EsFkgtWHqBhqUP5Mz/CIYFDZyFfzDgALyYhu7kd3b9pxXw714PhVK609oLBwg==
   dependencies:
-    "@daybrush/utils" "^1.4.0"
-    framework-utils "^1.0.0"
-    gesto "^1.3.0"
-    keycon "^1.1.2"
-    react-css-styled "^1.0.0"
+    "@daybrush/utils" "^1.10.2"
+    framework-utils "^1.1.0"
+    gesto "^1.15.1"
+    keycon "^1.4.0"
+    react-css-styled "^1.0.4"
 
-"@scena/react-guides@^0.20.1":
-  version "0.20.1"
-  resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.20.1.tgz#74f9b69b90775c491ad63bb53e57df26979016ca"
-  integrity sha512-Nvv1Zk3FaLi4ulqFqLFNOpTL5HofWaGAR9R8rhPoY8roe2e93TqP+UOLUZwk7m5ekuZlPFy0g/ncf7ip5FlUVA==
+"@scena/react-guides@^0.22.2":
+  version "0.22.2"
+  resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.22.2.tgz#1718d26573a4255ddb9c1aae983808af3422baba"
+  integrity sha512-XoLN3oCsVVJLAmlnavP4VJWsHKZwzYsTVQZUXG1CtC2q/H3gN8NJ+ZAeHKIkWhZXqaLgN70TOv9fNUTyGz/Mgw==
   dependencies:
     "@daybrush/utils" "^1.4.0"
     "@scena/dragscroll" "^1.3.0"
@@ -6793,7 +6793,7 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
-framework-utils@^1.0.0, framework-utils@^1.1.0:
+framework-utils@^1.1.0:
   version "1.1.0"
   resolved "https://registry.npmjs.org/framework-utils/-/framework-utils-1.1.0.tgz#a3b528bce838dfd623148847dc92371b09d0da2d"
   integrity sha512-KAfqli5PwpFJ8o3psRNs8svpMGyCSAe8nmGcjQ0zZBWN2H6dZDnq+ABp3N3hdUmFeMrLtjOCTXD4yplUJIWceg==
@@ -6921,7 +6921,7 @@ gensync@^1.0.0-beta.2:
   resolved "https://registry.npmjs.org/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
   integrity sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==
 
-gesto@^1.13.0, gesto@^1.13.1, gesto@^1.13.4, gesto@^1.15.0, gesto@^1.3.0:
+gesto@^1.13.0, gesto@^1.13.1, gesto@^1.13.4, gesto@^1.15.0, gesto@^1.15.1:
   version "1.15.0"
   resolved "https://registry.npmjs.org/gesto/-/gesto-1.15.0.tgz#b5f3cbe456ca2016de58bd050a019d339f06dc9c"
   integrity sha512-al19XPu2TA0KrVTDXIVzFqC/cgZv5hGyLj4IYOf+6iKx7AWag3rvt96C8fP9RaLaptGWgFrhr7c+KVu2F2pEOw==
@@ -8884,20 +8884,20 @@ keycode@^2.2.0:
   resolved "https://registry.npmjs.org/keycode/-/keycode-2.2.1.tgz#09c23b2be0611d26117ea2501c2c391a01f39eff"
   integrity sha512-Rdgz9Hl9Iv4QKi8b0OlCRQEzp4AgVxyCtz5S/+VIHezDmrDhkp2N2TqBWOLz0/gbeREXOOiI9/4b8BY9uw2vFg==
 
-keycon@^1.1.2, keycon@^1.4.0, keycon@~1.4.0:
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/keycon/-/keycon-1.4.0.tgz#bf2a633f3c3b659ea564045938cff33e584cebd5"
-  integrity sha512-p1NAIxiRMH3jYfTeXRs2uWbVJ1WpEjpi8ktzUyBJsX7/wn2qu2VRXktneBLNtKNxJmlUYxRi9gOJt1DuthXR7A==
+keycon@^1.2.0:
+  version "1.3.2"
+  resolved "https://registry.npmjs.org/keycon/-/keycon-1.3.2.tgz#4def6e13ee450b22d3d6a8eaf7215dda8ecbde97"
+  integrity sha512-rNdi3Izqkp4r2P+f55Nrk8uCdEFS+eiMoUVNuIJOQ/qsTM0xuMvk3sv5E41pjfrClCGlC+T72MpXf6O+k9UXuA==
   dependencies:
     "@cfcs/core" "^0.0.6"
     "@daybrush/utils" "^1.7.1"
     "@scena/event-emitter" "^1.0.2"
     keycode "^2.2.0"
 
-keycon@^1.2.0:
-  version "1.3.2"
-  resolved "https://registry.npmjs.org/keycon/-/keycon-1.3.2.tgz#4def6e13ee450b22d3d6a8eaf7215dda8ecbde97"
-  integrity sha512-rNdi3Izqkp4r2P+f55Nrk8uCdEFS+eiMoUVNuIJOQ/qsTM0xuMvk3sv5E41pjfrClCGlC+T72MpXf6O+k9UXuA==
+keycon@^1.4.0, keycon@~1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npmjs.org/keycon/-/keycon-1.4.0.tgz#bf2a633f3c3b659ea564045938cff33e584cebd5"
+  integrity sha512-p1NAIxiRMH3jYfTeXRs2uWbVJ1WpEjpi8ktzUyBJsX7/wn2qu2VRXktneBLNtKNxJmlUYxRi9gOJt1DuthXR7A==
   dependencies:
     "@cfcs/core" "^0.0.6"
     "@daybrush/utils" "^1.7.1"
@@ -11466,7 +11466,7 @@ react-compat-css-styled@^1.0.9:
     framework-utils "^1.1.0"
     react-css-styled "~1.0.4"
 
-react-css-styled@^1.0.0, react-css-styled@^1.0.2, react-css-styled@^1.0.4, react-css-styled@~1.0.4:
+react-css-styled@^1.0.2, react-css-styled@^1.0.4, react-css-styled@~1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/react-css-styled/-/react-css-styled-1.0.4.tgz#236ce398232dc152084bbf20540df1c971534174"
   integrity sha512-nRske1bAKOCaf7Gf3o76tKQFIYggaW1qH4rutBlitH5lYnRPA7WoAYKrcxqdUPZd00oASg3SvFZSh3Mc1Wvj3w==
@@ -11548,21 +11548,21 @@ react-keycon@^0.3.0:
     "@cfcs/react" "^0.0.6"
     keycon "~1.4.0"
 
-react-moveable@^0.46.0-beta.0:
-  version "0.46.0-beta.0"
-  resolved "https://registry.npmjs.org/react-moveable/-/react-moveable-0.46.0-beta.0.tgz#435abe66454bd8801ed644184639ca9cba88ee91"
-  integrity sha512-BofXWl7NT0LFJYcqm10+q7Tb2xk70KD+jvDbidxeAoMAyc0VaF1A0BK9x3TKWAgfUH1dbMEWBJRq3n4dSFoJzQ==
+react-moveable@^0.46.1:
+  version "0.46.1"
+  resolved "https://registry.npmjs.org/react-moveable/-/react-moveable-0.46.1.tgz#533c09d943e5bdd08c1ebdeb71a78ce1a196f43e"
+  integrity sha512-Xi+64z51p7nrXwu3PeTUCoOYgRUwaZ6wxkrrbLAxYIqEd9Mfu/WHdiWzp5sp0kHsegJPX2t+XEErTmulAEQaIQ==
   dependencies:
     "@daybrush/utils" "^1.10.0"
     "@egjs/agent" "^2.2.1"
     "@egjs/children-differ" "^1.0.1"
     "@egjs/list-differ" "^1.0.0"
-    "@scena/dragscroll" "^1.3.0"
+    "@scena/dragscroll" "^1.4.0"
     "@scena/event-emitter" "^1.0.5"
     "@scena/matrix" "^1.1.1"
     css-to-mat "^1.0.3"
     framework-utils "^1.1.0"
-    gesto "^1.15.0"
+    gesto "^1.15.1"
     overlap-area "^1.1.0"
     react-css-styled "^1.0.4"
 

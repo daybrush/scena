@@ -135,7 +135,7 @@ export function setMoveMatrix(frame: Frame, moveMatrix: number[]) {
         frame.set("transform", transformOrders[0], matrix3d(moveMatrix, prevMatrix));
     } else if (frame.has("transform", "matrix3d")) {
         let num = 1;
-        while (frame.has("transform", `matrix3d${++num}`)) {}
+        while (frame.has("transform", `matrix3d${++num}`)) { }
 
         frame.set("transform", `matrix3d${num}`, [...moveMatrix]);
         frame.setOrders(["transform"], [`matrix3d${num}`, ...transformOrders]);
