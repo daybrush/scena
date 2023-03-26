@@ -60,11 +60,11 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
             const horizontalGuides = horizontalGuidesRef.current!;
             const verticalGuides = verticalGuidesRef.current!;
 
-            horizontalGuides.scroll(e.scrollLeft);
-            horizontalGuides.scrollGuides(e.scrollTop);
+            horizontalGuides.scroll(e.scrollLeft, e.zoomX);
+            horizontalGuides.scrollGuides(e.scrollTop, e.zoomY);
 
-            verticalGuides.scroll(e.scrollTop);
-            verticalGuides.scrollGuides(e.scrollLeft);
+            verticalGuides.scroll(e.scrollTop, e.zoomX);
+            verticalGuides.scrollGuides(e.scrollLeft, e.zoomY);
         }}
         onPinch={e => {
             if (moveableRef.current!.isDragging()) {

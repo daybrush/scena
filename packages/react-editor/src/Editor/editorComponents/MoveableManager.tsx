@@ -69,7 +69,8 @@ export const MoveableManager = React.forwardRef<Moveable, ScenaMoveableMangerPro
         }}
         draggable={true}
         useAccuratePosition={true}
-        // rotationPosition={"none"}
+        useResizeObserver={true}
+        useMutationObserver={true}
         rotateAroundControls={true}
         pinchable={["rotatable"]}
         zoom={1 / zoom}
