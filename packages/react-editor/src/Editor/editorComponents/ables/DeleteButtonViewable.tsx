@@ -7,10 +7,7 @@ export interface DeleteButtonViewableProps {
 }
 export const DeleteButtonViewable = {
     name: "deleteButtonViewable",
-    props: {
-        deleteButtonViewable: Boolean,
-    },
-    events: {},
+    props: ["deleteButtonViewable"],
     render(moveable: MoveableManagerInterface, React: Renderer) {
         const rect = moveable.getRect();
         const { pos2 } = moveable.state;

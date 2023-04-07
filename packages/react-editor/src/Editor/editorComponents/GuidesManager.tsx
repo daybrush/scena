@@ -53,6 +53,7 @@ export const GuidesManager = React.forwardRef<Guides, GuidesManagerProps>((props
         dragPosFormat={dragPosFormat}
         zoom={zoom}
         unit={unit}
+        useResizeObserver={true}
         selectedRanges={selectedRanges}
         onChangeGuides={React.useCallback(e => {
             setGuidelines(e.guides);

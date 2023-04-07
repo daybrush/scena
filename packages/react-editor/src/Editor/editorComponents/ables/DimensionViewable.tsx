@@ -6,10 +6,7 @@ export interface DimensionViewableProps {
 }
 export const DimensionViewable = {
     name: "dimensionViewable",
-    props: {
-        dimensionViewable: Boolean,
-    },
-    events: {},
+    props: ["dimensionViewable"],
     render(moveable: MoveableManagerInterface) {
         const zoom = moveable.props.zoom;
         const rect = moveable.getRect();

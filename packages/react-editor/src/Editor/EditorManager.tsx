@@ -2,7 +2,7 @@ import * as React from "react";
 import InfiniteViewer from "react-infinite-viewer";
 import Guides from "@scena/react-guides";
 import Selecto from "react-selecto";
-import styled, { StyledElement } from "react-css-styled";
+import { styled } from "react-css-styled";
 import Moveable from "react-moveable";
 
 // import ToolBar from "./ToolBar/ToolBar";
@@ -47,7 +47,7 @@ const EditorElement = styled("div", EDITOR_CSS);
 
 
 export interface EditorManagerInstance {
-    editorElementRef: React.MutableRefObject<StyledElement<HTMLDivElement> | null>;
+    editorElementRef: React.MutableRefObject<HTMLDivElement | null>;
     historyManager: HistoryManager;
     actionManager: ActionManager;
     memoryManager: MemoryManager;
@@ -86,7 +86,7 @@ export default function EditorManager2() {
     // const menuRef = React.useRef<ToolBar>(null);
     const viewportRef = React.useRef<ViewportInstnace>(null);
     // const tabsRef = React.useRef<Tabs>(null);
-    const editorElementRef = React.useRef<StyledElement<HTMLDivElement>>(null);
+    const editorElementRef = React.useRef<HTMLDivElement>(null);
 
 
     // declare global store
@@ -337,16 +337,16 @@ export default function EditorManager2() {
         keyManager.actionDown(["meta", "shift", "z"], "request.history.redo");
 
         // register default events
-        const onResize = () => {
-            horizontalGuidesRef.current!.resize();
-            verticalGuidesRef.current!.resize();
-        };
+        // const onResize = () => {
+        //     horizontalGuidesRef.current!.resize();
+        //     verticalGuidesRef.current!.resize();
+        // };
         const startId = requestAnimationFrame(() => {
-            onResize();
+            // onResize();
             infiniteViewerRef.current!.scrollCenter();
         });
         registerHistoryTypes(historyManager);
-        window.addEventListener("resize", onResize);
+        // window.addEventListener("resize", onResize);
 
         return () => {
             layerManager.set([], []);
@@ -354,7 +354,7 @@ export default function EditorManager2() {
             actionManager.off();
             keyManager.destroy();
             cancelAnimationFrame(startId);
-            window.removeEventListener("resize", onResize);
+            // window.removeEventListener("resize", onResize);
         };
     }, []);
 

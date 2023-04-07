@@ -24,7 +24,7 @@ export default function ColorPickerPortal() {
     const [id, setId] = React.useState("");
 
     React.useEffect(() => {
-        setPortal(editorRef.current!.editorElementRef.current!.getElement()!);
+        setPortal(editorRef.current!.editorElementRef.current!);
 
         const onClick = (e: any) => {
             if (e.__STOP__COLOR_PICKER) {

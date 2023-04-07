@@ -31,6 +31,7 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
         useWheelScroll={true}
         useForceWheel={true}
         useMouseDrag={isSpace}
+        useResizeObserver={true}
         pinchThreshold={50}
         maxPinchWheel={3}
         onDragStart={e => {
