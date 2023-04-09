@@ -11,8 +11,11 @@ import { isObject } from "@daybrush/utils";
 import { useAction } from "../../hooks/useAction";
 import { Frame } from "scenejs";
 import { Text } from "./inputs/Text";
+import { FOLDER_DEFAULT_STYLE } from "./FolderStyls";
 
 const FrameElement = styled("div", `
+${FOLDER_DEFAULT_STYLE}
+
 .scena-folder-file, .scena-folder-empty {
     position: relative;
     box-sizing: border-box;
@@ -21,20 +24,10 @@ const FrameElement = styled("div", `
     display: inline-block;
     width: 100%;
     font-size: 12px;
-    color: #fff;
+    color: var(--scena-editor-color-text);
 }
 .scena-folder-empty {
     text-align: center;
-}
-.scena-folder-file:not(.scena-folder-selected):hover:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    border: 1px solid var(--scena-editor-color-selected);
-    box-sizing: border-box;
 }
 .scena-folder-file-name {
     width: 100%;
@@ -71,7 +64,6 @@ function Property({ name, scope, path }: FileProps<string | number>) {
 
 
 export default function FrameTab() {
-    const editorRef = useStoreStateValue($editor);
     const layerManager = useStoreStateValue($layerManager);
     const [folded, setFolded] = React.useState<string[]>([]);
     const selectedLayers = useStoreStateValue($selectedLayers);
@@ -89,7 +81,6 @@ export default function FrameTab() {
         <FrameContext.Provider value={firstFrame}>
             {fisrtInfos.length ? <Folder<string | number>
                 scope={[]}
-                name=""
                 infos={fisrtInfos}
                 multiselect={true}
                 folded={folded}
@@ -99,6 +90,10 @@ export default function FrameTab() {
                 idProperty={value => `${value}`}
                 isPadding={true}
                 pathSeperator={SCENA_LAYER_SEPARATOR}
+                selectedColor="var(--scena-editor-color-folder-selected)"
+                iconColor="var(--scena-editor-color-folder-fold)"
+                fontColor="var(--scena-editor-color-text)"
+                backgroundColor="transparent"
                 borderColor="transparent"
                 childrenProperty={(value: string | number, scope: string[]) => {
                     return firstFrame?.getOrders([...scope, value]) ?? [];

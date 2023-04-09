@@ -17,12 +17,12 @@ import MemoryManager from "./managers/MemoryManager";
 
 import { EDITOR_CSS } from "./consts";
 
-import { useStoreRoot, useStoreStateSetPromise, useStoreValue } from "@scena/react-store";
+import { useStoreRoot, useStoreStateSetPromise, useStoreStateValue, useStoreValue } from "@scena/react-store";
 import {
     $actionManager, $layerManager, $editor,
     $historyManager, $horizontalGuides, $infiniteViewer,
     $keyManager, $layers, $memoryManager, $moveable,
-    $selectedLayers, $selecto, $verticalGuides, $zoom,
+    $selectedLayers, $selecto, $verticalGuides, $zoom, $showGuides, $darkMode,
 } from "./stores/stores";
 import { $alt, $meta, $shift, $space } from "./stores/keys";
 
@@ -39,6 +39,7 @@ import { Tabs } from "./uis/Tabs";
 import { Histories, registerHistoryTypes } from "./managers/histories/histories";
 import { readFiles } from "./managers/FileManager";
 import ColorPickerPortal from "./uis/ColorPickerPortal";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 
 
@@ -104,9 +105,11 @@ export default function EditorManager2() {
     useStoreValue($verticalGuides, verticalGuidesRef);
     useStoreValue($editor, editorRef);
 
+    const showGuidesStore = useStoreValue($showGuides);
     const zoomStore = useStoreValue($zoom);
     const layerStore = useStoreValue($layers);
-    const layers: ScenaElementLayer[] = React.useMemo(() => {
+
+    React.useMemo(() => {
         const layers: ScenaElementLayer[] = [
             {
                 id: "1",
@@ -284,8 +287,10 @@ export default function EditorManager2() {
 
     React.useEffect(() => {
         const onUpdate = () => {
-            actionManager.act("get.rect", {
-                rect: moveableRef.current!.getRect(),
+            requestAnimationFrame(() => {
+                actionManager.act("get.rect", {
+                    rect: moveableRef.current!.getRect(),
+                });
             });
         };
         actionManager.on("render.end", onUpdate);
@@ -321,6 +326,9 @@ export default function EditorManager2() {
         keyManager.toggleState(["alt"], $alt, keyChecker);
 
         // action down
+        keyManager.keydown(["r"], () => {
+            showGuidesStore.update(!showGuidesStore.value);
+        });
         keyManager.actionDown(["left"], "move.left");
         keyManager.actionDown(["right"], "move.right");
         keyManager.actionDown(["up"], "move.up");
@@ -358,9 +366,27 @@ export default function EditorManager2() {
         };
     }, []);
 
+
+    const showGuides = useStoreStateValue($showGuides);
+    const darkMode = useStoreStateValue($darkMode);
+    const leftTabs = React.useMemo(() => [
+        "layers",
+    ], []);
+    const rightTabs = React.useMemo(() => [
+        "align",
+        "transform",
+        "fill",
+        "stroke",
+        "frame",
+        "history",
+    ], []);
     return React.useMemo(() => <EditorElement
         ref={editorElementRef}
-        className={prefix("editor")}
+        className={prefix(
+            "editor",
+            showGuides ? "" : "hide-guides",
+            darkMode ? "" : "light-mode",
+        )}
         onDragOver={(e: DragEvent) => {
             e.preventDefault();
         }}
@@ -391,24 +417,37 @@ export default function EditorManager2() {
     >
         <ToolBar />
         <MenuList />
-        <Tabs />
-        <ColorPickerPortal />
-        <div className={prefix("reset")} onClick={() => {
-            infiniteViewerRef.current!.scrollCenter({ duration: 500, absolute: true });
-        }}></div>
-        <GuidesManager ref={horizontalGuidesRef} type="horizontal" />
-        <GuidesManager ref={verticalGuidesRef} type="vertical" />
-        <InfiniteViewerManager ref={infiniteViewerRef}>
-            <Viewport ref={viewportRef} onBlur={onBlur}
-                style={{
-                    width: `600px`,
-                    height: `800px`,
-                }}>
-                <MoveableManager ref={moveableRef} />
-            </Viewport>
-        </InfiniteViewerManager>
-        <SelectoManager ref={selectoRef} />
-    </EditorElement>, []);
+        <PanelGroup direction="horizontal">
+            <Panel className="scena-panel-left">
+                <Tabs tabs={leftTabs} />
+            </Panel>
+            <PanelResizeHandle className="scena-resize-handle" />
+            <Panel defaultSize={70} className="scena-center">
+                <div className={prefix("reset")} onClick={() => {
+                    infiniteViewerRef.current!.scrollCenter({ duration: 500, absolute: true });
+                }}></div>
+                {showGuides && <GuidesManager ref={horizontalGuidesRef} type="horizontal" />}
+                {showGuides && <GuidesManager ref={verticalGuidesRef} type="vertical" />}
+                <InfiniteViewerManager ref={infiniteViewerRef}>
+                    <Viewport ref={viewportRef} onBlur={onBlur}
+                        style={{
+                            width: `600px`,
+                            height: `800px`,
+                        }}>
+                        <MoveableManager ref={moveableRef} />
+                    </Viewport>
+                </InfiniteViewerManager>
+                <SelectoManager ref={selectoRef} />
+            </Panel>
+            <PanelResizeHandle className="scena-resize-handle" />
+            <Panel className="scena-panel-right" style={{
+                overflow: "visible",
+            }}>
+                <Tabs tabs={rightTabs} />
+                <ColorPickerPortal />
+            </Panel>
+        </PanelGroup>
+    </EditorElement>, [showGuides, darkMode]);
 }
 
 // export class EditorManager extends React.PureComponent<{

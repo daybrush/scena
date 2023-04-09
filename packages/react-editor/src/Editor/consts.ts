@@ -26,33 +26,86 @@ export const EDITOR_CSS = `
     position: relative;
     width: 100%;
     height: 100%;
+    transform-style: preserve-3d;
     font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    --scena-editor-color-background-tool: #2a2a2a;
+    --scena-editor-color-background-bold: #1a1a1a;
+    --scena-editor-color-divider: #444;
+    --scena-editor-color-text: #fff;
+    --scena-editor-color-text-unlit: #555;
+    --scena-editor-color-text-selected: #fff;
+    --scena-editor-color-canvas: #1a1a1a;
+    --scena-editor-color-guides: #333;
+    --scena-editor-color-icon: #fff;
+
+    --scena-editor-color-folder-selected: #55bbff;
+    --scena-editor-color-folder-fold: #fff;
+    --scena-editor-color-folder-selected-text: #fff;
+
     --scena-editor-color-main: #4af;
     --scena-editor-color-selected: #5bf;
     --scena-editor-color-selected2: #55bbffaa;
+    --scena-editor-color-selected3: #55bbff55;
+
     --scena-editor-color-back1: #1a1a1a;
     --scena-editor-color-back2: #2a2a2a;
     --scena-editor-color-back3: #333;
-    --scena-editor-color-back4: #444;
     --scena-editor-color-back5: #555;
     --scena-editor-color-back6: #666;
-    transform-style: preserve-3d;
-
-    --scena-editor-size-tools: 45px;
+    --scena-editor-color-fill2: #eee;
     --scena-editor-size-guides: 30px;
-    --scena-editor-size-tabs: 250px;
+}
+:host.scena-light-mode {
+    --scena-editor-color-background-tool: #fff;
+    --scena-editor-color-background-bold: #ddd;
+    --scena-editor-color-divider: #eee;
+    --scena-editor-color-text: #555;
+    --scena-editor-color-text-unlit: #aaa;
+    --scena-editor-color-canvas: #f7f7f7;
+    --scena-editor-color-guides: #eee;
+    --scena-editor-color-icon: #555;
+
+    --scena-editor-color-folder-selected: #44aaff33;
+    --scena-editor-color-folder-selected-text: #333;
+    --scena-editor-color-folder-fold: #aaa;
+
+    --scena-editor-color-back1: #fff;
+    --scena-editor-color-back2: #eee;
+    --scena-editor-color-back3: #bbb;
+    --scena-editor-color-back5: #999;
+    --scena-editor-color-back6: #888;
+
+    --scena-editor-color-fill2: #222;
+}
+
+:host.scena-hide-guides {
+    --scena-editor-size-guides: 0px;
 }
 
 [class*="scena-"] {
     font-family: "Open Sans", sans-serif;
 }
 
+.scena-svg-icon {
+    fill: var(--scena-editor-color-text);
+    stroke: var(--scena-editor-color-text);
+}
+.scena-center {
+    position: relative;
+}
+.scena-panel-left, .scena-panel-right {
+    position: relative;
+    min-width: 250px;
+}
 .scena-viewer {
     position: absolute !important;
     left: var(--scena-editor-size-guides);
-    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-tools));
-    width: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tabs));
-    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tools));
+    top: calc(var(--scena-editor-size-guides));
+    width: calc(100% - var(--scena-editor-size-guides));
+    height: calc(100% - var(--scena-editor-size-guides));
+    background: var(--scena-editor-color-canvas);
 }
 
 .scena-viewport-container {
@@ -63,6 +116,7 @@ export const EDITOR_CSS = `
     width: 100%;
     height: 100%;
     box-sizing: border-box;
+    background: #fff;
 }
 .scena-viewport:before {
     content: "";
@@ -85,13 +139,32 @@ export const EDITOR_CSS = `
     pointer-events: none;
 }
 
-
+.scena-resize-handle {
+    position: relative;
+    z-index: 2;
+    transform: translateZ(1px);
+}
+.scena-resize-handle:before, .scena-resize-handle:after {
+    position: absolute;
+    content: "";
+    width: 10px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%);
+    z-index: 1;
+}
+.scena-resize-handle:after {
+    width: 1px;
+    background: var(--scena-editor-color-divider);
+}
 
 .scena-guides-manager {
     position: absolute !important;
-    top: var(--scena-editor-size-tools);
+    top: 0;
     left: 0;
     transform: translateZ(1px);
+    z-index: 1;
 }
 
 .scena-guides-manager.scena-guides-horizontal {
@@ -101,23 +174,23 @@ export const EDITOR_CSS = `
 }
 
 .scena-guides-manager.scena-guides-vertical {
-    top: calc(var(--scena-editor-size-guides) + var(--scena-editor-size-tools));
-    height: calc(100% - var(--scena-editor-size-guides) - var(--scena-editor-size-tools));
+    top: calc(var(--scena-editor-size-guides));
+    height: calc(100% - var(--scena-editor-size-guides));
     width: var(--scena-editor-size-guides) !important;
 }
 
 .scena-reset {
     position: absolute !important;
-    background: var(--scena-editor-color-back3);
+    background: var(--scena-editor-color-guides);
     width: var(--scena-editor-size-guides);
     height: var(--scena-editor-size-guides);
     z-index: 1;
-    border-right: 1px solid var(--scena-editor-color-back4);
-    border-bottom: 1px solid var(--scena-editor-color-back4);
+    border-right: 1px solid var(--scena-editor-color-divider);
+    border-bottom: 1px solid var(--scena-editor-color-divider);
     box-sizing: border-box;
     cursor: pointer;
     left: 0;
-    top: var(--scena-editor-size-tools);
+    top: 0;
 }
 
 .scena-overlay {

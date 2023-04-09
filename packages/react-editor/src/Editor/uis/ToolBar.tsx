@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "react-css-styled";
 import { StoreStateType, StoreValue, useStoreState, useStoreStateValue, useStoreValue } from "@scena/react-store";
-import { $pointer, $rect, $selectedTool } from "../stores/stores";
+import { $darkMode, $pointer, $rect, $selectedTool } from "../stores/stores";
 import { prefix } from "../utils/utils";
 import {
     MoveToolIcon,
@@ -12,17 +12,20 @@ import {
     TransformIcon,
     RoundRectIcon,
     OvalIcon,
+    LightModeIcon,
 } from "./icons";
 import { $openMenu, MenuItem } from "./Menu";
+import { DarkModeIcon } from "./icons";
 
 const ToolBarElement = styled("div", `
 {
-    position: absolute;
+    --scena-editor-size-tools: 45px;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
     height: var(--scena-editor-size-tools);
-    background: var(--scena-editor-color-back2);
+    background: var(--scena-editor-color-background-tool);
     box-sizing: border-box;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -31,7 +34,7 @@ const ToolBarElement = styled("div", `
     z-index: 10;
     transform: translateZ(1px);
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 .scena-menu-bottom {
     position: absolute;
@@ -56,24 +59,26 @@ svg, .scena-i {
     transition: all ease 0.2s;
     vertical-align: top;
 }
-.scena-icon.scena-menu-main {
-    position: absolute;
-    top: 0;
-    left: 0;
-}
+
 .scena-icon-inner {
     position: relative;
     padding: 10px;
-    display: block;
+    display: flex;
+    align-items: center;
+    justified-contents: center;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
 }
-:host>.scena-icon:hover {
+.scena-tool-left>.scena-icon:hover, .scena-tool-right>.scena-icon:hover  {
+    --scena-editor-color-icon: #fff;
     background: #000;
 }
-:host>.scena-icon.scena-selected {
+.scena-tool-left>.scena-icon.scena-selected {
     background: var(--scena-editor-color-main);
+}
+.scena-icon.scena-selected {
+    --scena-editor-color-icon: #fff;
 }
 .scena-icon.scena-selected svg *,
 .scena-sub-icon.scena-selected svg * {
@@ -84,10 +89,23 @@ svg, .scena-i {
     position: absolute;
     right: 4px;
     bottom: 4px;
-    border-bottom: 5px solid #eee;
+    border-bottom: 5px solid var(--scena-editor-color-icon);
     border-right: 0;
     border-left: 5px solid transparent;
     pointer-events: none;
+}
+.scena-tool-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--scena-editor-color-text);
+    font-weight: bold;
+    font-size: 12px;
+}
+.scena-tool-right {
+    position: absolute;
+    right: 0;
 }
 `);
 
@@ -204,6 +222,21 @@ const TOOLS: Tool[] = [
     },
 ];
 
+function DarkModeTool() {
+    const [isDarkMode, setDarkMode] = useStoreState($darkMode);
+
+    return <div className={prefix("icon")} onClick={() => {
+        setDarkMode(!isDarkMode);
+    }}>
+        <ToolIcon icon={() => {
+            if (isDarkMode) {
+                return <LightModeIcon />;
+            } else {
+                return <DarkModeIcon />;
+            }
+        }} />
+    </div>;
+}
 const ToolIcon = (props: {
     selected?: boolean;
     icon?: () => JSX.Element,
@@ -222,24 +255,33 @@ const ToolIcon = (props: {
         {Icon && <Icon />}
     </div>;
 };
+
 const ToolBar = () => {
     const [selectedTool, setSelectedTool] = useStoreState($selectedTool);
 
     return <ToolBarElement className={prefix("menu")}>
-        {TOOLS.map(({ className, name, icon: Icon, isExtends }) => {
-            const selected = name === selectedTool;
-            return <div
-                key={name}
-                className={prefix("icon", selected ? "selected" : "", className || "")}
-                onClick={() => {
-                    if (name) {
-                        setSelectedTool(name);
-                    }
-                }}>
-                {isExtends ? <Icon selected={selected} /> : <ToolIcon icon={() => <Icon />} selected={selected} />}
-                {isExtends && <div className={prefix("extends-icon")} />}
-            </div>;
-        })}
+        <div className="scena-tool-left">
+            {TOOLS.map(({ className, name, icon: Icon, isExtends }) => {
+                const selected = name === selectedTool;
+                return <div
+                    key={name}
+                    className={prefix("icon", selected ? "selected" : "", className || "")}
+                    onClick={() => {
+                        if (name) {
+                            setSelectedTool(name);
+                        }
+                    }}>
+                    {isExtends ? <Icon selected={selected} /> : <ToolIcon icon={() => <Icon />} selected={selected} />}
+                    {isExtends && <div className={prefix("extends-icon")} />}
+                </div>;
+            })}
+        </div>
+        <div className="scena-tool-title">
+            Scena Studio
+        </div>
+        <div className="scena-tool-right">
+            <DarkModeTool />
+        </div>
     </ToolBarElement>;
 };
 

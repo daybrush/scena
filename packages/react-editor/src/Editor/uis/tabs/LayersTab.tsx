@@ -6,11 +6,14 @@ import { ScenaElementLayer, ScenaElementLayerGroup } from "../../types";
 import { useStoreStateValue } from "@scena/react-store";
 import { $editor, $layerManager, $selectedLayers } from "../../stores/stores";
 import { flattenLayerGroup, isArrayContains, prefix } from "../../utils/utils";
-import styled from "react-css-styled";
+import { styled } from "react-css-styled";
 import { SCENA_LAYER_SEPARATOR } from "../../consts";
 import { FolderIcon, InvisibleIcon, LayerIcon, VisibleIcon } from "../icons";
+import { FOLDER_DEFAULT_STYLE } from "./FolderStyls";
 
 const LayersElement = styled("div", `
+${FOLDER_DEFAULT_STYLE}
+
 .scena-folder-file {
     position: relative;
     box-sizing: border-box;
@@ -18,7 +21,9 @@ const LayersElement = styled("div", `
     display: inline-block;
     width: 100%;
     font-size: 12px;
+    font-weight: bold;
 }
+
 .scena-layer.scena-layer-invisible {
     color: #9aa;
 }
@@ -26,21 +31,12 @@ const LayersElement = styled("div", `
     fill: #9aa;
     stroke: #9aa;
 }
+
 .scena-folder-file-name {
     width: 100%;
 }
 .scena-folder-file:hover .scena-layer-extra {
     opacity: 1;
-}
-.scena-folder-file:not(.scena-folder-selected):hover:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    border: 1px solid var(--scena-editor-color-selected);
-    box-sizing: border-box;
 }
 .scena-layer {
     display: flex;
@@ -103,7 +99,7 @@ function Layer({ name, value }: FileProps<ScenaElementLayer | ScenaElementLayerG
             "layer-extra",
             invisible ? "layer-invisible-extra" : "layer-visible-extra",
         )}>
-            {invisible ? <InvisibleIcon  /> : <VisibleIcon  />}
+            {invisible ? <InvisibleIcon /> : <VisibleIcon />}
         </div>
     </div>;
 }
@@ -122,7 +118,6 @@ export default function LayersTab() {
     return <LayersElement>
         <Folder<ScenaElementLayer | ScenaElementLayerGroup>
             scope={[]}
-            name=""
             infos={children}
             multiselect={true}
             folded={folded}
@@ -131,8 +126,12 @@ export default function LayersTab() {
             nameProperty="title"
             idProperty="id"
             isPadding={true}
-            pathSeperator={SCENA_LAYER_SEPARATOR}
+            selectedColor="var(--scena-editor-color-folder-selected)"
+            iconColor="var(--scena-editor-color-folder-fold)"
+            fontColor="var(--scena-editor-color-text)"
+            backgroundColor="transparent"
             borderColor="transparent"
+            pathSeperator={SCENA_LAYER_SEPARATOR}
             childrenProperty={React.useCallback((value: ScenaElementLayer | ScenaElementLayerGroup) => {
                 if (value.type === "group") {
                     return value.children;
@@ -210,7 +209,6 @@ export default function LayersTab() {
                 );
             }}
             onSelect={e => {
-
                 editorRef.current!.setSelectedLayers(
                     e.selectedInfos.map(info => info.value),
                 );

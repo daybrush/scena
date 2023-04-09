@@ -4,6 +4,7 @@ import { useStoreStateSetValue, useStoreStateValue, useStoreValue } from "@scena
 import { $space } from "../stores/keys";
 import {
     $actionManager, $horizontalGuides, $layerManager, $moveable,
+    $scrollPos,
     $selectedLayers, $selecto, $verticalGuides, $zoom,
 } from "../stores/stores";
 import { prefix } from "../utils/utils";
@@ -22,6 +23,7 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
 
     const isSpace = useStoreStateValue($space);
     const setZoom = useStoreStateSetValue($zoom);
+    const setScrollPos = useStoreStateSetValue($scrollPos);
 
     return <InfiniteViewer
         ref={ref}
@@ -61,11 +63,15 @@ export const InfiniteViewerManager = React.forwardRef<InfiniteViewer, InfiniteVi
             const horizontalGuides = horizontalGuidesRef.current!;
             const verticalGuides = verticalGuidesRef.current!;
 
-            horizontalGuides.scroll(e.scrollLeft, e.zoomX);
-            horizontalGuides.scrollGuides(e.scrollTop, e.zoomY);
+            if (horizontalGuides && verticalGuides) {
+                horizontalGuides.scroll(e.scrollLeft, e.zoomX);
+                horizontalGuides.scrollGuides(e.scrollTop, e.zoomY);
 
-            verticalGuides.scroll(e.scrollTop, e.zoomX);
-            verticalGuides.scrollGuides(e.scrollLeft, e.zoomY);
+                verticalGuides.scroll(e.scrollTop, e.zoomX);
+                verticalGuides.scrollGuides(e.scrollLeft, e.zoomY);
+            }
+            setScrollPos([e.scrollLeft, e.scrollTop]);
+            setZoom(e.zoomX);
         }}
         onPinch={e => {
             if (moveableRef.current!.isDragging()) {

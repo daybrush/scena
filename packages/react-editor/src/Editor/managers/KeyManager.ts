@@ -18,16 +18,16 @@ export default class KeyManager {
     public disable() {
         this.isEnable = false;
     }
-    public toggleState(keys: string[], state: StoreState<boolean>, callback: (e: any) => any) {
+    public toggleState(keys: string[], state: StoreState<boolean>, callback?: (e: any) => any) {
         const root = this._root;
 
         this.keydown(keys, e => {
-            callback(e);
+            callback?.(e);
             root.set(state, true);
         }, `key toggle down`);
 
         this.keyup(keys, e => {
-            callback(e);
+            callback?.(e);
             root.set(state, false);
         }, `key toggle up`);
     }

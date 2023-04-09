@@ -12,7 +12,7 @@ import { useAction } from "../../hooks/useAction";
 
 const AppearanceTabElement = styled("div", `
 {
-    color: #fff;
+    color: var(--scena-editor-color-text);
     font-size: 12px;
     padding: 0px 5px;
     display: flex;
@@ -35,8 +35,8 @@ const AppearanceTabElement = styled("div", `
     width: 10px;
     height: 10px;
     border-radius: 80% 0 0 0;
-    border-left: 1px solid #fff;
-    border-top: 1px solid #fff;
+    border-left: 1px solid var(--scena-editor-color-text);
+    border-top: 1px solid var(--scena-editor-color-text);
 }
 `);
 
@@ -65,7 +65,7 @@ export default function BorderTab() {
     });
 
     const radiusValues = radius ? radius.split(" ") : [];
-    const length = radiusValues.length;
+    const length = radiusValues.length || 1;
     const [
         leftTop = "0",
         rightTop = leftTop,

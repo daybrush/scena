@@ -1,6 +1,6 @@
 import { getKey } from "keycon";
 import * as React from "react";
-import styled, { StyledElement } from "react-css-styled";
+import { styled, StyledElement } from "react-css-styled";
 
 
 const TextElement = styled("input", `
@@ -32,11 +32,11 @@ export interface TextInstance {
     getElement(): HTMLInputElement;
 }
 export const Text = React.forwardRef<TextInstance, TextProps>((props, ref) => {
-    const styledRef = React.useRef<StyledElement<HTMLInputElement>>(null);
+    const styledRef = React.useRef<HTMLInputElement>(null);
     const prevValueRef = React.useRef<string>("0");
 
     React.useImperativeHandle(ref, () => {
-        const element = styledRef.current!.getElement();
+        const element = styledRef.current!;
         return {
             setValue(value: string) {
                 prevValueRef.current = value;
@@ -55,7 +55,7 @@ export const Text = React.forwardRef<TextInstance, TextProps>((props, ref) => {
     } = props;
 
     React.useEffect(() => {
-        const element = styledRef.current!.getElement();
+        const element = styledRef.current!;
 
         prevValueRef.current = defaultValue as any;
         element.value = defaultValue as any;
@@ -75,7 +75,7 @@ export const Text = React.forwardRef<TextInstance, TextProps>((props, ref) => {
 
             e.stopPropagation();
             if (getKey(e.keyCode) === "enter" && prevValueRef.current !== value) {
-                props.onChangeValue?.(value);
+                onChangeValue?.(value);
             }
         }}
         onBlur={(e: any) => {
@@ -83,7 +83,7 @@ export const Text = React.forwardRef<TextInstance, TextProps>((props, ref) => {
             const value = target.value;
 
             if (prevValueRef.current !== value) {
-                props.onChangeValue?.(value);
+                onChangeValue?.(value);
             }
         }} />;
 });

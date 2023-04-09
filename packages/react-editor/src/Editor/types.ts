@@ -1,12 +1,12 @@
-import { IObject } from "@daybrush/utils";
+
 import * as React from "react";
 import { SceneItem } from "scenejs";
 
 export interface TagAppendInfo {
     tag: any;
-    props: IObject<any>;
+    props: Record<string, any>;
     name: string;
-    frame: IObject<any>;
+    frame: Record<string, any>;
 }
 
 
@@ -27,13 +27,13 @@ export interface SavedScenaData {
     tagName: string;
     innerHTML?: string;
     innerText?: string;
-    attrs: IObject<any>;
-    frame: IObject<any>;
+    attrs: Record<string, any>;
+    frame: Record<string, any>;
     children: SavedScenaData[];
 }
 export interface ScenaProps {
     scenaElementId?: string;
-    scenaAttrs?: IObject<any>;
+    scenaAttrs?: Record<string, any>;
     scenaText?: string;
     scenaHTML?: string;
 }
@@ -51,8 +51,8 @@ export type ScenaJSXType = ScenaJSXElement | string | ScenaComponent;
 
 
 export interface FrameInfo {
-    frame: IObject<any>;
-    order: IObject<any>;
+    frame: Record<string, any>;
+    order: Record<string, any>;
 }
 
 export type ScenaTargetGroupsType

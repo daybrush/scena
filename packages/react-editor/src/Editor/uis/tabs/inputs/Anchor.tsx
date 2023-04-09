@@ -21,7 +21,7 @@ const AnchorElement = styled("div", `
     position: relative;
     width: 30px;
     height: 30px;
-    background: var(--scena-editor-color-back1);
+    background: var(--scena-editor-color-background-bold);
 }
 .scena-anchor-control {
     position: absolute;
@@ -32,12 +32,13 @@ const AnchorElement = styled("div", `
     top: 50%;
     padding: 1px;
     box-sizing: border-box;
+    cursor: pointer;
 }
 .scena-anchor-control:before {
     content: "";
     position: relative;
     display: block;
-    background: var(--scena-editor-color-back5);
+    background: var(--scena-editor-color-text-unlit);
     width: 100%;
     height: 100%;
 }
@@ -45,7 +46,7 @@ const AnchorElement = styled("div", `
     padding: 0px;
 }
 .scena-anchor-control.scena-anchor-selected:before {
-    background: white;
+    background: var(--scena-editor-color-text);
 }
 .scena-anchor-control.scena-anchor-n {
     top: 0;

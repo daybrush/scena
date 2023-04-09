@@ -24,11 +24,11 @@ export interface MenuItem {
 const MenuListElement = styled("div", `
 {
     position: fixed;
-    z-index: 1;
+    z-index: 12;
     transform: translateZ(10px);
     padding: 5px 0px;
-    background: #333;
-    color: #fff;
+    background: var(--scena-editor-color-background-tool);
+    color: var(--scena-editor-color-text);
     left: 0;
 }
 .scena-menu-item {
@@ -36,14 +36,17 @@ const MenuListElement = styled("div", `
     padding: 5px 10px;
     display: flex;
 
-    background: #333;
+    background: var(--scena-editor-color-background-tool);
     transition: background ease 0.2s;
     font-size: 13px;
     font-weight: bold;
     align-items: center;
 }
 .scena-menu-item:hover {
-    background: #4af;
+    background: var(--scena-editor-color-selected);
+    --scena-editor-color-icon: var(--scena-editor-color-text-selected);
+    --scena-editor-color-text: var(--scena-editor-color-text-selected);
+    color: var(--scena-editor-color-text);
 }
 .scena-menu-item-icon {
     width: 24px;
@@ -61,8 +64,8 @@ const MenuListElement = styled("div", `
 }
 
 .scena-menu-item-icon svg * {
-    fill: #fff;
-    stroke: #fff;
+    fill: var(--scena-editor-color-text);
+    stroke: var(--scena-editor-color-text);
 }
 
 .scena-menu-item-text {

@@ -7,8 +7,8 @@ import { $actionManager, $editor } from "../stores/stores";
 
 const ColorPickerElement = styled("div", `
 {
-    position: fixed;
-    right: var(--scena-editor-size-tabs);
+    position: absolute;
+    right: 100%;
     z-index: 10;
     transform: translateZ(100px);
     user-select: none;
@@ -19,12 +19,12 @@ export default function ColorPickerPortal() {
     const editorRef = useStoreStateValue($editor);
     const actionManager = useStoreStateValue($actionManager);
     const elementRef = React.useRef<StyledElement<HTMLDivElement>>(null);
-    const [portal, setPortal] = React.useState<HTMLDivElement>();
+    // const [portal, setPortal] = React.useState<HTMLDivElement>();
     const [color, setColor] = React.useState<string | RGBColor>("#ffffff");
     const [id, setId] = React.useState("");
 
     React.useEffect(() => {
-        setPortal(editorRef.current!.editorElementRef.current!);
+        // setPortal(editorRef.current!.editorElementRef.current!);
 
         const onClick = (e: any) => {
             if (e.__STOP__COLOR_PICKER) {
@@ -66,28 +66,28 @@ export default function ColorPickerPortal() {
             actionManager.off("request.color.picker.change");
         };
     }, []);
-    return portal ? createPortal(
-        <ColorPickerElement ref={elementRef} onClick={(e: any) => {
-            const event = e.nativeEvent || e;
+    return <ColorPickerElement ref={elementRef} onClick={(e: any) => {
+        const event = e.nativeEvent || e;
 
-            event.__STOP__COLOR_PICKER = true;
-        }} style={{
-            display: "none",
-        }}>
-            <ChromePicker
-                color={color}
-                onChange={e => {
-                    setColor(e.rgb);
-                }}
-                onChangeComplete={e => {
-                    const rgb = e.rgb;
-                    actionManager.act("request.color.picker.change", {
-                        id,
-                        color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${rgb.a ?? 1})`,
-                    });
-                }}
-            />
-        </ColorPickerElement>,
-        portal,
-    ) : null;
+        event.__STOP__COLOR_PICKER = true;
+    }} style={{
+        display: "none",
+    }}>
+        <ChromePicker
+            color={color}
+            onChange={e => {
+                setColor(e.rgb);
+            }}
+            onChangeComplete={e => {
+                const isTransparent = !color || color === "transparent";
+                const rgb = e.rgb;
+
+                console.log(isTransparent, color, rgb);
+                actionManager.act("request.color.picker.change", {
+                    id,
+                    color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${isTransparent ? 1 : (rgb.a ?? 1)})`,
+                });
+            }}
+        />
+    </ColorPickerElement>;
 }

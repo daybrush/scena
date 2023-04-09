@@ -12,11 +12,11 @@ import {
 } from "../../stores/stores";
 import { Frame, rgbaToHexa, rgbaToHexWithOpacity } from "scenejs";
 import { useAction } from "../../hooks/useAction";
-import { hexToRGBA } from "@daybrush/utils";
+import { COLOR_MODELS, hexToRGBA, stringToRGBA } from "@daybrush/utils";
 
 const ColorTabElement = styled("div", `
 {
-    color: #fff;
+    color: var(--scena-editor-color-text);
     font-size: 12px;
     padding: 0px 5px;
     display: flex;
@@ -127,6 +127,34 @@ export default function ColorTab(props: ColorTabProps) {
         });
     }
 
+    function setColor(color: string) {
+        const selectedLayers = selectedLayersStore.value;
+
+        if (!selectedLayers.length) {
+            return;
+        }
+        if (!property) {
+            props.onChnage?.(color);
+            return;
+        }
+        historyManager.addHistory("render", {
+            infos: selectedLayers.map(layer => {
+                const frame = layerManager.getFrame(layer);
+                const prev = frame.toCSSObject();
+
+                frame.set(props.id, color);
+                layer.ref.current!.style.cssText += frame.toCSSText();
+                return {
+                    layer,
+                    prev,
+                    next: frame.toCSSObject(),
+                };
+            }),
+        });
+
+        actionManager.act("render.end");
+    }
+
     React.useEffect(() => {
         actionManager.act("request.color.picker.refresh", {
             id: props.id,
@@ -134,38 +162,12 @@ export default function ColorTab(props: ColorTabProps) {
         });
     }, [color]);
 
-
     React.useEffect(() => {
         const onChange = (e: any) => {
             if (e.id !== props.id) {
                 return;
             }
-            const selectedLayers = selectedLayersStore.value;
-            const color = e.color;
-
-            if (!selectedLayers.length) {
-                return;
-            }
-            if (!property) {
-                props.onChnage?.(color);
-                return;
-            }
-            historyManager.addHistory("render", {
-                infos: selectedLayers.map(layer => {
-                    const frame = layerManager.getFrame(layer);
-                    const prev = frame.toCSSObject();
-
-                    frame.set(props.id, e.color);
-                    layer.ref.current!.style.cssText += frame.toCSSText();
-                    return {
-                        layer,
-                        prev,
-                        next: frame.toCSSObject(),
-                    };
-                }),
-            });
-
-            actionManager.act("render.end");
+            setColor(e.color);
         };
         actionManager.on("request.color.picker.change", onChange);
 
@@ -196,10 +198,19 @@ export default function ColorTab(props: ColorTabProps) {
             }}></div>
         </div>
         <div className={prefix("tab-grid", "tab-grid-hex")}>
-            <Text defaultValue={hex || "transparent"} />
+            <Text defaultValue={hex || "transparent"} onChangeValue={value => {
+                const rgba = stringToRGBA(color);
+                const nextRGBA = stringToRGBA(value);
+
+                setColor(`rgba(${nextRGBA[0]}, ${nextRGBA[1]}, ${nextRGBA[2]}, ${rgba[3]})`);
+            }} />
         </div>
         <div className={prefix("tab-grid", "tab-grid-opacity")}>
-            <Text defaultValue={opacity * 100} type="number" />
+            <Text defaultValue={opacity * 100} type="number" onChangeValue={value => {
+                const rgba = stringToRGBA(color);
+
+                setColor(`rgba(${rgba[0]}, ${rgba[1]}, ${rgba[2]}, ${parseFloat(value) / 100})`);
+            }} />
         </div>
 
     </ColorTabElement>;

@@ -19,7 +19,8 @@ import { Histories } from "../managers/histories/histories";
 import { compute } from "@scena/react-store";
 
 
-
+export const $showGuides = atom<boolean>(true);
+export const $darkMode = atom<boolean>(true);
 
 
 export const $layerManager = atom<LayerManager | null>(null);
@@ -39,6 +40,7 @@ export const $selectedFlattenLayers = compute(({ get }) => {
     return layerManager.toFlatten(selectedLayers);
 });
 export const $layers = atom<ScenaElementLayer[]>([]);
+export const $scrollPos = atom<number[]>([0, 0]);
 export const $zoom = atom<number>(1);
 export const $groupOrigin = atom<string>("50% 50%");
 export const $selectedTool = atom<string>("pointer");

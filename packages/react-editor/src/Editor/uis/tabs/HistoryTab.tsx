@@ -4,8 +4,10 @@ import { $historyManager } from "../../stores/stores";
 import { prefix } from "../../utils/utils";
 import styled from "react-css-styled";
 import { useAction } from "../../hooks/useAction";
+import { FOLDER_DEFAULT_STYLE } from "./FolderStyls";
 
 const HistoryElement = styled("div", `
+${FOLDER_DEFAULT_STYLE}
 {
     max-height: 100px;
     overflow: auto;
@@ -17,21 +19,13 @@ const HistoryElement = styled("div", `
     line-height: 30px;
     width: 100%;
     font-size: 12px;
-    color: #fff;
     padding: 0px 10px;
 }
-.scena-tab-history-selected {
-    background: var(--scena-editor-color-selected2);
+.scena-folder-file {
+    color: var(--scena-editor-color-text);
 }
-.scena-tab-history:not(.scena-tab-history-selected):hover:before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    border: 1px solid var(--scena-editor-color-selected2);
-    box-sizing: border-box;
+.scena-folder-selected {
+    background: var(--scena-editor-color-folder-selected);
 }
 `);
 
@@ -49,7 +43,7 @@ export default function HistoryTab() {
 
     return <HistoryElement>
         <div
-            className={prefix("tab-history", !currentHistory ? "tab-history-selected" : "")}
+            className={prefix("tab-history", "folder-file", !currentHistory ? "folder-selected" : "")}
         >Initial History</div>
         {[
             ...historyManager.undoStack,
@@ -57,7 +51,7 @@ export default function HistoryTab() {
         ].map((history, i) => {
             return <div
                 key={i}
-                className={prefix("tab-history", currentHistory === history ? "tab-history-selected" : "")}
+                className={prefix("tab-history", "folder-file", currentHistory === history ? "folder-selected" : "")}
             >
                 {history.description || history.type}
             </div>;

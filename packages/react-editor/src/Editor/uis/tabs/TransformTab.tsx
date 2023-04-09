@@ -11,7 +11,7 @@ import { LinkIcon, UnlinkIcon } from "../icons";
 
 const TransformTabElement = styled("div", `
 {
-    color: #fff;
+    color: var(--scena-editor-color-text);
     font-size: 12px;
 }
 .scena-tab-line {
