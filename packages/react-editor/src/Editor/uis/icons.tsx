@@ -1,12 +1,16 @@
 /* eslint-disable max-len */
 import * as React from "react";
 
-export function DefaultSVG(props: any) {
+export const DefaultSVG = React.forwardRef<SVGSVGElement, Record<string, any>>((props: any, ref) => {
     return <svg
+        ref={ref}
         fill="var(--scena-editor-color-icon)"
         stroke="var(--scena-editor-color-icon)"
         {...props} />;
-}
+});
+
+DefaultSVG.displayName = "DefaultSVG";
+
 export function MoveToolIcon() {
     return <DefaultSVG viewBox="0 0 80 80" fill="none">
         <path
@@ -32,18 +36,17 @@ export function CropIcon() {
     </svg>;
 }
 
-export function ScenaIcon() {
-    return <DefaultSVG width="100%" height="100%" viewBox="0 0 230 230">
-        <g>
-            <path d="M129.097,98.831c-1.034,-3.857 -4.585,-5.422 -7.925,-3.494l-20.522,11.849c-3.34,1.928 -5.213,6.625 -4.179,10.482l3.745,13.977c1.033,3.857 4.584,5.423 7.924,3.494l20.522,-11.848c3.341,-1.928 5.213,-6.626 4.18,-10.483l-3.745,-13.977Z" />
-            <path d="M88.238,146.562l-7.49,-27.954l-21.209,12.299c-6.68,3.857 -8.972,12.412 -5.115,19.092c3.857,6.681 12.412,8.973 19.092,5.116l14.722,-8.553Zm0.435,-24.459c-1.034,-3.857 -4.584,-5.423 -7.925,-3.495l7.49,27.954c3.341,-1.928 5.214,-6.625 4.18,-10.482l-3.745,-13.977Z" />
-            <path d="M141.795,83.417l7.49,27.953l21.208,-12.298c6.681,-3.857 8.973,-12.412 5.116,-19.093c-3.857,-6.68 -12.412,-8.973 -19.092,-5.116l-14.722,8.554Zm-0.435,24.459c1.033,3.857 4.584,5.423 7.925,3.494l-7.49,-27.953c-3.341,1.928 -5.214,6.625 -4.18,10.482l3.745,13.977Z" />
-        </g>
-        <path d="M187.89,121.25c-3.085,-5.344 -9.928,-7.177 -15.271,-4.092l-101.881,58.82c-5.343,3.085 -7.177,9.928 -4.092,15.272c3.085,5.343 9.928,7.177 15.271,4.092l101.881,-58.821c5.343,-3.085 7.177,-9.928 4.092,-15.271Z" />
-        <path d="M163.394,38.821c-3.085,-5.343 -9.928,-7.177 -15.271,-4.092l-101.846,58.801c-5.344,3.085 -7.177,9.928 -4.092,15.271c3.085,5.344 9.928,7.177 15.271,4.092l101.846,-58.8c5.343,-3.085 7.177,-9.928 4.092,-15.272Z" />
+export const ScenaIcon = React.forwardRef<SVGSVGElement, Record<string, any>>((props, ref) => {
+    return <DefaultSVG ref={ref} width="100%" height="100%" viewBox="0 0 256 256" fill="none" stroke="#fff" strokeWidth="5" {...props}>
+        <rect x="32" y="80" width="192" height="96" />
+        <path d="M224,176l-96,-0l-32,48l128,-0l0,-48Z" />
+        <path d="M160,32l-128,0l-0,48l96,0l32,-48Z" />
+        <path d="M88,176l-56,0l0,48l24,-0l32,-48Z" />
+        <path d="M224,32l-24,-0l-32,48l56,0l0,-48Z" />
     </DefaultSVG>;
-}
+});
 
+ScenaIcon.displayName = "ScenaIcon";
 
 export function RectIcon() {
     return <svg viewBox="0 0 73 73">

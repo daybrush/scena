@@ -9,7 +9,7 @@ import Moveable from "react-moveable";
 import Viewport, { ViewportInstnace } from "./editorComponents/Viewport";
 import { prefix, checkInput, getParnetScenaElement, keyChecker, isArrayEquals } from "./utils/utils";
 
-import LayerManager, { createGroup } from "./managers/LayerManager";
+import LayerManager, { createGroup, createLayer } from "./managers/LayerManager";
 import KeyManager from "./managers/KeyManager";
 import HistoryManager from "./managers/HistoryManager";
 import ActionManager from "./managers/ActionManager";
@@ -40,6 +40,7 @@ import { Histories, registerHistoryTypes } from "./managers/histories/histories"
 import { readFiles } from "./managers/FileManager";
 import ColorPickerPortal from "./uis/ColorPickerPortal";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { ScenaIcon } from "./uis/icons";
 
 
 
@@ -172,6 +173,13 @@ export default function EditorManager2() {
                 }),
                 ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
             },
+            createLayer({
+                title: "Scena Icon",
+                jsx: <ScenaIcon stroke="#333" style={{
+                    width: "300px",
+                    height: "300px",
+                }}/>,
+            }),
         ];
         const groups: ScenaElementLayerGroup[] = [
             createGroup({
@@ -326,7 +334,7 @@ export default function EditorManager2() {
         keyManager.toggleState(["alt"], $alt, keyChecker);
 
         // action down
-        keyManager.keydown(["r"], () => {
+        keyManager.keydown(["shift", "r"], () => {
             showGuidesStore.update(!showGuidesStore.value);
         });
         keyManager.actionDown(["left"], "move.left");
@@ -423,26 +431,29 @@ export default function EditorManager2() {
             </Panel>
             <PanelResizeHandle className="scena-resize-handle" />
             <Panel defaultSize={70} className="scena-center">
-                <div className={prefix("reset")} onClick={() => {
-                    infiniteViewerRef.current!.scrollCenter({ duration: 500, absolute: true });
-                }}></div>
-                {showGuides && <GuidesManager ref={horizontalGuidesRef} type="horizontal" />}
-                {showGuides && <GuidesManager ref={verticalGuidesRef} type="vertical" />}
-                <InfiniteViewerManager ref={infiniteViewerRef}>
-                    <Viewport ref={viewportRef} onBlur={onBlur}
-                        style={{
-                            width: `600px`,
-                            height: `800px`,
-                        }}>
-                        <MoveableManager ref={moveableRef} />
-                    </Viewport>
-                </InfiniteViewerManager>
-                <SelectoManager ref={selectoRef} />
+                <div className="scena-canvas">
+                    <div className={prefix("reset")} onClick={() => {
+                        infiniteViewerRef.current!.scrollCenter({ duration: 500, absolute: true });
+                    }}></div>
+                    {showGuides && <GuidesManager ref={horizontalGuidesRef} type="horizontal" />}
+                    {showGuides && <GuidesManager ref={verticalGuidesRef} type="vertical" />}
+                    <InfiniteViewerManager ref={infiniteViewerRef}>
+                        <Viewport ref={viewportRef} onBlur={onBlur}
+                            style={{
+                                width: `600px`,
+                                height: `800px`,
+                            }}>
+                            <MoveableManager ref={moveableRef} />
+                        </Viewport>
+                    </InfiniteViewerManager>
+                    <SelectoManager ref={selectoRef} />
+                </div>
             </Panel>
             <PanelResizeHandle className="scena-resize-handle" />
             <Panel className="scena-panel-right" style={{
                 overflow: "visible",
             }}>
+
                 <Tabs tabs={rightTabs} />
                 <ColorPickerPortal />
             </Panel>

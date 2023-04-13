@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "react-css-styled";
-import { StoreStateType, StoreValue, useStoreState, useStoreStateValue, useStoreValue } from "@scena/react-store";
+import { useStoreState, useStoreValue } from "@scena/react-store";
 import { $darkMode, $pointer, $rect, $selectedTool } from "../stores/stores";
 import { prefix } from "../utils/utils";
 import {
@@ -114,7 +114,7 @@ interface Tool {
     name: string;
     className?: string;
     title?: string;
-    icon: (props: { selected?: boolean }) => JSX.Element;
+    icon: (props: { selected?: boolean }) => JSX.Element | null;
     isExtends?: boolean;
 }
 

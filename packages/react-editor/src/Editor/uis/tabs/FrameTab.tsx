@@ -3,7 +3,7 @@
 import * as React from "react";
 import Folder, { FileProps } from "@scena/react-folder";
 import { useStoreStateValue } from "@scena/react-store";
-import { $editor, $layerManager, $selectedLayers } from "../../stores/stores";
+import { $layerManager, $selectedLayers } from "../../stores/stores";
 import { prefix } from "../../utils/utils";
 import styled from "react-css-styled";
 import { SCENA_LAYER_SEPARATOR } from "../../consts";
@@ -50,14 +50,13 @@ ${FOLDER_DEFAULT_STYLE}
 
 const FrameContext = React.createContext<Frame | null>(null);
 
-function Property({ name, scope, path }: FileProps<string | number>) {
+function Property({ name, path }: FileProps<string | number>) {
     const frame = React.useContext(FrameContext);
-
     const value = frame?.get(...path);
 
     return <div className={prefix("property")}>
         <div className={prefix("property-label")}>{name}</div>
-        {!isObject(value) && <div className={prefix("property-input")}><Text value={value} onChange={e => {
+        {!isObject(value) && <div className={prefix("property-input")}><Text defaultValue={value} onChange={e => {
         }}/></div>}
     </div>;
 }

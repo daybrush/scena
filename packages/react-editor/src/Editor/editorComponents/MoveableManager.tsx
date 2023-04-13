@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as React from "react";
 import Moveable, { ElementGuidelineValueOption, MoveableRefType, SnapDirections } from "react-moveable";
-import { getContentElement, getId } from "../utils/utils";
+import { getContentElement } from "../utils/utils";
 import { DimensionViewable } from "./ables/DimensionViewable";
 import { DeleteButtonViewable } from "./ables/DeleteButtonViewable";
 import { useStoreState, useStoreStateValue, useStoreValue } from "@scena/react-store";
@@ -11,8 +11,7 @@ import {
     $layers, $memoryManager, $selectedTool, $selectedLayers,
     $selecto, $verticalGuidelines, $zoom, $pointer, $groupOrigin,
 } from "../stores/stores";
-import { EditorManagerInstance } from "../EditorManager";
-import { $alt, $meta, $shift } from "../stores/keys";
+import { $alt, $shift } from "../stores/keys";
 
 const SNAP_DIRECTIONS: SnapDirections = {
     top: true, left: true,

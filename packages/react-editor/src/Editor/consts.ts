@@ -95,6 +95,11 @@ export const EDITOR_CSS = `
 .scena-center {
     position: relative;
 }
+.scena-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
 .scena-panel-left, .scena-panel-right {
     position: relative;
     min-width: 250px;

@@ -2736,10 +2736,10 @@
     keycon "^1.4.0"
     react-css-styled "^1.1.2"
 
-"@scena/react-guides@^0.25.0-beta.1":
-  version "0.25.0-beta.1"
-  resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.25.0-beta.1.tgz#4970f15caf9a9d812497e5f53c952bce5b6a77bd"
-  integrity sha512-2XxxL3P+Qctf6x8EmcGM6s1k5RcdO92dHe6dlMYC4GfG3QPMHA3fo0LgKwsXgM15m5V/CUHrsDJe+dt2pXkYaQ==
+"@scena/react-guides@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.npmjs.org/@scena/react-guides/-/react-guides-0.25.0.tgz#7a7c470e5d43e2e9a672adc4de921c09c590a370"
+  integrity sha512-7eFgJ5ZL6cfcwjWf3SKBvKqqZPyUn9Qz+lCXkPEKBG5IqBHpORdgw9WmBiccE9o3uoPU13Rsg1zW4FvnpCoJjg==
   dependencies:
     "@daybrush/utils" "^1.4.0"
     "@scena/dragscroll" "^1.3.0"
@@ -3224,9 +3224,9 @@
     "@types/react" "^17"
 
 "@types/react@*", "@types/react@^16.9.17", "@types/react@^17":
-  version "16.14.38"
-  resolved "https://registry.npmjs.org/@types/react/-/react-16.14.38.tgz#b814d157ca8906603593d5106f6d733af9b79df4"
-  integrity sha512-PbEjuhwkdH6IB5Sak6BFAqpVMHY/wJxa0EG3bKkr0vWA2hSDIq3iEMhHyqjXrDFMqRzkiQkdyNXOnoELrh/9aQ==
+  version "16.14.40"
+  resolved "https://registry.npmjs.org/@types/react/-/react-16.14.40.tgz#cbf1c6249e9a96eb1badc7f32f1055e532e21c72"
+  integrity sha512-elQj2VQHDuJ5xuEcn5Wxh/YQFNbEuPJFRKSdyG866awDm5dmtoqsMmuAJWb/l/qd2kDkZMfOTKygVfMIdBBPKg==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -7597,10 +7597,10 @@ infer-owner@^1.0.4:
   resolved "https://registry.npmjs.org/infer-owner/-/infer-owner-1.0.4.tgz#c4cefcaa8e51051c2a40ba2ce8a3d27295af9467"
   integrity sha512-IClj+Xz94+d7irH5qRyfJonOdfTzuDaifE6ZPWfx0N0+/ATZCbuTPq2prFl526urkQd90WyUKIh1DfBQ2hMz9A==
 
-infinite-viewer@~0.23.0:
-  version "0.23.0"
-  resolved "https://registry.npmjs.org/infinite-viewer/-/infinite-viewer-0.23.0.tgz#5875b0f94b0b6bb20ceed2400810387fdee7ddfb"
-  integrity sha512-TIz6i1upOarlq3x9xeWP0RD1ZBjsX2IyPe+edZB3MLKYqbCoLbJfFI2uw27yU3rs72BA4REwtXMm+9FhRATS4A==
+infinite-viewer@~0.24.0:
+  version "0.24.0"
+  resolved "https://registry.npmjs.org/infinite-viewer/-/infinite-viewer-0.24.0.tgz#6dfd94ec051828206211856763862230cc9b13c1"
+  integrity sha512-E3PgwA6SD5vFeNQnSiQvFTqqPfeoFxoL4OZ7l3hS8Q5Sh7pDEunD/Ciu70Ps+SrfV0jsgaaGGtPIYPpcFa/Yjg==
   dependencies:
     "@daybrush/utils" "^1.9.1"
     "@egjs/agent" "^2.2.1"
@@ -11518,12 +11518,12 @@ react-error-overlay@^6.0.11:
   resolved "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.11.tgz#92835de5841c5cf08ba00ddd2d677b6d17ff9adb"
   integrity sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==
 
-react-infinite-viewer@^0.23.1:
-  version "0.23.1"
-  resolved "https://registry.npmjs.org/react-infinite-viewer/-/react-infinite-viewer-0.23.1.tgz#72267beb026a8dfbcfaff7cd036e70d48e6205f3"
-  integrity sha512-JDqNGMMTZR/0L+c9optMnfz8i9UYrfTAGj6EObZzaz5/5CsD/6rVTGdwwy3+GWsiDaFB7PiGw9iwORecb8g3Fg==
+react-infinite-viewer@^0.24.0:
+  version "0.24.0"
+  resolved "https://registry.npmjs.org/react-infinite-viewer/-/react-infinite-viewer-0.24.0.tgz#d2ee7ff57efba3502a3d3e5853b9ee0dbec632a1"
+  integrity sha512-k2SzxOnDOPG2S1LlqnxDAy9hJtDBhYMT3MIZ6Vy+72g3azir0N1cbw7LBUyczmii4k5MrtOWuxQbVlTJbnCKMg==
   dependencies:
-    infinite-viewer "~0.23.0"
+    infinite-viewer "~0.24.0"
 
 react-is@^16.12.0, react-is@^16.13.1, react-is@^16.8.4:
   version "16.13.1"
@@ -11548,10 +11548,10 @@ react-keycon@^0.3.0:
     "@cfcs/react" "^0.0.6"
     keycon "~1.4.0"
 
-react-moveable@^0.49.0-beta.0:
-  version "0.49.0-beta.0"
-  resolved "https://registry.npmjs.org/react-moveable/-/react-moveable-0.49.0-beta.0.tgz#247ac80d620a5fdff14a3db792f23d5151d0459a"
-  integrity sha512-XoaECfCDQFM5yO3B19Hk3XwF4WTIOwTuJ+TRBiRWXphsFSA35WWrEQSR7NYw2koDOl0yoKpNG9NspCYAMAkVUg==
+react-moveable@^0.49.0:
+  version "0.49.0"
+  resolved "https://registry.npmjs.org/react-moveable/-/react-moveable-0.49.0.tgz#4674c54f1b2f8823e98b38776f4eb5acd558b7f7"
+  integrity sha512-H/d8lhilkgGMPSmySfApX5ZsQwqLdCSoPuW+y2Z/DCNMtS0KXPXrBMR1weWLklWxf3uYQGy7JLwfDv9QF1nU4A==
   dependencies:
     "@daybrush/utils" "^1.11.0"
     "@egjs/agent" "^2.2.1"

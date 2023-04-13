@@ -24,12 +24,12 @@ export function createLayer(
     layerInfo: Partial<ScenaElementLayer> = {},
 ): ScenaElementLayer {
     return {
-        id: layerInfo.id || getNextId(),
         scope: [],
-        item: new SceneItem(),
-        jsx: layerInfo.jsx || <div></div>,
         ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
         ...layerInfo,
+        item: layerInfo.item || new SceneItem(),
+        jsx: layerInfo.jsx || <div></div>,
+        id: layerInfo.id || getNextId(),
         title: layerInfo.title || "",
     };
 }
