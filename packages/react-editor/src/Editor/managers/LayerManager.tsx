@@ -26,6 +26,7 @@ export function createLayer(
     return {
         scope: [],
         ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
+        style: {},
         ...layerInfo,
         item: layerInfo.item || new SceneItem(),
         jsx: layerInfo.jsx || <div></div>,

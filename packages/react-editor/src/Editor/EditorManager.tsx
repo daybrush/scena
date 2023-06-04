@@ -112,73 +112,73 @@ export default function EditorManager2() {
 
     React.useMemo(() => {
         const layers: ScenaElementLayer[] = [
-            {
-                id: "1",
-                title: "",
-                scope: [],
-                jsx: <div style={{
+            createLayer({
+                style: {
                     position: "absolute",
                     border: "1px solid #333",
                     width: "100px",
                     height: "100px",
-                }}></div>,
-                item: new SceneItem(),
-                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-            },
-            {
-                id: "2",
-                title: "",
+                },
+                jsx: <div></div>,
+            }),
+            createLayer({
                 scope: ["g"],
-                jsx: <div style={{
+                style: {
                     position: "absolute",
                     border: "1px solid #f55",
                     top: "100px",
                     left: "100px",
                     width: "100px",
                     height: "100px",
-                }}></div>,
-                item: new SceneItem(),
-                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-            },
-            {
-                id: "3",
-                title: "",
+                },
+                jsx: <div></div>,
+            }),
+            createLayer({
                 scope: ["g"],
-                jsx: <div style={{
+                style: {
                     position: "absolute",
                     border: "1px solid #f55",
                     top: "150px",
                     left: "150px",
                     width: "100px",
                     height: "100px",
-                }}></div>,
-                item: new SceneItem(),
-                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-            },
-            {
-                id: "4",
-                title: "",
-                scope: ["b"],
+                },
                 jsx: <div></div>,
-                item: new SceneItem({
-                    0: {
-                        "border-radius": "10px",
-                        position: "absolute",
-                        border: "1px solid #f55",
-                        top: "150px",
-                        left: "300px",
-                        width: "200px",
-                        height: "200px",
-                    },
-                }),
-                ref: React.createRef<HTMLElement | null>() as React.MutableRefObject<HTMLElement | null>,
-            },
+            }),
+            createLayer({
+                scope: ["b"],
+                style: {
+                    "border-radius": "10px",
+                    position: "absolute",
+                    border: "1px solid #f55",
+                    top: "150px",
+                    left: "300px",
+                    width: "200px",
+                    height: "200px",
+                },
+                jsx: <div></div>,
+            }),
             createLayer({
                 title: "Scena Icon",
                 jsx: <ScenaIcon stroke="#333" style={{
                     width: "300px",
                     height: "300px",
                 }}/>,
+            }),
+            createLayer({
+                title: "Main Title",
+                style: {
+                    border: "2px dashed #4af",
+                    padding: "20px",
+                    display: "inline-block",
+                    fontSize: "30px",
+                    fontWeight: "bold",
+                },
+                jsx: <div>
+                    Everything in the editor,<br />
+                    Tools, Animations, and Viewers,<br />
+                    All with Open Source.<br />
+                </div>,
             }),
         ];
         const groups: ScenaElementLayerGroup[] = [

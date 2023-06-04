@@ -30,6 +30,7 @@ export function ScenaLayerElement(props: ScenaLayerElementProps) {
     React.useEffect(() => {
         const element = layer.ref.current!;
 
+        layer.item.set(0, layer.style);
         element.style.cssText += layerManager.compositeFrame(layer).toCSSText();
     }, [layer.id]);
 

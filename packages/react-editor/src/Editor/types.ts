@@ -66,6 +66,7 @@ export interface ScenaElementLayer {
     jsx: React.ReactElement<any, any>;
     item: SceneItem;
     ref: React.MutableRefObject<SVGElement | HTMLElement | null>;
+    style: Record<string, any>;
 }
 
 export interface ScenaElementLayerGroup {
